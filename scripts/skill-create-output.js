@@ -87,12 +87,16 @@ class SkillCreateOutput {
 
   header() {
     const subtitle = `Extracting patterns from ${chalk.cyan(this.repoName)}`;
+    const frameWidth = 66;
+    const innerWidth = frameWidth - 2;
+    const titleText = '  🔮 ai-code Skill Creator';
+    const subtitleText = `     ${subtitle}`;
 
     console.log('\n');
-    console.log(chalk.bold(chalk.magenta('╔════════════════════════════════════════════════════════════════╗')));
-    console.log(chalk.bold(chalk.magenta('║')) + chalk.bold('  🔮 ECC Skill Creator                                          ') + chalk.bold(chalk.magenta('║')));
-    console.log(chalk.bold(chalk.magenta('║')) + `     ${subtitle}${' '.repeat(Math.max(0, 59 - stripAnsi(subtitle).length))}` + chalk.bold(chalk.magenta('║')));
-    console.log(chalk.bold(chalk.magenta('╚════════════════════════════════════════════════════════════════╝')));
+    console.log(chalk.bold(chalk.magenta(`╔${'═'.repeat(innerWidth)}╗`)));
+    console.log(chalk.bold(chalk.magenta('║')) + chalk.bold(`${titleText}${' '.repeat(Math.max(0, innerWidth - titleText.length))}`) + chalk.bold(chalk.magenta('║')));
+    console.log(chalk.bold(chalk.magenta('║')) + `${subtitleText}${' '.repeat(Math.max(0, innerWidth - stripAnsi(subtitleText).length))}` + chalk.bold(chalk.magenta('║')));
+    console.log(chalk.bold(chalk.magenta(`╚${'═'.repeat(innerWidth)}╝`)));
     console.log('');
   }
 
@@ -167,7 +171,7 @@ ${chalk.yellow('4.')} Evolve into skills: ${chalk.cyan('/evolve')}
 
   footer() {
     console.log(chalk.gray('─'.repeat(60)));
-    console.log(chalk.dim(`  Powered by Everything Claude Code • ecc.tools`));
+    console.log(chalk.dim(`  Powered by ai-code • github.com/Zack-Zz/ai-code`));
     console.log(chalk.dim(`  GitHub App: github.com/apps/skill-creator`));
     console.log('\n');
   }

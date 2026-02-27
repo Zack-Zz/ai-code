@@ -24,7 +24,7 @@ const {
   handleClear
 } = require(path.join(__dirname, '..', '..', 'scripts', 'claw.js'));
 
-// Test helper — matches ECC's custom test pattern
+// Test helper — matches ai-code's custom test pattern
 function test(name, fn) {
   try {
     fn();
@@ -124,7 +124,7 @@ function runTests() {
   })) passed++; else failed++;
 
   if (test('loadECCContext() concatenates multiple skill files', () => {
-    // Use real skills from the ECC repo if they exist
+    // Use real skills from the ai-code repo if they exist
     const skillsDir = path.join(process.cwd(), 'skills');
     if (!fs.existsSync(skillsDir)) {
       console.log('    (skipped — no skills/ directory in CWD)');

@@ -1,4 +1,4 @@
-# Everything Claude Code (ECC) — Codex CLI Reference Configuration
+# ai-code — Codex Reference Configuration (CLI + GUI)
 #
 # Copy this file to ~/.codex/config.toml to apply globally.
 # Or keep it in your project root for project-level config.
@@ -6,7 +6,7 @@
 # Docs: https://github.com/openai/codex
 
 # Model selection
-model = "o4-mini"
+model = "gpt-5.3-codex"
 model_provider = "openai"
 
 # Permissions
@@ -18,14 +18,14 @@ sandbox_mode = "workspace-write"
 
 # Notifications (macOS)
 [notify]
-command = "terminal-notifier -title 'Codex ECC' -message 'Task completed!' -sound default"
+command = "terminal-notifier -title 'Codex ai-code' -message 'Task completed!' -sound default"
 on_complete = true
 
 # History - persistent instructions applied to every session
 [history]
 # These are prepended to every conversation
 persistent_instructions = """
-Follow ECC principles:
+Follow ai-code principles:
 1. Test-Driven Development (TDD) - write tests first, 80%+ coverage required
 2. Immutability - always create new objects, never mutate
 3. Security-First - validate all inputs, no hardcoded secrets
@@ -33,6 +33,9 @@ Follow ECC principles:
 5. File organization: many small files (200-400 lines, 800 max)
 6. Error handling: handle at every level, never swallow errors
 7. Input validation: schema-based validation at system boundaries
+8. If Java is detected: prefer Maven/Gradle native commands and run tests before implementation
+9. If Python is detected: prefer pytest workflow and run tests before implementation
+10. Always report exact commands executed and summarize results
 """
 
 # MCP Servers
@@ -77,4 +80,9 @@ sandbox_mode = "workspace-read"
 
 [profiles.yolo]
 approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+# Java/Python focused profile
+[profiles.java-python]
+approval_policy = "on-request"
 sandbox_mode = "workspace-write"

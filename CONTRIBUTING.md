@@ -1,4 +1,4 @@
-# Contributing to Everything Claude Code
+# Contributing to ai-code
 
 Thanks for wanting to contribute! This repo is a community resource for Claude Code users.
 
@@ -49,8 +49,8 @@ Slash commands that invoke useful workflows:
 
 ```bash
 # 1. Fork and clone
-gh repo fork affaan-m/everything-claude-code --clone
-cd everything-claude-code
+gh repo fork Zack-Zz/ai-code --clone
+cd ai-code
 
 # 2. Create a branch
 git checkout -b feat/my-contribution
@@ -85,7 +85,7 @@ skills/
 ---
 name: your-skill-name
 description: Brief description shown in skill list
-origin: ECC
+origin: ai-code
 ---
 
 # Your Skill Title
@@ -417,7 +417,7 @@ How you tested this.
 
 ## Questions?
 
-- **Issues:** [github.com/affaan-m/everything-claude-code/issues](https://github.com/affaan-m/everything-claude-code/issues)
+- **Issues:** [github.com/affaan-m/ai-code/issues](https://github.com/affaan-m/ai-code/issues)
 - **X/Twitter:** [@affaanmustafa](https://x.com/affaanmustafa)
 
 ---

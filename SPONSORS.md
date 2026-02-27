@@ -1,6 +1,6 @@
 # Sponsors
 
-Thank you to everyone who sponsors this project! Your support keeps the ECC ecosystem growing.
+Thank you to everyone who sponsors this project! Your support keeps the ai-code ecosystem growing.
 
 ## Enterprise Sponsors
 

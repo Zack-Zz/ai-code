@@ -1,10 +1,10 @@
-**Language:** English | [繁體中文](docs/zh-TW/README.md)
+**Language:** [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](docs/zh-TW/README.md) | [日本語](docs/ja-JP/README.md)
 
-# Everything Claude Code
+# ai-code
 
-[![Stars](https://img.shields.io/github/stars/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/stargazers)
-[![Forks](https://img.shields.io/github/forks/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/network/members)
-[![Contributors](https://img.shields.io/github/contributors/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/graphs/contributors)
+[![Stars](https://img.shields.io/github/stars/Zack-Zz/ai-code?style=flat)](https://github.com/Zack-Zz/ai-code/stargazers)
+[![Forks](https://img.shields.io/github/forks/Zack-Zz/ai-code?style=flat)](https://github.com/Zack-Zz/ai-code/network/members)
+[![Contributors](https://img.shields.io/github/contributors/Zack-Zz/ai-code?style=flat)](https://github.com/Zack-Zz/ai-code/graphs/contributors)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Shell](https://img.shields.io/badge/-Shell-4EAA25?logo=gnu-bash&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript&logoColor=white)
@@ -12,10 +12,6 @@
 ![Go](https://img.shields.io/badge/-Go-00ADD8?logo=go&logoColor=white)
 ![Java](https://img.shields.io/badge/-Java-ED8B00?logo=openjdk&logoColor=white)
 ![Markdown](https://img.shields.io/badge/-Markdown-000000?logo=markdown&logoColor=white)
-
-> **50K+ stars** | **6K+ forks** | **30 contributors** | **6 languages supported** | **Anthropic Hackathon Winner**
-
----
 
 <div align="center">
 
@@ -27,135 +23,90 @@
 
 ---
 
-**The complete collection of Claude Code configs from an Anthropic hackathon winner.**
+**A practical multi-assistant configuration toolkit for ChatGPT, Codex, Claude, and other mainstream AI coding tools.**
 
 Production-ready agents, skills, hooks, commands, rules, and MCP configurations evolved over 10+ months of intensive daily use building real products.
 
 ---
 
-## The Guides
+## Project Goal
 
-This repo is the raw code only. The guides explain everything.
+`ai-code` is a fork-oriented toolkit designed for cross-assistant workflows instead of a single-vendor setup.
 
-<table>
-<tr>
-<td width="50%">
-<a href="https://x.com/affaanmustafa/status/2012378465664745795">
-<img src="https://github.com/user-attachments/assets/1a471488-59cc-425b-8345-5245c7efbcef" alt="The Shorthand Guide to Everything Claude Code" />
-</a>
-</td>
-<td width="50%">
-<a href="https://x.com/affaanmustafa/status/2014040193557471352">
-<img src="https://github.com/user-attachments/assets/c9ca43bc-b149-427f-b551-af6840c368f0" alt="The Longform Guide to Everything Claude Code" />
-</a>
-</td>
-</tr>
-<tr>
-<td align="center"><b>Shorthand Guide</b><br/>Setup, foundations, philosophy. <b>Read this first.</b></td>
-<td align="center"><b>Longform Guide</b><br/>Token optimization, memory persistence, evals, parallelization.</td>
-</tr>
-</table>
-
-| Topic | What You'll Learn |
-|-------|-------------------|
-| Token Optimization | Model selection, system prompt slimming, background processes |
-| Memory Persistence | Hooks that save/load context across sessions automatically |
-| Continuous Learning | Auto-extract patterns from sessions into reusable skills |
-| Verification Loops | Checkpoint vs continuous evals, grader types, pass@k metrics |
-| Parallelization | Git worktrees, cascade method, when to scale instances |
-| Subagent Orchestration | The context problem, iterative retrieval pattern |
+- ChatGPT / Codex: project-level `AGENTS.md`, `.codex/config.toml`, `codex.md`
+- Claude Code: plugin/rules/hooks compatible assets
+- Cursor/OpenCode: compatible configs and command sets
+- Java/Python first-class workflows, with support for other stacks
 
 ---
 
-## What's New
+## Usage Overview
 
-### v1.6.0 — Codex CLI, AgentShield & Marketplace (Feb 2026)
+- Choose your assistant stack first: Codex/ChatGPT, Claude Code, or Cursor/OpenCode.
+- Keep project-level instructions in `AGENTS.md`, and add language-specific workflow notes when needed.
+- For Java/Python projects, start from `codex.md` and run tests before implementation.
+- Use only the directories you need (`agents/`, `skills/`, `rules/`, `commands/`) to keep setup minimal.
 
-- **Codex CLI support** — New `/codex-setup` command generates `codex.md` for OpenAI Codex CLI compatibility
-- **7 new skills** — `search-first`, `swift-actor-persistence`, `swift-protocol-di-testing`, `regex-vs-llm-structured-text`, `content-hash-cache-pattern`, `cost-aware-llm-pipeline`, `skill-stocktake`
-- **AgentShield integration** — `/security-scan` skill runs AgentShield directly from Claude Code; 1282 tests, 102 rules
-- **GitHub Marketplace** — ECC Tools GitHub App live at [github.com/marketplace/ecc-tools](https://github.com/marketplace/ecc-tools) with free/pro/enterprise tiers
-- **30+ community PRs merged** — Contributions from 30 contributors across 6 languages
-- **978 internal tests** — Expanded validation suite across agents, skills, commands, hooks, and rules
+### Unified Runtime Config (Codex + Claude)
 
-### v1.4.1 — Bug Fix (Feb 2026)
+For hook/session scripts, you can use one set of environment variables across assistants:
 
-- **Fixed instinct import content loss** — `parse_instinct_file()` was silently dropping all content after frontmatter (Action, Evidence, Examples sections) during `/instinct-import`. Fixed by community contributor @ericcai0814 ([#148](https://github.com/affaan-m/everything-claude-code/issues/148), [#161](https://github.com/affaan-m/everything-claude-code/pull/161))
+```bash
+export AI_CODE_TOOL=codex      # codex | claude
+export AI_CODE_HOME=/path/to/assistant-home
+```
 
-### v1.4.0 — Multi-Language Rules, Installation Wizard & PM2 (Feb 2026)
-
-- **Interactive installation wizard** — New `configure-ecc` skill provides guided setup with merge/overwrite detection
-- **PM2 & multi-agent orchestration** — 6 new commands (`/pm2`, `/multi-plan`, `/multi-execute`, `/multi-backend`, `/multi-frontend`, `/multi-workflow`) for managing complex multi-service workflows
-- **Multi-language rules architecture** — Rules restructured from flat files into `common/` + `typescript/` + `python/` + `golang/` directories. Install only the languages you need
-- **Chinese (zh-CN) translations** — Complete translation of all agents, commands, skills, and rules (80+ files)
-- **GitHub Sponsors support** — Sponsor the project via GitHub Sponsors
-- **Enhanced CONTRIBUTING.md** — Detailed PR templates for each contribution type
-
-### v1.3.0 — OpenCode Plugin Support (Feb 2026)
-
-- **Full OpenCode integration** — 12 agents, 24 commands, 16 skills with hook support via OpenCode's plugin system (20+ event types)
-- **3 native custom tools** — run-tests, check-coverage, security-audit
-- **LLM documentation** — `llms.txt` for comprehensive OpenCode docs
-
-### v1.2.0 — Unified Commands & Skills (Feb 2026)
-
-- **Python/Django support** — Django patterns, security, TDD, and verification skills
-- **Java Spring Boot skills** — Patterns, security, TDD, and verification for Spring Boot
-- **Session management** — `/sessions` command for session history
-- **Continuous learning v2** — Instinct-based learning with confidence scoring, import/export, evolution
-
-See the full changelog in [Releases](https://github.com/affaan-m/everything-claude-code/releases).
+- `AI_CODE_HOME` has highest priority.
+- If `AI_CODE_HOME` is unset and `AI_CODE_TOOL=codex`, default path is `~/.codex`.
+- Otherwise default path is `~/.claude`.
+- Hook scripts also support `--tool` and `--home` flags for one-off runs.
 
 ---
 
 ## 🚀 Quick Start
 
-Get up and running in under 2 minutes:
-
-### Step 1: Install the Plugin
+### One-Command Bootstrap (New Project)
 
 ```bash
-# Add marketplace
-/plugin marketplace add affaan-m/everything-claude-code
-
-# Install plugin
-/plugin install everything-claude-code@everything-claude-code
+scripts/bootstrap-codex-project.sh --target /path/to/your-project --langs java
+scripts/bootstrap-codex-project.sh --target /path/to/your-project --langs java,python,go
+# Optional tool mode: --tool auto|codex|kiro|both
 ```
 
-### Step 2: Install Rules (Required)
-
-> ⚠️ **Important:** Claude Code plugins cannot distribute `rules` automatically. Install them manually:
-
+### Option 1: Codex / ChatGPT Stack (Recommended)
 
 ```bash
-# Clone the repo first
-git clone https://github.com/affaan-m/everything-claude-code.git
-cd everything-claude-code
-
-# Recommended: use the installer (handles common + language rules safely)
-./install.sh typescript    # or python or golang
-# You can pass multiple languages:
-# ./install.sh typescript python golang
-# or target cursor:
-# ./install.sh --target cursor typescript
+git clone https://github.com/Zack-Zz/ai-code.git
+cd ai-code
+cp .codex/config.toml ~/.codex/config.toml
 ```
 
-For manual install instructions see the README in the `rules/` folder.
+Then open the repo in Codex GUI and start with:
+`Read /codex.md and follow the Java/Python workflow defaults.`
 
-### Step 3: Start Using
+### Option 2: Claude Code Stack
 
 ```bash
-# Try a command (plugin install uses namespaced form)
-/everything-claude-code:plan "Add user authentication"
-
-# Manual install (Option 2) uses the shorter form:
-# /plan "Add user authentication"
-
-# Check available commands
-/plugin list everything-claude-code@everything-claude-code
+git clone https://github.com/Zack-Zz/ai-code.git
+cd ai-code
+./install.sh typescript python golang
 ```
 
-✨ **That's it!** You now have access to 13 agents, 48 skills, and 32 commands.
+### Option 3: Cursor / OpenCode Stack
+
+- Cursor: use `.cursor/` with `./install.sh --target cursor ...`
+- OpenCode: run from repo root and load `.opencode/` config
+
+### Option 4: Kiro GUI Stack
+
+```bash
+git clone https://github.com/Zack-Zz/ai-code.git
+cd ai-code
+```
+
+- Open the folder in Kiro.
+- Kiro will load steering files from `.kiro/steering/`.
+- Root `AGENTS.md` is also supported for global repository instructions.
 
 ---
 
@@ -199,7 +150,7 @@ Or use the `/setup-pm` command in Claude Code.
 This repo is a **Claude Code plugin** - install it directly or copy components manually.
 
 ```
-everything-claude-code/
+ai-code/
 |-- .claude-plugin/   # Plugin and marketplace manifests
 |   |-- plugin.json         # Plugin metadata and component paths
 |   |-- marketplace.json    # Marketplace catalog for /plugin marketplace add
@@ -224,14 +175,14 @@ everything-claude-code/
 |   |-- clickhouse-io/              # ClickHouse analytics, queries, data engineering
 |   |-- backend-patterns/           # API, database, caching patterns
 |   |-- frontend-patterns/          # React, Next.js patterns
-|   |-- continuous-learning/        # Auto-extract patterns from sessions (Longform Guide)
+|   |-- continuous-learning/        # Auto-extract patterns from sessions (Usage Guide)
 |   |-- continuous-learning-v2/     # Instinct-based learning with confidence scoring
 |   |-- iterative-retrieval/        # Progressive context refinement for subagents
-|   |-- strategic-compact/          # Manual compaction suggestions (Longform Guide)
+|   |-- strategic-compact/          # Manual compaction suggestions (Usage Guide)
 |   |-- tdd-workflow/               # TDD methodology
 |   |-- security-review/            # Security checklist
-|   |-- eval-harness/               # Verification loop evaluation (Longform Guide)
-|   |-- verification-loop/          # Continuous verification (Longform Guide)
+|   |-- eval-harness/               # Verification loop evaluation (Usage Guide)
+|   |-- verification-loop/          # Continuous verification (Usage Guide)
 |   |-- golang-patterns/            # Go idioms and best practices
 |   |-- golang-testing/             # Go testing patterns, TDD, benchmarks
 |   |-- cpp-coding-standards/         # C++ coding standards from C++ Core Guidelines (NEW)
@@ -246,7 +197,7 @@ everything-claude-code/
 |   |-- springboot-security/        # Spring Boot security (NEW)
 |   |-- springboot-tdd/             # Spring Boot TDD (NEW)
 |   |-- springboot-verification/    # Spring Boot verification (NEW)
-|   |-- configure-ecc/              # Interactive installation wizard (NEW)
+|   |-- configure-ai-code/              # Interactive installation wizard (NEW)
 |   |-- security-scan/              # AgentShield security auditor integration (NEW)
 |   |-- java-coding-standards/     # Java coding standards (NEW)
 |   |-- jpa-patterns/              # JPA/Hibernate patterns (NEW)
@@ -276,10 +227,10 @@ everything-claude-code/
 |   |-- code-review.md      # /code-review - Quality review
 |   |-- build-fix.md        # /build-fix - Fix build errors
 |   |-- refactor-clean.md   # /refactor-clean - Dead code removal
-|   |-- learn.md            # /learn - Extract patterns mid-session (Longform Guide)
+|   |-- learn.md            # /learn - Extract patterns mid-session (Usage Guide)
 |   |-- learn-eval.md       # /learn-eval - Extract, evaluate, and save patterns (NEW)
-|   |-- checkpoint.md       # /checkpoint - Save verification state (Longform Guide)
-|   |-- verify.md           # /verify - Run verification loop (Longform Guide)
+|   |-- checkpoint.md       # /checkpoint - Save verification state (Usage Guide)
+|   |-- verify.md           # /verify - Run verification loop (Usage Guide)
 |   |-- setup-pm.md         # /setup-pm - Configure package manager
 |   |-- go-review.md        # /go-review - Go code review (NEW)
 |   |-- go-test.md          # /go-test - Go TDD workflow (NEW)
@@ -321,8 +272,8 @@ everything-claude-code/
 |-- hooks/            # Trigger-based automations
 |   |-- README.md                 # Hook documentation, recipes, and customization guide
 |   |-- hooks.json                # All hooks config (PreToolUse, PostToolUse, Stop, etc.)
-|   |-- memory-persistence/       # Session lifecycle hooks (Longform Guide)
-|   |-- strategic-compact/        # Compaction suggestions (Longform Guide)
+|   |-- memory-persistence/       # Session lifecycle hooks (Usage Guide)
+|   |-- strategic-compact/        # Compaction suggestions (Usage Guide)
 |
 |-- scripts/          # Cross-platform Node.js scripts (NEW)
 |   |-- lib/                     # Shared utilities
@@ -341,7 +292,7 @@ everything-claude-code/
 |   |-- hooks/                   # Hook tests
 |   |-- run-all.js               # Run all tests
 |
-|-- contexts/         # Dynamic system prompt injection contexts (Longform Guide)
+|-- contexts/         # Dynamic system prompt injection contexts (Usage Guide)
 |   |-- dev.md              # Development mode context
 |   |-- review.md           # Code review mode context
 |   |-- research.md         # Research/exploration mode context
@@ -383,7 +334,7 @@ This analyzes your git history locally and generates SKILL.md files.
 
 For advanced features (10k+ commits, auto-PRs, team sharing):
 
-[Install GitHub App](https://github.com/apps/skill-creator) | [ecc.tools](https://ecc.tools)
+[Install GitHub App](https://github.com/apps/skill-creator) | [github.com/Zack-Zz/ai-code](https://github.com/Zack-Zz/ai-code)
 
 ```bash
 # Comment on any issue:
@@ -399,7 +350,7 @@ Both options create:
 
 ### AgentShield — Security Auditor
 
-> Built at the Claude Code Hackathon (Cerebral Valley x Anthropic, Feb 2026). 1282 tests, 98% coverage, 102 static analysis rules.
+> Security scanning companion tool for Claude Code workflows.
 
 Scan your Claude Code configuration for vulnerabilities, misconfigurations, and injection risks.
 
@@ -465,7 +416,7 @@ Claude Code v2.1+ **automatically loads** `hooks/hooks.json` from any installed 
 Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded file
 ```
 
-**History:** This has caused repeated fix/revert cycles in this repo ([#29](https://github.com/affaan-m/everything-claude-code/issues/29), [#52](https://github.com/affaan-m/everything-claude-code/issues/52), [#103](https://github.com/affaan-m/everything-claude-code/issues/103)). The behavior changed between Claude Code versions, leading to confusion. We now have a regression test to prevent this from being reintroduced.
+**History:** This has caused repeated fix/revert cycles in this repo ([#29](https://github.com/Zack-Zz/ai-code/issues/29), [#52](https://github.com/Zack-Zz/ai-code/issues/52), [#103](https://github.com/Zack-Zz/ai-code/issues/103)). The behavior changed between Claude Code versions, leading to confusion. We now have a regression test to prevent this from being reintroduced.
 
 ---
 
@@ -477,10 +428,10 @@ The easiest way to use this repo - install as a Claude Code plugin:
 
 ```bash
 # Add this repo as a marketplace
-/plugin marketplace add affaan-m/everything-claude-code
+/plugin marketplace add Zack-Zz/ai-code
 
 # Install the plugin
-/plugin install everything-claude-code@everything-claude-code
+/plugin install ai-code@ai-code
 ```
 
 Or add directly to your `~/.claude/settings.json`:
@@ -488,15 +439,15 @@ Or add directly to your `~/.claude/settings.json`:
 ```json
 {
   "extraKnownMarketplaces": {
-    "everything-claude-code": {
+    "ai-code": {
       "source": {
         "source": "github",
-        "repo": "affaan-m/everything-claude-code"
+        "repo": "Zack-Zz/ai-code"
       }
     }
   },
   "enabledPlugins": {
-    "everything-claude-code@everything-claude-code": true
+    "ai-code@ai-code": true
   }
 }
 ```
@@ -507,19 +458,19 @@ This gives you instant access to all commands, agents, skills, and hooks.
 >
 > ```bash
 > # Clone the repo first
-> git clone https://github.com/affaan-m/everything-claude-code.git
+> git clone https://github.com/Zack-Zz/ai-code.git
 >
 > # Option A: User-level rules (applies to all projects)
 > mkdir -p ~/.claude/rules
-> cp -r everything-claude-code/rules/common/* ~/.claude/rules/
-> cp -r everything-claude-code/rules/typescript/* ~/.claude/rules/   # pick your stack
-> cp -r everything-claude-code/rules/python/* ~/.claude/rules/
-> cp -r everything-claude-code/rules/golang/* ~/.claude/rules/
+> cp -r ai-code/rules/common/* ~/.claude/rules/
+> cp -r ai-code/rules/typescript/* ~/.claude/rules/   # pick your stack
+> cp -r ai-code/rules/python/* ~/.claude/rules/
+> cp -r ai-code/rules/golang/* ~/.claude/rules/
 >
 > # Option B: Project-level rules (applies to current project only)
 > mkdir -p .claude/rules
-> cp -r everything-claude-code/rules/common/* .claude/rules/
-> cp -r everything-claude-code/rules/typescript/* .claude/rules/     # pick your stack
+> cp -r ai-code/rules/common/* .claude/rules/
+> cp -r ai-code/rules/typescript/* .claude/rules/     # pick your stack
 > ```
 
 ---
@@ -530,22 +481,22 @@ If you prefer manual control over what's installed:
 
 ```bash
 # Clone the repo
-git clone https://github.com/affaan-m/everything-claude-code.git
+git clone https://github.com/Zack-Zz/ai-code.git
 
 # Copy agents to your Claude config
-cp everything-claude-code/agents/*.md ~/.claude/agents/
+cp ai-code/agents/*.md ~/.claude/agents/
 
 # Copy rules (common + language-specific)
-cp -r everything-claude-code/rules/common/* ~/.claude/rules/
-cp -r everything-claude-code/rules/typescript/* ~/.claude/rules/   # pick your stack
-cp -r everything-claude-code/rules/python/* ~/.claude/rules/
-cp -r everything-claude-code/rules/golang/* ~/.claude/rules/
+cp -r ai-code/rules/common/* ~/.claude/rules/
+cp -r ai-code/rules/typescript/* ~/.claude/rules/   # pick your stack
+cp -r ai-code/rules/python/* ~/.claude/rules/
+cp -r ai-code/rules/golang/* ~/.claude/rules/
 
 # Copy commands
-cp everything-claude-code/commands/*.md ~/.claude/commands/
+cp ai-code/commands/*.md ~/.claude/commands/
 
 # Copy skills
-cp -r everything-claude-code/skills/* ~/.claude/skills/
+cp -r ai-code/skills/* ~/.claude/skills/
 ```
 
 #### Add hooks to settings.json
@@ -627,8 +578,8 @@ Not sure where to start? Use this quick reference:
 
 | I want to... | Use this command | Agent used |
 |--------------|-----------------|------------|
-| Plan a new feature | `/everything-claude-code:plan "Add auth"` | planner |
-| Design system architecture | `/everything-claude-code:plan` + architect agent | architect |
+| Plan a new feature | `/ai-code:plan "Add auth"` | planner |
+| Design system architecture | `/ai-code:plan` + architect agent | architect |
 | Write code with tests first | `/tdd` | tdd-guide |
 | Review code I just wrote | `/code-review` | code-reviewer |
 | Fix a failing build | `/build-fix` | build-error-resolver |
@@ -644,7 +595,7 @@ Not sure where to start? Use this quick reference:
 
 **Starting a new feature:**
 ```
-/everything-claude-code:plan "Add user authentication with OAuth"
+/ai-code:plan "Add user authentication with OAuth"
                                               → planner creates implementation blueprint
 /tdd                                          → tdd-guide enforces write-tests-first
 /code-review                                  → code-reviewer checks your work
@@ -672,7 +623,7 @@ Not sure where to start? Use this quick reference:
 <summary><b>How do I check which agents/commands are installed?</b></summary>
 
 ```bash
-/plugin list everything-claude-code@everything-claude-code
+/plugin list ai-code@ai-code
 ```
 
 This shows all available agents, commands, and skills from the plugin.
@@ -681,7 +632,7 @@ This shows all available agents, commands, and skills from the plugin.
 <details>
 <summary><b>My hooks aren't working / I see "Duplicate hooks file" errors</b></summary>
 
-This is the most common issue. **Do NOT add a `"hooks"` field to `.claude-plugin/plugin.json`.** Claude Code v2.1+ automatically loads `hooks/hooks.json` from installed plugins. Explicitly declaring it causes duplicate detection errors. See [#29](https://github.com/affaan-m/everything-claude-code/issues/29), [#52](https://github.com/affaan-m/everything-claude-code/issues/52), [#103](https://github.com/affaan-m/everything-claude-code/issues/103).
+This is the most common issue. **Do NOT add a `"hooks"` field to `.claude-plugin/plugin.json`.** Claude Code v2.1+ automatically loads `hooks/hooks.json` from installed plugins. Explicitly declaring it causes duplicate detection errors. See [#29](https://github.com/Zack-Zz/ai-code/issues/29), [#52](https://github.com/Zack-Zz/ai-code/issues/52), [#103](https://github.com/Zack-Zz/ai-code/issues/103).
 </details>
 
 <details>
@@ -707,10 +658,10 @@ Yes. Use Option 2 (manual installation) and copy only what you need:
 
 ```bash
 # Just agents
-cp everything-claude-code/agents/*.md ~/.claude/agents/
+cp ai-code/agents/*.md ~/.claude/agents/
 
 # Just rules
-cp -r everything-claude-code/rules/common/* ~/.claude/rules/
+cp -r ai-code/rules/common/* ~/.claude/rules/
 ```
 
 Each component is fully independent.
@@ -719,10 +670,10 @@ Each component is fully independent.
 <details>
 <summary><b>Does this work with Cursor / OpenCode / Codex?</b></summary>
 
-Yes. ECC is cross-platform:
+Yes. ai-code is cross-platform:
 - **Cursor**: Pre-translated configs in `.cursor/`. See [Cursor IDE Support](#cursor-ide-support).
 - **OpenCode**: Full plugin support in `.opencode/`. See [OpenCode Support](#-opencode-support).
-- **Codex**: First-class support with adapter drift guards and SessionStart fallback. See PR [#257](https://github.com/affaan-m/everything-claude-code/pull/257).
+- **Codex**: First-class support with adapter drift guards and SessionStart fallback. See PR [#257](https://github.com/Zack-Zz/ai-code/pull/257).
 - **Claude Code**: Native — this is the primary target.
 </details>
 
@@ -778,7 +729,7 @@ Please contribute! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Cursor IDE Support
 
-ECC provides **full Cursor IDE support** with hooks, rules, agents, skills, commands, and MCP configs adapted for Cursor's native format.
+ai-code provides **full Cursor IDE support** with hooks, rules, agents, skills, commands, and MCP configs adapted for Cursor's native format.
 
 ### Quick Start (Cursor)
 
@@ -830,11 +781,11 @@ alwaysApply: false
 
 ---
 
-## Codex CLI Support
+## Codex Support (CLI + GUI)
 
-ECC provides **first-class Codex CLI support** with a reference configuration, Codex-specific AGENTS.md supplement, and 10 ported skills.
+ai-code provides **first-class Codex support** with a reference configuration, Codex-specific AGENTS.md supplement, and 10 ported skills.
 
-### Quick Start (Codex)
+### Quick Start (Codex CLI)
 
 ```bash
 # Copy the reference config to your home directory
@@ -844,15 +795,29 @@ cp .codex/config.toml ~/.codex/config.toml
 codex
 ```
 
+### Quick Start (Codex GUI, Java/Python)
+
+```bash
+# 1) Configure Codex once
+cp .codex/config.toml ~/.codex/config.toml
+
+# 2) Open this repository in Codex GUI
+# 3) Start your first prompt with:
+#    "Read /codex.md and follow Java/Python workflow defaults."
+```
+
+`codex.md` provides a practical Java/Python-first operating guide for Codex GUI sessions in this repo.
+
 ### What's Included
 
 | Component | Count | Details |
 |-----------|-------|---------|
 | Config | 1 | `.codex/config.toml` — model, permissions, MCP servers, persistent instructions |
 | AGENTS.md | 2 | Root (universal) + `.codex/AGENTS.md` (Codex-specific supplement) |
+| Session Guide | 1 | `codex.md` — Codex GUI startup guide with Java/Python defaults |
 | Skills | 10 | `.agents/skills/` — SKILL.md + agents/openai.yaml per skill |
 | MCP Servers | 4 | GitHub, Context7, Memory, Sequential Thinking (command-based) |
-| Profiles | 2 | `strict` (read-only sandbox) and `yolo` (full auto-approve) |
+| Profiles | 3 | `strict` (read-only), `java-python` (recommended), `yolo` (full auto-approve) |
 
 ### Skills
 
@@ -879,7 +844,7 @@ Codex CLI does **not yet support hooks** ([GitHub Issue #2109](https://github.co
 
 ## 🔌 OpenCode Support
 
-ECC provides **full OpenCode support** including plugins and hooks.
+ai-code provides **full OpenCode support** including plugins and hooks.
 
 ### Quick Start
 
@@ -960,19 +925,19 @@ OpenCode's plugin system is MORE sophisticated than Claude Code with 20+ event t
 
 **Option 1: Use directly**
 ```bash
-cd everything-claude-code
+cd ai-code
 opencode
 ```
 
 **Option 2: Install as npm package**
 ```bash
-npm install ecc-universal
+npm install ai-code-universal
 ```
 
 Then add to your `opencode.json`:
 ```json
 {
-  "plugin": ["ecc-universal"]
+  "plugin": ["ai-code-universal"]
 }
 ```
 
@@ -987,7 +952,7 @@ Then add to your `opencode.json`:
 
 ## Cross-Tool Feature Parity
 
-ECC is the **first plugin to maximize every major AI coding tool**. Here's how each harness compares:
+ai-code is the **first plugin to maximize every major AI coding tool**. Here's how each harness compares:
 
 | Feature | Claude Code | Cursor IDE | Codex CLI | OpenCode |
 |---------|------------|------------|-----------|----------|
@@ -1015,9 +980,8 @@ ECC is the **first plugin to maximize every major AI coding tool**. Here's how e
 
 ## 📖 Background
 
-I've been using Claude Code since the experimental rollout. Won the Anthropic x Forum Ventures hackathon in Sep 2025 building [zenith.chat](https://zenith.chat) with [@DRodriguezFX](https://x.com/DRodriguezFX) - entirely using Claude Code.
-
-These configs are battle-tested across multiple production applications.
+This repository is maintained as a practical, fork-friendly configuration baseline.
+Use it as a starting point and adapt components to your own projects.
 
 ---
 
@@ -1119,26 +1083,10 @@ These configs work for my workflow. You should:
 
 ---
 
-## 💜 Sponsors
-
-This project is free and open source. Sponsors help keep it maintained and growing.
-
-[**Become a Sponsor**](https://github.com/sponsors/affaan-m) | [Sponsor Tiers](SPONSORS.md)
-
----
-
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=affaan-m/everything-claude-code&type=Date)](https://star-history.com/#affaan-m/everything-claude-code&Date)
-
----
-
 ## 🔗 Links
 
-- **Shorthand Guide (Start Here):** [The Shorthand Guide to Everything Claude Code](https://x.com/affaanmustafa/status/2012378465664745795)
-- **Longform Guide (Advanced):** [The Longform Guide to Everything Claude Code](https://x.com/affaanmustafa/status/2014040193557471352)
-- **Follow:** [@affaanmustafa](https://x.com/affaanmustafa)
-- **zenith.chat:** [zenith.chat](https://zenith.chat)
+- **Local Usage Guide:** [docs/USAGE.md](docs/USAGE.md)
+- **Fork Repository:** [Zack-Zz/ai-code](https://github.com/Zack-Zz/ai-code)
 - **Skills Directory:** awesome-agent-skills (community-maintained directory of agent skills)
 
 ---
@@ -1149,4 +1097,4 @@ MIT - Use freely, modify as needed, contribute back if you can.
 
 ---
 
-**Star this repo if it helps. Read both guides. Build something great.**
+**Use what fits your workflow, and keep iterating based on your project needs.**

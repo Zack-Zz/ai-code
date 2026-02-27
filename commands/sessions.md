@@ -1,6 +1,7 @@
 # Sessions Command
 
 Manage Claude Code session history - list, load, alias, and edit sessions stored in `~/.claude/sessions/`.
+This command is part of the Claude compatibility layer.
 
 ## Usage
 

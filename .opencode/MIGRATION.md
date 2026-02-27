@@ -1,6 +1,6 @@
 # Migration Guide: Claude Code to OpenCode
 
-This guide helps you migrate from Claude Code to OpenCode while using the Everything Claude Code (ECC) configuration.
+This guide helps you migrate from Claude Code to OpenCode while using the ai-code configuration.
 
 ## Overview
 
@@ -65,9 +65,9 @@ export const PrettierPlugin = async ({ $ }) => {
 }
 ```
 
-### ECC Plugin Hooks Included
+### ai-code Plugin Hooks Included
 
-The ECC OpenCode configuration includes translated hooks:
+The ai-code OpenCode configuration includes translated hooks:
 
 | Hook | OpenCode Event | Purpose |
 |------|----------------|---------|
@@ -88,7 +88,7 @@ npm install -g opencode
 curl -fsSL https://opencode.ai/install | bash
 ```
 
-### 2. Use the ECC OpenCode Configuration
+### 2. Use the ai-code OpenCode Configuration
 
 The `.opencode/` directory in this repository contains the translated configuration:
 
@@ -96,7 +96,7 @@ The `.opencode/` directory in this repository contains the translated configurat
 .opencode/
 ├── opencode.json              # Main configuration
 ├── plugins/                   # Hook plugins (translated from hooks.json)
-│   ├── ecc-hooks.ts           # All ECC hooks as plugins
+│   ├── ecc-hooks.ts           # All ai-code hooks as plugins (legacy filename)
 │   └── index.ts               # Plugin exports
 ├── tools/                     # Custom tools
 │   ├── run-tests.ts           # Run test suite
@@ -278,20 +278,20 @@ After migration, ALL 23 commands are available:
 
 ## Plugin Installation
 
-### Option 1: Use ECC Configuration Directly
+### Option 1: Use ai-code Configuration Directly
 
 The `.opencode/` directory contains everything pre-configured.
 
 ### Option 2: Install as npm Package
 
 ```bash
-npm install ecc-universal
+npm install ai-code-universal
 ```
 
 Then in your `opencode.json`:
 ```json
 {
-  "plugin": ["ecc-universal"]
+  "plugin": ["ai-code-universal"]
 }
 ```
 
@@ -353,4 +353,4 @@ If you need to switch back:
 
 For issues specific to:
 - **OpenCode CLI**: Report to OpenCode's issue tracker
-- **ECC Configuration**: Report to [github.com/affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)
+- **ai-code Configuration**: Report to [github.com/Zack-Zz/ai-code](https://github.com/Zack-Zz/ai-code)

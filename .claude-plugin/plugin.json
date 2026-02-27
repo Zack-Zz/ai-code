@@ -1,13 +1,13 @@
 {
-  "name": "everything-claude-code",
+  "name": "ai-code",
   "version": "1.4.1",
-  "description": "Complete collection of battle-tested Claude Code configs from an Anthropic hackathon winner - agents, skills, hooks, and rules evolved over 10+ months of intensive daily use",
+  "description": "ai-code plugin: reusable agents, skills, hooks, commands, and rules for multi-assistant workflows",
   "author": {
     "name": "Affaan Mustafa",
     "url": "https://x.com/affaanmustafa"
   },
-  "homepage": "https://github.com/affaan-m/everything-claude-code",
-  "repository": "https://github.com/affaan-m/everything-claude-code",
+  "homepage": "https://github.com/Zack-Zz/ai-code",
+  "repository": "https://github.com/Zack-Zz/ai-code",
   "license": "MIT",
   "keywords": [
     "claude-code",

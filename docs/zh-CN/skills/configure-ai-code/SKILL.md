@@ -1,40 +1,40 @@
 ---
-name: configure-ecc
-description: Everything Claude Code 的交互式安装程序 — 引导用户选择并安装技能和规则到用户级或项目级目录，验证路径，并可选择性地优化已安装的文件。
+name: configure-ai-code
+description: ai-code 的交互式安装程序 — 引导用户选择并安装技能和规则到用户级或项目级目录，验证路径，并可选择性地优化已安装的文件。
 ---
 
-# 配置 Everything Claude Code (ECC)
+# 配置 ai-code (Unified Setup)
 
-一个交互式、分步安装向导，用于 Everything Claude Code 项目。使用 `AskUserQuestion` 引导用户选择性安装技能和规则，然后验证正确性并提供优化。
+一个交互式、分步安装向导，用于 ai-code 项目。使用 `AskUserQuestion` 引导用户选择性安装技能和规则，然后验证正确性并提供优化。
 
 ## 何时激活
 
-* 用户说 "configure ecc"、"install ecc"、"setup everything claude code" 或类似表述
+* 用户说 "configure ai-code"、"install ai-code"、"setup ai-code" 或类似表述
 * 用户想要从此项目中选择性安装技能或规则
-* 用户想要验证或修复现有的 ECC 安装
+* 用户想要验证或修复现有的 ai-code 安装
 * 用户想要为其项目优化已安装的技能或规则
 
 ## 先决条件
 
 此技能必须在激活前对 Claude Code 可访问。有两种引导方式：
 
-1. **通过插件**: `/plugin install everything-claude-code` — 插件会自动加载此技能
-2. **手动**: 仅将此技能复制到 `~/.claude/skills/configure-ecc/SKILL.md`，然后通过说 "configure ecc" 激活
+1. **通过插件**: `/plugin install ai-code@ai-code` — 插件会自动加载此技能
+2. **手动**: 仅将此技能复制到 `~/.claude/skills/configure-ai-code/SKILL.md`，然后通过说 "configure ai-code" 激活
 
 ***
 
-## 步骤 0：克隆 ECC 仓库
+## 步骤 0：克隆 ai-code 仓库
 
-在任何安装之前，将最新的 ECC 源代码克隆到 `/tmp`：
+在任何安装之前，将最新的 ai-code 源代码克隆到 `/tmp`：
 
 ```bash
-rm -rf /tmp/everything-claude-code
-git clone https://github.com/affaan-m/everything-claude-code.git /tmp/everything-claude-code
+rm -rf /tmp/ai-code
+git clone https://github.com/Zack-Zz/ai-code.git /tmp/ai-code
 ```
 
-将 `ECC_ROOT=/tmp/everything-claude-code` 设置为所有后续复制操作的源。
+将 `AI_CODE_ROOT=/tmp/ai-code` 设置为所有后续复制操作的源。
 
-如果克隆失败（网络问题等），使用 `AskUserQuestion` 要求用户提供现有 ECC 克隆的本地路径。
+如果克隆失败（网络问题等），使用 `AskUserQuestion` 要求用户提供现有 ai-code 克隆的本地路径。
 
 ***
 
@@ -43,7 +43,7 @@ git clone https://github.com/affaan-m/everything-claude-code.git /tmp/everything
 使用 `AskUserQuestion` 询问用户安装位置：
 
 ```
-Question: "Where should ECC components be installed?"
+Question: "Where should ai-code components be installed?"
 Options:
   - "User-level (~/.claude/)" — "Applies to all your Claude Code projects"
   - "Project-level (.claude/)" — "Applies only to the current project"
@@ -136,7 +136,7 @@ Options:
 对于每个选定的技能，复制整个技能目录：
 
 ```bash
-cp -r $ECC_ROOT/skills/<skill-name> $TARGET/skills/
+cp -r $AI_CODE_ROOT/skills/<skill-name> $TARGET/skills/
 ```
 
 注意：`continuous-learning` 和 `continuous-learning-v2` 有额外的文件（config.json、钩子、脚本）——确保复制整个目录，而不仅仅是 SKILL.md。
@@ -160,12 +160,12 @@ Options:
 
 ```bash
 # Common rules (flat copy into rules/)
-cp -r $ECC_ROOT/rules/common/* $TARGET/rules/
+cp -r $AI_CODE_ROOT/rules/common/* $TARGET/rules/
 
 # Language-specific rules (flat copy into rules/)
-cp -r $ECC_ROOT/rules/typescript/* $TARGET/rules/   # if selected
-cp -r $ECC_ROOT/rules/python/* $TARGET/rules/        # if selected
-cp -r $ECC_ROOT/rules/golang/* $TARGET/rules/        # if selected
+cp -r $AI_CODE_ROOT/rules/typescript/* $TARGET/rules/   # if selected
+cp -r $AI_CODE_ROOT/rules/python/* $TARGET/rules/        # if selected
+cp -r $AI_CODE_ROOT/rules/golang/* $TARGET/rules/        # if selected
 ```
 
 **重要**：如果用户选择了任何特定语言的规则但**没有**选择通用规则，警告他们：
@@ -256,7 +256,7 @@ Options:
    * 安全要求
 3. 在安装目标处就地编辑规则文件
 
-**关键**：只修改安装目标（`$TARGET/`）中的文件，**绝不**修改源 ECC 仓库（`$ECC_ROOT/`）中的文件。
+**关键**：只修改安装目标（`$TARGET/`）中的文件，**绝不**修改源 ai-code 仓库（`$AI_CODE_ROOT/`）中的文件。
 
 ***
 
@@ -265,13 +265,13 @@ Options:
 从 `/tmp` 清理克隆的仓库：
 
 ```bash
-rm -rf /tmp/everything-claude-code
+rm -rf /tmp/ai-code
 ```
 
 然后打印摘要报告：
 
 ```
-## ECC Installation Complete
+## ai-code Installation Complete
 
 ### Installation Target
 - Level: [user-level / project-level / both]

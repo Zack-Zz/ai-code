@@ -1,7 +1,7 @@
 {
-  "name": "ecc-universal",
+  "name": "ai-code-universal",
   "version": "1.6.0",
-  "description": "Complete collection of battle-tested Claude Code configs — agents, skills, hooks, commands, and rules evolved over 10+ months of intensive daily use by an Anthropic hackathon winner",
+  "description": "Multi-assistant developer toolkit for ChatGPT, Codex, Claude, Kiro, Cursor, and OpenCode",
   "keywords": [
     "claude-code",
     "ai",
@@ -17,6 +17,8 @@
     "security",
     "automation",
     "best-practices",
+    "codex",
+    "codex-gui",
     "cursor",
     "cursor-ide",
     "opencode"
@@ -28,13 +30,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/affaan-m/everything-claude-code.git"
+    "url": "git+https://github.com/Zack-Zz/ai-code.git"
   },
-  "homepage": "https://github.com/affaan-m/everything-claude-code#readme",
+  "homepage": "https://github.com/Zack-Zz/ai-code#readme",
   "bugs": {
-    "url": "https://github.com/affaan-m/everything-claude-code/issues"
+    "url": "https://github.com/Zack-Zz/ai-code/issues"
   },
   "files": [
+    ".codex/",
     ".cursor/",
     ".opencode/commands/",
     ".opencode/instructions/",
@@ -67,14 +70,15 @@
     "skills/",
     ".claude-plugin/plugin.json",
     ".claude-plugin/README.md",
+    "codex.md",
     "install.sh",
     "llms.txt"
   ],
   "bin": {
-    "ecc-install": "install.sh"
+    "ai-code-install": "install.sh"
   },
   "scripts": {
-    "postinstall": "echo '\\n  ecc-universal installed!\\n  Run: npx ecc-install typescript\\n  Docs: https://github.com/affaan-m/everything-claude-code\\n'",
+    "postinstall": "echo '\\n  ai-code-universal installed!\\n  Run: npx ai-code-install typescript\\n  Docs: https://github.com/Zack-Zz/ai-code\\n'",
     "lint": "eslint . && markdownlint '**/*.md' --ignore node_modules",
     "claw": "node scripts/claw.js",
     "test": "node scripts/ci/validate-agents.js && node scripts/ci/validate-commands.js && node scripts/ci/validate-rules.js && node scripts/ci/validate-skills.js && node scripts/ci/validate-hooks.js && node tests/run-all.js"

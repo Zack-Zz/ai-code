@@ -4,7 +4,7 @@
  *
  * Cross-platform (Windows, macOS, Linux)
  *
- * Runs when Claude session ends. Extracts a meaningful summary from
+ * Runs when an assistant session ends. Extracts a meaningful summary from
  * the session transcript (via stdin JSON transcript_path) and saves it
  * to a session file for cross-session continuity.
  */
@@ -102,7 +102,7 @@ function extractSessionSummary(transcriptPath) {
   };
 }
 
-// Read hook input from stdin (Claude Code provides transcript_path via stdin JSON)
+// Read hook input from stdin (assistant provides transcript_path via stdin JSON)
 const MAX_STDIN = 1024 * 1024;
 let stdinData = '';
 process.stdin.setEncoding('utf8');
@@ -132,8 +132,8 @@ async function main() {
     const input = JSON.parse(stdinData);
     transcriptPath = input.transcript_path;
   } catch {
-    // Fallback: try env var for backwards compatibility
-    transcriptPath = process.env.CLAUDE_TRANSCRIPT_PATH;
+    // Fallback env vars for compatibility across assistants
+    transcriptPath = process.env.AI_CODE_TRANSCRIPT_PATH || process.env.CLAUDE_TRANSCRIPT_PATH || process.env.CODEX_TRANSCRIPT_PATH;
   }
 
   const sessionsDir = getSessionsDir();
@@ -232,4 +232,3 @@ function buildSummarySection(summary) {
 
   return section;
 }
-

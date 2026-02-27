@@ -1,15 +1,15 @@
-# ECC for Codex CLI
+# ai-code for Codex (CLI + GUI)
 
-This supplements the root `AGENTS.md` with Codex-specific guidance.
+This supplements the root `AGENTS.md` with Codex-specific guidance for both CLI and Codex GUI.
 
 ## Model Recommendations
 
 | Task Type | Recommended Model |
 |-----------|------------------|
-| Routine coding, tests, formatting | o4-mini |
-| Complex features, architecture | o3 |
-| Debugging, refactoring | o4-mini |
-| Security review | o3 |
+| Routine coding, tests, formatting | gpt-5.3-codex |
+| Complex features, architecture | gpt-5.3-codex |
+| Debugging, refactoring | gpt-5.3-codex |
+| Security review | gpt-5.3-codex |
 
 ## Skills Discovery
 
@@ -29,14 +29,43 @@ Available skills:
 - api-design — REST API design patterns
 - verification-loop — Build, test, lint, typecheck, security
 
+## Java + Python Defaults
+
+When the repository contains Java or Python code, prioritize these workflows:
+
+### Java (Maven / Gradle)
+
+1. Detect build tool from `pom.xml` or `build.gradle*`.
+2. Before implementation, write/update tests first (TDD).
+3. Run:
+   - Maven: `mvn -q test`
+   - Gradle: `./gradlew test`
+4. For build issues:
+   - Maven: `mvn -q -DskipTests compile`
+   - Gradle: `./gradlew compileJava`
+5. Security/dependency checks:
+   - Maven: `mvn -q org.owasp:dependency-check-maven:check` (if plugin available)
+   - Gradle: `./gradlew dependencyCheckAnalyze` (if plugin available)
+
+### Python (pytest)
+
+1. Detect environment from `pyproject.toml`, `requirements*.txt`, or `poetry.lock`.
+2. Before implementation, write/update tests first (TDD).
+3. Run:
+   - `pytest -q`
+   - `ruff check .` (if configured)
+   - `mypy .` (if configured)
+4. Security/dependency checks:
+   - `pip-audit` (if available)
+
 ## MCP Servers
 
 Configure in `~/.codex/config.toml` under `[mcp_servers]`. See `.codex/config.toml` for reference configuration with GitHub, Context7, Memory, and Sequential Thinking servers.
 
 ## Key Differences from Claude Code
 
-| Feature | Claude Code | Codex CLI |
-|---------|------------|-----------|
+| Feature | Claude Code | Codex (CLI/GUI) |
+|---------|------------|------------------|
 | Hooks | 8+ event types | Not yet supported |
 | Context file | CLAUDE.md + AGENTS.md | AGENTS.md only |
 | Skills | Skills loaded via plugin | `.agents/skills/` directory |

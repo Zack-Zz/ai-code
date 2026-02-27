@@ -1,4 +1,4 @@
-# 为 Everything Claude Code 做贡献
+# 为 ai-code 做贡献
 
 感谢您想要贡献！这个仓库是 Claude Code 用户的社区资源。
 
@@ -57,8 +57,8 @@
 
 ```bash
 # 1. Fork and clone
-gh repo fork affaan-m/everything-claude-code --clone
-cd everything-claude-code
+gh repo fork Zack-Zz/ai-code --clone
+cd ai-code
 
 # 2. Create a branch
 git checkout -b feat/my-contribution
@@ -434,7 +434,7 @@ docs: improve contributing guide
 
 ## 有问题吗？
 
-* **问题：** [github.com/affaan-m/everything-claude-code/issues](https://github.com/affaan-m/everything-claude-code/issues)
+* **问题：** [github.com/Zack-Zz/ai-code/issues](https://github.com/Zack-Zz/ai-code/issues)
 * **X/Twitter：** [@affaanmustafa](https://x.com/affaanmustafa)
 
 ***

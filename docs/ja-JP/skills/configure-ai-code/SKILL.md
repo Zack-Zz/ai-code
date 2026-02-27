@@ -1,39 +1,39 @@
 ---
-name: configure-ecc
-description: Everything Claude Code のインタラクティブなインストーラー — スキルとルールの選択とインストールをユーザーレベルまたはプロジェクトレベルのディレクトリへガイドし、パスを検証し、必要に応じてインストールされたファイルを最適化します。
+name: configure-ai-code
+description: ai-code のインタラクティブなインストーラー — スキルとルールの選択とインストールをユーザーレベルまたはプロジェクトレベルのディレクトリへガイドし、パスを検証し、必要に応じてインストールされたファイルを最適化します。
 ---
 
-# Configure Everything Claude Code (ECC)
+# Configure ai-code (Unified Setup)
 
-Everything Claude Code プロジェクトのインタラクティブなステップバイステップのインストールウィザードです。`AskUserQuestion` を使用してスキルとルールの選択的インストールをユーザーにガイドし、正確性を検証し、最適化を提供します。
+ai-code プロジェクトのインタラクティブなステップバイステップのインストールウィザードです。`AskUserQuestion` を使用してスキルとルールの選択的インストールをユーザーにガイドし、正確性を検証し、最適化を提供します。
 
 ## 起動タイミング
 
-- ユーザーが "configure ecc"、"install ecc"、"setup everything claude code" などと言った場合
+- ユーザーが "configure ai-code"、"install ai-code"、"setup ai-code" などと言った場合
 - ユーザーがこのプロジェクトからスキルまたはルールを選択的にインストールしたい場合
-- ユーザーが既存の ECC インストールを検証または修正したい場合
+- ユーザーが既存の ai-code インストールを検証または修正したい場合
 - ユーザーがインストールされたスキルまたはルールをプロジェクト用に最適化したい場合
 
 ## 前提条件
 
 このスキルは起動前に Claude Code からアクセス可能である必要があります。ブートストラップには2つの方法があります：
-1. **プラグイン経由**: `/plugin install everything-claude-code` — プラグインがこのスキルを自動的にロードします
-2. **手動**: このスキルのみを `~/.claude/skills/configure-ecc/SKILL.md` にコピーし、"configure ecc" と言って起動します
+1. **プラグイン経由**: `/plugin install ai-code@ai-code` — プラグインがこのスキルを自動的にロードします
+2. **手動**: このスキルのみを `~/.claude/skills/configure-ai-code/SKILL.md` にコピーし、"configure ai-code" と言って起動します
 
 ---
 
-## ステップ 0: ECC リポジトリのクローン
+## ステップ 0: ai-code リポジトリのクローン
 
-インストールの前に、最新の ECC ソースを `/tmp` にクローンします：
+インストールの前に、最新の ai-code ソースを `/tmp` にクローンします：
 
 ```bash
-rm -rf /tmp/everything-claude-code
-git clone https://github.com/affaan-m/everything-claude-code.git /tmp/everything-claude-code
+rm -rf /tmp/ai-code
+git clone https://github.com/Zack-Zz/ai-code.git /tmp/ai-code
 ```
 
-以降のすべてのコピー操作のソースとして `ECC_ROOT=/tmp/everything-claude-code` を設定します。
+以降のすべてのコピー操作のソースとして `AI_CODE_ROOT=/tmp/ai-code` を設定します。
 
-クローンが失敗した場合（ネットワークの問題など）、`AskUserQuestion` を使用してユーザーに既存の ECC クローンへのローカルパスを提供するよう依頼します。
+クローンが失敗した場合（ネットワークの問題など）、`AskUserQuestion` を使用してユーザーに既存の ai-code クローンへのローカルパスを提供するよう依頼します。
 
 ---
 
@@ -42,7 +42,7 @@ git clone https://github.com/affaan-m/everything-claude-code.git /tmp/everything
 `AskUserQuestion` を使用してユーザーにインストール先を尋ねます：
 
 ```
-Question: "ECC コンポーネントをどこにインストールしますか？"
+Question: "ai-code コンポーネントをどこにインストールしますか？"
 Options:
   - "User-level (~/.claude/)" — "すべての Claude Code プロジェクトに適用されます"
   - "Project-level (.claude/)" — "現在のプロジェクトのみに適用されます"
@@ -132,7 +132,7 @@ Options:
 
 選択された各スキルについて、スキルディレクトリ全体をコピーします：
 ```bash
-cp -r $ECC_ROOT/skills/<skill-name> $TARGET/skills/
+cp -r $AI_CODE_ROOT/skills/<skill-name> $TARGET/skills/
 ```
 
 注: `continuous-learning` と `continuous-learning-v2` には追加ファイル（config.json、フック、スクリプト）があります — SKILL.md だけでなく、ディレクトリ全体がコピーされることを確認してください。
@@ -155,12 +155,12 @@ Options:
 インストールを実行：
 ```bash
 # 共通ルール（rules/ にフラットコピー）
-cp -r $ECC_ROOT/rules/common/* $TARGET/rules/
+cp -r $AI_CODE_ROOT/rules/common/* $TARGET/rules/
 
 # 言語固有のルール（rules/ にフラットコピー）
-cp -r $ECC_ROOT/rules/typescript/* $TARGET/rules/   # 選択された場合
-cp -r $ECC_ROOT/rules/python/* $TARGET/rules/        # 選択された場合
-cp -r $ECC_ROOT/rules/golang/* $TARGET/rules/        # 選択された場合
+cp -r $AI_CODE_ROOT/rules/typescript/* $TARGET/rules/   # 選択された場合
+cp -r $AI_CODE_ROOT/rules/python/* $TARGET/rules/        # 選択された場合
+cp -r $AI_CODE_ROOT/rules/golang/* $TARGET/rules/        # 選択された場合
 ```
 
 **重要**: ユーザーが言語固有のルールを選択したが、共通ルールを選択しなかった場合、警告します：
@@ -243,7 +243,7 @@ Options:
    - セキュリティ要件
 3. インストール先でルールファイルをその場で編集します
 
-**重要**: インストール先（`$TARGET/`）のファイルのみを変更し、ソース ECC リポジトリ（`$ECC_ROOT/`）のファイルは決して変更しないでください。
+**重要**: インストール先（`$TARGET/`）のファイルのみを変更し、ソース ai-code リポジトリ（`$AI_CODE_ROOT/`）のファイルは決して変更しないでください。
 
 ---
 
@@ -252,13 +252,13 @@ Options:
 `/tmp` からクローンされたリポジトリをクリーンアップします：
 
 ```bash
-rm -rf /tmp/everything-claude-code
+rm -rf /tmp/ai-code
 ```
 
 次にサマリーレポートを出力します：
 
 ```
-## ECC インストール完了
+## ai-code インストール完了
 
 ### インストール先
 - レベル: [user-level / project-level / both]

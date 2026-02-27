@@ -112,9 +112,9 @@ Tips:
 
 ---
 
-## Future: configure-ecc Integration
+## Future: configure-ai-code Integration
 
-The `configure-ecc` install wizard could offer to set these environment variables during setup, with explanations of the cost tradeoffs. This would help new users optimize from day one rather than discovering these settings after hitting limits.
+The `configure-ai-code` install wizard could offer to set these environment variables during setup, with explanations of the cost tradeoffs. This would help new users optimize from day one rather than discovering these settings after hitting limits.
 
 ---
 

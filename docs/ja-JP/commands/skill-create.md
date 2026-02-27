@@ -171,4 +171,4 @@ src/
 
 ---
 
-*[Everything Claude Code](https://github.com/affaan-m/everything-claude-code)の一部*
+*[ai-code](https://github.com/Zack-Zz/ai-code)の一部*

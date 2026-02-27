@@ -282,7 +282,7 @@ pytest -n auto
 pytest --lf
 ```
 
-## ECC Workflow
+## ai-code Workflow
 
 ```bash
 # Planning

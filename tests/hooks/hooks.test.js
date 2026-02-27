@@ -10,6 +10,10 @@ const fs = require('fs');
 const os = require('os');
 const { spawn } = require('child_process');
 
+const DEFAULT_TEST_HOME = path.join(os.tmpdir(), `ai-code-test-home-${process.pid}`);
+fs.mkdirSync(path.join(DEFAULT_TEST_HOME, '.claude', 'sessions'), { recursive: true });
+fs.mkdirSync(path.join(DEFAULT_TEST_HOME, '.claude', 'skills', 'learned'), { recursive: true });
+
 // Test helper
 function test(name, fn) {
   try {
@@ -40,7 +44,12 @@ async function asyncTest(name, fn) {
 function runScript(scriptPath, input = '', env = {}) {
   return new Promise((resolve, reject) => {
     const proc = spawn('node', [scriptPath], {
-      env: { ...process.env, ...env },
+      env: {
+        ...process.env,
+        HOME: DEFAULT_TEST_HOME,
+        USERPROFILE: DEFAULT_TEST_HOME,
+        ...env
+      },
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
@@ -240,7 +249,7 @@ async function runTests() {
     // Check if session file was created
     // Note: Without CLAUDE_SESSION_ID, falls back to project name (not 'default')
     // Use local time to match the script's getDateString() function
-    const sessionsDir = path.join(os.homedir(), '.claude', 'sessions');
+    const sessionsDir = path.join(DEFAULT_TEST_HOME, '.claude', 'sessions');
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
@@ -263,7 +272,7 @@ async function runTests() {
 
     // Check if session file was created with session ID
     // Use local time to match the script's getDateString() function
-    const sessionsDir = path.join(os.homedir(), '.claude', 'sessions');
+    const sessionsDir = path.join(DEFAULT_TEST_HOME, '.claude', 'sessions');
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const sessionFile = path.join(sessionsDir, `${today}-${expectedShortId}-session.tmp`);
@@ -286,7 +295,7 @@ async function runTests() {
 
   if (await asyncTest('creates compaction log', async () => {
     await runScript(path.join(scriptsDir, 'pre-compact.js'));
-    const logFile = path.join(os.homedir(), '.claude', 'sessions', 'compaction-log.txt');
+    const logFile = path.join(DEFAULT_TEST_HOME, '.claude', 'sessions', 'compaction-log.txt');
     assert.ok(fs.existsSync(logFile), 'Compaction log should exist');
   })) passed++; else failed++;
 
@@ -1235,7 +1244,7 @@ async function runTests() {
   if (test('plugin.json does NOT have explicit hooks declaration', () => {
     // Claude Code automatically loads hooks/hooks.json by convention.
     // Explicitly declaring it in plugin.json causes a duplicate detection error.
-    // See: https://github.com/affaan-m/everything-claude-code/issues/103
+    // See: https://github.com/Zack-Zz/ai-code/issues/103
     const pluginPath = path.join(__dirname, '..', '..', '.claude-plugin', 'plugin.json');
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf8'));
 
@@ -1301,6 +1310,23 @@ async function runTests() {
     );
     // No valid transcript path from either source → exit 0
     assert.strictEqual(result.code, 0);
+  })) passed++; else failed++;
+
+  if (await asyncTest('session-end falls back to AI_CODE_TRANSCRIPT_PATH env var', async () => {
+    const testDir = createTestDir();
+    const transcriptPath = path.join(testDir, 'env-transcript.jsonl');
+    const lines = [];
+    for (let i = 0; i < 3; i++) lines.push(`{"type":"user","content":"env message ${i}"}`);
+    fs.writeFileSync(transcriptPath, lines.join('\n'));
+
+    const result = await runScript(
+      path.join(scriptsDir, 'session-end.js'),
+      'invalid-json',
+      { AI_CODE_TRANSCRIPT_PATH: transcriptPath }
+    );
+
+    assert.strictEqual(result.code, 0, 'Should exit successfully using AI_CODE_TRANSCRIPT_PATH');
+    cleanupTestDir(testDir);
   })) passed++; else failed++;
 
   // ─── suggest-compact.js tests ───

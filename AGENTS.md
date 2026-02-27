@@ -1,4 +1,4 @@
-# Everything Claude Code (ECC) — Agent Instructions
+# ai-code — Agent Instructions
 
 This is a **production-ready AI coding plugin** providing 13 specialized agents, 50+ skills, 33 commands, and automated hook workflows for software development.
 

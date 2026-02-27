@@ -1,18 +1,18 @@
-# OpenCode ECC Plugin
+# OpenCode ai-code Plugin
 
 > ⚠️ This README is specific to OpenCode usage.  
-> If you installed ECC via npm (e.g. `npm install opencode-ecc`), refer to the root README instead.
+> If you installed ai-code via npm (e.g. `npm install ai-code-universal`), refer to the root README instead.
 
-Everything Claude Code (ECC) plugin for OpenCode - agents, commands, hooks, and skills.
+ai-code plugin for OpenCode - agents, commands, hooks, and skills.
 
 ## Installation
 
 ## Installation Overview
 
-There are two ways to use Everything Claude Code (ECC):
+There are two ways to use ai-code in OpenCode:
 
 1. **npm package (recommended for most users)**  
-   Install via npm/bun/yarn and use the `ecc-install` CLI to set up rules and agents.
+   Install via npm/bun/yarn and use the `ai-code-install` CLI to set up rules and agents.
 
 2. **Direct clone / plugin mode**  
    Clone the repository and run OpenCode directly inside it.
@@ -22,20 +22,20 @@ Choose the method that matches your workflow below.
 ### Option 1: npm Package
 
 ```bash
-npm install ecc-universal
+npm install ai-code-universal
 ```
 
 Add to your `opencode.json`:
 
 ```json
 {
-  "plugin": ["ecc-universal"]
+  "plugin": ["ai-code-universal"]
 }
 ```
-After installation, the `ecc-install` CLI becomes available:
+After installation, the `ai-code-install` CLI becomes available:
 
 ```bash
-npx ecc-install typescript
+npx ai-code-install typescript
 ```
 
 ### Option 2: Direct Use
@@ -43,8 +43,8 @@ npx ecc-install typescript
 Clone and run OpenCode in the repository:
 
 ```bash
-git clone https://github.com/affaan-m/everything-claude-code
-cd everything-claude-code
+git clone https://github.com/Zack-Zz/ai-code
+cd ai-code
 opencode
 ```
 
@@ -130,7 +130,7 @@ OpenCode has 20+ additional events not available in Claude Code.
 
 ## Skills
 
-All 16 ECC skills are available via the `instructions` array:
+All 16 ai-code skills are available via the `instructions` array:
 
 - coding-standards
 - backend-patterns

@@ -71,6 +71,30 @@ function runTests() {
     assert.ok(sessionsDir.includes('sessions'), 'Should contain sessions');
   })) passed++; else failed++;
 
+  if (test('getAssistantTool respects AI_CODE_TOOL=codex', () => {
+    const original = process.env.AI_CODE_TOOL;
+    process.env.AI_CODE_TOOL = 'codex';
+    try {
+      assert.strictEqual(utils.getAssistantTool(), 'codex');
+    } finally {
+      if (original) process.env.AI_CODE_TOOL = original;
+      else delete process.env.AI_CODE_TOOL;
+    }
+  })) passed++; else failed++;
+
+  if (test('getAssistantHome respects AI_CODE_HOME', () => {
+    const originalHome = process.env.AI_CODE_HOME;
+    const testHome = path.join(utils.getTempDir(), `ai-code-home-${Date.now()}`);
+    process.env.AI_CODE_HOME = testHome;
+    try {
+      assert.strictEqual(utils.getAssistantHome(), testHome);
+      assert.strictEqual(utils.getClaudeDir(), testHome);
+    } finally {
+      if (originalHome) process.env.AI_CODE_HOME = originalHome;
+      else delete process.env.AI_CODE_HOME;
+    }
+  })) passed++; else failed++;
+
   if (test('getTempDir returns valid temp directory', () => {
     const tempDir = utils.getTempDir();
     assert.strictEqual(typeof tempDir, 'string');
@@ -151,6 +175,25 @@ function runTests() {
     } finally {
       if (original) process.env.CLAUDE_SESSION_ID = original;
       else delete process.env.CLAUDE_SESSION_ID;
+    }
+  })) passed++; else failed++;
+
+  if (test('getSessionIdShort uses AI_CODE_SESSION_ID first', () => {
+    const originalAi = process.env.AI_CODE_SESSION_ID;
+    const originalClaude = process.env.CLAUDE_SESSION_ID;
+    const originalCodex = process.env.CODEX_SESSION_ID;
+    process.env.AI_CODE_SESSION_ID = 'ai-code-session-99999999';
+    process.env.CLAUDE_SESSION_ID = 'claude-session-11111111';
+    process.env.CODEX_SESSION_ID = 'codex-session-22222222';
+    try {
+      assert.strictEqual(utils.getSessionIdShort(), '99999999');
+    } finally {
+      if (originalAi) process.env.AI_CODE_SESSION_ID = originalAi;
+      else delete process.env.AI_CODE_SESSION_ID;
+      if (originalClaude) process.env.CLAUDE_SESSION_ID = originalClaude;
+      else delete process.env.CLAUDE_SESSION_ID;
+      if (originalCodex) process.env.CODEX_SESSION_ID = originalCodex;
+      else delete process.env.CODEX_SESSION_ID;
     }
   })) passed++; else failed++;
 
@@ -466,7 +509,7 @@ function runTests() {
   console.log('\nisGitRepo():');
 
   if (test('isGitRepo returns true in a git repo', () => {
-    // We're running from within the ECC repo, so this should be true
+    // We're running from within the ai-code repo, so this should be true
     assert.strictEqual(utils.isGitRepo(), true);
   })) passed++; else failed++;
 

@@ -1,5 +1,5 @@
 /**
- * Cross-platform utility functions for Claude Code hooks and scripts
+ * Cross-platform utility functions for ai-code hooks and scripts
  * Works on Windows, macOS, and Linux
  */
 
@@ -20,25 +20,93 @@ function getHomeDir() {
   return os.homedir();
 }
 
+function getArgValue(name) {
+  const prefix = `--${name}=`;
+  for (let i = 0; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+    if (arg === `--${name}`) {
+      const next = process.argv[i + 1];
+      if (next && !next.startsWith('--')) return next;
+      return '';
+    }
+    if (arg.startsWith(prefix)) {
+      return arg.slice(prefix.length);
+    }
+  }
+  return null;
+}
+
+function normalizeTool(tool) {
+  if (!tool || typeof tool !== 'string') return null;
+  const value = tool.trim().toLowerCase();
+  if (value === 'chatgpt') return 'codex';
+  if (value === 'claude' || value === 'codex') return value;
+  return null;
+}
+
 /**
- * Get the Claude config directory
+ * Get active assistant tool from CLI args/env.
+ * Priority:
+ * 1) --tool <claude|codex>
+ * 2) AI_CODE_TOOL env var
+ * 3) fallback ('claude')
+ */
+function getAssistantTool(fallback = 'claude') {
+  const argTool = normalizeTool(getArgValue('tool'));
+  if (argTool) return argTool;
+
+  const envTool = normalizeTool(process.env.AI_CODE_TOOL);
+  if (envTool) return envTool;
+
+  return normalizeTool(fallback) || 'claude';
+}
+
+function expandHomePath(rawPath) {
+  if (!rawPath || typeof rawPath !== 'string') return null;
+  if (rawPath === '~') return getHomeDir();
+  if (rawPath.startsWith('~/') || rawPath.startsWith('~\\')) {
+    return path.join(getHomeDir(), rawPath.slice(2));
+  }
+  return rawPath;
+}
+
+/**
+ * Get assistant config home directory.
+ * Priority:
+ * 1) --home <path>
+ * 2) AI_CODE_HOME env var
+ * 3) tool default (~/.claude or ~/.codex)
+ */
+function getAssistantHome(tool = getAssistantTool()) {
+  const homeArg = expandHomePath(getArgValue('home'));
+  if (homeArg) return path.resolve(homeArg);
+
+  const envHome = expandHomePath(process.env.AI_CODE_HOME);
+  if (envHome) return path.resolve(envHome);
+
+  return path.join(getHomeDir(), tool === 'codex' ? '.codex' : '.claude');
+}
+
+/**
+ * Backward-compatible helper.
+ * Returns the active assistant home directory.
  */
 function getClaudeDir() {
-  return path.join(getHomeDir(), '.claude');
+  return getAssistantHome();
 }
 
 /**
  * Get the sessions directory
  */
 function getSessionsDir() {
-  return path.join(getClaudeDir(), 'sessions');
+  return path.join(getAssistantHome(), 'sessions');
 }
 
 /**
  * Get the learned skills directory
  */
 function getLearnedSkillsDir() {
-  return path.join(getClaudeDir(), 'skills', 'learned');
+  return path.join(getAssistantHome(), 'skills', 'learned');
 }
 
 /**
@@ -108,11 +176,11 @@ function getProjectName() {
 }
 
 /**
- * Get short session ID from CLAUDE_SESSION_ID environment variable
+ * Get short session ID from AI_CODE_SESSION_ID / CLAUDE_SESSION_ID / CODEX_SESSION_ID
  * Returns last 8 characters, falls back to project name then 'default'
  */
 function getSessionIdShort(fallback = 'default') {
-  const sessionId = process.env.CLAUDE_SESSION_ID;
+  const sessionId = process.env.AI_CODE_SESSION_ID || process.env.CLAUDE_SESSION_ID || process.env.CODEX_SESSION_ID;
   if (sessionId && sessionId.length > 0) {
     return sessionId.slice(-8);
   }
@@ -491,6 +559,8 @@ module.exports = {
 
   // Directories
   getHomeDir,
+  getAssistantTool,
+  getAssistantHome,
   getClaudeDir,
   getSessionsDir,
   getLearnedSkillsDir,

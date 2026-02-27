@@ -1,5 +1,5 @@
 /**
- * Cross-platform utility functions for Claude Code hooks and scripts.
+ * Cross-platform utility functions for ai-code hooks and scripts.
  * Works on Windows, macOS, and Linux.
  */
 
@@ -15,7 +15,13 @@ export const isLinux: boolean;
 /** Get the user's home directory (cross-platform) */
 export function getHomeDir(): string;
 
-/** Get the Claude config directory (~/.claude) */
+/** Get active assistant tool ('claude' or 'codex') */
+export function getAssistantTool(fallback?: 'claude' | 'codex'): 'claude' | 'codex';
+
+/** Get active assistant home directory (supports --home / AI_CODE_HOME overrides) */
+export function getAssistantHome(tool?: 'claude' | 'codex'): string;
+
+/** Backward-compatible alias for active assistant home directory */
 export function getClaudeDir(): string;
 
 /** Get the sessions directory (~/.claude/sessions) */
@@ -48,7 +54,7 @@ export function getDateTimeString(): string;
 // --- Session/Project ---
 
 /**
- * Get short session ID from CLAUDE_SESSION_ID environment variable.
+ * Get short session ID from AI_CODE_SESSION_ID / CLAUDE_SESSION_ID / CODEX_SESSION_ID.
  * Returns last 8 characters, falls back to project name then the provided fallback.
  */
 export function getSessionIdShort(fallback?: string): string;

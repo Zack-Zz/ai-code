@@ -1,6 +1,6 @@
-# Everything Claude Code
+# ai-code
 
-[![Stars](https://img.shields.io/github/stars/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/stargazers)
+[![Stars](https://img.shields.io/github/stars/Zack-Zz/ai-code?style=flat)](https://github.com/Zack-Zz/ai-code/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Shell](https://img.shields.io/badge/-Shell-4EAA25?logo=gnu-bash&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript&logoColor=white)
@@ -19,86 +19,105 @@
 
 ---
 
-**来自 Anthropic 黑客马拉松获胜者的完整 Claude Code 配置集合。**
+**面向 ChatGPT、Codex、Claude 等主流 AI 开发助手的多平台实用配置集合。**
 
 生产级代理、技能、钩子、命令、规则和 MCP 配置，经过 10 多个月构建真实产品的密集日常使用而演化。
 
 ---
 
-## 指南
+## 项目定位
 
-这个仓库只包含原始代码。指南解释了一切。
+`ai-code` 是一个面向多助手协同的配置仓库，不只针对 Claude。
 
-<table>
-<tr>
-<td width="50%">
-<a href="https://x.com/affaanmustafa/status/2012378465664745795">
-<img src="https://github.com/user-attachments/assets/1a471488-59cc-425b-8345-5245c7efbcef" alt="The Shorthand Guide to Everything Claude Code" />
-</a>
-</td>
-<td width="50%">
-<a href="https://x.com/affaanmustafa/status/2014040193557471352">
-<img src="https://github.com/user-attachments/assets/c9ca43bc-b149-427f-b551-af6840c368f0" alt="The Longform Guide to Everything Claude Code" />
-</a>
-</td>
-</tr>
-<tr>
-<td align="center"><b>精简指南</b><br/>设置、基础、理念。<b>先读这个。</b></td>
-<td align="center"><b>详细指南</b><br/>Token 优化、内存持久化、评估、并行化。</td>
-</tr>
-</table>
+- ChatGPT/Codex：`AGENTS.md` + `.codex/config.toml` + `codex.md`
+- Claude Code：插件/规则/钩子工作流
+- Cursor/OpenCode：兼容配置和命令体系
+- Java/Python 优先，其他语言可按需扩展
 
-| 主题 | 你将学到什么 |
-|-------|-------------------|
-| Token 优化 | 模型选择、系统提示精简、后台进程 |
-| 内存持久化 | 自动跨会话保存/加载上下文的钩子 |
-| 持续学习 | 从会话中自动提取模式到可重用的技能 |
-| 验证循环 | 检查点 vs 持续评估、评分器类型、pass@k 指标 |
-| 并行化 | Git worktrees、级联方法、何时扩展实例 |
-| 子代理编排 | 上下文问题、迭代检索模式 |
+---
+
+## 使用介绍
+
+- 先选择你要用的助手栈：Codex/ChatGPT、Claude Code，或 Cursor/OpenCode。
+- 在 `AGENTS.md` 维护项目级指令，按语言再补充具体工作流。
+- Java/Python 项目建议从 `codex.md` 启动，并坚持先测后改（TDD）。
+- 按需启用目录（`agents/`、`skills/`、`rules/`、`commands/`），避免一次性全量接入。
+
+### 统一运行时配置（Codex + Claude）
+
+Hook/Session 脚本支持统一环境变量：
+
+```bash
+export AI_CODE_TOOL=codex      # codex | claude
+export AI_CODE_HOME=/path/to/assistant-home
+```
+
+- `AI_CODE_HOME` 优先级最高。
+- 未设置 `AI_CODE_HOME` 且 `AI_CODE_TOOL=codex` 时，默认目录是 `~/.codex`。
+- 其他情况默认目录是 `~/.claude`。
+- 也可对单次执行使用 `--tool`、`--home` 参数。
 
 ---
 
 ## 🚀 快速开始
 
-在 2 分钟内快速上手：
-
-### 第一步：安装插件
+### 方案 1：Codex / ChatGPT（推荐）
 
 ```bash
-# 添加市场
-/plugin marketplace add affaan-m/everything-claude-code
-
-# 安装插件
-/plugin install everything-claude-code@everything-claude-code
+git clone https://github.com/Zack-Zz/ai-code.git
+cd ai-code
+cp .codex/config.toml ~/.codex/config.toml
 ```
 
-### 第二步：安装规则（必需）
+在 Codex GUI 中打开仓库，首条消息建议：
+`请先阅读 /codex.md，并按 Java/Python 工作流执行`
 
-> ⚠️ **重要提示：** Claude Code 插件无法自动分发 `rules`，需要手动安装：
+### 方案 2：Claude Code
 
 ```bash
-# 首先克隆仓库
-git clone https://github.com/affaan-m/everything-claude-code.git
-
-# 复制规则（应用于所有项目）
-cp -r everything-claude-code/rules/* ~/.claude/rules/
+git clone https://github.com/Zack-Zz/ai-code.git
+cd ai-code
+./install.sh typescript python golang
 ```
 
-### 第三步：开始使用
+### 方案 3：Cursor / OpenCode
+
+- Cursor：使用 `.cursor/`，可配合 `./install.sh --target cursor ...`
+- OpenCode：在仓库根目录运行并加载 `.opencode/` 配置
+
+### 方案 4：Kiro GUI
 
 ```bash
-# 尝试一个命令（插件安装使用命名空间形式）
-/everything-claude-code:plan "添加用户认证"
-
-# 手动安装（选项2）使用简短形式：
-# /plan "添加用户认证"
-
-# 查看可用命令
-/plugin list everything-claude-code@everything-claude-code
+git clone https://github.com/Zack-Zz/ai-code.git
+cd ai-code
 ```
 
-✨ **完成！** 你现在可以使用 13 个代理、43 个技能和 31 个命令。
+- 在 Kiro 中打开该目录。
+- Kiro 会自动加载 `.kiro/steering/` 中的规则文件。
+- 仓库根目录 `AGENTS.md` 也可作为全局指令被读取。
+
+---
+
+## Codex GUI 适配（Java / Python）
+
+本仓库已补充 Codex GUI 可直接使用的配置与会话模板，适合以 Java、Python 为主的开发流程。
+
+### 快速开始
+
+```bash
+# 1) 首次配置 Codex
+cp .codex/config.toml ~/.codex/config.toml
+
+# 2) 在 Codex GUI 中打开本仓库
+# 3) 首条消息建议：
+#    "请先阅读 /codex.md，并按 Java/Python 工作流执行"
+```
+
+### 已包含内容
+
+- `.codex/config.toml`：Codex CLI/GUI 通用配置（权限、MCP、持久指令）
+- `.codex/AGENTS.md`：Codex 专用补充指引（含 Java/Python 默认流程）
+- `codex.md`：Codex GUI 会话启动模板（测试优先、安全优先、验证命令）
 
 ---
 
@@ -142,7 +161,7 @@ node scripts/setup-package-manager.js --detect
 这个仓库是一个 **Claude Code 插件** - 直接安装或手动复制组件。
 
 ```
-everything-claude-code/
+ai-code/
 |-- .claude-plugin/   # 插件和市场清单
 |   |-- plugin.json         # 插件元数据和组件路径
 |   |-- marketplace.json    # /plugin marketplace add 的市场目录
@@ -164,14 +183,14 @@ everything-claude-code/
 |   |-- coding-standards/           # 语言最佳实践
 |   |-- backend-patterns/           # API、数据库、缓存模式
 |   |-- frontend-patterns/          # React、Next.js 模式
-|   |-- continuous-learning/        # 从会话中自动提取模式（详细指南）
+|   |-- continuous-learning/        # 从会话中自动提取模式（使用文档）
 |   |-- continuous-learning-v2/     # 基于直觉的学习与置信度评分
 |   |-- iterative-retrieval/        # 子代理的渐进式上下文细化
-|   |-- strategic-compact/          # 手动压缩建议（详细指南）
+|   |-- strategic-compact/          # 手动压缩建议（使用文档）
 |   |-- tdd-workflow/               # TDD 方法论
 |   |-- security-review/            # 安全检查清单
-|   |-- eval-harness/               # 验证循环评估（详细指南）
-|   |-- verification-loop/          # 持续验证（详细指南）
+|   |-- eval-harness/               # 验证循环评估（使用文档）
+|   |-- verification-loop/          # 持续验证（使用文档）
 |   |-- golang-patterns/            # Go 惯用语和最佳实践（新增）
 |   |-- golang-testing/             # Go 测试模式、TDD、基准测试（新增）
 |   |-- cpp-testing/                # C++ 测试模式、GoogleTest、CMake/CTest（新增）
@@ -183,9 +202,9 @@ everything-claude-code/
 |   |-- code-review.md      # /code-review - 质量审查
 |   |-- build-fix.md        # /build-fix - 修复构建错误
 |   |-- refactor-clean.md   # /refactor-clean - 死代码移除
-|   |-- learn.md            # /learn - 会话中提取模式（详细指南）
-|   |-- checkpoint.md       # /checkpoint - 保存验证状态（详细指南）
-|   |-- verify.md           # /verify - 运行验证循环（详细指南）
+|   |-- learn.md            # /learn - 会话中提取模式（使用文档）
+|   |-- checkpoint.md       # /checkpoint - 保存验证状态（使用文档）
+|   |-- verify.md           # /verify - 运行验证循环（使用文档）
 |   |-- setup-pm.md         # /setup-pm - 配置包管理器
 |   |-- go-review.md        # /go-review - Go 代码审查（新增）
 |   |-- go-test.md          # /go-test - Go TDD 工作流（新增）
@@ -206,8 +225,8 @@ everything-claude-code/
 |
 |-- hooks/            # 基于触发器的自动化
 |   |-- hooks.json                # 所有钩子配置（PreToolUse、PostToolUse、Stop 等）
-|   |-- memory-persistence/       # 会话生命周期钩子（详细指南）
-|   |-- strategic-compact/        # 压缩建议（详细指南）
+|   |-- memory-persistence/       # 会话生命周期钩子（使用文档）
+|   |-- strategic-compact/        # 压缩建议（使用文档）
 |
 |-- scripts/          # 跨平台 Node.js 脚本（新增）
 |   |-- lib/                     # 共享工具
@@ -226,7 +245,7 @@ everything-claude-code/
 |   |-- hooks/                   # 钩子测试
 |   |-- run-all.js               # 运行所有测试
 |
-|-- contexts/         # 动态系统提示注入上下文（详细指南）
+|-- contexts/         # 动态系统提示注入上下文（使用文档）
 |   |-- dev.md              # 开发模式上下文
 |   |-- review.md           # 代码审查模式上下文
 |   |-- research.md         # 研究/探索模式上下文
@@ -264,7 +283,7 @@ everything-claude-code/
 
 用于高级功能（10k+ 提交、自动 PR、团队共享）：
 
-[安装 GitHub 应用](https://github.com/apps/skill-creator) | [ecc.tools](https://ecc.tools)
+[安装 GitHub 应用](https://github.com/apps/skill-creator) | [github.com/Zack-Zz/ai-code](https://github.com/Zack-Zz/ai-code)
 
 ```bash
 # 在任何问题上评论：
@@ -301,10 +320,10 @@ everything-claude-code/
 
 ```bash
 # 将此仓库添加为市场
-/plugin marketplace add affaan-m/everything-claude-code
+/plugin marketplace add Zack-Zz/ai-code
 
 # 安装插件
-/plugin install everything-claude-code@everything-claude-code
+/plugin install ai-code@ai-code
 ```
 
 或直接添加到你的 `~/.claude/settings.json`：
@@ -312,15 +331,15 @@ everything-claude-code/
 ```json
 {
   "extraKnownMarketplaces": {
-    "everything-claude-code": {
+    "ai-code": {
       "source": {
         "source": "github",
-        "repo": "affaan-m/everything-claude-code"
+        "repo": "Zack-Zz/ai-code"
       }
     }
   },
   "enabledPlugins": {
-    "everything-claude-code@everything-claude-code": true
+    "ai-code@ai-code": true
   }
 }
 ```
@@ -331,14 +350,14 @@ everything-claude-code/
 >
 > ```bash
 > # 首先克隆仓库
-> git clone https://github.com/affaan-m/everything-claude-code.git
+> git clone https://github.com/Zack-Zz/ai-code.git
 >
 > # 选项 A：用户级规则（应用于所有项目）
-> cp -r everything-claude-code/rules/* ~/.claude/rules/
+> cp -r ai-code/rules/* ~/.claude/rules/
 >
 > # 选项 B：项目级规则（仅应用于当前项目）
 > mkdir -p .claude/rules
-> cp -r everything-claude-code/rules/* .claude/rules/
+> cp -r ai-code/rules/* .claude/rules/
 > ```
 
 ---
@@ -349,19 +368,19 @@ everything-claude-code/
 
 ```bash
 # 克隆仓库
-git clone https://github.com/affaan-m/everything-claude-code.git
+git clone https://github.com/Zack-Zz/ai-code.git
 
 # 将代理复制到你的 Claude 配置
-cp everything-claude-code/agents/*.md ~/.claude/agents/
+cp ai-code/agents/*.md ~/.claude/agents/
 
 # 复制规则
-cp everything-claude-code/rules/*.md ~/.claude/rules/
+cp ai-code/rules/*.md ~/.claude/rules/
 
 # 复制命令
-cp everything-claude-code/commands/*.md ~/.claude/commands/
+cp ai-code/commands/*.md ~/.claude/commands/
 
 # 复制技能
-cp -r everything-claude-code/skills/* ~/.claude/skills/
+cp -r ai-code/skills/* ~/.claude/skills/
 ```
 
 #### 将钩子添加到 settings.json
@@ -474,9 +493,8 @@ node tests/hooks/hooks.test.js
 
 ## 📖 背景
 
-自实验性推出以来，我一直在使用 Claude Code。2025 年 9 月，与 [@DRodriguezFX](https://x.com/DRodriguezFX) 一起使用 Claude Code 构建 [zenith.chat](https://zenith.chat)，赢得了 Anthropic x Forum Ventures 黑客马拉松。
-
-这些配置在多个生产应用中经过了实战测试。
+本仓库作为可二次定制的实用配置基线维护。
+建议按你的项目需求裁剪并持续演进。
 
 ---
 
@@ -503,18 +521,10 @@ node tests/hooks/hooks.test.js
 
 ---
 
-## 🌟 Star 历史
-
-[![Star History Chart](https://api.star-history.com/svg?repos=affaan-m/everything-claude-code&type=Date)](https://star-history.com/#affaan-m/everything-claude-code&Date)
-
----
-
 ## 🔗 链接
 
-- **精简指南（从这里开始）：** [The Shorthand Guide to Everything Claude Code](https://x.com/affaanmustafa/status/2012378465664745795)
-- **详细指南（高级）：** [The Longform Guide to Everything Claude Code](https://x.com/affaanmustafa/status/2014040193557471352)
-- **关注：** [@affaanmustafa](https://x.com/affaanmustafa)
-- **zenith.chat:** [zenith.chat](https://zenith.chat)
+- **本地使用文档：** [docs/USAGE.md](docs/USAGE.md)
+- **Fork 仓库：** [Zack-Zz/ai-code](https://github.com/Zack-Zz/ai-code)
 - **技能目录：** awesome-agent-skills（社区维护的智能体技能目录）
 
 ---
@@ -525,4 +535,4 @@ MIT - 自由使用，根据需要修改，如果可以请回馈。
 
 ---
 
-**如果这个仓库有帮助，请给它一个 Star。阅读两个指南。构建一些很棒的东西。**
+**按你的项目需求取用并持续迭代即可。**

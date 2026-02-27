@@ -11,6 +11,7 @@ const ROOT_DIR = path.join(__dirname, '../..');
 const COMMANDS_DIR = path.join(ROOT_DIR, 'commands');
 const AGENTS_DIR = path.join(ROOT_DIR, 'agents');
 const SKILLS_DIR = path.join(ROOT_DIR, 'skills');
+const DYNAMIC_SKILL_DIR_REFS = new Set(['learned']);
 
 function validateCommands() {
   if (!fs.existsSync(COMMANDS_DIR)) {
@@ -102,6 +103,7 @@ function validateCommands() {
     const skillRefs = contentNoCodeBlocks.matchAll(/skills\/([a-z][-a-z0-9]*)\//g);
     for (const match of skillRefs) {
       const refName = match[1];
+      if (DYNAMIC_SKILL_DIR_REFS.has(refName)) continue;
       if (!validSkills.has(refName)) {
         console.warn(`WARN: ${file} - references skill directory skills/${refName}/ (not found locally)`);
         warnCount++;

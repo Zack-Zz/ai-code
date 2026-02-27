@@ -1,6 +1,7 @@
 # Sessions 命令
 
 管理 Claude Code 会话历史 - 列出、加载、设置别名和编辑存储在 `~/.claude/sessions/` 中的会话。
+该命令属于 Claude 兼容层。
 
 ## 用法
 
