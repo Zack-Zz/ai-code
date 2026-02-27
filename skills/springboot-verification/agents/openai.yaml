@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spring Boot Verification"
+  short_description: "Build, test, and security verification loop for Spring Boot"
+  brand_color: "#F59E0B"
+  default_prompt: "Run Spring Boot verification loop: tests, compile, static checks, and dependency security checks"
+policy:
+  allow_implicit_invocation: true

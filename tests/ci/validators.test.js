@@ -36,6 +36,15 @@ function cleanupTestDir(testDir) {
   fs.rmSync(testDir, { recursive: true, force: true });
 }
 
+function writeSkillMetadata(skillDir) {
+  const agentsDir = path.join(skillDir, 'agents');
+  fs.mkdirSync(agentsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(agentsDir, 'openai.yaml'),
+    'interface:\n  display_name: "Test Skill"\npolicy:\n  allow_implicit_invocation: true\n'
+  );
+}
+
 /**
  * Run a validator script via a wrapper that overrides its directory constant.
  * This allows testing error cases without modifying real project files.
@@ -438,6 +447,7 @@ function runTests() {
     const skillDir = path.join(testDir, 'empty-skill');
     fs.mkdirSync(skillDir);
     fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '');
+    writeSkillMetadata(skillDir);
 
     const result = runValidatorWithDir('validate-skills', 'SKILLS_DIR', testDir);
     assert.strictEqual(result.code, 1, 'Should fail on empty SKILL.md');
@@ -450,6 +460,7 @@ function runTests() {
     const skillDir = path.join(testDir, 'good-skill');
     fs.mkdirSync(skillDir);
     fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# My Skill\nDescription here.');
+    writeSkillMetadata(skillDir);
 
     const result = runValidatorWithDir('validate-skills', 'SKILLS_DIR', testDir);
     assert.strictEqual(result.code, 0, 'Should pass for valid skill');
@@ -463,6 +474,7 @@ function runTests() {
     const skillDir = path.join(testDir, 'real-skill');
     fs.mkdirSync(skillDir);
     fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '# Skill');
+    writeSkillMetadata(skillDir);
 
     const result = runValidatorWithDir('validate-skills', 'SKILLS_DIR', testDir);
     assert.strictEqual(result.code, 0, 'Should ignore non-directory entries');
@@ -475,6 +487,7 @@ function runTests() {
     const skillDir = path.join(testDir, 'blank-skill');
     fs.mkdirSync(skillDir);
     fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '   \n\t\n  ');
+    writeSkillMetadata(skillDir);
 
     const result = runValidatorWithDir('validate-skills', 'SKILLS_DIR', testDir);
     assert.strictEqual(result.code, 1, 'Should reject whitespace-only SKILL.md');
@@ -1344,6 +1357,7 @@ function runTests() {
     const goodSkill = path.join(testDir, 'good-skill');
     fs.mkdirSync(goodSkill);
     fs.writeFileSync(path.join(goodSkill, 'SKILL.md'), '# Good Skill');
+    writeSkillMetadata(goodSkill);
     // Missing SKILL.md
     const badSkill = path.join(testDir, 'bad-skill');
     fs.mkdirSync(badSkill);
@@ -1351,6 +1365,7 @@ function runTests() {
     const emptySkill = path.join(testDir, 'empty-skill');
     fs.mkdirSync(emptySkill);
     fs.writeFileSync(path.join(emptySkill, 'SKILL.md'), '');
+    writeSkillMetadata(emptySkill);
 
     const result = runValidatorWithDir('validate-skills', 'SKILLS_DIR', testDir);
     assert.strictEqual(result.code, 1, 'Should fail when any skill is invalid');
@@ -2131,6 +2146,7 @@ function runTests() {
     fs.mkdirSync(skillDir, { recursive: true });
     // Create SKILL.md with only whitespace (trim to zero length)
     fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '   \n  \n');
+    writeSkillMetadata(skillDir);
 
     const result = runValidatorWithDir('validate-skills', 'SKILLS_DIR', testDir);
     assert.strictEqual(result.code, 1, 'Should reject empty SKILL.md');

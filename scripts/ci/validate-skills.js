@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Validate skill directories have SKILL.md with required structure
+ * Validate skill directories have SKILL.md and Codex metadata.
  */
 
 const fs = require('fs');
@@ -21,12 +21,12 @@ function validateSkills() {
 
   for (const dir of dirs) {
     const skillMd = path.join(SKILLS_DIR, dir, 'SKILL.md');
+    const metadataPath = path.join(SKILLS_DIR, dir, 'agents', 'openai.yaml');
     if (!fs.existsSync(skillMd)) {
       console.error(`ERROR: ${dir}/ - Missing SKILL.md`);
       hasErrors = true;
       continue;
     }
-
     let content;
     try {
       content = fs.readFileSync(skillMd, 'utf-8');
@@ -37,6 +37,24 @@ function validateSkills() {
     }
     if (content.trim().length === 0) {
       console.error(`ERROR: ${dir}/SKILL.md - Empty file`);
+      hasErrors = true;
+      continue;
+    }
+    if (!fs.existsSync(metadataPath)) {
+      console.error(`ERROR: ${dir}/ - Missing agents/openai.yaml`);
+      hasErrors = true;
+      continue;
+    }
+    let metadata;
+    try {
+      metadata = fs.readFileSync(metadataPath, 'utf-8');
+    } catch (err) {
+      console.error(`ERROR: ${dir}/agents/openai.yaml - ${err.message}`);
+      hasErrors = true;
+      continue;
+    }
+    if (metadata.trim().length === 0) {
+      console.error(`ERROR: ${dir}/agents/openai.yaml - Empty file`);
       hasErrors = true;
       continue;
     }

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Database Migrations"
+  short_description: "Database migration best practices for schema changes, data migrations, rollbacks, and zero-downtime deployments across"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Database Migrations guidance for this task"
+policy:
+  allow_implicit_invocation: true

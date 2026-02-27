@@ -1,0 +1,7 @@
+interface:
+  display_name: "Java Coding Standards"
+  short_description: "Java 17+ coding standards for Spring Boot services"
+  brand_color: "#2563EB"
+  default_prompt: "Apply Java coding standards: naming, immutability, Optional usage, exceptions, package layout"
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Swift Concurrency 6 2"
+  short_description: "Swift 6.2 Approachable Concurrency — single-threaded by default, @concurrent for explicit background offloading, isola"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Swift Concurrency 6 2 guidance for this task"
+policy:
+  allow_implicit_invocation: true

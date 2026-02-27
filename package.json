@@ -67,6 +67,7 @@
     "scripts/claw.js",
     "scripts/setup-package-manager.js",
     "scripts/skill-create-output.js",
+    "templates/",
     "skills/",
     ".claude-plugin/plugin.json",
     ".claude-plugin/README.md",

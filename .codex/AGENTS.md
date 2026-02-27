@@ -13,11 +13,11 @@ This supplements the root `AGENTS.md` with Codex-specific guidance for both CLI 
 
 ## Skills Discovery
 
-Skills are auto-loaded from `.agents/skills/`. Each skill contains:
+Skills are sourced from `skills/`. Each skill contains:
 - `SKILL.md` — Detailed instructions and workflow
 - `agents/openai.yaml` — Codex interface metadata
 
-Available skills:
+Core skills:
 - tdd-workflow — Test-driven development with 80%+ coverage
 - security-review — Comprehensive security checklist
 - coding-standards — Universal coding standards
@@ -28,6 +28,8 @@ Available skills:
 - strategic-compact — Context management
 - api-design — REST API design patterns
 - verification-loop — Build, test, lint, typecheck, security
+
+Language- and domain-specific skills are also available under `skills/`.
 
 ## Java + Python Defaults
 
@@ -68,7 +70,7 @@ Configure in `~/.codex/config.toml` under `[mcp_servers]`. See `.codex/config.to
 |---------|------------|------------------|
 | Hooks | 8+ event types | Not yet supported |
 | Context file | CLAUDE.md + AGENTS.md | AGENTS.md only |
-| Skills | Skills loaded via plugin | `.agents/skills/` directory |
+| Skills | Skills loaded via skill metadata | `skills/` directory |
 | Commands | `/slash` commands | Instruction-based |
 | Agents | Subagent Task tool | Single agent model |
 | Security | Hook-based enforcement | Instruction + sandbox |

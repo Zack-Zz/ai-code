@@ -1,0 +1,7 @@
+interface:
+  display_name: "Cpp Testing"
+  short_description: "Use only when writing/updating/fixing C++ tests, configuring GoogleTest/CTest, diagnosing failing or flaky tests, or a"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Cpp Testing guidance for this task"
+policy:
+  allow_implicit_invocation: true

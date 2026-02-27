@@ -61,6 +61,15 @@ export AI_CODE_HOME=/path/to/assistant-home
 
 ## 🚀 快速开始
 
+### 一键 Bootstrap（新项目）
+
+```bash
+scripts/bootstrap-project.sh --target /path/to/your-project --langs java
+scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,go
+# 可选 tool 模式：--tool auto|codex|kiro|claude|both|all
+# both = codex + kiro，all = codex + kiro + claude
+```
+
 ### 方案 1：Codex / ChatGPT（推荐）
 
 ```bash
@@ -78,6 +87,8 @@ cp .codex/config.toml ~/.codex/config.toml
 git clone https://github.com/Zack-Zz/ai-code.git
 cd ai-code
 ./install.sh typescript python golang
+# 或直接对目标项目执行 bootstrap：
+# scripts/bootstrap-project.sh --target /path/to/project --langs java --tool claude
 ```
 
 ### 方案 3：Cursor / OpenCode

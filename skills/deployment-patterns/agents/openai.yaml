@@ -1,0 +1,7 @@
+interface:
+  display_name: "Deployment Patterns"
+  short_description: "Deployment workflows, CI/CD pipeline patterns, Docker containerization, health checks, rollback strategies, and produc"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Deployment Patterns guidance for this task"
+policy:
+  allow_implicit_invocation: true

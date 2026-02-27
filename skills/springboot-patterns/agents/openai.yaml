@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spring Boot Patterns"
+  short_description: "Production architecture and implementation patterns for Spring Boot"
+  brand_color: "#16A34A"
+  default_prompt: "Apply Spring Boot patterns: layering, DTO mapping, transactions, validation boundaries"
+policy:
+  allow_implicit_invocation: true

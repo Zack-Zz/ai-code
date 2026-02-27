@@ -1,0 +1,7 @@
+interface:
+  display_name: "Content Hash Cache Pattern"
+  short_description: "Cache expensive file processing results using SHA-256 content hashes — path-independent, auto-invalidating, with servi"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Content Hash Cache Pattern guidance for this task"
+policy:
+  allow_implicit_invocation: true

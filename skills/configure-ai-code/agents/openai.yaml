@@ -1,0 +1,7 @@
+interface:
+  display_name: "Configure Ai Code"
+  short_description: "Interactive installer for ai-code — guides users through selecting and installing skills and rules to user-level or pr"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Configure Ai Code guidance for this task"
+policy:
+  allow_implicit_invocation: true

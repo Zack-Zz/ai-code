@@ -1,0 +1,7 @@
+interface:
+  display_name: "Security Scan"
+  short_description: "Scan your Claude Code configuration (.claude/ directory) for security vulnerabilities, misconfigurations, and injectio"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Security Scan guidance for this task"
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "JPA Patterns"
+  short_description: "Entity modeling, repository patterns, and query optimization"
+  brand_color: "#0EA5E9"
+  default_prompt: "Apply JPA patterns: entity boundaries, fetch strategy, transactions, and query tuning"
+policy:
+  allow_implicit_invocation: true

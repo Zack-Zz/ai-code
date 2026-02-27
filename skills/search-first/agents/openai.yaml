@@ -1,0 +1,7 @@
+interface:
+  display_name: "Search First"
+  short_description: "Research-before-coding workflow. Search for existing tools, libraries, and patterns before writing custom code. Invoke"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Search First guidance for this task"
+policy:
+  allow_implicit_invocation: true

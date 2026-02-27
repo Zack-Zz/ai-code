@@ -1,0 +1,7 @@
+interface:
+  display_name: "Regex Vs Llm Structured Text"
+  short_description: "Decision framework for choosing between regex and LLM when parsing structured text — start with regex, add LLM only fo"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Regex Vs Llm Structured Text guidance for this task"
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Nutrient Document Processing"
+  short_description: "Process, convert, OCR, extract, redact, sign, and fill documents using the Nutrient DWS API. Works with PDFs, DOCX, XL"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Nutrient Document Processing guidance for this task"
+policy:
+  allow_implicit_invocation: true

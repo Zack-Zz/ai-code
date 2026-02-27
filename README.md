@@ -68,9 +68,10 @@ export AI_CODE_HOME=/path/to/assistant-home
 ### One-Command Bootstrap (New Project)
 
 ```bash
-scripts/bootstrap-codex-project.sh --target /path/to/your-project --langs java
-scripts/bootstrap-codex-project.sh --target /path/to/your-project --langs java,python,go
-# Optional tool mode: --tool auto|codex|kiro|both
+scripts/bootstrap-project.sh --target /path/to/your-project --langs java
+scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,go
+# Optional tool mode: --tool auto|codex|kiro|claude|both|all
+# both = codex + kiro, all = codex + kiro + claude
 ```
 
 ### Option 1: Codex / ChatGPT Stack (Recommended)
@@ -90,6 +91,8 @@ Then open the repo in Codex GUI and start with:
 git clone https://github.com/Zack-Zz/ai-code.git
 cd ai-code
 ./install.sh typescript python golang
+# or bootstrap a target project directly:
+# scripts/bootstrap-project.sh --target /path/to/project --langs java --tool claude
 ```
 
 ### Option 3: Cursor / OpenCode Stack
@@ -783,7 +786,7 @@ alwaysApply: false
 
 ## Codex Support (CLI + GUI)
 
-ai-code provides **first-class Codex support** with a reference configuration, Codex-specific AGENTS.md supplement, and 10 ported skills.
+ai-code provides **first-class Codex support** with a reference configuration, Codex-specific AGENTS.md supplement, and a single-source skills catalog.
 
 ### Quick Start (Codex CLI)
 
@@ -815,13 +818,13 @@ cp .codex/config.toml ~/.codex/config.toml
 | Config | 1 | `.codex/config.toml` — model, permissions, MCP servers, persistent instructions |
 | AGENTS.md | 2 | Root (universal) + `.codex/AGENTS.md` (Codex-specific supplement) |
 | Session Guide | 1 | `codex.md` — Codex GUI startup guide with Java/Python defaults |
-| Skills | 10 | `.agents/skills/` — SKILL.md + agents/openai.yaml per skill |
+| Skills | 50 | `skills/` — SKILL.md + agents/openai.yaml per skill |
 | MCP Servers | 4 | GitHub, Context7, Memory, Sequential Thinking (command-based) |
 | Profiles | 3 | `strict` (read-only), `java-python` (recommended), `yolo` (full auto-approve) |
 
 ### Skills
 
-Skills at `.agents/skills/` are auto-loaded by Codex:
+Skills are maintained in `skills/` and include Codex metadata (`agents/openai.yaml`):
 
 | Skill | Description |
 |-------|-------------|

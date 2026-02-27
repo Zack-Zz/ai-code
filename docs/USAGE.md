@@ -12,17 +12,19 @@ This is the local, concise usage guide for `ai-code`.
 ## 2) Bootstrap a New Project
 
 ```bash
-scripts/bootstrap-codex-project.sh --target /path/to/project --langs java
-scripts/bootstrap-codex-project.sh --target /path/to/project --langs java,python,go
+scripts/bootstrap-project.sh --target /path/to/project --langs java
+scripts/bootstrap-project.sh --target /path/to/project --langs java,python,go
 ```
 
 Optional tool mode:
 
 ```bash
-scripts/bootstrap-codex-project.sh --target /path/to/project --langs java --tool auto
-scripts/bootstrap-codex-project.sh --target /path/to/project --langs java --tool codex
-scripts/bootstrap-codex-project.sh --target /path/to/project --langs java --tool kiro
-scripts/bootstrap-codex-project.sh --target /path/to/project --langs java --tool both
+scripts/bootstrap-project.sh --target /path/to/project --langs java --tool auto
+scripts/bootstrap-project.sh --target /path/to/project --langs java --tool codex
+scripts/bootstrap-project.sh --target /path/to/project --langs java --tool kiro
+scripts/bootstrap-project.sh --target /path/to/project --langs java --tool claude
+scripts/bootstrap-project.sh --target /path/to/project --langs java --tool both
+scripts/bootstrap-project.sh --target /path/to/project --langs java --tool all
 ```
 
 ## 3) Language Strategy

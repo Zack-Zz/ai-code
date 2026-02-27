@@ -1,0 +1,7 @@
+interface:
+  display_name: "Continuous Learning V2"
+  short_description: "Instinct-based learning system that observes sessions via hooks, creates atomic instincts with confidence scoring, and"
+  brand_color: "#3B82F6"
+  default_prompt: "Apply Continuous Learning V2 guidance for this task"
+policy:
+  allow_implicit_invocation: true

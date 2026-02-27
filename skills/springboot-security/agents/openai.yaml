@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spring Boot Security"
+  short_description: "Security checklist for Spring Boot services and APIs"
+  brand_color: "#DC2626"
+  default_prompt: "Run Spring Boot security review: authn/authz, input validation, secret handling, error leakage"
+policy:
+  allow_implicit_invocation: true
