@@ -276,8 +276,24 @@ fi
 
 # Kiro files
 if [[ "$APPLY_KIRO" == "true" ]]; then
+  # Core steering files
   copy_file "$ROOT_DIR/.kiro/steering/ai-code-core.md" "$TARGET_DIR/.kiro/steering/ai-code-core.md"
   copy_file "$ROOT_DIR/.kiro/steering/multi-language-workflow.md" "$TARGET_DIR/.kiro/steering/multi-language-workflow.md"
+  copy_file "$ROOT_DIR/.kiro/steering/agents-overview.md" "$TARGET_DIR/.kiro/steering/agents-overview.md"
+  copy_file "$ROOT_DIR/.kiro/steering/security-checklist.md" "$TARGET_DIR/.kiro/steering/security-checklist.md"
+  copy_file "$ROOT_DIR/.kiro/steering/tdd-workflow.md" "$TARGET_DIR/.kiro/steering/tdd-workflow.md"
+  copy_file "$ROOT_DIR/.kiro/steering/coding-standards.md" "$TARGET_DIR/.kiro/steering/coding-standards.md"
+  
+  # Hooks configuration
+  copy_file "$ROOT_DIR/.kiro/hooks/hooks.json" "$TARGET_DIR/.kiro/hooks/hooks.json"
+  
+  # MCP configuration template
+  copy_file "$ROOT_DIR/.kiro/settings/mcp.json" "$TARGET_DIR/.kiro/settings/mcp.json"
+  
+  # Documentation
+  copy_file "$ROOT_DIR/.kiro/README.md" "$TARGET_DIR/.kiro/README.md"
+  copy_file "$ROOT_DIR/.kiro/QUICK_START.md" "$TARGET_DIR/.kiro/QUICK_START.md"
+  copy_file "$ROOT_DIR/.kiro/CHANGELOG.md" "$TARGET_DIR/.kiro/CHANGELOG.md"
 fi
 
 # Claude files
@@ -312,6 +328,8 @@ if [[ "$APPLY_CODEX" == "true" ]]; then
 fi
 if [[ "$APPLY_KIRO" == "true" ]]; then
   echo "- Kiro: open the target project; steering files from .kiro/steering load automatically."
+  echo "- Kiro: review .kiro/settings/mcp.json and replace YOUR_*_HERE placeholders with actual API keys."
+  echo "- Kiro: hooks are configured in .kiro/hooks/hooks.json (fileEdited, promptSubmit, agentStop)."
 fi
 if [[ "$APPLY_CLAUDE" == "true" ]]; then
   echo "- Claude Code: review CLAUDE.md and merge hooks/hooks.json into your Claude settings as needed."

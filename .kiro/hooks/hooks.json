@@ -1,0 +1,56 @@
+{
+  "version": "1.0",
+  "description": "Kiro hooks configuration for ai-code toolkit",
+  "hooks": [
+    {
+      "id": "file-edited-format",
+      "name": "Auto-format on file edit",
+      "description": "Automatically format code files when edited",
+      "when": {
+        "type": "fileEdited",
+        "patterns": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.py", "*.go", "*.java"]
+      },
+      "then": {
+        "type": "askAgent",
+        "prompt": "The file was just edited. Please check if it needs formatting and apply the project's code formatter if needed."
+      }
+    },
+    {
+      "id": "file-edited-console-warn",
+      "name": "Warn about console.log",
+      "description": "Warn when console.log is added to production code",
+      "when": {
+        "type": "fileEdited",
+        "patterns": ["*.ts", "*.tsx", "*.js", "*.jsx"]
+      },
+      "then": {
+        "type": "askAgent",
+        "prompt": "Check if console.log statements were added. If found, remind to remove them before committing to production."
+      }
+    },
+    {
+      "id": "prompt-submit-security",
+      "name": "Security check on commit-related prompts",
+      "description": "Run security checklist when user mentions commit/push/deploy",
+      "when": {
+        "type": "promptSubmit"
+      },
+      "then": {
+        "type": "askAgent",
+        "prompt": "If the user is about to commit, push, or deploy code, remind them to review the security checklist in .kiro/steering/security-checklist.md"
+      }
+    },
+    {
+      "id": "agent-stop-session-summary",
+      "name": "Session summary on stop",
+      "description": "Provide a brief summary when the session ends",
+      "when": {
+        "type": "agentStop"
+      },
+      "then": {
+        "type": "askAgent",
+        "prompt": "Provide a brief summary of what was accomplished in this session and any pending tasks."
+      }
+    }
+  ]
+}

@@ -101,11 +101,25 @@ cd ai-code
 ```bash
 git clone https://github.com/Zack-Zz/ai-code.git
 cd ai-code
+
+# 为新项目引导 Kiro 支持
+scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python --tool kiro
+
+# 或直接使用本仓库
+# 在 Kiro 中打开该目录 - steering 文件自动加载
 ```
 
-- 在 Kiro 中打开该目录。
-- Kiro 会自动加载 `.kiro/steering/` 中的规则文件。
-- 仓库根目录 `AGENTS.md` 也可作为全局指令被读取。
+**安装内容：**
+- `.kiro/steering/` 中的 6 个 steering 文件（核心原则、安全、TDD、编码标准）
+- `.kiro/hooks/hooks.json` 中的 Hooks 配置（自动格式化、安全检查）
+- `.kiro/settings/mcp.json` 中的 MCP 模板（文件系统、GitHub、PostgreSQL、搜索）
+
+**后续步骤：**
+1. 在 Kiro 中打开项目 - steering 文件自动加载
+2. 配置 `.kiro/settings/mcp.json` 中的 MCP 服务器（将 `YOUR_*_HERE` 替换为实际 API 密钥）
+3. 查看 `.kiro/hooks/hooks.json` 中的 hooks（fileEdited、promptSubmit、agentStop）
+
+详细的 Kiro 配置指南请参阅 [`.kiro/README.md`](.kiro/README.md)。
 
 ---
 

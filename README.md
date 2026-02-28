@@ -105,11 +105,25 @@ cd ai-code
 ```bash
 git clone https://github.com/Zack-Zz/ai-code.git
 cd ai-code
+
+# Bootstrap a new project with Kiro support
+scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python --tool kiro
+
+# Or use this repo directly
+# Open the folder in Kiro - steering files load automatically
 ```
 
-- Open the folder in Kiro.
-- Kiro will load steering files from `.kiro/steering/`.
-- Root `AGENTS.md` is also supported for global repository instructions.
+**What gets installed:**
+- 6 steering files in `.kiro/steering/` (core principles, security, TDD, coding standards)
+- Hooks configuration in `.kiro/hooks/hooks.json` (auto-format, security checks)
+- MCP template in `.kiro/settings/mcp.json` (filesystem, GitHub, PostgreSQL, search)
+
+**Next steps:**
+1. Open project in Kiro - steering files load automatically
+2. Configure MCP servers in `.kiro/settings/mcp.json` (replace `YOUR_*_HERE` with API keys)
+3. Review hooks in `.kiro/hooks/hooks.json` (fileEdited, promptSubmit, agentStop)
+
+See [`.kiro/README.md`](.kiro/README.md) for detailed Kiro configuration guide.
 
 ---
 
@@ -781,6 +795,146 @@ globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
 alwaysApply: false
 ---
 ```
+
+---
+
+## Kiro IDE Support
+
+ai-code provides **comprehensive Kiro support** with steering files, hooks, and MCP configurations adapted for Kiro's native format.
+
+### Quick Start (Kiro)
+
+```bash
+# Bootstrap a new project with Kiro support
+scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python --tool kiro
+
+# Or use this repo directly in Kiro
+# Open the folder in Kiro - steering files load automatically
+```
+
+### What's Included
+
+| Component | Count | Details |
+|-----------|-------|---------|
+| Steering Files | 6 | Core principles, security, TDD, coding standards, multi-language workflow |
+| Hooks | 4 | fileEdited (format, console warn), promptSubmit (security), agentStop (summary) |
+| MCP Template | 4 servers | filesystem, GitHub, PostgreSQL, brave-search (disabled by default) |
+| Agent Guidelines | 13 | Reference to specialized agent workflows (planner, tdd-guide, security-reviewer, etc.) |
+
+### Steering Files
+
+Kiro steering files provide context and guidelines automatically:
+
+#### Always Included
+- `ai-code-core.md` - Core behavior and quality principles
+- `agents-overview.md` - Reference to 13 specialized agent guidelines
+- `security-checklist.md` - Security requirements and common vulnerabilities
+- `coding-standards.md` - Immutability, file organization, error handling
+
+#### Conditionally Included (fileMatch)
+- `tdd-workflow.md` - Loaded when working with test files (`*.test.*`, `*.spec.*`)
+- `multi-language-workflow.md` - Loaded when working with source files (`*.java`, `*.py`, `*.go`, `*.ts`, etc.)
+
+### Steering File Format
+
+Kiro steering files use YAML frontmatter with `inclusion` setting:
+
+```yaml
+---
+inclusion: always
+---
+
+# Your Steering Content
+
+Guidelines here...
+```
+
+Or use `fileMatch` for conditional inclusion:
+
+```yaml
+---
+inclusion: fileMatch
+fileMatchPattern: ".*\\.tsx?$"
+---
+
+# TypeScript-Specific Guidelines
+
+TypeScript guidelines here...
+```
+
+### Hooks Configuration
+
+Hooks in `.kiro/hooks/hooks.json` provide event-based automations:
+
+```json
+{
+  "id": "file-edited-format",
+  "name": "Auto-format on file edit",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["*.ts", "*.tsx", "*.js", "*.jsx"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check if formatting is needed and apply the project's formatter."
+  }
+}
+```
+
+**Available Hook Events:**
+- `fileEdited` - When a file is saved
+- `fileCreated` - When a new file is created
+- `fileDeleted` - When a file is deleted
+- `promptSubmit` - When a message is sent to Kiro
+- `agentStop` - When Kiro finishes processing
+- `userTriggered` - Manual trigger by user
+
+### MCP Configuration
+
+MCP servers in `.kiro/settings/mcp.json` provide additional capabilities:
+
+```json
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_TOKEN_HERE"
+      },
+      "disabled": true
+    }
+  }
+}
+```
+
+**Setup Steps:**
+1. Replace `YOUR_*_HERE` placeholders with actual API keys
+2. Set `disabled: false` for servers you want to enable
+3. Adjust file paths and connection strings as needed
+
+### Differences from Claude Code
+
+| Feature | Claude Code | Kiro |
+|---------|-------------|------|
+| Guidelines | `rules/` directory | `steering/` directory |
+| Inclusion | `alwaysApply` field | `inclusion: always` |
+| File matching | Not supported | `inclusion: fileMatch` |
+| Hooks | `hooks.json` in root | `.kiro/hooks/hooks.json` |
+| MCP | `config.json` | `.kiro/settings/mcp.json` |
+| Agents | Native delegation | Reference guidelines only |
+
+### Agent Guidelines Reference
+
+While Kiro doesn't have native agent delegation, you can reference agent guidelines:
+
+- `agents/planner.md` - Implementation planning for complex features
+- `agents/tdd-guide.md` - Test-driven development methodology
+- `agents/code-reviewer.md` - Code quality and maintainability
+- `agents/security-reviewer.md` - Vulnerability detection and security audits
+- And 9 more specialized agents
+
+See [`.kiro/README.md`](.kiro/README.md) for detailed configuration guide.
 
 ---
 
