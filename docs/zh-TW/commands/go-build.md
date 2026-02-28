@@ -4,6 +4,9 @@ description: Fix Go build errors, go vet warnings, and linter issues incremental
 
 # Go 建置與修復
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 此指令呼叫 **go-build-resolver** Agent，以最小變更增量修復 Go 建置錯誤。
 
 ## 此指令的功能

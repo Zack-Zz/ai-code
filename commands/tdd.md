@@ -4,6 +4,9 @@ description: Enforce test-driven development workflow. Scaffold interfaces, gene
 
 # TDD Command
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 This command invokes the **tdd-guide** agent to enforce test-driven development methodology.
 
 ## What This Command Does
@@ -320,7 +323,7 @@ Never skip the RED phase. Never write code before tests.
 ## Related Agents
 
 This command invokes the `tdd-guide` agent located at:
-`~/.claude/agents/tdd-guide.md`
+`$AI_CODE_HOME/agents/tdd-guide.md`
 
 And can reference the `tdd-workflow` skill at:
-`~/.claude/skills/tdd-workflow/`
+`$AI_CODE_HOME/skills/tdd-workflow/`

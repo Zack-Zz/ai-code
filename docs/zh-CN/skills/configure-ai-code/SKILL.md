@@ -19,7 +19,7 @@ description: ai-code 的交互式安装程序 — 引导用户选择并安装技
 此技能必须在激活前对 Claude Code 可访问。有两种引导方式：
 
 1. **通过插件**: `/plugin install ai-code@ai-code` — 插件会自动加载此技能
-2. **手动**: 仅将此技能复制到 `~/.claude/skills/configure-ai-code/SKILL.md`，然后通过说 "configure ai-code" 激活
+2. **手动**: 仅将此技能复制到 `$AI_CODE_HOME/skills/configure-ai-code/SKILL.md`，然后通过说 "configure ai-code" 激活
 
 ***
 
@@ -45,16 +45,16 @@ git clone https://github.com/Zack-Zz/ai-code.git /tmp/ai-code
 ```
 Question: "Where should ai-code components be installed?"
 Options:
-  - "User-level (~/.claude/)" — "Applies to all your Claude Code projects"
+  - "User-level ($AI_CODE_HOME/)" — "Applies to all your Claude Code projects"
   - "Project-level (.claude/)" — "Applies only to the current project"
   - "Both" — "Common/shared items user-level, project-specific items project-level"
 ```
 
 将选择存储为 `INSTALL_LEVEL`。设置目标目录：
 
-* 用户级别：`TARGET=~/.claude`
+* 用户级别：`TARGET=$AI_CODE_HOME`
 * 项目级别：`TARGET=.claude`（相对于当前项目根目录）
-* 两者：`TARGET_USER=~/.claude`，`TARGET_PROJECT=.claude`
+* 两者：`TARGET_USER=$AI_CODE_HOME`，`TARGET_PROJECT=.claude`
 
 如果目标目录不存在，则创建它们：
 
@@ -192,15 +192,15 @@ ls -la $TARGET/rules/
 扫描所有已安装的 `.md` 文件中的路径引用：
 
 ```bash
-grep -rn "~/.claude/" $TARGET/skills/ $TARGET/rules/
+grep -rn "$AI_CODE_HOME/" $TARGET/skills/ $TARGET/rules/
 grep -rn "../common/" $TARGET/rules/
 grep -rn "skills/" $TARGET/skills/
 ```
 
-**对于项目级别安装**，标记任何对 `~/.claude/` 路径的引用：
+**对于项目级别安装**，标记任何对 `$AI_CODE_HOME/` 路径的引用：
 
-* 如果技能引用 `~/.claude/settings.json` — 这通常没问题（设置始终是用户级别的）
-* 如果技能引用 `~/.claude/skills/` 或 `~/.claude/rules/` — 如果仅安装在项目级别，这可能损坏
+* 如果技能引用 `$AI_CODE_HOME/settings.json` — 这通常没问题（设置始终是用户级别的）
+* 如果技能引用 `$AI_CODE_HOME/skills/` 或 `$AI_CODE_HOME/rules/` — 如果仅安装在项目级别，这可能损坏
 * 如果技能通过名称引用另一项技能 — 检查被引用的技能是否也已安装
 
 ### 4c：检查技能间的交叉引用
@@ -209,7 +209,7 @@ grep -rn "skills/" $TARGET/skills/
 
 * `django-tdd` 可能引用 `django-patterns`
 * `springboot-tdd` 可能引用 `springboot-patterns`
-* `continuous-learning-v2` 引用 `~/.claude/homunculus/` 目录
+* `continuous-learning-v2` 引用 `$AI_CODE_HOME/homunculus/` 目录
 * `python-testing` 可能引用 `python-patterns`
 * `golang-testing` 可能引用 `golang-patterns`
 * 特定语言规则引用其 `common/` 对应项
@@ -220,7 +220,7 @@ grep -rn "skills/" $TARGET/skills/
 
 1. **文件**：包含问题引用的文件
 2. **行号**：行号
-3. **问题**：哪里出错了（例如，"引用了 ~/.claude/skills/python-patterns 但 python-patterns 未安装"）
+3. **问题**：哪里出错了（例如，"引用了 $AI_CODE_HOME/skills/python-patterns 但 python-patterns 未安装"）
 4. **建议的修复**：该怎么做（例如，"安装 python-patterns 技能" 或 "将路径更新为 .claude/skills/"）
 
 ***
@@ -300,7 +300,7 @@ rm -rf /tmp/ai-code
 ### "Claude Code 未获取技能"
 
 * 验证技能目录包含一个 `SKILL.md` 文件（不仅仅是松散的 .md 文件）
-* 对于用户级别：检查 `~/.claude/skills/<skill-name>/SKILL.md` 是否存在
+* 对于用户级别：检查 `$AI_CODE_HOME/skills/<skill-name>/SKILL.md` 是否存在
 * 对于项目级别：检查 `.claude/skills/<skill-name>/SKILL.md` 是否存在
 
 ### "规则不工作"
@@ -310,5 +310,5 @@ rm -rf /tmp/ai-code
 
 ### "项目级别安装后出现路径引用错误"
 
-* 有些技能假设 `~/.claude/` 路径。运行步骤 4 验证来查找并修复这些问题。
-* 对于 `continuous-learning-v2`，`~/.claude/homunculus/` 目录始终是用户级别的 — 这是预期的，不是错误。
+* 有些技能假设 `$AI_CODE_HOME/` 路径。运行步骤 4 验证来查找并修复这些问题。
+* 对于 `continuous-learning-v2`，`$AI_CODE_HOME/homunculus/` 目录始终是用户级别的 — 这是预期的，不是错误。

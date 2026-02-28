@@ -118,3 +118,6 @@ $ARGUMENTS:
 - `report <name>` - Generate full report
 - `list` - Show all evals
 - `clean` - Remove old eval logs (keeps last 10 runs)
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

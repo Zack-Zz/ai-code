@@ -4,6 +4,9 @@ description: Generate and run end-to-end tests with Playwright. Creates test jou
 
 # E2E 指令
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 此指令呼叫 **e2e-runner** Agent 來產生、維護和執行使用 Playwright 的端對端測試。
 
 ## 此指令的功能
@@ -112,4 +115,4 @@ npx playwright show-report
 ## 相關 Agent
 
 此指令呼叫位於以下位置的 `e2e-runner` Agent：
-`~/.claude/agents/e2e-runner.md`
+`$AI_CODE_HOME/agents/e2e-runner.md`

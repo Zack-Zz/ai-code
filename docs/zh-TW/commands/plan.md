@@ -4,6 +4,9 @@ description: Restate requirements, assess risks, and create step-by-step impleme
 
 # Plan 指令
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 此指令呼叫 **planner** Agent，在撰寫任何程式碼前建立全面的實作計畫。
 
 ## 此指令的功能
@@ -110,4 +113,4 @@ Agent（planner）：
 ## 相關 Agent
 
 此指令呼叫位於以下位置的 `planner` Agent：
-`~/.claude/agents/planner.md`
+`$AI_CODE_HOME/agents/planner.md`

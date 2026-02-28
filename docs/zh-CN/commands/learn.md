@@ -33,7 +33,7 @@
 
 ## 输出格式
 
-在 `~/.claude/skills/learned/[pattern-name].md` 创建一个技能文件：
+在 `$AI_CODE_HOME/skills/learned/[pattern-name].md` 创建一个技能文件：
 
 ```markdown
 # [Descriptive Pattern Name]
@@ -60,7 +60,7 @@
 2. 识别最有价值/可重用的见解
 3. 起草技能文件
 4. 在保存前请用户确认
-5. 保存到 `~/.claude/skills/learned/`
+5. 保存到 `$AI_CODE_HOME/skills/learned/`
 
 ## 注意事项
 
@@ -68,3 +68,6 @@
 * 不要提取一次性问题（特定的 API 中断等）
 * 专注于那些将在未来会话中节省时间的模式
 * 保持技能的专注性 - 一个技能对应一个模式
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

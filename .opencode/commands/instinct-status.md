@@ -13,7 +13,7 @@ Read and display instincts from the continuous-learning-v2 system.
 
 ## Instinct Location
 
-Global: `~/.claude/instincts/`
+Global: `$AI_CODE_HOME/instincts/`
 Project: `.claude/instincts/`
 
 ## Status Display

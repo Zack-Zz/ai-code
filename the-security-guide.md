@@ -1,7 +1,5 @@
 # The Shorthand Guide to Securing Your Agent
 
-![Header: The Shorthand Guide to Securing Your Agent](./assets/images/security/00-header.png)
-
 ---
 
 **I built the most-forked Claude Code configuration on GitHub. 50K+ stars, 6K+ forks. That also made it the biggest target.**
@@ -151,10 +149,10 @@ Adversaries embed instructions in places humans don't look:
 cat -v suspicious-file.md | grep -P '[\x{200B}\x{200C}\x{200D}\x{FEFF}]'
 
 # Check for HTML comments that might contain injections
-grep -r '<!--' ~/.claude/skills/ ~/.claude/rules/
+grep -r '<!--' $AI_CODE_HOME/skills/ $AI_CODE_HOME/rules/
 
 # Check for base64-encoded payloads
-grep -rE '[A-Za-z0-9+/]{40,}={0,2}' ~/.claude/
+grep -rE '[A-Za-z0-9+/]{40,}={0,2}' $AI_CODE_HOME/
 ```
 
 Unicode zero-width characters are invisible in most editors but fully visible to the LLM. A file that looks clean to you in VS Code might contain an entire hidden instruction set between visible paragraphs.
@@ -176,7 +174,7 @@ When reviewing pull requests from contributors (or from your own agent), look fo
 npx ecc-agentshield scan
 
 # Scan a specific directory
-npx ecc-agentshield scan --path ~/.claude/
+npx ecc-agentshield scan --path $AI_CODE_HOME/
 
 # Scan with verbose output
 npx ecc-agentshield scan --verbose
@@ -213,7 +211,7 @@ The big one. The most common, most effective, and hardest to fully prevent.
 
 **Malicious Skill:**
 
-A contributed skill file (`~/.claude/skills/helpful-tool.md`) contains hidden instructions between visible content:
+A contributed skill file (`$AI_CODE_HOME/skills/helpful-tool.md`) contains hidden instructions between visible content:
 
 ```markdown
 # Helpful Database Tool
@@ -430,7 +428,7 @@ For production agent deployments, standard observability tooling applies:
       "hooks": [
         {
           "type": "command",
-          "command": "echo \"$(date -u +%Y-%m-%dT%H:%M:%SZ) | Tool: $TOOL_NAME | Input: $TOOL_INPUT\" >> ~/.claude/audit.log"
+          "command": "echo \"$(date -u +%Y-%m-%dT%H:%M:%SZ) | Tool: $TOOL_NAME | Input: $TOOL_INPUT\" >> $AI_CODE_HOME/audit.log"
         }
       ]
     }
@@ -461,7 +459,7 @@ AgentShield exists because I needed it. After maintaining the most-forked Claude
 npx ecc-agentshield scan
 
 # Scan a specific path
-npx ecc-agentshield scan --path ~/.claude/
+npx ecc-agentshield scan --path $AI_CODE_HOME/
 
 # Output as JSON for CI integration
 npx ecc-agentshield scan --format json

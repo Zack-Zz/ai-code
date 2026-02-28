@@ -36,7 +36,7 @@
 
 拡張思考の制御:
 - **トグル**: Option+T（macOS）/ Alt+T（Windows/Linux）
-- **設定**: `~/.claude/settings.json` で `alwaysThinkingEnabled` を設定
+- **設定**: `$AI_CODE_HOME/settings.json` で `alwaysThinkingEnabled` を設定
 - **予算上限**: `export MAX_THINKING_TOKENS=10000`
 - **詳細モード**: Ctrl+O で思考出力を表示
 

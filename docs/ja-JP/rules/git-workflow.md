@@ -10,7 +10,7 @@
 
 タイプ: feat, fix, refactor, docs, test, chore, perf, ci
 
-注記: Attribution は ~/.claude/settings.json でグローバルに無効化されています。
+注記: Attribution は $AI_CODE_HOME/settings.json でグローバルに無効化されています。
 
 ## Pull Request ワークフロー
 

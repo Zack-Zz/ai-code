@@ -13,7 +13,7 @@ description: Automatically extract reusable patterns from Claude Code sessions a
 
 1. **工作階段評估**：檢查工作階段是否有足夠訊息（預設：10+ 則）
 2. **模式偵測**：從工作階段識別可提取的模式
-3. **技能提取**：將有用模式儲存到 `~/.claude/skills/learned/`
+3. **技能提取**：將有用模式儲存到 `$AI_CODE_HOME/skills/learned/`
 
 ## 設定
 
@@ -24,7 +24,7 @@ description: Automatically extract reusable patterns from Claude Code sessions a
   "min_session_length": 10,
   "extraction_threshold": "medium",
   "auto_approve": false,
-  "learned_skills_path": "~/.claude/skills/learned/",
+  "learned_skills_path": "$AI_CODE_HOME/skills/learned/",
   "patterns_to_detect": [
     "error_resolution",
     "user_corrections",
@@ -52,7 +52,7 @@ description: Automatically extract reusable patterns from Claude Code sessions a
 
 ## Hook 設定
 
-新增到你的 `~/.claude/settings.json`：
+新增到你的 `$AI_CODE_HOME/settings.json`：
 
 ```json
 {
@@ -61,7 +61,7 @@ description: Automatically extract reusable patterns from Claude Code sessions a
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/continuous-learning/evaluate-session.sh"
+        "command": "$AI_CODE_HOME/skills/continuous-learning/evaluate-session.sh"
       }]
     }]
   }
@@ -76,7 +76,7 @@ description: Automatically extract reusable patterns from Claude Code sessions a
 
 ## 相關
 
-- [Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - 持續學習章節
+- [Longform Guide](../../../USAGE.md) - 持續學習章節
 - `/learn` 指令 - 工作階段中手動提取模式
 
 ---

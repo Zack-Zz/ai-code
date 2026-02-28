@@ -66,7 +66,7 @@ git checkout -b feat/my-contribution
 # 3. Add your contribution (see sections below)
 
 # 4. Test locally
-cp -r skills/my-skill ~/.claude/skills/  # for skills
+cp -r skills/my-skill $AI_CODE_HOME/skills/  # for skills
 # Then test with Claude Code
 
 # 5. Submit PR
@@ -435,7 +435,7 @@ docs: improve contributing guide
 ## 有问题吗？
 
 * **问题：** [github.com/Zack-Zz/ai-code/issues](https://github.com/Zack-Zz/ai-code/issues)
-* **X/Twitter：** [@affaanmustafa](https://x.com/affaanmustafa)
+* **讨论：** [github.com/Zack-Zz/ai-code/discussions](https://github.com/Zack-Zz/ai-code/discussions)
 
 ***
 

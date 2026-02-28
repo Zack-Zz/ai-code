@@ -92,7 +92,7 @@ Session Activity
 
 ### 1. 観察フックを有効化
 
-`~/.claude/settings.json`に追加します。
+`$AI_CODE_HOME/settings.json`に追加します。
 
 **プラグインとしてインストールした場合**（推奨）：
 
@@ -103,21 +103,21 @@ Session Activity
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh pre"
+        "command": "${AI_CODE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh pre"
       }]
     }],
     "PostToolUse": [{
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh post"
+        "command": "${AI_CODE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh post"
       }]
     }]
   }
 }
 ```
 
-**`~/.claude/skills`に手動でインストールした場合**：
+**`$AI_CODE_HOME/skills`に手動でインストールした場合**：
 
 ```json
 {
@@ -126,14 +126,14 @@ Session Activity
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh pre"
+        "command": "$AI_CODE_HOME/skills/continuous-learning-v2/hooks/observe.sh pre"
       }]
     }],
     "PostToolUse": [{
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh post"
+        "command": "$AI_CODE_HOME/skills/continuous-learning-v2/hooks/observe.sh post"
       }]
     }]
   }
@@ -145,8 +145,8 @@ Session Activity
 Python CLIが自動的に作成しますが、手動で作成することもできます：
 
 ```bash
-mkdir -p ~/.claude/homunculus/{instincts/{personal,inherited},evolved/{agents,skills,commands}}
-touch ~/.claude/homunculus/observations.jsonl
+mkdir -p $AI_CODE_HOME/homunculus/{instincts/{personal,inherited},evolved/{agents,skills,commands}}
+touch $AI_CODE_HOME/homunculus/observations.jsonl
 ```
 
 ### 3. インスティンクトコマンドを使用
@@ -176,13 +176,13 @@ touch ~/.claude/homunculus/observations.jsonl
   "version": "2.0",
   "observation": {
     "enabled": true,
-    "store_path": "~/.claude/homunculus/observations.jsonl",
+    "store_path": "$AI_CODE_HOME/homunculus/observations.jsonl",
     "max_file_size_mb": 10,
     "archive_after_days": 7
   },
   "instincts": {
-    "personal_path": "~/.claude/homunculus/instincts/personal/",
-    "inherited_path": "~/.claude/homunculus/instincts/inherited/",
+    "personal_path": "$AI_CODE_HOME/homunculus/instincts/personal/",
+    "inherited_path": "$AI_CODE_HOME/homunculus/instincts/inherited/",
     "min_confidence": 0.3,
     "auto_approve_threshold": 0.7,
     "confidence_decay_rate": 0.05
@@ -200,7 +200,7 @@ touch ~/.claude/homunculus/observations.jsonl
   },
   "evolution": {
     "cluster_threshold": 3,
-    "evolved_path": "~/.claude/homunculus/evolved/"
+    "evolved_path": "$AI_CODE_HOME/homunculus/evolved/"
   }
 }
 ```
@@ -208,7 +208,7 @@ touch ~/.claude/homunculus/observations.jsonl
 ## ファイル構造
 
 ```
-~/.claude/homunculus/
+$AI_CODE_HOME/homunculus/
 ├── identity.json           # プロフィール、技術レベル
 ├── observations.jsonl      # 現在のセッション観察
 ├── observations.archive/   # 処理済み観察
@@ -262,7 +262,7 @@ touch ~/.claude/homunculus/observations.jsonl
 ## 後方互換性
 
 v2はv1と完全に互換性があります：
-- 既存の`~/.claude/skills/learned/`スキルは引き続き機能
+- 既存の`$AI_CODE_HOME/skills/learned/`スキルは引き続き機能
 - Stopフックは引き続き実行される（ただしv2にもフィードされる）
 - 段階的な移行パス：両方を並行して実行
 
@@ -277,7 +277,7 @@ v2はv1と完全に互換性があります：
 
 - [Skill Creator](https://skill-creator.app) - リポジトリ履歴からインスティンクトを生成
 - Homunculus - v2アーキテクチャのインスピレーション（アトミック観察、信頼度スコアリング、インスティンクト進化パイプライン）
-- [The Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - 継続的学習セクション
+- [The Longform Guide](../../../USAGE.md) - 継続的学習セクション
 
 ---
 

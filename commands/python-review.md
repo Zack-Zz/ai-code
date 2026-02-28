@@ -4,6 +4,9 @@ description: Comprehensive Python code review for PEP 8 compliance, type hints, 
 
 # Python Code Review
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 This command invokes the **python-reviewer** agent for comprehensive Python-specific code review.
 
 ## What This Command Does

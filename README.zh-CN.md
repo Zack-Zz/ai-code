@@ -54,7 +54,7 @@ export AI_CODE_HOME=/path/to/assistant-home
 
 - `AI_CODE_HOME` 优先级最高。
 - 未设置 `AI_CODE_HOME` 且 `AI_CODE_TOOL=codex` 时，默认目录是 `~/.codex`。
-- 其他情况默认目录是 `~/.claude`。
+- 其他情况默认目录是 `$AI_CODE_HOME`。
 - 也可对单次执行使用 `--tool`、`--home` 参数。
 
 ---
@@ -134,24 +134,24 @@ cp .codex/config.toml ~/.codex/config.toml
 
 ## 🌐 跨平台支持
 
-此插件现在完全支持 **Windows、macOS 和 Linux**。所有钩子和脚本都已用 Node.js 重写，以实现最大的兼容性。
+该工具集现在完全支持 **Windows、macOS 和 Linux**。所有钩子和脚本都已用 Node.js 重写，以实现最大的兼容性。
 
 ### 包管理器检测
 
-插件自动检测你首选的包管理器（npm、pnpm、yarn 或 bun），优先级如下：
+在 Claude Code 工作流中，包管理器检测优先级如下：
 
-1. **环境变量**: `CLAUDE_PACKAGE_MANAGER`
+1. **环境变量**: `AI_CODE_PACKAGE_MANAGER`
 2. **项目配置**: `.claude/package-manager.json`
 3. **package.json**: `packageManager` 字段
 4. **锁文件**: 从 package-lock.json、yarn.lock、pnpm-lock.yaml 或 bun.lockb 检测
-5. **全局配置**: `~/.claude/package-manager.json`
+5. **全局配置**: `$AI_CODE_HOME/package-manager.json`
 6. **回退**: 第一个可用的包管理器
 
 要设置你首选的包管理器：
 
 ```bash
 # 通过环境变量
-export CLAUDE_PACKAGE_MANAGER=pnpm
+export AI_CODE_PACKAGE_MANAGER=pnpm
 
 # 通过全局配置
 node scripts/setup-package-manager.js --global pnpm
@@ -169,7 +169,7 @@ node scripts/setup-package-manager.js --detect
 
 ## 📦 里面有什么
 
-这个仓库是一个 **Claude Code 插件** - 直接安装或手动复制组件。
+这个仓库是一个 **多助手工具集**，包含 Claude Code 插件资产、Codex 配置和 Kiro steering 文件。
 
 ```
 ai-code/
@@ -226,7 +226,7 @@ ai-code/
 |   |-- instinct-export.md  # /instinct-export - 导出直觉（新增）
 |   |-- evolve.md           # /evolve - 将直觉聚类到技能中（新增）
 |
-|-- rules/            # 始终遵循的指南（复制到 ~/.claude/rules/）
+|-- rules/            # 始终遵循的指南（复制到 $AI_CODE_HOME/rules/）
 |   |-- security.md         # 强制性安全检查
 |   |-- coding-style.md     # 不可变性、文件组织
 |   |-- testing.md          # TDD、80% 覆盖率要求
@@ -337,7 +337,7 @@ ai-code/
 /plugin install ai-code@ai-code
 ```
 
-或直接添加到你的 `~/.claude/settings.json`：
+或直接添加到你的 `$AI_CODE_HOME/settings.json`：
 
 ```json
 {
@@ -364,7 +364,7 @@ ai-code/
 > git clone https://github.com/Zack-Zz/ai-code.git
 >
 > # 选项 A：用户级规则（应用于所有项目）
-> cp -r ai-code/rules/* ~/.claude/rules/
+> cp -r ai-code/rules/* $AI_CODE_HOME/rules/
 >
 > # 选项 B：项目级规则（仅应用于当前项目）
 > mkdir -p .claude/rules
@@ -382,25 +382,25 @@ ai-code/
 git clone https://github.com/Zack-Zz/ai-code.git
 
 # 将代理复制到你的 Claude 配置
-cp ai-code/agents/*.md ~/.claude/agents/
+cp ai-code/agents/*.md $AI_CODE_HOME/agents/
 
 # 复制规则
-cp ai-code/rules/*.md ~/.claude/rules/
+cp ai-code/rules/*.md $AI_CODE_HOME/rules/
 
 # 复制命令
-cp ai-code/commands/*.md ~/.claude/commands/
+cp ai-code/commands/*.md $AI_CODE_HOME/commands/
 
 # 复制技能
-cp -r ai-code/skills/* ~/.claude/skills/
+cp -r ai-code/skills/* $AI_CODE_HOME/skills/
 ```
 
 #### 将钩子添加到 settings.json
 
-将 `hooks/hooks.json` 中的钩子复制到你的 `~/.claude/settings.json`。
+将 `hooks/hooks.json` 中的钩子复制到你的 `$AI_CODE_HOME/settings.json`。
 
 #### 配置 MCP
 
-将所需的 MCP 服务器从 `mcp-configs/mcp-servers.json` 复制到你的 `~/.claude.json`。
+将所需的 MCP 服务器从 `mcp-configs/mcp-servers.json` 复制到你的 `$AI_CODE_HOME/config.json`。
 
 **重要：** 将 `YOUR_*_HERE` 占位符替换为你的实际 API 密钥。
 
@@ -456,7 +456,7 @@ model: opus
 规则是始终遵循的指南。保持模块化：
 
 ```
-~/.claude/rules/
+$AI_CODE_HOME/rules/
   security.md      # 无硬编码秘密
   coding-style.md  # 不可变性、文件限制
   testing.md       # TDD、覆盖率要求

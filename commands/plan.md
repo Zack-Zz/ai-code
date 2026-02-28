@@ -4,6 +4,9 @@ description: Restate requirements, assess risks, and create step-by-step impleme
 
 # Plan Command
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 This command invokes the **planner** agent to create a comprehensive implementation plan before writing any code.
 
 ## What This Command Does
@@ -110,4 +113,4 @@ After planning:
 ## Related Agents
 
 This command invokes the `planner` agent located at:
-`~/.claude/agents/planner.md`
+`$AI_CODE_HOME/agents/planner.md`

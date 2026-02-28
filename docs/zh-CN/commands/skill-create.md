@@ -6,6 +6,9 @@ allowed_tools: ["Bash", "Read", "Write", "Grep", "Glob"]
 
 # /skill-create - 本地技能生成
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 分析你的仓库的 git 历史，以提取编码模式并生成 SKILL.md 文件，用于向 Claude 传授你团队的实践方法。
 
 ## 使用方法

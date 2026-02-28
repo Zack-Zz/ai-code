@@ -25,3 +25,6 @@
 - エラーハンドリング
 - エッジケース（null、undefined、空）
 - 境界条件
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

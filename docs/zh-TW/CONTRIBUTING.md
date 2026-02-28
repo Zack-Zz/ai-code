@@ -184,7 +184,7 @@ git push origin add-python-reviewer
 
 ## 有問題？
 
-開啟 issue 或在 X 上聯繫：[@affaanmustafa](https://x.com/affaanmustafa)
+請開啟 issue 或使用討論區：[github.com/Zack-Zz/ai-code/discussions](https://github.com/Zack-Zz/ai-code/discussions)
 
 ---
 

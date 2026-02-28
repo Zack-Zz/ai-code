@@ -4,6 +4,9 @@ description: Comprehensive Go code review for idiomatic patterns, concurrency sa
 
 # Go 程式碼審查
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 此指令呼叫 **go-reviewer** Agent 進行全面的 Go 特定程式碼審查。
 
 ## 此指令的功能

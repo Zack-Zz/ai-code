@@ -4,6 +4,9 @@ description: PEP 8準拠、型ヒント、セキュリティ、Pythonic慣用句
 
 # Python Code Review
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 このコマンドは、Python固有の包括的なコードレビューのために**python-reviewer**エージェントを呼び出します。
 
 ## このコマンドの機能

@@ -6,18 +6,21 @@ command: true
 
 # インスティンクトインポートコマンド
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 ## 実装
 
 プラグインルートパスを使用してインスティンクトCLIを実行します:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" import <file-or-url> [--dry-run] [--force] [--min-confidence 0.7]
+python3 "${AI_CODE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" import <file-or-url> [--dry-run] [--force] [--min-confidence 0.7]
 ```
 
-または、`CLAUDE_PLUGIN_ROOT` が設定されていない場合（手動インストール）:
+または、`AI_CODE_PLUGIN_ROOT` が設定されていない場合（手動インストール）:
 
 ```bash
-python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py import <file-or-url>
+python3 $AI_CODE_HOME/skills/continuous-learning-v2/scripts/instinct-cli.py import <file-or-url>
 ```
 
 以下のソースからインスティンクトをインポートできます:
@@ -40,7 +43,7 @@ python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py import <
 2. 形式を解析して検証
 3. 既存のインスティンクトとの重複をチェック
 4. 新しいインスティンクトをマージまたは追加
-5. `~/.claude/homunculus/instincts/inherited/` に保存
+5. `$AI_CODE_HOME/homunculus/instincts/inherited/` に保存
 
 ## インポートプロセス
 
@@ -136,7 +139,7 @@ Added: 8 instincts
 Updated: 1 instinct
 Skipped: 3 instincts (2 duplicates, 1 conflict)
 
-New instincts saved to: ~/.claude/homunculus/instincts/inherited/
+New instincts saved to: $AI_CODE_HOME/homunculus/instincts/inherited/
 
 Run /instinct-status to see all instincts.
 ```

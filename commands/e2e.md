@@ -4,6 +4,9 @@ description: Generate and run end-to-end tests with Playwright. Creates test jou
 
 # E2E Command
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 This command invokes the **e2e-runner** agent to generate, maintain, and execute end-to-end tests using Playwright.
 
 ## What This Command Does
@@ -338,7 +341,7 @@ For PMX, prioritize these E2E tests:
 ## Related Agents
 
 This command invokes the `e2e-runner` agent located at:
-`~/.claude/agents/e2e-runner.md`
+`$AI_CODE_HOME/agents/e2e-runner.md`
 
 ## Quick Commands
 

@@ -13,18 +13,18 @@ Set up package manager preference for the project or globally.
 
 ## Detection Order
 
-1. **Environment variable**: `CLAUDE_PACKAGE_MANAGER`
+1. **Environment variable**: `AI_CODE_PACKAGE_MANAGER`
 2. **Project config**: `.claude/package-manager.json`
 3. **package.json**: `packageManager` field
 4. **Lock file**: Auto-detect from lock files
-5. **Global config**: `~/.claude/package-manager.json`
+5. **Global config**: `$AI_CODE_HOME/package-manager.json`
 6. **Fallback**: First available
 
 ## Configuration Options
 
 ### Option 1: Environment Variable
 ```bash
-export CLAUDE_PACKAGE_MANAGER=pnpm
+export AI_CODE_PACKAGE_MANAGER=pnpm
 ```
 
 ### Option 2: Project Config
@@ -42,8 +42,8 @@ echo '{"packageManager": "pnpm"}' > .claude/package-manager.json
 
 ### Option 4: Global Config
 ```bash
-# Create ~/.claude/package-manager.json
-echo '{"packageManager": "yarn"}' > ~/.claude/package-manager.json
+# Create $AI_CODE_HOME/package-manager.json
+echo '{"packageManager": "yarn"}' > $AI_CODE_HOME/package-manager.json
 ```
 
 ## Supported Package Managers

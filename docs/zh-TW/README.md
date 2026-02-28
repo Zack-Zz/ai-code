@@ -54,7 +54,7 @@ export AI_CODE_HOME=/path/to/assistant-home
 
 - `AI_CODE_HOME` 優先級最高。
 - 未設定 `AI_CODE_HOME` 且 `AI_CODE_TOOL=codex` 時，預設目錄是 `~/.codex`。
-- 其他情況預設目錄是 `~/.claude`。
+- 其他情況預設目錄是 `$AI_CODE_HOME`。
 - 也可在單次執行使用 `--tool`、`--home` 參數。
 
 ---
@@ -111,24 +111,24 @@ cd ai-code
 
 ## 🌐 跨平台支援
 
-此外掛程式現已完整支援 **Windows、macOS 和 Linux**。所有鉤子和腳本已使用 Node.js 重寫以獲得最佳相容性。
+此工具集現已完整支援 **Windows、macOS 和 Linux**。所有鉤子和腳本已使用 Node.js 重寫以獲得最佳相容性。
 
 ### 套件管理器偵測
 
-外掛程式會自動偵測您偏好的套件管理器（npm、pnpm、yarn 或 bun），優先順序如下：
+在 Claude Code 工作流中，套件管理器偵測優先順序如下：
 
-1. **環境變數**：`CLAUDE_PACKAGE_MANAGER`
+1. **環境變數**：`AI_CODE_PACKAGE_MANAGER`
 2. **專案設定**：`.claude/package-manager.json`
 3. **package.json**：`packageManager` 欄位
 4. **鎖定檔案**：從 package-lock.json、yarn.lock、pnpm-lock.yaml 或 bun.lockb 偵測
-5. **全域設定**：`~/.claude/package-manager.json`
+5. **全域設定**：`$AI_CODE_HOME/package-manager.json`
 6. **備援方案**：第一個可用的套件管理器
 
 設定您偏好的套件管理器：
 
 ```bash
 # 透過環境變數
-export CLAUDE_PACKAGE_MANAGER=pnpm
+export AI_CODE_PACKAGE_MANAGER=pnpm
 
 # 透過全域設定
 node scripts/setup-package-manager.js --global pnpm
@@ -146,7 +146,7 @@ node scripts/setup-package-manager.js --detect
 
 ## 📦 內容概覽
 
-本儲存庫是一個 **Claude Code 外掛程式** - 可直接安裝或手動複製元件。
+本儲存庫是一個 **多助手工具集**，包含 Claude Code 外掛資產、Codex 設定與 Kiro steering 檔案。
 
 ```
 ai-code/
@@ -197,7 +197,7 @@ ai-code/
 |   |-- go-test.md          # /go-test - Go TDD 工作流程（新增）
 |   |-- go-build.md         # /go-build - 修復 Go 建置錯誤（新增）
 |
-|-- rules/            # 必須遵守的準則（複製到 ~/.claude/rules/）
+|-- rules/            # 必須遵守的準則（複製到 $AI_CODE_HOME/rules/）
 |   |-- security.md         # 強制性安全檢查
 |   |-- coding-style.md     # 不可變性、檔案組織
 |   |-- testing.md          # TDD、80% 覆蓋率要求
@@ -259,7 +259,7 @@ ai-code/
 
 ```bash
 # 安裝 GitHub App 後，技能會出現在：
-~/.claude/skills/generated/
+$AI_CODE_HOME/skills/generated/
 ```
 
 與 `continuous-learning-v2` 技能無縫整合以繼承本能。
@@ -280,7 +280,7 @@ ai-code/
 /plugin install ai-code@ai-code
 ```
 
-或直接新增到您的 `~/.claude/settings.json`：
+或直接新增到您的 `$AI_CODE_HOME/settings.json`：
 
 ```json
 {
@@ -311,25 +311,25 @@ ai-code/
 git clone https://github.com/Zack-Zz/ai-code.git
 
 # 將代理程式複製到您的 Claude 設定
-cp ai-code/agents/*.md ~/.claude/agents/
+cp ai-code/agents/*.md $AI_CODE_HOME/agents/
 
 # 複製規則
-cp ai-code/rules/*.md ~/.claude/rules/
+cp ai-code/rules/*.md $AI_CODE_HOME/rules/
 
 # 複製指令
-cp ai-code/commands/*.md ~/.claude/commands/
+cp ai-code/commands/*.md $AI_CODE_HOME/commands/
 
 # 複製技能
-cp -r ai-code/skills/* ~/.claude/skills/
+cp -r ai-code/skills/* $AI_CODE_HOME/skills/
 ```
 
 #### 將鉤子新增到 settings.json
 
-將 `hooks/hooks.json` 中的鉤子複製到您的 `~/.claude/settings.json`。
+將 `hooks/hooks.json` 中的鉤子複製到您的 `$AI_CODE_HOME/settings.json`。
 
 #### 設定 MCP
 
-將 `mcp-configs/mcp-servers.json` 中所需的 MCP 伺服器複製到您的 `~/.claude.json`。
+將 `mcp-configs/mcp-servers.json` 中所需的 MCP 伺服器複製到您的 `$AI_CODE_HOME/config.json`。
 
 **重要：** 將 `YOUR_*_HERE` 佔位符替換為您實際的 API 金鑰。
 
@@ -385,7 +385,7 @@ You are a senior code reviewer...
 規則是必須遵守的準則。保持模組化：
 
 ```
-~/.claude/rules/
+$AI_CODE_HOME/rules/
   security.md      # 禁止寫死密鑰
   coding-style.md  # 不可變性、檔案限制
   testing.md       # TDD、覆蓋率要求

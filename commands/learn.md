@@ -33,7 +33,7 @@ Look for:
 
 ## Output Format
 
-Create a skill file at `~/.claude/skills/learned/[pattern-name].md`:
+Create a skill file at `$AI_CODE_HOME/skills/learned/[pattern-name].md`:
 
 ```markdown
 # [Descriptive Pattern Name]
@@ -60,7 +60,7 @@ Create a skill file at `~/.claude/skills/learned/[pattern-name].md`:
 2. Identify the most valuable/reusable insight
 3. Draft the skill file
 4. Ask user to confirm before saving
-5. Save to `~/.claude/skills/learned/`
+5. Save to `$AI_CODE_HOME/skills/learned/`
 
 ## Notes
 
@@ -68,3 +68,6 @@ Create a skill file at `~/.claude/skills/learned/[pattern-name].md`:
 - Don't extract one-time issues (specific API outages, etc.)
 - Focus on patterns that will save time in future sessions
 - Keep skills focused - one pattern per skill
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

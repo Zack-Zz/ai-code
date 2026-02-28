@@ -10,7 +10,7 @@
 
 類型：feat、fix、refactor、docs、test、chore、perf、ci
 
-注意：歸屬透過 ~/.claude/settings.json 全域停用。
+注意：歸屬透過 $AI_CODE_HOME/settings.json 全域停用。
 
 ## Pull Request 工作流程
 

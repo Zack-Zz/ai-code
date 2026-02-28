@@ -5,6 +5,9 @@ disable-model-invocation: true
 
 # 包管理器设置
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 配置您为此项目或全局偏好的包管理器。
 
 ## 使用方式
@@ -27,11 +30,11 @@ node scripts/setup-package-manager.js --list
 
 在确定使用哪个包管理器时，会按以下顺序检查：
 
-1. **环境变量**：`CLAUDE_PACKAGE_MANAGER`
+1. **环境变量**：`AI_CODE_PACKAGE_MANAGER`
 2. **项目配置**：`.claude/package-manager.json`
 3. **package.json**：`packageManager` 字段
 4. **锁文件**：package-lock.json、yarn.lock、pnpm-lock.yaml 或 bun.lockb 的存在
-5. **全局配置**：`~/.claude/package-manager.json`
+5. **全局配置**：`$AI_CODE_HOME/package-manager.json`
 6. **回退方案**：第一个可用的包管理器 (pnpm > bun > yarn > npm)
 
 ## 配置文件
@@ -39,7 +42,7 @@ node scripts/setup-package-manager.js --list
 ### 全局配置
 
 ```json
-// ~/.claude/package-manager.json
+// $AI_CODE_HOME/package-manager.json
 {
   "packageManager": "pnpm"
 }
@@ -64,14 +67,14 @@ node scripts/setup-package-manager.js --list
 
 ## 环境变量
 
-设置 `CLAUDE_PACKAGE_MANAGER` 以覆盖所有其他检测方法：
+设置 `AI_CODE_PACKAGE_MANAGER` 以覆盖所有其他检测方法：
 
 ```bash
 # Windows (PowerShell)
-$env:CLAUDE_PACKAGE_MANAGER = "pnpm"
+$env:AI_CODE_PACKAGE_MANAGER = "pnpm"
 
 # macOS/Linux
-export CLAUDE_PACKAGE_MANAGER=pnpm
+export AI_CODE_PACKAGE_MANAGER=pnpm
 ```
 
 ## 运行检测

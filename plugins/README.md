@@ -77,7 +77,7 @@ claude plugin marketplace add https://github.com/mixedbread-ai/mgrep
 ## Plugin Files Location
 
 ```
-~/.claude/plugins/
+$AI_CODE_HOME/plugins/
 |-- cache/                    # Downloaded plugins
 |-- installed_plugins.json    # Installed list
 |-- known_marketplaces.json   # Added marketplaces

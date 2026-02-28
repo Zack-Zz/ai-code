@@ -6,18 +6,21 @@ command: true
 
 # Evolve 命令
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 ## 实现方式
 
 使用插件根路径运行 instinct CLI：
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" evolve [--generate]
+python3 "${AI_CODE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" evolve [--generate]
 ```
 
-或者如果 `CLAUDE_PLUGIN_ROOT` 未设置（手动安装）：
+或者如果 `AI_CODE_PLUGIN_ROOT` 未设置（手动安装）：
 
 ```bash
-python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py evolve [--generate]
+python3 $AI_CODE_HOME/skills/continuous-learning-v2/scripts/instinct-cli.py evolve [--generate]
 ```
 
 分析本能并将相关的本能聚合成更高层次的结构：
@@ -88,7 +91,7 @@ python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py evolve [
 
 ## 操作步骤
 
-1. 从 `~/.claude/homunculus/instincts/` 读取所有本能
+1. 从 `$AI_CODE_HOME/homunculus/instincts/` 读取所有本能
 2. 按以下方式对本能进行分组：
    * 领域相似性
    * 触发器模式重叠
@@ -96,7 +99,7 @@ python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py evolve [
 3. 对于每个包含 3 个以上相关本能的集群：
    * 确定演化类型（命令/技能/代理）
    * 生成相应的文件
-   * 保存到 `~/.claude/homunculus/evolved/{commands,skills,agents}/`
+   * 保存到 `$AI_CODE_HOME/homunculus/evolved/{commands,skills,agents}/`
 4. 将演化后的结构链接回源本能
 
 ## 输出格式
@@ -114,7 +117,7 @@ Confidence: 85% (based on 12 observations)
 
 Would create: /new-table command
 Files:
-  - ~/.claude/homunculus/evolved/commands/new-table.md
+  - $AI_CODE_HOME/homunculus/evolved/commands/new-table.md
 
 ## Cluster 2: Functional Code Style
 Instincts: prefer-functional, use-immutable, avoid-classes, pure-functions
@@ -123,7 +126,7 @@ Confidence: 78% (based on 8 observations)
 
 Would create: functional-patterns skill
 Files:
-  - ~/.claude/homunculus/evolved/skills/functional-patterns.md
+  - $AI_CODE_HOME/homunculus/evolved/skills/functional-patterns.md
 
 ## Cluster 3: Debugging Process
 Instincts: debug-check-logs, debug-isolate, debug-reproduce, debug-verify
@@ -132,7 +135,7 @@ Confidence: 72% (based on 6 observations)
 
 Would create: debugger agent
 Files:
-  - ~/.claude/homunculus/evolved/agents/debugger.md
+  - $AI_CODE_HOME/homunculus/evolved/agents/debugger.md
 
 ---
 Run `/evolve --execute` to create these files.

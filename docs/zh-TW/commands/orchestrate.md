@@ -138,3 +138,6 @@ $ARGUMENTS:
 3. **對驗證/支付/PII 使用 security-reviewer**
 4. **保持交接簡潔** - 專注於下一個 Agent 需要的內容
 5. **如有需要，在 Agents 之間執行 verification**
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

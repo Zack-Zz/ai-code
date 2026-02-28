@@ -29,7 +29,7 @@ description: Suggests manual context compaction at logical intervals to preserve
 
 ## Hook 設定
 
-新增到你的 `~/.claude/settings.json`：
+新增到你的 `$AI_CODE_HOME/settings.json`：
 
 ```json
 {
@@ -38,7 +38,7 @@ description: Suggests manual context compaction at logical intervals to preserve
       "matcher": "tool == \"Edit\" || tool == \"Write\"",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/strategic-compact/suggest-compact.sh"
+        "command": "$AI_CODE_HOME/skills/strategic-compact/suggest-compact.sh"
       }]
     }]
   }
@@ -59,5 +59,5 @@ description: Suggests manual context compaction at logical intervals to preserve
 
 ## 相關
 
-- [Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - Token 優化章節
+- [Longform Guide](../../../USAGE.md) - Token 優化章節
 - 記憶持久性 hooks - 用於壓縮後存活的狀態

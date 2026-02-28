@@ -4,6 +4,9 @@ description: 逐步修复Go构建错误、go vet警告和linter问题。调用go
 
 # Go 构建与修复
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 此命令调用 **go-build-resolver** 代理，以最小的更改增量修复 Go 构建错误。
 
 ## 此命令的作用

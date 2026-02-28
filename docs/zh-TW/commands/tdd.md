@@ -4,6 +4,9 @@ description: Enforce test-driven development workflow. Scaffold interfaces, gene
 
 # TDD 指令
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 此指令呼叫 **tdd-guide** Agent 來強制執行測試驅動開發方法論。
 
 ## 此指令的功能
@@ -94,7 +97,7 @@ REPEAT:   下一個功能/情境
 ## 相關 Agent
 
 此指令呼叫位於以下位置的 `tdd-guide` Agent：
-`~/.claude/agents/tdd-guide.md`
+`$AI_CODE_HOME/agents/tdd-guide.md`
 
 並可參考位於以下位置的 `tdd-workflow` 技能：
-`~/.claude/skills/tdd-workflow/`
+`$AI_CODE_HOME/skills/tdd-workflow/`

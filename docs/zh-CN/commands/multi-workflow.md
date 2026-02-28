@@ -37,7 +37,7 @@
 ```
 # New session call
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement (or $ARGUMENTS if not enhanced)>
@@ -52,7 +52,7 @@ EOF",
 
 # Resume session call
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement (or $ARGUMENTS if not enhanced)>
@@ -74,9 +74,9 @@ EOF",
 
 | 阶段 | Codex | Gemini |
 |-------|-------|--------|
-| 分析 | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| 规划 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/architect.md` |
-| 审查 | `~/.claude/.ccg/prompts/codex/reviewer.md` | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
+| 分析 | `$AI_CODE_HOME/.ccg/prompts/codex/analyzer.md` | `$AI_CODE_HOME/.ccg/prompts/gemini/analyzer.md` |
+| 规划 | `$AI_CODE_HOME/.ccg/prompts/codex/architect.md` | `$AI_CODE_HOME/.ccg/prompts/gemini/architect.md` |
+| 审查 | `$AI_CODE_HOME/.ccg/prompts/codex/reviewer.md` | `$AI_CODE_HOME/.ccg/prompts/gemini/reviewer.md` |
 
 **会话复用**：每次调用返回 `SESSION_ID: xxx`，在后续阶段使用 `resume xxx` 子命令（注意：`resume`，而非 `--resume`）。
 
@@ -187,3 +187,6 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 1. 阶段顺序不可跳过（除非用户明确指示）
 2. 外部模型**对文件系统零写入权限**，所有修改由 Claude 执行
 3. 当评分 < 7 或用户不批准时**强制停止**
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

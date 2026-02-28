@@ -62,8 +62,8 @@ Use this skill when:
 Before writing a utility or adding functionality, mentally run through:
 
 1. Is this a common problem? → Search npm/PyPI
-2. Is there an MCP for this? → Check `~/.claude/settings.json` and search
-3. Is there a skill for this? → Check `~/.claude/skills/`
+2. Is there an MCP for this? → Check `$AI_CODE_HOME/settings.json` and search
+3. Is there a skill for this? → Check `$AI_CODE_HOME/skills/`
 4. Is there a GitHub template? → Search GitHub
 
 ### Full Mode (agent)

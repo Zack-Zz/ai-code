@@ -33,7 +33,7 @@
 ```
 # New session call
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini --gemini-model gemini-3-pro-preview - \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini --gemini-model gemini-3-pro-preview - \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement (or $ARGUMENTS if not enhanced)>
@@ -48,7 +48,7 @@ EOF",
 
 # Resume session call
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini --gemini-model gemini-3-pro-preview resume <SESSION_ID> - \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini --gemini-model gemini-3-pro-preview resume <SESSION_ID> - \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement (or $ARGUMENTS if not enhanced)>
@@ -66,9 +66,9 @@ EOF",
 
 | 阶段 | Gemini |
 |-------|--------|
-| 分析 | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| 规划 | `~/.claude/.ccg/prompts/gemini/architect.md` |
-| 评审 | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
+| 分析 | `$AI_CODE_HOME/.ccg/prompts/gemini/analyzer.md` |
+| 规划 | `$AI_CODE_HOME/.ccg/prompts/gemini/architect.md` |
+| 评审 | `$AI_CODE_HOME/.ccg/prompts/gemini/reviewer.md` |
 
 **会话重用**: 每次调用返回 `SESSION_ID: xxx`，在后续阶段使用 `resume xxx`。在阶段 2 保存 `GEMINI_SESSION`，在阶段 3 和 5 使用 `resume`。
 
@@ -101,7 +101,7 @@ EOF",
 
 **必须调用 Gemini**（遵循上述调用规范）:
 
-* ROLE\_FILE: `~/.claude/.ccg/prompts/gemini/analyzer.md`
+* ROLE\_FILE: `$AI_CODE_HOME/.ccg/prompts/gemini/analyzer.md`
 * 需求: 增强后的需求（或未经增强的 $ARGUMENTS）
 * 上下文: 来自阶段 1 的项目上下文
 * 输出: UI 可行性分析、推荐解决方案（至少 2 个）、UX 评估
@@ -116,7 +116,7 @@ EOF",
 
 **必须调用 Gemini**（使用 `resume <GEMINI_SESSION>` 来重用会话）:
 
-* ROLE\_FILE: `~/.claude/.ccg/prompts/gemini/architect.md`
+* ROLE\_FILE: `$AI_CODE_HOME/.ccg/prompts/gemini/architect.md`
 * 需求: 用户选择的解决方案
 * 上下文: 阶段 2 的分析结果
 * 输出: 组件结构、UI 流程、样式方案
@@ -137,7 +137,7 @@ Claude 综合规划，在用户批准后保存到 `.claude/plan/task-name.md`。
 
 **必须调用 Gemini**（遵循上述调用规范）:
 
-* ROLE\_FILE: `~/.claude/.ccg/prompts/gemini/reviewer.md`
+* ROLE\_FILE: `$AI_CODE_HOME/.ccg/prompts/gemini/reviewer.md`
 * 需求: 评审以下前端代码变更
 * 上下文: git diff 或代码内容
 * 输出: 可访问性、响应式设计、性能、设计一致性等问题列表
@@ -160,3 +160,6 @@ Claude 综合规划，在用户批准后保存到 `.claude/plan/task-name.md`。
 2. **Codex 的前端意见仅供参考**
 3. 外部模型**没有文件系统写入权限**
 4. Claude 处理所有代码写入和文件操作
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

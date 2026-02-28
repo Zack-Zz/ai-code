@@ -78,3 +78,6 @@ All tests passing ✅
 - **One deletion at a time** — Atomic changes make rollback easy
 - **Skip if uncertain** — Better to keep dead code than break production
 - **Don't refactor while cleaning** — Separate concerns (clean first, refactor later)
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

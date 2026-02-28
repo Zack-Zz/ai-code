@@ -62,7 +62,7 @@ git checkout -b feat/my-contribution
 # 3. 貢献を追加（以下のセクション参照）
 
 # 4. ローカルでテスト
-cp -r skills/my-skill ~/.claude/skills/  # スキルの場合
+cp -r skills/my-skill $AI_CODE_HOME/skills/  # スキルの場合
 # その後、Claude Codeでテスト
 
 # 5. PR を送信
@@ -423,7 +423,7 @@ docs: improve contributing guide
 ## 質問がありますか？
 
 - **Issues:** [github.com/Zack-Zz/ai-code/issues](https://github.com/Zack-Zz/ai-code/issues)
-- **X/Twitter:** [@affaanmustafa](https://x.com/affaanmustafa)
+- **Discussions:** [github.com/Zack-Zz/ai-code/discussions](https://github.com/Zack-Zz/ai-code/discussions)
 
 ---
 

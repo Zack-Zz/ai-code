@@ -18,7 +18,7 @@ Claude Codeセッションからの観察を分析してパターンを検出し
 
 ## 入力
 
-`~/.claude/homunculus/observations.jsonl`から観察を読み取ります:
+`$AI_CODE_HOME/homunculus/observations.jsonl`から観察を読み取ります:
 
 ```jsonl
 {"timestamp":"2025-01-22T10:30:00Z","event":"tool_start","session":"abc123","tool":"Edit","input":"..."}
@@ -65,7 +65,7 @@ Claude Codeセッションからの観察を分析してパターンを検出し
 
 ## 出力
 
-`~/.claude/homunculus/instincts/personal/`に本能を作成/更新:
+`$AI_CODE_HOME/homunculus/instincts/personal/`に本能を作成/更新:
 
 ```yaml
 ---

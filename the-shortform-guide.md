@@ -1,7 +1,5 @@
 # The Shorthand Guide to ai-code
 
-![Header: Anthropic Hackathon Winner - Tips & Tricks for Claude Code](./assets/images/shortform/00-header.png)
-
 ---
 
 **Been an avid Claude Code user since the experimental rollout in Feb, and won the Anthropic x Forum Ventures hackathon with [zenith.chat](https://zenith.chat) alongside [@DRodriguezFX](https://x.com/DRodriguezFX) - completely using Claude Code.**
@@ -16,17 +14,16 @@ Skills operate like rules, constricted to certain scopes and workflows. They're 
 
 After a long session of coding with Opus 4.5, you want to clean out dead code and loose .md files? Run `/refactor-clean`. Need testing? `/tdd`, `/e2e`, `/test-coverage`. Skills can also include codemaps - a way for Claude to quickly navigate your codebase without burning context on exploration.
 
-![Terminal showing chained commands](./assets/images/shortform/02-chaining-commands.jpeg)
 *Chaining commands together*
 
 Commands are skills executed via slash commands. They overlap but are stored differently:
 
-- **Skills**: `~/.claude/skills/` - broader workflow definitions
-- **Commands**: `~/.claude/commands/` - quick executable prompts
+- **Skills**: `$AI_CODE_HOME/skills/` - broader workflow definitions
+- **Commands**: `$AI_CODE_HOME/commands/` - quick executable prompts
 
 ```bash
 # Example skill structure
-~/.claude/skills/
+$AI_CODE_HOME/skills/
   pmx-guidelines.md      # Project-specific patterns
   coding-standards.md    # Language best practices
   tdd-workflow/          # Multi-file skill with README.md
@@ -66,7 +63,6 @@ Hooks are trigger-based automations that fire on specific events. Unlike skills,
 }
 ```
 
-![PostToolUse hook feedback](./assets/images/shortform/03-posttooluse-hook.png)
 *Example of what feedback you get in Claude Code, while running a PostToolUse hook*
 
 **Pro tip:** Use the `hookify` plugin to create hooks conversationally instead of writing JSON manually. Run `/hookify` and describe what you want.
@@ -81,7 +77,7 @@ Subagents work nicely with skills - a subagent capable of executing a subset of 
 
 ```bash
 # Example subagent structure
-~/.claude/agents/
+$AI_CODE_HOME/agents/
   planner.md           # Feature implementation planning
   architect.md         # System design decisions
   tdd-guide.md         # Test-driven development
@@ -104,7 +100,7 @@ Your `.rules` folder holds `.md` files with best practices Claude should ALWAYS 
 2. **Rules folder** - Modular `.md` files grouped by concern
 
 ```bash
-~/.claude/rules/
+$AI_CODE_HOME/rules/
   security.md      # No hardcoded secrets, validate inputs
   coding-style.md  # Immutability, file organization
   testing.md       # TDD workflow, 80% coverage
@@ -129,7 +125,6 @@ MCPs connect Claude to external services directly. Not a replacement for APIs - 
 
 **Example:** Supabase MCP lets Claude pull specific data, run SQL directly upstream without copy-paste. Same for databases, deployment platforms, etc.
 
-![Supabase MCP listing tables](./assets/images/shortform/04-supabase-mcp.jpeg)
 *Example of the Supabase MCP listing the tables within the public schema*
 
 **Chrome in Claude:** is a built-in plugin MCP that lets Claude autonomously control your browser - clicking around to see how things work.
@@ -138,7 +133,6 @@ MCPs connect Claude to external services directly. Not a replacement for APIs - 
 
 Be picky with MCPs. I keep all MCPs in user config but **disable everything unused**. Navigate to `/plugins` and scroll down or run `/mcp`.
 
-![/plugins interface](./assets/images/shortform/05-plugins-interface.jpeg)
 *Using /plugins to navigate to MCPs to see which ones are currently installed and their status*
 
 Your 200k context window before compacting might only be 70k with too many tools enabled. Performance degrades significantly.
@@ -149,7 +143,7 @@ Your 200k context window before compacting might only be 70k with too many tools
 # Check enabled MCPs
 /mcp
 
-# Disable unused ones in ~/.claude.json under projects.disabledMcpServers
+# Disable unused ones in $AI_CODE_HOME/config.json under projects.disabledMcpServers
 ```
 
 ---
@@ -167,7 +161,6 @@ claude plugin marketplace add https://github.com/mixedbread-ai/mgrep
 # Open Claude, run /plugins, find new marketplace, install from there
 ```
 
-![Marketplaces tab showing mgrep](./assets/images/shortform/06-marketplaces-mgrep.jpeg)
 *Displaying the newly installed Mixedbread-Grep marketplace*
 
 **LSP Plugins** are particularly useful if you run Claude Code outside editors frequently. Language Server Protocol gives Claude real-time type checking, go-to-definition, and intelligent completions without needing an IDE open.
@@ -238,7 +231,6 @@ mgrep --web "Next.js 15 app router changes"  # Web search
 
 Set up code review on your PRs with GitHub Actions. Claude can review PRs automatically when configured.
 
-![Claude bot approving a PR](./assets/images/shortform/08-github-pr-review.jpeg)
 *Claude approving a bug fix PR*
 
 ### Sandboxing
@@ -263,7 +255,6 @@ I use [Zed](https://zed.dev) - written in Rust, so it's genuinely fast. Opens in
 - **Minimal Resource Usage** - Won't compete with Claude for RAM/CPU during heavy operations. Important when running Opus
 - **Vim Mode** - Full vim keybindings if that's your thing
 
-![Zed Editor with custom commands](./assets/images/shortform/09-zed-editor.jpeg)
 *Zed Editor with custom commands dropdown using CMD+Shift+R. Following mode shown as the bullseye in the bottom right.*
 
 **Editor-Agnostic Tips:**
@@ -278,7 +269,6 @@ I use [Zed](https://zed.dev) - written in Rust, so it's genuinely fast. Opens in
 
 This is also a viable choice and works well with Claude Code. You can use it in either terminal format, with automatic sync with your editor using `\ide` enabling LSP functionality (somewhat redundant with plugins now). Or you can opt for the extension which is more integrated with the Editor and has a matching UI.
 
-![VS Code Claude Code Extension](./assets/images/shortform/10-vscode-extension.jpeg)
 *The VS Code extension provides a native graphical interface for Claude Code, integrated directly into your IDE.*
 
 ---
@@ -362,7 +352,6 @@ This is the key - I have 14 MCPs configured but only ~5-6 enabled per project. K
 
 Shows user, directory, git branch with dirty indicator, context remaining %, model, time, and todo count:
 
-![Custom status line](./assets/images/shortform/11-statusline.jpeg)
 *Example statusline in my Mac root directory*
 
 ```
@@ -373,7 +362,7 @@ affoon:~ ctx:65% Opus 4.5 19:52
 ### Rules Structure
 
 ```
-~/.claude/rules/
+$AI_CODE_HOME/rules/
   security.md      # Mandatory security checks
   coding-style.md  # Immutability, file size limits
   testing.md       # TDD, 80% coverage
@@ -387,7 +376,7 @@ affoon:~ ctx:65% Opus 4.5 19:52
 ### Subagents
 
 ```
-~/.claude/agents/
+$AI_CODE_HOME/agents/
   planner.md           # Break down features
   architect.md         # System design
   tdd-guide.md         # Write tests first

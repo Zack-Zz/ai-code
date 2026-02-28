@@ -18,7 +18,7 @@ run_mode: background
 
 ## 输入
 
-从 `~/.claude/homunculus/observations.jsonl` 读取观察结果：
+从 `$AI_CODE_HOME/homunculus/observations.jsonl` 读取观察结果：
 
 ```jsonl
 {"timestamp":"2025-01-22T10:30:00Z","event":"tool_start","session":"abc123","tool":"Edit","input":"..."}
@@ -73,7 +73,7 @@ run_mode: background
 
 ## 输出
 
-在 `~/.claude/homunculus/instincts/personal/` 中创建/更新本能：
+在 `$AI_CODE_HOME/homunculus/instincts/personal/` 中创建/更新本能：
 
 ```yaml
 ---

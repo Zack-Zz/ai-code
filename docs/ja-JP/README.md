@@ -58,7 +58,7 @@ export AI_CODE_HOME=/path/to/assistant-home
 
 - `AI_CODE_HOME` が最優先です。
 - `AI_CODE_HOME` 未設定かつ `AI_CODE_TOOL=codex` の場合、既定は `~/.codex` です。
-- それ以外は既定で `~/.claude` を使用します。
+- それ以外は既定で `$AI_CODE_HOME` を使用します。
 - 単発実行では `--tool`、`--home` も利用できます。
 
 ---
@@ -104,24 +104,24 @@ cd ai-code
 
 ## 🌐 クロスプラットフォーム対応
 
-このプラグインは **Windows、macOS、Linux** を完全にサポートしています。すべてのフックとスクリプトが Node.js で書き直され、最大の互換性を実現しています。
+このツールキットは **Windows、macOS、Linux** を完全にサポートしています。すべてのフックとスクリプトが Node.js で書き直され、最大の互換性を実現しています。
 
 ### パッケージマネージャー検出
 
-プラグインは、以下の優先順位で、お好みのパッケージマネージャー（npm、pnpm、yarn、bun）を自動検出します：
+Claude Code ワークフローでは、以下の優先順位でパッケージマネージャーを検出します：
 
-1. **環境変数**: `CLAUDE_PACKAGE_MANAGER`
+1. **環境変数**: `AI_CODE_PACKAGE_MANAGER`
 2. **プロジェクト設定**: `.claude/package-manager.json`
 3. **package.json**: `packageManager` フィールド
 4. **ロックファイル**: package-lock.json、yarn.lock、pnpm-lock.yaml、bun.lockb から検出
-5. **グローバル設定**: `~/.claude/package-manager.json`
+5. **グローバル設定**: `$AI_CODE_HOME/package-manager.json`
 6. **フォールバック**: 最初に利用可能なパッケージマネージャー
 
 お好みのパッケージマネージャーを設定するには：
 
 ```bash
 # 環境変数経由
-export CLAUDE_PACKAGE_MANAGER=pnpm
+export AI_CODE_PACKAGE_MANAGER=pnpm
 
 # グローバル設定経由
 node scripts/setup-package-manager.js --global pnpm
@@ -139,7 +139,7 @@ node scripts/setup-package-manager.js --detect
 
 ## 📦 含まれるもの
 
-このリポジトリは**Claude Codeプラグイン**です - 直接インストールするか、コンポーネントを手動でコピーできます。
+このリポジトリは**マルチアシスタントツールキット**であり、Claude Code プラグイン資産、Codex 設定、Kiro steering ファイルを含みます。
 
 ```
 ai-code/
@@ -216,7 +216,7 @@ ai-code/
 |   |-- multi-frontend.md   # /multi-frontend - フロントエンド マルチサービス オーケストレーション（新規）
 |   |-- multi-workflow.md   # /multi-workflow - 一般的なマルチサービス ワークフロー（新規）
 |
-|-- rules/            # 常に従うべきガイドライン（~/.claude/rules/ にコピー）
+|-- rules/            # 常に従うべきガイドライン（$AI_CODE_HOME/rules/ にコピー）
 |   |-- README.md            # 構造概要とインストールガイド
 |   |-- common/              # 言語非依存の原則
 |   |   |-- coding-style.md    # イミュータビリティ、ファイル組織
@@ -385,7 +385,7 @@ Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded fil
 /plugin install ai-code@ai-code
 ```
 
-または、`~/.claude/settings.json` に直接追加：
+または、`$AI_CODE_HOME/settings.json` に直接追加：
 
 ```json
 {
@@ -412,11 +412,11 @@ Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded fil
 > git clone https://github.com/Zack-Zz/ai-code.git
 >
 > # オプション A：ユーザーレベルルール（すべてのプロジェクトに適用）
-> mkdir -p ~/.claude/rules
-> cp -r ai-code/rules/common/* ~/.claude/rules/
-> cp -r ai-code/rules/typescript/* ~/.claude/rules/   # スタックを選択
-> cp -r ai-code/rules/python/* ~/.claude/rules/
-> cp -r ai-code/rules/golang/* ~/.claude/rules/
+> mkdir -p $AI_CODE_HOME/rules
+> cp -r ai-code/rules/common/* $AI_CODE_HOME/rules/
+> cp -r ai-code/rules/typescript/* $AI_CODE_HOME/rules/   # スタックを選択
+> cp -r ai-code/rules/python/* $AI_CODE_HOME/rules/
+> cp -r ai-code/rules/golang/* $AI_CODE_HOME/rules/
 >
 > # オプション B：プロジェクトレベルルール（現在のプロジェクトのみ）
 > mkdir -p .claude/rules
@@ -435,28 +435,28 @@ Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded fil
 git clone https://github.com/Zack-Zz/ai-code.git
 
 # エージェントを Claude 設定にコピー
-cp ai-code/agents/*.md ~/.claude/agents/
+cp ai-code/agents/*.md $AI_CODE_HOME/agents/
 
 # ルール（共通 + 言語固有）をコピー
-cp -r ai-code/rules/common/* ~/.claude/rules/
-cp -r ai-code/rules/typescript/* ~/.claude/rules/   # スタックを選択
-cp -r ai-code/rules/python/* ~/.claude/rules/
-cp -r ai-code/rules/golang/* ~/.claude/rules/
+cp -r ai-code/rules/common/* $AI_CODE_HOME/rules/
+cp -r ai-code/rules/typescript/* $AI_CODE_HOME/rules/   # スタックを選択
+cp -r ai-code/rules/python/* $AI_CODE_HOME/rules/
+cp -r ai-code/rules/golang/* $AI_CODE_HOME/rules/
 
 # コマンドをコピー
-cp ai-code/commands/*.md ~/.claude/commands/
+cp ai-code/commands/*.md $AI_CODE_HOME/commands/
 
 # スキルをコピー
-cp -r ai-code/skills/* ~/.claude/skills/
+cp -r ai-code/skills/* $AI_CODE_HOME/skills/
 ```
 
 #### settings.json にフックを追加
 
-`hooks/hooks.json` のフックを `~/.claude/settings.json` にコピーします。
+`hooks/hooks.json` のフックを `$AI_CODE_HOME/settings.json` にコピーします。
 
 #### MCP を設定
 
-`mcp-configs/mcp-servers.json` から必要な MCP サーバーを `~/.claude.json` にコピーします。
+`mcp-configs/mcp-servers.json` から必要な MCP サーバーを `$AI_CODE_HOME/config.json` にコピーします。
 
 **重要:** `YOUR_*_HERE`プレースホルダーを実際のAPIキーに置き換えてください。
 

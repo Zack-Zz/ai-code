@@ -62,4 +62,4 @@ node scripts/hooks/session-end.js --tool claude --home /tmp/ai-code-home
 Path defaults:
 - `AI_CODE_HOME` set: always use that directory
 - `AI_CODE_TOOL=codex`: defaults to `~/.codex`
-- otherwise defaults to `~/.claude`
+- otherwise defaults to `$AI_CODE_HOME`

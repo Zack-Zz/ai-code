@@ -26,3 +26,6 @@
 * 错误处理
 * 边界情况（null、undefined、空值）
 * 边界条件
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

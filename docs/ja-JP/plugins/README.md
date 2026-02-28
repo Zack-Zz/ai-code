@@ -1,6 +1,6 @@
 # プラグインとマーケットプレイス
 
-プラグインは新しいツールと機能でClaude Codeを拡張します。このガイドではインストールのみをカバーしています - いつ、なぜ使用するかについては[完全な記事](https://x.com/affaanmustafa/status/2012378465664745795)を参照してください。
+プラグインは Claude Code の機能を拡張します。このガイドはインストールと有効化に集中しています。マルチアシスタント運用はメイン README と利用ガイドを参照してください。
 
 ---
 
@@ -77,7 +77,7 @@ claude plugin marketplace add https://github.com/mixedbread-ai/mgrep
 ## プラグインファイルの場所
 
 ```
-~/.claude/plugins/
+$AI_CODE_HOME/plugins/
 |-- cache/                    # ダウンロードされたプラグイン
 |-- installed_plugins.json    # インストール済みリスト
 |-- known_marketplaces.json   # 追加されたマーケットプレイス

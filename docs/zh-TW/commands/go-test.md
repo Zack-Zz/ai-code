@@ -4,6 +4,9 @@ description: Enforce TDD workflow for Go. Write table-driven tests first, then i
 
 # Go TDD 指令
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 此指令強制執行 Go 程式碼的測試驅動開發方法論，使用慣用的 Go 測試模式。
 
 ## 此指令的功能

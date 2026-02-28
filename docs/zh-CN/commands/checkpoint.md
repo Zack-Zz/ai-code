@@ -76,3 +76,6 @@ $ARGUMENTS:
 * `verify <name>` - 根据指定名称的检查点进行验证
 * `list` - 显示所有检查点
 * `clear` - 删除旧的检查点（保留最后5个）
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

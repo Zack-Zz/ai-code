@@ -6,7 +6,7 @@
 - **PostToolUse**：工具執行後（自動格式化、檢查）
 - **Stop**：工作階段結束時（最終驗證）
 
-## 目前 Hooks（在 ~/.claude/settings.json）
+## 目前 Hooks（在 $AI_CODE_HOME/settings.json）
 
 ### PreToolUse
 - **tmux 提醒**：建議對長時間執行的指令使用 tmux（npm、pnpm、yarn、cargo 等）
@@ -28,7 +28,7 @@
 - 對受信任、定義明確的計畫啟用
 - 對探索性工作停用
 - 絕不使用 dangerously-skip-permissions flag
-- 改為在 `~/.claude.json` 中設定 `allowedTools`
+- 改為在 `$AI_CODE_HOME/config.json` 中設定 `allowedTools`
 
 ## TodoWrite 最佳實務
 

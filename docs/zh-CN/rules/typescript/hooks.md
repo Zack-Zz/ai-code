@@ -4,7 +4,7 @@
 
 ## PostToolUse 钩子
 
-在 `~/.claude/settings.json` 中配置：
+在 `$AI_CODE_HOME/settings.json` 中配置：
 
 * **Prettier**：编辑后自动格式化 JS/TS 文件
 * **TypeScript 检查**：编辑 `.ts`/`.tsx` 文件后运行 `tsc`

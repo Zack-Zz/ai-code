@@ -1,6 +1,6 @@
 # 用户级别 CLAUDE.md 示例
 
-这是一个用户级别 CLAUDE.md 文件的示例。放置在 `~/.claude/CLAUDE.md`。
+这是一个用户级别 CLAUDE.md 文件的示例。放置在 `$AI_CODE_HOME/CLAUDE.md`。
 
 用户级别配置全局应用于所有项目。用于：
 
@@ -26,7 +26,7 @@
 
 ## 模块化规则
 
-详细指南位于 `~/.claude/rules/`：
+详细指南位于 `$AI_CODE_HOME/rules/`：
 
 | 规则文件 | 内容 |
 |-----------|----------|
@@ -43,7 +43,7 @@
 
 ## 可用代理
 
-位于 `~/.claude/agents/`：
+位于 `$AI_CODE_HOME/agents/`：
 
 | 代理 | 目的 |
 |-------|---------|

@@ -13,7 +13,7 @@
 * 为受信任、定义明确的计划启用
 * 为探索性工作禁用
 * 切勿使用 dangerously-skip-permissions 标志
-* 改为在 `~/.claude.json` 中配置 `allowedTools`
+* 改为在 `$AI_CODE_HOME/config.json` 中配置 `allowedTools`
 
 ## TodoWrite 最佳实践
 

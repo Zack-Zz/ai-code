@@ -12,7 +12,7 @@
 - 信頼できる、明確に定義された計画に対して有効化
 - 探索的な作業では無効化
 - dangerously-skip-permissions フラグを決して使用しない
-- 代わりに `~/.claude.json` で `allowedTools` を設定
+- 代わりに `$AI_CODE_HOME/config.json` で `allowedTools` を設定
 
 ## TodoWrite ベストプラクティス
 

@@ -57,3 +57,6 @@ $ARGUMENTS can be:
 - `full` - All checks (default)
 - `pre-commit` - Checks relevant for commits
 - `pre-pr` - Full checks plus security scan
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

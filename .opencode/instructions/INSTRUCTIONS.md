@@ -1,6 +1,6 @@
-# Everything Claude Code - OpenCode Instructions
+# ai-code - OpenCode Instructions
 
-This document consolidates the core rules and guidelines from the Claude Code configuration for use with OpenCode.
+This document consolidates the core rules and guidelines from ai-code for use with OpenCode.
 
 ## Security Guidelines (CRITICAL)
 

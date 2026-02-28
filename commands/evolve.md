@@ -6,18 +6,21 @@ command: true
 
 # Evolve Command
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 ## Implementation
 
 Run the instinct CLI using the plugin root path:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" evolve [--generate]
+python3 "${AI_CODE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" evolve [--generate]
 ```
 
-Or if `CLAUDE_PLUGIN_ROOT` is not set (manual installation):
+Or if `AI_CODE_PLUGIN_ROOT` is not set (manual installation):
 
 ```bash
-python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py evolve [--generate]
+python3 $AI_CODE_HOME/skills/continuous-learning-v2/scripts/instinct-cli.py evolve [--generate]
 ```
 
 Analyzes instincts and clusters related ones into higher-level structures:
@@ -78,7 +81,7 @@ Example:
 
 ## What to Do
 
-1. Read all instincts from `~/.claude/homunculus/instincts/`
+1. Read all instincts from `$AI_CODE_HOME/homunculus/instincts/`
 2. Group instincts by:
    - Domain similarity
    - Trigger pattern overlap
@@ -86,7 +89,7 @@ Example:
 3. For each cluster of 3+ related instincts:
    - Determine evolution type (command/skill/agent)
    - Generate the appropriate file
-   - Save to `~/.claude/homunculus/evolved/{commands,skills,agents}/`
+   - Save to `$AI_CODE_HOME/homunculus/evolved/{commands,skills,agents}/`
 4. Link evolved structure back to source instincts
 
 ## Output Format
@@ -104,7 +107,7 @@ Confidence: 85% (based on 12 observations)
 
 Would create: /new-table command
 Files:
-  - ~/.claude/homunculus/evolved/commands/new-table.md
+  - $AI_CODE_HOME/homunculus/evolved/commands/new-table.md
 
 ## Cluster 2: Functional Code Style
 Instincts: prefer-functional, use-immutable, avoid-classes, pure-functions
@@ -113,7 +116,7 @@ Confidence: 78% (based on 8 observations)
 
 Would create: functional-patterns skill
 Files:
-  - ~/.claude/homunculus/evolved/skills/functional-patterns.md
+  - $AI_CODE_HOME/homunculus/evolved/skills/functional-patterns.md
 
 ## Cluster 3: Debugging Process
 Instincts: debug-check-logs, debug-isolate, debug-reproduce, debug-verify
@@ -122,7 +125,7 @@ Confidence: 72% (based on 6 observations)
 
 Would create: debugger agent
 Files:
-  - ~/.claude/homunculus/evolved/agents/debugger.md
+  - $AI_CODE_HOME/homunculus/evolved/agents/debugger.md
 
 ---
 Run `/evolve --execute` to create these files.

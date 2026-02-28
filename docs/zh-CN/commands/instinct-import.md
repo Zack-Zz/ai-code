@@ -6,18 +6,21 @@ command: true
 
 # 本能导入命令
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 ## 实现
 
 使用插件根路径运行本能 CLI：
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" import <file-or-url> [--dry-run] [--force] [--min-confidence 0.7]
+python3 "${AI_CODE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" import <file-or-url> [--dry-run] [--force] [--min-confidence 0.7]
 ```
 
-或者，如果 `CLAUDE_PLUGIN_ROOT` 未设置（手动安装）：
+或者，如果 `AI_CODE_PLUGIN_ROOT` 未设置（手动安装）：
 
 ```bash
-python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py import <file-or-url>
+python3 $AI_CODE_HOME/skills/continuous-learning-v2/scripts/instinct-cli.py import <file-or-url>
 ```
 
 从以下来源导入本能：
@@ -41,7 +44,7 @@ python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py import <
 2. 解析并验证格式
 3. 检查与现有本能的重复项
 4. 合并或添加新本能
-5. 保存到 `~/.claude/homunculus/instincts/inherited/`
+5. 保存到 `$AI_CODE_HOME/homunculus/instincts/inherited/`
 
 ## 导入过程
 
@@ -144,7 +147,7 @@ Added: 8 instincts
 Updated: 1 instinct
 Skipped: 3 instincts (2 duplicates, 1 conflict)
 
-New instincts saved to: ~/.claude/homunculus/instincts/inherited/
+New instincts saved to: $AI_CODE_HOME/homunculus/instincts/inherited/
 
 Run /instinct-status to see all instincts.
 ```

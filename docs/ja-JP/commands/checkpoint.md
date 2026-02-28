@@ -76,3 +76,6 @@ $ARGUMENTS:
 * `verify <name>` - 指定の名前のチェックポイントに対して検証
 * `list` - すべてのチェックポイントを表示
 * `clear` - 古いチェックポイント削除（最新 5 個を保持）
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

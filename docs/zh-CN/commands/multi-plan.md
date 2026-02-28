@@ -22,7 +22,7 @@ $ARGUMENTS
 
 ```
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement>
@@ -44,8 +44,8 @@ EOF",
 
 | 阶段 | Codex | Gemini |
 |-------|-------|--------|
-| 分析 | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| 规划 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/architect.md` |
+| 分析 | `$AI_CODE_HOME/.ccg/prompts/codex/analyzer.md` | `$AI_CODE_HOME/.ccg/prompts/gemini/analyzer.md` |
+| 规划 | `$AI_CODE_HOME/.ccg/prompts/codex/architect.md` | `$AI_CODE_HOME/.ccg/prompts/gemini/architect.md` |
 
 **会话复用**：每次调用返回 `SESSION_ID: xxx`（通常由包装器输出），**必须保存** 供后续 `/ccg:execute` 使用。
 
@@ -122,12 +122,12 @@ mcp__ace-tool__search_context({
 将 **原始需求**（不预设观点）分发给两个模型：
 
 1. **Codex 后端分析**：
-   * ROLE\_FILE：`~/.claude/.ccg/prompts/codex/analyzer.md`
+   * ROLE\_FILE：`$AI_CODE_HOME/.ccg/prompts/codex/analyzer.md`
    * 重点：技术可行性、架构影响、性能考虑、潜在风险
    * 输出：多视角解决方案 + 优缺点分析
 
 2. **Gemini 前端分析**：
-   * ROLE\_FILE：`~/.claude/.ccg/prompts/gemini/analyzer.md`
+   * ROLE\_FILE：`$AI_CODE_HOME/.ccg/prompts/gemini/analyzer.md`
    * 重点：UI/UX 影响、用户体验、视觉设计
    * 输出：多视角解决方案 + 优缺点分析
 
@@ -147,11 +147,11 @@ mcp__ace-tool__search_context({
 为减少 Claude 综合计划中的遗漏风险，可以并行让两个模型输出“计划草案”（仍然 **不允许** 修改文件）：
 
 1. **Codex 计划草案**（后端权威）：
-   * ROLE\_FILE：`~/.claude/.ccg/prompts/codex/architect.md`
+   * ROLE\_FILE：`$AI_CODE_HOME/.ccg/prompts/codex/architect.md`
    * 输出：分步计划 + 伪代码（重点：数据流/边缘情况/错误处理/测试策略）
 
 2. **Gemini 计划草案**（前端权威）：
-   * ROLE\_FILE：`~/.claude/.ccg/prompts/gemini/architect.md`
+   * ROLE\_FILE：`$AI_CODE_HOME/.ccg/prompts/gemini/architect.md`
    * 输出：分步计划 + 伪代码（重点：信息架构/交互/可访问性/视觉一致性）
 
 使用 `TaskOutput` 等待两个模型的完整结果，记录它们建议的关键差异。
@@ -268,3 +268,6 @@ mcp__ace-tool__search_context({
 3. **信任规则** – 后端遵循 Codex，前端遵循 Gemini
 4. 外部模型 **零文件系统写入权限**
 5. **SESSION\_ID 交接** – 计划末尾必须包含 `CODEX_SESSION` / `GEMINI_SESSION`（供 `/ccg:execute resume <SESSION_ID>` 使用）
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

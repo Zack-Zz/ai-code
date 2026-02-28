@@ -23,7 +23,7 @@ $ARGUMENTS
 ```
 # Resume session call (recommended) - Implementation Prototype
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <task description>
@@ -38,7 +38,7 @@ EOF",
 
 # New session call - Implementation Prototype
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <task description>
@@ -56,7 +56,7 @@ EOF",
 
 ```
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Scope: Audit the final code changes.
@@ -85,8 +85,8 @@ EOF",
 
 | 阶段 | Codex | Gemini |
 |-------|-------|--------|
-| 实施 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/frontend.md` |
-| 审查 | `~/.claude/.ccg/prompts/codex/reviewer.md` | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
+| 实施 | `$AI_CODE_HOME/.ccg/prompts/codex/architect.md` | `$AI_CODE_HOME/.ccg/prompts/gemini/frontend.md` |
+| 审查 | `$AI_CODE_HOME/.ccg/prompts/codex/reviewer.md` | `$AI_CODE_HOME/.ccg/prompts/gemini/reviewer.md` |
 
 **会话重用**：如果 `/ccg:plan` 提供了 SESSION\_ID，使用 `resume <SESSION_ID>` 来重用上下文。
 
@@ -174,7 +174,7 @@ mcp__ace-tool__search_context({
 
 **限制**：上下文 < 32k 令牌
 
-1. 调用 Gemini（使用 `~/.claude/.ccg/prompts/gemini/frontend.md`）
+1. 调用 Gemini（使用 `$AI_CODE_HOME/.ccg/prompts/gemini/frontend.md`）
 2. 输入：计划内容 + 检索到的上下文 + 目标文件
 3. 输出：`Unified Diff Patch ONLY. Strictly prohibit any actual modifications.`
 4. **Gemini 是前端设计权威，其 CSS/React/Vue 原型是最终的视觉基线**
@@ -183,7 +183,7 @@ mcp__ace-tool__search_context({
 
 #### 路由 B：后端/逻辑/算法 → Codex
 
-1. 调用 Codex（使用 `~/.claude/.ccg/prompts/codex/architect.md`）
+1. 调用 Codex（使用 `$AI_CODE_HOME/.ccg/prompts/codex/architect.md`）
 2. 输入：计划内容 + 检索到的上下文 + 目标文件
 3. 输出：`Unified Diff Patch ONLY. Strictly prohibit any actual modifications.`
 4. **Codex 是后端逻辑权威，利用其逻辑推理和调试能力**
@@ -244,12 +244,12 @@ mcp__ace-tool__search_context({
 **更改生效后，必须立即并行调用** Codex 和 Gemini 进行代码审查：
 
 1. **Codex 审查**（`run_in_background: true`）：
-   * ROLE\_FILE：`~/.claude/.ccg/prompts/codex/reviewer.md`
+   * ROLE\_FILE：`$AI_CODE_HOME/.ccg/prompts/codex/reviewer.md`
    * 输入：更改的差异 + 目标文件
    * 重点：安全性、性能、错误处理、逻辑正确性
 
 2. **Gemini 审查**（`run_in_background: true`）：
-   * ROLE\_FILE：`~/.claude/.ccg/prompts/gemini/reviewer.md`
+   * ROLE\_FILE：`$AI_CODE_HOME/.ccg/prompts/gemini/reviewer.md`
    * 输入：更改的差异 + 目标文件
    * 重点：可访问性、设计一致性、用户体验
 
@@ -313,3 +313,6 @@ mcp__ace-tool__search_context({
 1. `/ccg:plan` 生成计划 + SESSION\_ID
 2. 用户用“Y”确认
 3. `/ccg:execute` 读取计划，重用 SESSION\_ID，执行实施
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

@@ -4,6 +4,9 @@ description: Start the NanoClaw agent REPL — a persistent, session-aware AI as
 
 # Claw Command
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 Start an interactive AI agent session that persists conversation history to disk and optionally loads ai-code skill context.
 
 ## Usage
@@ -40,18 +43,18 @@ exit        Quit the REPL
 ## How It Works
 
 1. Reads `CLAW_SESSION` env var to select a named session (default: `default`)
-2. Loads conversation history from `~/.claude/claw/{session}.md`
+2. Loads conversation history from `$AI_CODE_HOME/claw/{session}.md`
 3. Optionally loads ai-code skill context from `CLAW_SKILLS` env var
 4. Enters a blocking prompt loop — each user message is sent to `claude -p` with full history
 5. Responses are appended to the session file for persistence across restarts
 
 ## Session Storage
 
-Sessions are stored as Markdown files in `~/.claude/claw/`:
+Sessions are stored as Markdown files in `$AI_CODE_HOME/claw/`:
 
 ```
-~/.claude/claw/default.md
-~/.claude/claw/my-project.md
+$AI_CODE_HOME/claw/default.md
+$AI_CODE_HOME/claw/my-project.md
 ```
 
 Each turn is formatted as:

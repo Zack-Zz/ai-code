@@ -45,12 +45,12 @@ rules/
 
 ```bash
 # Install common rules (required for all projects)
-cp -r rules/common ~/.claude/rules/common
+cp -r rules/common $AI_CODE_HOME/rules/common
 
 # Install language-specific rules based on your project's tech stack
-cp -r rules/typescript ~/.claude/rules/typescript
-cp -r rules/python ~/.claude/rules/python
-cp -r rules/golang ~/.claude/rules/golang
+cp -r rules/typescript $AI_CODE_HOME/rules/typescript
+cp -r rules/python $AI_CODE_HOME/rules/python
+cp -r rules/golang $AI_CODE_HOME/rules/golang
 
 # Attention ! ! ! Configure according to your actual project requirements; the configuration here is for reference only.
 ```

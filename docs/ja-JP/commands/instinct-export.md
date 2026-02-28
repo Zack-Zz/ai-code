@@ -6,6 +6,9 @@ command: /instinct-export
 
 # インスティンクトエクスポートコマンド
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 インスティンクトを共有可能な形式でエクスポートします。以下の用途に最適です:
 - チームメイトとの共有
 - 新しいマシンへの転送
@@ -22,7 +25,7 @@ command: /instinct-export
 
 ## 実行内容
 
-1. `~/.claude/homunculus/instincts/personal/` からインスティンクトを読み込む
+1. `$AI_CODE_HOME/homunculus/instincts/personal/` からインスティンクトを読み込む
 2. フラグに基づいてフィルタリング
 3. 機密情報を除外:
    - セッションIDを削除

@@ -15,3 +15,6 @@
 6. 將報告儲存到 .reports/codemap-diff.txt
 
 使用 TypeScript/Node.js 進行分析。專注於高階結構，而非實作細節。
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

@@ -281,3 +281,6 @@ pm2 resurrect          # Restore saved processes
 
 **Tip:** Run `pm2 save` after first start to enable simplified commands.
 ```
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

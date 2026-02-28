@@ -57,3 +57,6 @@ $ARGUMENTS は以下のいずれか:
 - `full` - すべてのチェック（デフォルト）
 - `pre-commit` - コミットに関連するチェック
 - `pre-pr` - 完全なチェック + セキュリティスキャン
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

@@ -6,6 +6,9 @@ command: true
 
 # 本能状态命令
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 显示所有已学习的本能及其置信度分数，按领域分组。
 
 ## 实现
@@ -13,13 +16,13 @@ command: true
 使用插件根路径运行本能 CLI：
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" status
+python3 "${AI_CODE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" status
 ```
 
-或者，如果未设置 `CLAUDE_PLUGIN_ROOT`（手动安装），则使用：
+或者，如果未设置 `AI_CODE_PLUGIN_ROOT`（手动安装），则使用：
 
 ```bash
-python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py status
+python3 $AI_CODE_HOME/skills/continuous-learning-v2/scripts/instinct-cli.py status
 ```
 
 ## 用法
@@ -32,8 +35,8 @@ python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py status
 
 ## 操作步骤
 
-1. 从 `~/.claude/homunculus/instincts/personal/` 读取所有本能文件
-2. 从 `~/.claude/homunculus/instincts/inherited/` 读取继承的本能
+1. 从 `$AI_CODE_HOME/homunculus/instincts/personal/` 读取所有本能文件
+2. 从 `$AI_CODE_HOME/homunculus/instincts/inherited/` 读取继承的本能
 3. 按领域分组显示它们，并带有置信度条
 
 ## 输出格式

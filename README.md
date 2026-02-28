@@ -58,7 +58,7 @@ export AI_CODE_HOME=/path/to/assistant-home
 
 - `AI_CODE_HOME` has highest priority.
 - If `AI_CODE_HOME` is unset and `AI_CODE_TOOL=codex`, default path is `~/.codex`.
-- Otherwise default path is `~/.claude`.
+- Otherwise default path is `$AI_CODE_HOME`.
 - Hook scripts also support `--tool` and `--home` flags for one-off runs.
 
 ---
@@ -115,24 +115,24 @@ cd ai-code
 
 ## 🌐 Cross-Platform Support
 
-This plugin now fully supports **Windows, macOS, and Linux**. All hooks and scripts have been rewritten in Node.js for maximum compatibility.
+This toolkit fully supports **Windows, macOS, and Linux**. All hooks and scripts have been rewritten in Node.js for maximum compatibility.
 
 ### Package Manager Detection
 
-The plugin automatically detects your preferred package manager (npm, pnpm, yarn, or bun) with the following priority:
+For Claude Code workflows, package-manager detection follows this priority:
 
-1. **Environment variable**: `CLAUDE_PACKAGE_MANAGER`
+1. **Environment variable**: `AI_CODE_PACKAGE_MANAGER`
 2. **Project config**: `.claude/package-manager.json`
 3. **package.json**: `packageManager` field
 4. **Lock file**: Detection from package-lock.json, yarn.lock, pnpm-lock.yaml, or bun.lockb
-5. **Global config**: `~/.claude/package-manager.json`
+5. **Global config**: `$AI_CODE_HOME/package-manager.json`
 6. **Fallback**: First available package manager
 
 To set your preferred package manager:
 
 ```bash
 # Via environment variable
-export CLAUDE_PACKAGE_MANAGER=pnpm
+export AI_CODE_PACKAGE_MANAGER=pnpm
 
 # Via global config
 node scripts/setup-package-manager.js --global pnpm
@@ -150,7 +150,7 @@ Or use the `/setup-pm` command in Claude Code.
 
 ## 📦 What's Inside
 
-This repo is a **Claude Code plugin** - install it directly or copy components manually.
+This repo is a **multi-assistant toolkit** that includes Claude Code plugin assets, Codex configs, and Kiro steering files.
 
 ```
 ai-code/
@@ -257,7 +257,7 @@ ai-code/
 |   |-- update-codemaps.md  # /update-codemaps - Update codemaps
 |   |-- python-review.md    # /python-review - Python code review (NEW)
 |
-|-- rules/            # Always-follow guidelines (copy to ~/.claude/rules/)
+|-- rules/            # Always-follow guidelines (copy to $AI_CODE_HOME/rules/)
 |   |-- README.md            # Structure overview and installation guide
 |   |-- common/              # Language-agnostic principles
 |   |   |-- coding-style.md    # Immutability, file organization
@@ -437,7 +437,7 @@ The easiest way to use this repo - install as a Claude Code plugin:
 /plugin install ai-code@ai-code
 ```
 
-Or add directly to your `~/.claude/settings.json`:
+Or add directly to your `$AI_CODE_HOME/settings.json`:
 
 ```json
 {
@@ -464,11 +464,11 @@ This gives you instant access to all commands, agents, skills, and hooks.
 > git clone https://github.com/Zack-Zz/ai-code.git
 >
 > # Option A: User-level rules (applies to all projects)
-> mkdir -p ~/.claude/rules
-> cp -r ai-code/rules/common/* ~/.claude/rules/
-> cp -r ai-code/rules/typescript/* ~/.claude/rules/   # pick your stack
-> cp -r ai-code/rules/python/* ~/.claude/rules/
-> cp -r ai-code/rules/golang/* ~/.claude/rules/
+> mkdir -p $AI_CODE_HOME/rules
+> cp -r ai-code/rules/common/* $AI_CODE_HOME/rules/
+> cp -r ai-code/rules/typescript/* $AI_CODE_HOME/rules/   # pick your stack
+> cp -r ai-code/rules/python/* $AI_CODE_HOME/rules/
+> cp -r ai-code/rules/golang/* $AI_CODE_HOME/rules/
 >
 > # Option B: Project-level rules (applies to current project only)
 > mkdir -p .claude/rules
@@ -487,28 +487,28 @@ If you prefer manual control over what's installed:
 git clone https://github.com/Zack-Zz/ai-code.git
 
 # Copy agents to your Claude config
-cp ai-code/agents/*.md ~/.claude/agents/
+cp ai-code/agents/*.md $AI_CODE_HOME/agents/
 
 # Copy rules (common + language-specific)
-cp -r ai-code/rules/common/* ~/.claude/rules/
-cp -r ai-code/rules/typescript/* ~/.claude/rules/   # pick your stack
-cp -r ai-code/rules/python/* ~/.claude/rules/
-cp -r ai-code/rules/golang/* ~/.claude/rules/
+cp -r ai-code/rules/common/* $AI_CODE_HOME/rules/
+cp -r ai-code/rules/typescript/* $AI_CODE_HOME/rules/   # pick your stack
+cp -r ai-code/rules/python/* $AI_CODE_HOME/rules/
+cp -r ai-code/rules/golang/* $AI_CODE_HOME/rules/
 
 # Copy commands
-cp ai-code/commands/*.md ~/.claude/commands/
+cp ai-code/commands/*.md $AI_CODE_HOME/commands/
 
 # Copy skills
-cp -r ai-code/skills/* ~/.claude/skills/
+cp -r ai-code/skills/* $AI_CODE_HOME/skills/
 ```
 
 #### Add hooks to settings.json
 
-Copy the hooks from `hooks/hooks.json` to your `~/.claude/settings.json`.
+Copy the hooks from `hooks/hooks.json` to your `$AI_CODE_HOME/settings.json`.
 
 #### Configure MCPs
 
-Copy desired MCP servers from `mcp-configs/mcp-servers.json` to your `~/.claude.json`.
+Copy desired MCP servers from `mcp-configs/mcp-servers.json` to your `$AI_CODE_HOME/config.json`.
 
 **Important:** Replace `YOUR_*_HERE` placeholders with your actual API keys.
 
@@ -661,10 +661,10 @@ Yes. Use Option 2 (manual installation) and copy only what you need:
 
 ```bash
 # Just agents
-cp ai-code/agents/*.md ~/.claude/agents/
+cp ai-code/agents/*.md $AI_CODE_HOME/agents/
 
 # Just rules
-cp -r ai-code/rules/common/* ~/.claude/rules/
+cp -r ai-code/rules/common/* $AI_CODE_HOME/rules/
 ```
 
 Each component is fully independent.
@@ -994,14 +994,14 @@ Claude Code usage can be expensive if you don't manage token consumption. These 
 
 ### Recommended Settings
 
-Add to `~/.claude/settings.json`:
+Add to `$AI_CODE_HOME/settings.json`:
 
 ```json
 {
   "model": "sonnet",
   "env": {
     "MAX_THINKING_TOKENS": "10000",
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50"
+    "AI_CODE_AUTOCOMPACT_PCT_OVERRIDE": "50"
   }
 }
 ```
@@ -1010,7 +1010,7 @@ Add to `~/.claude/settings.json`:
 |---------|---------|-------------|--------|
 | `model` | opus | **sonnet** | ~60% cost reduction; handles 80%+ of coding tasks |
 | `MAX_THINKING_TOKENS` | 31,999 | **10,000** | ~70% reduction in hidden thinking cost per request |
-| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` | 95 | **50** | Compacts earlier — better quality in long sessions |
+| `AI_CODE_AUTOCOMPACT_PCT_OVERRIDE` | 95 | **50** | Compacts earlier — better quality in long sessions |
 
 Switch to Opus only when you need deep architectural reasoning:
 ```
@@ -1063,13 +1063,13 @@ Hitting daily limits? See the **[Token Optimization Guide](docs/token-optimizati
 Quick wins:
 
 ```json
-// ~/.claude/settings.json
+// $AI_CODE_HOME/settings.json
 {
   "model": "sonnet",
   "env": {
     "MAX_THINKING_TOKENS": "10000",
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku"
+    "AI_CODE_AUTOCOMPACT_PCT_OVERRIDE": "50",
+    "AI_CODE_SUBAGENT_MODEL": "haiku"
   }
 }
 ```

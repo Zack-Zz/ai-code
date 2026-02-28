@@ -29,3 +29,6 @@
 6. 顯示差異摘要
 
 單一真相來源：package.json 和 .env.example
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

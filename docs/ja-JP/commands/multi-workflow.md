@@ -36,7 +36,7 @@
 ```
 # 新規セッション呼び出し
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
 ROLE_FILE: <ロールプロンプトパス>
 <TASK>
 Requirement: <強化された要件(または強化されていない場合は$ARGUMENTS)>
@@ -51,7 +51,7 @@ EOF",
 
 # セッション再開呼び出し
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
 ROLE_FILE: <ロールプロンプトパス>
 <TASK>
 Requirement: <強化された要件(または強化されていない場合は$ARGUMENTS)>
@@ -72,9 +72,9 @@ EOF",
 
 | フェーズ | Codex | Gemini |
 |-------|-------|--------|
-| 分析 | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| 計画 | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/architect.md` |
-| レビュー | `~/.claude/.ccg/prompts/codex/reviewer.md` | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
+| 分析 | `$AI_CODE_HOME/.ccg/prompts/codex/analyzer.md` | `$AI_CODE_HOME/.ccg/prompts/gemini/analyzer.md` |
+| 計画 | `$AI_CODE_HOME/.ccg/prompts/codex/architect.md` | `$AI_CODE_HOME/.ccg/prompts/gemini/architect.md` |
+| レビュー | `$AI_CODE_HOME/.ccg/prompts/codex/reviewer.md` | `$AI_CODE_HOME/.ccg/prompts/gemini/reviewer.md` |
 
 **セッション再利用**: 各呼び出しは`SESSION_ID: xxx`を返し、後続のフェーズでは`resume xxx`サブコマンドを使用します(注意: `resume`、`--resume`ではない)。
 
@@ -181,3 +181,6 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 1. フェーズの順序はスキップできません(ユーザーが明示的に指示しない限り)
 2. 外部モデルは**ファイルシステムへの書き込みアクセスがゼロ**、すべての変更はClaudeが実行
 3. スコア < 7またはユーザーが承認しない場合は**強制停止**
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

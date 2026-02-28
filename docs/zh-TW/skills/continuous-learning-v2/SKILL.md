@@ -92,7 +92,7 @@ source: "session-observation"
 
 ### 1. 啟用觀察 Hooks
 
-新增到你的 `~/.claude/settings.json`：
+新增到你的 `$AI_CODE_HOME/settings.json`：
 
 ```json
 {
@@ -101,14 +101,14 @@ source: "session-observation"
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh pre"
+        "command": "$AI_CODE_HOME/skills/continuous-learning-v2/hooks/observe.sh pre"
       }]
     }],
     "PostToolUse": [{
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh post"
+        "command": "$AI_CODE_HOME/skills/continuous-learning-v2/hooks/observe.sh post"
       }]
     }]
   }
@@ -118,8 +118,8 @@ source: "session-observation"
 ### 2. 初始化目錄結構
 
 ```bash
-mkdir -p ~/.claude/homunculus/{instincts/{personal,inherited},evolved/{agents,skills,commands}}
-touch ~/.claude/homunculus/observations.jsonl
+mkdir -p $AI_CODE_HOME/homunculus/{instincts/{personal,inherited},evolved/{agents,skills,commands}}
+touch $AI_CODE_HOME/homunculus/observations.jsonl
 ```
 
 ### 3. 執行 Observer Agent（可選）
@@ -128,7 +128,7 @@ touch ~/.claude/homunculus/observations.jsonl
 
 ```bash
 # 啟動背景觀察者
-~/.claude/skills/continuous-learning-v2/agents/start-observer.sh
+$AI_CODE_HOME/skills/continuous-learning-v2/agents/start-observer.sh
 ```
 
 ## 指令
@@ -149,13 +149,13 @@ touch ~/.claude/homunculus/observations.jsonl
   "version": "2.0",
   "observation": {
     "enabled": true,
-    "store_path": "~/.claude/homunculus/observations.jsonl",
+    "store_path": "$AI_CODE_HOME/homunculus/observations.jsonl",
     "max_file_size_mb": 10,
     "archive_after_days": 7
   },
   "instincts": {
-    "personal_path": "~/.claude/homunculus/instincts/personal/",
-    "inherited_path": "~/.claude/homunculus/instincts/inherited/",
+    "personal_path": "$AI_CODE_HOME/homunculus/instincts/personal/",
+    "inherited_path": "$AI_CODE_HOME/homunculus/instincts/inherited/",
     "min_confidence": 0.3,
     "auto_approve_threshold": 0.7,
     "confidence_decay_rate": 0.05
@@ -173,7 +173,7 @@ touch ~/.claude/homunculus/observations.jsonl
   },
   "evolution": {
     "cluster_threshold": 3,
-    "evolved_path": "~/.claude/homunculus/evolved/"
+    "evolved_path": "$AI_CODE_HOME/homunculus/evolved/"
   }
 }
 ```
@@ -181,7 +181,7 @@ touch ~/.claude/homunculus/observations.jsonl
 ## 檔案結構
 
 ```
-~/.claude/homunculus/
+$AI_CODE_HOME/homunculus/
 ├── identity.json           # 你的個人資料、技術水平
 ├── observations.jsonl      # 當前工作階段觀察
 ├── observations.archive/   # 已處理觀察
@@ -235,7 +235,7 @@ Hooks **100% 的時間**確定性地觸發。這意味著：
 ## 向後相容性
 
 v2 完全相容 v1：
-- 現有 `~/.claude/skills/learned/` 技能仍可運作
+- 現有 `$AI_CODE_HOME/skills/learned/` 技能仍可運作
 - Stop hook 仍執行（但現在也餵入 v2）
 - 漸進遷移路徑：兩者並行執行
 
@@ -250,7 +250,7 @@ v2 完全相容 v1：
 
 - [Skill Creator](https://skill-creator.app) - 從倉庫歷史產生本能
 - Homunculus - 啟發 v2 架構的社區專案（原子觀察、信心評分、本能演化管線）
-- [Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - 持續學習章節
+- [Longform Guide](../../../USAGE.md) - 持續學習章節
 
 ---
 

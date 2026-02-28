@@ -27,3 +27,6 @@
    * 新引入的错误
 
 为了安全起见，一次只修复一个错误！
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

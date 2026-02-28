@@ -19,7 +19,7 @@ An interactive, step-by-step installation wizard for the ai-code project. Uses `
 
 This skill must be accessible to Claude Code before activation. Two ways to bootstrap:
 1. **Via Plugin**: `/plugin install ai-code@ai-code` — the plugin loads this skill automatically
-2. **Manual**: Copy only this skill to `~/.claude/skills/configure-ai-code/SKILL.md`, then activate by saying "configure ai-code"
+2. **Manual**: Copy only this skill to `$AI_CODE_HOME/skills/configure-ai-code/SKILL.md`, then activate by saying "configure ai-code"
 
 ---
 
@@ -45,15 +45,15 @@ Use `AskUserQuestion` to ask the user where to install:
 ```
 Question: "Where should ai-code components be installed?"
 Options:
-  - "User-level (~/.claude/)" — "Applies to all your Claude Code projects"
+  - "User-level ($AI_CODE_HOME/)" — "Applies to all your Claude Code projects"
   - "Project-level (.claude/)" — "Applies only to the current project"
   - "Both" — "Common/shared items user-level, project-specific items project-level"
 ```
 
 Store the choice as `INSTALL_LEVEL`. Set the target directory:
-- User-level: `TARGET=~/.claude`
+- User-level: `TARGET=$AI_CODE_HOME`
 - Project-level: `TARGET=.claude` (relative to current project root)
-- Both: `TARGET_USER=~/.claude`, `TARGET_PROJECT=.claude`
+- Both: `TARGET_USER=$AI_CODE_HOME`, `TARGET_PROJECT=.claude`
 
 Create the target directories if they don't exist:
 ```bash
@@ -185,14 +185,14 @@ ls -la $TARGET/rules/
 
 Scan all installed `.md` files for path references:
 ```bash
-grep -rn "~/.claude/" $TARGET/skills/ $TARGET/rules/
+grep -rn "$AI_CODE_HOME/" $TARGET/skills/ $TARGET/rules/
 grep -rn "../common/" $TARGET/rules/
 grep -rn "skills/" $TARGET/skills/
 ```
 
-**For project-level installs**, flag any references to `~/.claude/` paths:
-- If a skill references `~/.claude/settings.json` — this is usually fine (settings are always user-level)
-- If a skill references `~/.claude/skills/` or `~/.claude/rules/` — this may be broken if installed only at project level
+**For project-level installs**, flag any references to `$AI_CODE_HOME/` paths:
+- If a skill references `$AI_CODE_HOME/settings.json` — this is usually fine (settings are always user-level)
+- If a skill references `$AI_CODE_HOME/skills/` or `$AI_CODE_HOME/rules/` — this may be broken if installed only at project level
 - If a skill references another skill by name — check that the referenced skill was also installed
 
 ### 4c: Check Cross-References Between Skills
@@ -200,7 +200,7 @@ grep -rn "skills/" $TARGET/skills/
 Some skills reference others. Verify these dependencies:
 - `django-tdd` may reference `django-patterns`
 - `springboot-tdd` may reference `springboot-patterns`
-- `continuous-learning-v2` references `~/.claude/homunculus/` directory
+- `continuous-learning-v2` references `$AI_CODE_HOME/homunculus/` directory
 - `python-testing` may reference `python-patterns`
 - `golang-testing` may reference `golang-patterns`
 - Language-specific rules reference `common/` counterparts
@@ -210,7 +210,7 @@ Some skills reference others. Verify these dependencies:
 For each issue found, report:
 1. **File**: The file containing the problematic reference
 2. **Line**: The line number
-3. **Issue**: What's wrong (e.g., "references ~/.claude/skills/python-patterns but python-patterns was not installed")
+3. **Issue**: What's wrong (e.g., "references $AI_CODE_HOME/skills/python-patterns but python-patterns was not installed")
 4. **Suggested fix**: What to do (e.g., "install python-patterns skill" or "update path to .claude/skills/")
 
 ---
@@ -287,7 +287,7 @@ Then print a summary report:
 
 ### "Skills not being picked up by Claude Code"
 - Verify the skill directory contains a `SKILL.md` file (not just loose .md files)
-- For user-level: check `~/.claude/skills/<skill-name>/SKILL.md` exists
+- For user-level: check `$AI_CODE_HOME/skills/<skill-name>/SKILL.md` exists
 - For project-level: check `.claude/skills/<skill-name>/SKILL.md` exists
 
 ### "Rules not working"
@@ -295,5 +295,5 @@ Then print a summary report:
 - Restart Claude Code after installing rules
 
 ### "Path reference errors after project-level install"
-- Some skills assume `~/.claude/` paths. Run Step 4 verification to find and fix these.
-- For `continuous-learning-v2`, the `~/.claude/homunculus/` directory is always user-level — this is expected and not an error.
+- Some skills assume `$AI_CODE_HOME/` paths. Run Step 4 verification to find and fix these.
+- For `continuous-learning-v2`, the `$AI_CODE_HOME/homunculus/` directory is always user-level — this is expected and not an error.

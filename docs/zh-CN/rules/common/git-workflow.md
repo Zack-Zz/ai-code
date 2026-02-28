@@ -10,7 +10,7 @@
 
 类型：feat, fix, refactor, docs, test, chore, perf, ci
 
-注意：通过 ~/.claude/settings.json 全局禁用了归因。
+注意：通过 $AI_CODE_HOME/settings.json 全局禁用了归因。
 
 ## 拉取请求工作流程
 

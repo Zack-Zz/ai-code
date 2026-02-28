@@ -93,7 +93,7 @@ Session Activity
 
 ### 1. 启用观察钩子
 
-添加到你的 `~/.claude/settings.json` 中。
+添加到你的 `$AI_CODE_HOME/settings.json` 中。
 
 **如果作为插件安装**（推荐）：
 
@@ -104,21 +104,21 @@ Session Activity
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh pre"
+        "command": "${AI_CODE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh pre"
       }]
     }],
     "PostToolUse": [{
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh post"
+        "command": "${AI_CODE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh post"
       }]
     }]
   }
 }
 ```
 
-**如果手动安装**到 `~/.claude/skills`：
+**如果手动安装**到 `$AI_CODE_HOME/skills`：
 
 ```json
 {
@@ -127,14 +127,14 @@ Session Activity
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh pre"
+        "command": "$AI_CODE_HOME/skills/continuous-learning-v2/hooks/observe.sh pre"
       }]
     }],
     "PostToolUse": [{
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh post"
+        "command": "$AI_CODE_HOME/skills/continuous-learning-v2/hooks/observe.sh post"
       }]
     }]
   }
@@ -146,8 +146,8 @@ Session Activity
 Python CLI 会自动创建这些目录，但你也可以手动创建：
 
 ```bash
-mkdir -p ~/.claude/homunculus/{instincts/{personal,inherited},evolved/{agents,skills,commands}}
-touch ~/.claude/homunculus/observations.jsonl
+mkdir -p $AI_CODE_HOME/homunculus/{instincts/{personal,inherited},evolved/{agents,skills,commands}}
+touch $AI_CODE_HOME/homunculus/observations.jsonl
 ```
 
 ### 3. 使用本能命令
@@ -177,13 +177,13 @@ touch ~/.claude/homunculus/observations.jsonl
   "version": "2.0",
   "observation": {
     "enabled": true,
-    "store_path": "~/.claude/homunculus/observations.jsonl",
+    "store_path": "$AI_CODE_HOME/homunculus/observations.jsonl",
     "max_file_size_mb": 10,
     "archive_after_days": 7
   },
   "instincts": {
-    "personal_path": "~/.claude/homunculus/instincts/personal/",
-    "inherited_path": "~/.claude/homunculus/instincts/inherited/",
+    "personal_path": "$AI_CODE_HOME/homunculus/instincts/personal/",
+    "inherited_path": "$AI_CODE_HOME/homunculus/instincts/inherited/",
     "min_confidence": 0.3,
     "auto_approve_threshold": 0.7,
     "confidence_decay_rate": 0.05
@@ -201,7 +201,7 @@ touch ~/.claude/homunculus/observations.jsonl
   },
   "evolution": {
     "cluster_threshold": 3,
-    "evolved_path": "~/.claude/homunculus/evolved/"
+    "evolved_path": "$AI_CODE_HOME/homunculus/evolved/"
   }
 }
 ```
@@ -209,7 +209,7 @@ touch ~/.claude/homunculus/observations.jsonl
 ## 文件结构
 
 ```
-~/.claude/homunculus/
+$AI_CODE_HOME/homunculus/
 ├── identity.json           # Your profile, technical level
 ├── observations.jsonl      # Current session observations
 ├── observations.archive/   # Processed observations
@@ -268,7 +268,7 @@ touch ~/.claude/homunculus/observations.jsonl
 
 v2 与 v1 完全兼容：
 
-* 现有的 `~/.claude/skills/learned/` 技能仍然有效
+* 现有的 `$AI_CODE_HOME/skills/learned/` 技能仍然有效
 * 停止钩子仍然运行（但现在也输入到 v2）
 * 渐进式迁移路径：并行运行两者
 
@@ -283,7 +283,7 @@ v2 与 v1 完全兼容：
 
 * [技能创建器](https://skill-creator.app) - 从仓库历史生成本能
 * Homunculus - 启发 v2 架构的社区项目（原子观察、置信度评分、本能演化管线）
-* [长文指南](https://x.com/affaanmustafa/status/2014040193557471352) - 持续学习部分
+* [长文指南](../../../USAGE.md) - 持续学习部分
 
 ***
 

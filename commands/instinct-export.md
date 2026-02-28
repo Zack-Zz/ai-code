@@ -6,6 +6,9 @@ command: /instinct-export
 
 # Instinct Export Command
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 Exports instincts to a shareable format. Perfect for:
 - Sharing with teammates
 - Transferring to a new machine
@@ -22,7 +25,7 @@ Exports instincts to a shareable format. Perfect for:
 
 ## What to Do
 
-1. Read instincts from `~/.claude/homunculus/instincts/personal/`
+1. Read instincts from `$AI_CODE_HOME/homunculus/instincts/personal/`
 2. Filter based on flags
 3. Strip sensitive information:
    - Remove session IDs

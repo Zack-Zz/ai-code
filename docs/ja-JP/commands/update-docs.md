@@ -29,3 +29,6 @@
 6. 差分サマリーを表示
 
 信頼できる唯一の情報源: package.jsonと.env.example
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

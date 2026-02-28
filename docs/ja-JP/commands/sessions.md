@@ -1,6 +1,6 @@
 # Sessionsコマンド
 
-Claude Codeセッション履歴を管理 - `~/.claude/sessions/` に保存されたセッションのリスト表示、読み込み、エイリアス設定、編集を行います。
+Claude Codeセッション履歴を管理 - `$AI_CODE_HOME/sessions/` に保存されたセッションのリスト表示、読み込み、エイリアス設定、編集を行います。
 このコマンドは Claude 互換レイヤーに属します。
 
 ## 使用方法
@@ -82,7 +82,7 @@ const size = sm.getSessionSize(session.sessionPath);
 const aliases = aa.getAliasesForSession(session.filename);
 
 console.log('Session: ' + session.filename);
-console.log('Path: ~/.claude/sessions/' + session.filename);
+console.log('Path: $AI_CODE_HOME/sessions/' + session.filename);
 console.log('');
 console.log('Statistics:');
 console.log('  Lines: ' + stats.lineCount);
@@ -300,7 +300,10 @@ $ARGUMENTS:
 
 ## 備考
 
-- セッションは `~/.claude/sessions/` にMarkdownファイルとして保存されます
-- エイリアスは `~/.claude/session-aliases.json` に保存されます
+- セッションは `$AI_CODE_HOME/sessions/` にMarkdownファイルとして保存されます
+- エイリアスは `$AI_CODE_HOME/session-aliases.json` に保存されます
 - セッションIDは短縮できます（通常、最初の4〜8文字で一意になります）
 - 頻繁に参照するセッションにはエイリアスを使用してください
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

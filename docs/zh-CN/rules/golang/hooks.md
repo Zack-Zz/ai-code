@@ -4,7 +4,7 @@
 
 ## PostToolUse 钩子
 
-在 `~/.claude/settings.json` 中配置：
+在 `$AI_CODE_HOME/settings.json` 中配置：
 
 * **gofmt/goimports**：编辑后自动格式化 `.go` 文件
 * **go vet**：编辑 `.go` 文件后运行静态分析

@@ -25,3 +25,6 @@
 - 錯誤處理
 - 邊界情況（null、undefined、空值）
 - 邊界條件
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

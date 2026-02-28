@@ -32,7 +32,7 @@ You are the **Frontend Orchestrator**, coordinating multi-model collaboration fo
 ```
 # New session call
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini --gemini-model gemini-3-pro-preview - \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini --gemini-model gemini-3-pro-preview - \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement (or $ARGUMENTS if not enhanced)>
@@ -47,7 +47,7 @@ EOF",
 
 # Resume session call
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini --gemini-model gemini-3-pro-preview resume <SESSION_ID> - \"$PWD\" <<'EOF'
+  command: "$AI_CODE_HOME/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend gemini --gemini-model gemini-3-pro-preview resume <SESSION_ID> - \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement (or $ARGUMENTS if not enhanced)>
@@ -65,9 +65,9 @@ EOF",
 
 | Phase | Gemini |
 |-------|--------|
-| Analysis | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| Planning | `~/.claude/.ccg/prompts/gemini/architect.md` |
-| Review | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
+| Analysis | `$AI_CODE_HOME/.ccg/prompts/gemini/analyzer.md` |
+| Planning | `$AI_CODE_HOME/.ccg/prompts/gemini/architect.md` |
+| Review | `$AI_CODE_HOME/.ccg/prompts/gemini/reviewer.md` |
 
 **Session Reuse**: Each call returns `SESSION_ID: xxx`, use `resume xxx` for subsequent phases. Save `GEMINI_SESSION` in Phase 2, use `resume` in Phases 3 and 5.
 
@@ -99,7 +99,7 @@ EOF",
 `[Mode: Ideation]` - Gemini-led analysis
 
 **MUST call Gemini** (follow call specification above):
-- ROLE_FILE: `~/.claude/.ccg/prompts/gemini/analyzer.md`
+- ROLE_FILE: `$AI_CODE_HOME/.ccg/prompts/gemini/analyzer.md`
 - Requirement: Enhanced requirement (or $ARGUMENTS if not enhanced)
 - Context: Project context from Phase 1
 - OUTPUT: UI feasibility analysis, recommended solutions (at least 2), UX evaluation
@@ -113,7 +113,7 @@ Output solutions (at least 2), wait for user selection.
 `[Mode: Plan]` - Gemini-led planning
 
 **MUST call Gemini** (use `resume <GEMINI_SESSION>` to reuse session):
-- ROLE_FILE: `~/.claude/.ccg/prompts/gemini/architect.md`
+- ROLE_FILE: `$AI_CODE_HOME/.ccg/prompts/gemini/architect.md`
 - Requirement: User's selected solution
 - Context: Analysis results from Phase 2
 - OUTPUT: Component structure, UI flow, styling approach
@@ -133,7 +133,7 @@ Claude synthesizes plan, save to `.claude/plan/task-name.md` after user approval
 `[Mode: Optimize]` - Gemini-led review
 
 **MUST call Gemini** (follow call specification above):
-- ROLE_FILE: `~/.claude/.ccg/prompts/gemini/reviewer.md`
+- ROLE_FILE: `$AI_CODE_HOME/.ccg/prompts/gemini/reviewer.md`
 - Requirement: Review the following frontend code changes
 - Context: git diff or code content
 - OUTPUT: Accessibility, responsiveness, performance, design consistency issues list
@@ -156,3 +156,6 @@ Integrate review feedback, execute optimization after user confirmation.
 2. **Codex frontend opinions for reference only**
 3. External models have **zero filesystem write access**
 4. Claude handles all code writes and file operations
+
+**Tool Scope:** `claude` / `codex` / `kiro`
+

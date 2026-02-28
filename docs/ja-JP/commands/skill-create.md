@@ -6,6 +6,9 @@ allowed_tools: ["Bash", "Read", "Write", "Grep", "Glob"]
 
 # /skill-create - ローカルスキル生成
 
+**Tool Scope:** `claude` / `codex` / `kiro`
+
+
 リポジトリのgit履歴を分析してコーディングパターンを抽出し、Claudeにチームのプラクティスを教えるSKILL.mdファイルを生成します。
 
 ## 使用方法

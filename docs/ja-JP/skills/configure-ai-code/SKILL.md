@@ -18,7 +18,7 @@ ai-code プロジェクトのインタラクティブなステップバイステ
 
 このスキルは起動前に Claude Code からアクセス可能である必要があります。ブートストラップには2つの方法があります：
 1. **プラグイン経由**: `/plugin install ai-code@ai-code` — プラグインがこのスキルを自動的にロードします
-2. **手動**: このスキルのみを `~/.claude/skills/configure-ai-code/SKILL.md` にコピーし、"configure ai-code" と言って起動します
+2. **手動**: このスキルのみを `$AI_CODE_HOME/skills/configure-ai-code/SKILL.md` にコピーし、"configure ai-code" と言って起動します
 
 ---
 
@@ -44,15 +44,15 @@ git clone https://github.com/Zack-Zz/ai-code.git /tmp/ai-code
 ```
 Question: "ai-code コンポーネントをどこにインストールしますか？"
 Options:
-  - "User-level (~/.claude/)" — "すべての Claude Code プロジェクトに適用されます"
+  - "User-level ($AI_CODE_HOME/)" — "すべての Claude Code プロジェクトに適用されます"
   - "Project-level (.claude/)" — "現在のプロジェクトのみに適用されます"
   - "Both" — "共通/共有アイテムはユーザーレベル、プロジェクト固有アイテムはプロジェクトレベル"
 ```
 
 選択を `INSTALL_LEVEL` として保存します。ターゲットディレクトリを設定します：
-- User-level: `TARGET=~/.claude`
+- User-level: `TARGET=$AI_CODE_HOME`
 - Project-level: `TARGET=.claude`（現在のプロジェクトルートからの相対パス）
-- Both: `TARGET_USER=~/.claude`、`TARGET_PROJECT=.claude`
+- Both: `TARGET_USER=$AI_CODE_HOME`、`TARGET_PROJECT=.claude`
 
 ターゲットディレクトリが存在しない場合は作成します：
 ```bash
@@ -184,14 +184,14 @@ ls -la $TARGET/rules/
 
 インストールされたすべての `.md` ファイルでパス参照をスキャンします：
 ```bash
-grep -rn "~/.claude/" $TARGET/skills/ $TARGET/rules/
+grep -rn "$AI_CODE_HOME/" $TARGET/skills/ $TARGET/rules/
 grep -rn "../common/" $TARGET/rules/
 grep -rn "skills/" $TARGET/skills/
 ```
 
-**プロジェクトレベルのインストールの場合**、`~/.claude/` パスへの参照をフラグします：
-- スキルが `~/.claude/settings.json` を参照している場合 — これは通常問題ありません（設定は常にユーザーレベルです）
-- スキルが `~/.claude/skills/` または `~/.claude/rules/` を参照している場合 — プロジェクトレベルのみにインストールされている場合、これは壊れている可能性があります
+**プロジェクトレベルのインストールの場合**、`$AI_CODE_HOME/` パスへの参照をフラグします：
+- スキルが `$AI_CODE_HOME/settings.json` を参照している場合 — これは通常問題ありません（設定は常にユーザーレベルです）
+- スキルが `$AI_CODE_HOME/skills/` または `$AI_CODE_HOME/rules/` を参照している場合 — プロジェクトレベルのみにインストールされている場合、これは壊れている可能性があります
 - スキルが別のスキルを名前で参照している場合 — 参照されているスキルもインストールされているか確認します
 
 ### 4c: スキル間の相互参照のチェック
@@ -199,7 +199,7 @@ grep -rn "skills/" $TARGET/skills/
 一部のスキルは他のスキルを参照します。これらの依存関係を検証します：
 - `django-tdd` は `django-patterns` を参照する可能性があります
 - `springboot-tdd` は `springboot-patterns` を参照する可能性があります
-- `continuous-learning-v2` は `~/.claude/homunculus/` ディレクトリを参照します
+- `continuous-learning-v2` は `$AI_CODE_HOME/homunculus/` ディレクトリを参照します
 - `python-testing` は `python-patterns` を参照する可能性があります
 - `golang-testing` は `golang-patterns` を参照する可能性があります
 - 言語固有のルールは `common/` の対応物を参照します
@@ -209,7 +209,7 @@ grep -rn "skills/" $TARGET/skills/
 見つかった各問題について、報告します：
 1. **ファイル**: 問題のある参照を含むファイル
 2. **行**: 行番号
-3. **問題**: 何が間違っているか（例: "~/.claude/skills/python-patterns を参照していますが、python-patterns がインストールされていません"）
+3. **問題**: 何が間違っているか（例: "$AI_CODE_HOME/skills/python-patterns を参照していますが、python-patterns がインストールされていません"）
 4. **推奨される修正**: 何をすべきか（例: "python-patterns スキルをインストール" または "パスを .claude/skills/ に更新"）
 
 ---
@@ -286,7 +286,7 @@ rm -rf /tmp/ai-code
 
 ### "スキルが Claude Code に認識されません"
 - スキルディレクトリに `SKILL.md` ファイルが含まれていることを確認します（単なる緩い .md ファイルではありません）
-- ユーザーレベルの場合: `~/.claude/skills/<skill-name>/SKILL.md` が存在するか確認します
+- ユーザーレベルの場合: `$AI_CODE_HOME/skills/<skill-name>/SKILL.md` が存在するか確認します
 - プロジェクトレベルの場合: `.claude/skills/<skill-name>/SKILL.md` が存在するか確認します
 
 ### "ルールが機能しません"
@@ -294,5 +294,5 @@ rm -rf /tmp/ai-code
 - ルールをインストール後、Claude Code を再起動します
 
 ### "プロジェクトレベルのインストール後のパス参照エラー"
-- 一部のスキルは `~/.claude/` パスを前提としています。ステップ4の検証を実行してこれらを見つけて修正します。
-- `continuous-learning-v2` の場合、`~/.claude/homunculus/` ディレクトリは常にユーザーレベルです — これは想定されており、エラーではありません。
+- 一部のスキルは `$AI_CODE_HOME/` パスを前提としています。ステップ4の検証を実行してこれらを見つけて修正します。
+- `continuous-learning-v2` の場合、`$AI_CODE_HOME/homunculus/` ディレクトリは常にユーザーレベルです — これは想定されており、エラーではありません。
