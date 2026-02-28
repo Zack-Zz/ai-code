@@ -277,7 +277,7 @@ fi
 # Kiro files
 if [[ "$APPLY_KIRO" == "true" ]]; then
   copy_file "$ROOT_DIR/.kiro/steering/ai-code-core.md" "$TARGET_DIR/.kiro/steering/ai-code-core.md"
-  copy_file "$ROOT_DIR/.kiro/steering/java-python-workflow.md" "$TARGET_DIR/.kiro/steering/java-python-workflow.md"
+  copy_file "$ROOT_DIR/.kiro/steering/multi-language-workflow.md" "$TARGET_DIR/.kiro/steering/multi-language-workflow.md"
 fi
 
 # Claude files
