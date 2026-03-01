@@ -13,6 +13,7 @@ TARGET_DIR=""
 LANGS_RAW=""
 TOOL_MODE=""
 FORCE_OVERWRITE="true"
+COPY_CODEX_CONFIG=""
 
 print_help() {
   cat <<'EOF'
@@ -24,6 +25,8 @@ Required:
 Optional:
   --langs <list>       Comma-separated languages (overrides manifest)
   --tool <mode>        auto|codex|kiro|claude|both|all (overrides manifest)
+  --copy-codex-config  Copy .codex/config.toml into target project
+  --no-copy-codex-config  Do not copy .codex/config.toml into target project
   --force              Force overwrite (default: true)
   --help               Show this help
 
@@ -49,6 +52,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --force)
       FORCE_OVERWRITE="true"
+      shift
+      ;;
+    --copy-codex-config)
+      COPY_CODEX_CONFIG="true"
+      shift
+      ;;
+    --no-copy-codex-config)
+      COPY_CODEX_CONFIG="false"
       shift
       ;;
     --help|-h)
@@ -100,14 +111,29 @@ if [[ -z "$TOOL_MODE" ]]; then
   fi
 fi
 
+if [[ -z "$COPY_CODEX_CONFIG" ]]; then
+  COPY_CODEX_CONFIG="$(node -e "const fs=require('fs');const p=process.argv[1];const d=JSON.parse(fs.readFileSync(p,'utf8'));process.stdout.write(String(d.copy_codex_config||'false'));" "$MANIFEST_PATH" || true)"
+  if [[ -z "$COPY_CODEX_CONFIG" ]]; then
+    COPY_CODEX_CONFIG="false"
+  fi
+fi
+
 echo "Sync target: $TARGET_DIR"
 echo "Sync langs: $LANGS_RAW"
 echo "Sync tool: $TOOL_MODE"
+echo "Sync copy codex config: $COPY_CODEX_CONFIG"
 echo "Force overwrite: $FORCE_OVERWRITE"
 echo
 
-"$ROOT_DIR/scripts/bootstrap-project.sh" \
-  --target "$TARGET_DIR" \
-  --langs "$LANGS_RAW" \
-  --tool "$TOOL_MODE" \
+args=(
+  --target "$TARGET_DIR"
+  --langs "$LANGS_RAW"
+  --tool "$TOOL_MODE"
   --force
+)
+
+if [[ "$COPY_CODEX_CONFIG" == "true" ]]; then
+  args+=(--copy-codex-config)
+fi
+
+"$ROOT_DIR/scripts/bootstrap-project.sh" "${args[@]}"

@@ -24,7 +24,8 @@ const testFiles = [
   'scripts/setup-package-manager.test.js',
   'scripts/skill-create-output.test.js',
   'scripts/bootstrap-project.test.js',
-  'scripts/sync-project.test.js'
+  'scripts/sync-project.test.js',
+  'scripts/sync-codex-global-config.test.js'
 ];
 
 const BOX_W = 58; // inner width between ║ delimiters

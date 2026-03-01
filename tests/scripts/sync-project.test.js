@@ -50,18 +50,24 @@ function runTests() {
     const manifestPath = path.join(targetDir, '.ai-code', 'bootstrap.json');
     assert.ok(fs.existsSync(manifestPath), 'manifest should exist after bootstrap');
 
-    const markerPath = path.join(targetDir, 'codex.md');
+    const markerPath = path.join(targetDir, '.codex', 'codex.md');
     fs.writeFileSync(markerPath, 'stale-content');
 
     run('bash', [SYNC, '--target', targetDir]);
     const content = fs.readFileSync(markerPath, 'utf8');
-    assert.ok(content.includes('Codex GUI Project Guide'), 'sync should overwrite codex.md from latest bootstrap');
+    assert.ok(content.includes('Codex GUI Project Guide'), 'sync should overwrite .codex/codex.md from latest bootstrap');
+    assert.ok(!fs.existsSync(path.join(targetDir, '.codex', 'config.toml')), 'sync should keep project codex config absent when manifest says false');
   })) passed++; else failed++;
 
   if (test('sync accepts explicit langs/tool overrides', () => {
     run('bash', [SYNC, '--target', targetDir, '--langs', 'java', '--tool', 'all']);
     assert.ok(fs.existsSync(path.join(targetDir, 'CLAUDE.md')), 'explicit --tool all should copy Claude assets');
     assert.ok(fs.existsSync(path.join(targetDir, '.kiro', 'steering', 'ai-code-core.md')), 'explicit --tool all should copy Kiro assets');
+  })) passed++; else failed++;
+
+  if (test('sync supports explicit codex config copy override', () => {
+    run('bash', [SYNC, '--target', targetDir, '--langs', 'js', '--tool', 'codex', '--copy-codex-config']);
+    assert.ok(fs.existsSync(path.join(targetDir, '.codex', 'config.toml')), 'sync with --copy-codex-config should copy .codex/config.toml');
   })) passed++; else failed++;
 
   fs.rmSync(tempRoot, { recursive: true, force: true });
