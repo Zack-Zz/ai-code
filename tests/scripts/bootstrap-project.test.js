@@ -24,8 +24,8 @@ function test(name, fn) {
   }
 }
 
-function runBootstrap(target, langs = 'java', tool = 'both') {
-  return execFileSync('bash', [SCRIPT, '--target', target, '--langs', langs, '--tool', tool], {
+function runBootstrap(target, langs = 'java', tool = 'both', extraArgs = []) {
+  return execFileSync('bash', [SCRIPT, '--target', target, '--langs', langs, '--tool', tool, ...extraArgs], {
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
     timeout: 20000
@@ -76,6 +76,11 @@ function runTests() {
     const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     assert.strictEqual(data.langs, 'java', 'manifest should record langs');
     assert.strictEqual(data.tool, 'both', 'manifest should record tool');
+    assert.strictEqual(data.copy_codex_config, 'false', 'manifest should record codex config copy mode');
+  })) passed++; else failed++;
+
+  if (test('does not copy project .codex/config.toml by default', () => {
+    assert.ok(!fs.existsSync(path.join(targetDir, '.codex', 'config.toml')), '.codex/config.toml should not exist by default');
   })) passed++; else failed++;
 
   console.log('\n--langs java --tool all:');
@@ -86,6 +91,13 @@ function runTests() {
     assert.ok(fs.existsSync(path.join(targetAllDir, 'hooks', 'hooks.json')), 'hooks/hooks.json should exist');
     assert.ok(fs.existsSync(path.join(targetAllDir, 'scripts', 'hooks', 'session-start.js')), 'scripts/hooks should exist');
     assert.ok(fs.existsSync(path.join(targetAllDir, 'scripts', 'lib', 'utils.js')), 'scripts/lib should exist');
+  })) passed++; else failed++;
+
+  if (test('copies project .codex/config.toml only when explicitly requested', () => {
+    const targetConfigDir = path.join(tempRoot, 'target-codex-config-project');
+    fs.mkdirSync(targetConfigDir, { recursive: true });
+    runBootstrap(targetConfigDir, 'js', 'codex', ['--copy-codex-config']);
+    assert.ok(fs.existsSync(path.join(targetConfigDir, '.codex', 'config.toml')), '.codex/config.toml should exist when --copy-codex-config is used');
   })) passed++; else failed++;
 
   // Cleanup temp directory

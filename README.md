@@ -33,7 +33,7 @@ Production-ready agents, skills, hooks, commands, rules, and MCP configurations 
 
 `ai-code` is a fork-oriented toolkit designed for cross-assistant workflows instead of a single-vendor setup.
 
-- ChatGPT / Codex: project-level `AGENTS.md`, `.codex/config.toml`, `codex.md`
+- ChatGPT / Codex: project-level `AGENTS.md`, `.codex/config.toml`, `.codex/codex.md`
 - Claude Code: plugin/rules/hooks compatible assets
 - Cursor/OpenCode: compatible configs and command sets
 - Polyglot workflows: TypeScript/JavaScript, Java, Python, Go, and Rust
@@ -44,7 +44,7 @@ Production-ready agents, skills, hooks, commands, rules, and MCP configurations 
 
 - Choose your assistant stack first: Codex/ChatGPT, Claude Code, or Cursor/OpenCode.
 - Keep project-level instructions in `AGENTS.md`, and add language-specific workflow notes when needed.
-- Start from `codex.md` for a polyglot Codex workflow and run tests before implementation.
+- Start from `.codex/codex.md` for a polyglot Codex workflow and run tests before implementation.
 - Use only the directories you need (`agents/`, `skills/`, `rules/`, `commands/`) to keep setup minimal.
 
 ### Unified Runtime Config (Codex + Claude)
@@ -72,8 +72,12 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs js
 scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,go
 # Optional tool mode: --tool auto|codex|kiro|claude|both|all
 # both = codex + kiro, all = codex + kiro + claude
+# Optional project-level codex config copy:
+# scripts/bootstrap-project.sh --target /path/to/your-project --langs js --tool codex --copy-codex-config
 # Re-sync latest ai-code updates using target manifest:
 # scripts/sync-project.sh --target /path/to/your-project
+# Sync global Codex config (recommended):
+# scripts/sync-codex-global-config.sh
 ```
 
 ### Option 1: Codex / ChatGPT Stack (Recommended)
@@ -85,7 +89,7 @@ cp .codex/config.toml ~/.codex/config.toml
 ```
 
 Then open the repo in Codex GUI and start with:
-`Read /codex.md and follow the polyglot workflow defaults.`
+`Read /.codex/codex.md and follow the polyglot workflow defaults.`
 
 ### Option 2: Claude Code Stack
 
@@ -962,10 +966,10 @@ cp .codex/config.toml ~/.codex/config.toml
 
 # 2) Open this repository in Codex GUI
 # 3) Start your first prompt with:
-#    "Read /codex.md and follow polyglot workflow defaults."
+#    "Read /.codex/codex.md and follow polyglot workflow defaults."
 ```
 
-`codex.md` provides a practical polyglot operating guide for Codex GUI sessions in this repo.
+`.codex/codex.md` provides a practical polyglot operating guide for Codex GUI sessions in this repo.
 
 ### What's Included
 
@@ -973,7 +977,7 @@ cp .codex/config.toml ~/.codex/config.toml
 |-----------|-------|---------|
 | Config | 1 | `.codex/config.toml` — model, permissions, MCP servers, persistent instructions |
 | AGENTS.md | 2 | Root (universal) + `.codex/AGENTS.md` (Codex-specific supplement) |
-| Session Guide | 1 | `codex.md` — Codex GUI startup guide with polyglot defaults |
+| Session Guide | 1 | `.codex/codex.md` — Codex GUI startup guide with polyglot defaults |
 | Skills | 50 | `skills/` — SKILL.md + agents/openai.yaml per skill |
 | MCP Servers | 4 | GitHub, Context7, Memory, Sequential Thinking (command-based) |
 | Profiles | 4 | `strict` (read-only), `polyglot` (recommended), `java-python` (compat), `yolo` (full auto-approve) |

@@ -16,6 +16,7 @@ TOOL_MODE="auto"
 APPLY_CODEX="false"
 APPLY_KIRO="false"
 APPLY_CLAUDE="false"
+COPY_CODEX_CONFIG="false"
 HAS_JAVA="false"
 MANIFEST_PATH=""
 
@@ -29,6 +30,7 @@ Required:
 
 Optional:
   --tool <mode>        auto|codex|kiro|claude|both|all (default: auto)
+  --copy-codex-config  Copy .codex/config.toml into target project (default: off)
   --force              Overwrite existing files
   --help               Show this help
 
@@ -37,6 +39,7 @@ Examples:
   scripts/bootstrap-project.sh --target ~/work/poly-app --langs java,python,js
   scripts/bootstrap-project.sh --target ~/work/new-service --langs java --tool kiro
   scripts/bootstrap-project.sh --target ~/work/team-project --langs java --tool all
+  scripts/bootstrap-project.sh --target ~/work/my-ts-app --langs js --tool codex --copy-codex-config
 EOF
 }
 
@@ -56,6 +59,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --force)
       FORCE_OVERWRITE="true"
+      shift
+      ;;
+    --copy-codex-config)
+      COPY_CODEX_CONFIG="true"
       shift
       ;;
     --help|-h)
@@ -86,7 +93,7 @@ fi
 TOOL_MODE="$(echo "$TOOL_MODE" | tr '[:upper:]' '[:lower:]' | xargs)"
 case "$TOOL_MODE" in
   auto)
-    if [[ -d "$TARGET_DIR/.codex" || -f "$TARGET_DIR/codex.md" ]]; then
+    if [[ -d "$TARGET_DIR/.codex" || -f "$TARGET_DIR/.codex/codex.md" ]]; then
       APPLY_CODEX="true"
     fi
     if [[ -d "$TARGET_DIR/.kiro" ]]; then
@@ -154,6 +161,7 @@ write_manifest() {
   "tool": "$TOOL_MODE",
   "langs": "$LANGS_RAW",
   "force": "$FORCE_OVERWRITE",
+  "copy_codex_config": "$COPY_CODEX_CONFIG",
   "source_repo": "$ROOT_DIR",
   "source_git_revision": "$git_rev",
   "updated_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -286,6 +294,7 @@ echo "Tool mode: $TOOL_MODE"
 echo "Apply Codex: $APPLY_CODEX"
 echo "Apply Kiro: $APPLY_KIRO"
 echo "Apply Claude: $APPLY_CLAUDE"
+echo "Copy Codex Config: $COPY_CODEX_CONFIG"
 echo "Force overwrite: $FORCE_OVERWRITE"
 echo
 
@@ -294,9 +303,11 @@ copy_file "$ROOT_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"
 
 # Codex files
 if [[ "$APPLY_CODEX" == "true" ]]; then
-  copy_file "$ROOT_DIR/codex.md" "$TARGET_DIR/codex.md"
+  copy_file "$ROOT_DIR/.codex/codex.md" "$TARGET_DIR/.codex/codex.md"
   copy_file "$ROOT_DIR/.codex/AGENTS.md" "$TARGET_DIR/.codex/AGENTS.md"
-  copy_file "$ROOT_DIR/.codex/config.toml" "$TARGET_DIR/.codex/config.toml"
+  if [[ "$COPY_CODEX_CONFIG" == "true" ]]; then
+    copy_file "$ROOT_DIR/.codex/config.toml" "$TARGET_DIR/.codex/config.toml"
+  fi
 fi
 
 # Kiro files
@@ -350,8 +361,12 @@ echo "Bootstrap complete."
 echo "Next steps:"
 if [[ "$APPLY_CODEX" == "true" ]]; then
   echo "- Codex: open the target project in Codex GUI."
-  echo "- Codex: start with 'Read /codex.md and follow the workflow defaults.'"
-  echo "- Codex: optionally copy .codex/config.toml to ~/.codex/config.toml for global MCP/model defaults."
+  echo "- Codex: start with 'Read /.codex/codex.md and follow the workflow defaults.'"
+  if [[ "$COPY_CODEX_CONFIG" != "true" ]]; then
+    echo "- Codex: by default project .codex/config.toml is not copied; keep config in ~/.codex/config.toml."
+  else
+    echo "- Codex: project .codex/config.toml was copied as requested."
+  fi
 fi
 if [[ "$APPLY_KIRO" == "true" ]]; then
   echo "- Kiro: open the target project; steering files from .kiro/steering load automatically."

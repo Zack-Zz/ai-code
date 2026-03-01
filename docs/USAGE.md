@@ -4,7 +4,7 @@ This is the local, concise usage guide for `ai-code`.
 
 ## 1) Pick Your Tool
 
-- Codex/ChatGPT: use `.codex/` + `AGENTS.md` + `codex.md`
+- Codex/ChatGPT: use `.codex/` + `AGENTS.md` + `.codex/codex.md`
 - Claude Code: use plugin/rules/commands/hook assets
 - Kiro: use `.kiro/steering/`
 - Cursor/OpenCode: use `.cursor/` / `.opencode/`
@@ -14,6 +14,8 @@ This is the local, concise usage guide for `ai-code`.
 ```bash
 scripts/bootstrap-project.sh --target /path/to/project --langs js
 scripts/bootstrap-project.sh --target /path/to/project --langs java,python,go
+# optional if you want project-level .codex/config.toml:
+# scripts/bootstrap-project.sh --target /path/to/project --langs js --tool codex --copy-codex-config
 ```
 
 Optional tool mode:
@@ -48,15 +50,27 @@ You can also override manifest values explicitly:
 
 ```bash
 scripts/sync-project.sh --target /path/to/project --langs js --tool codex
+# optionally force project-level codex config copy:
+# scripts/sync-project.sh --target /path/to/project --langs js --tool codex --copy-codex-config
 ```
 
-## 5) Recommended Practice
+## 5) Sync Global Codex Config
+
+Keep Codex config global to avoid copying sensitive/local preferences into each project:
+
+```bash
+scripts/sync-codex-global-config.sh
+# or custom codex home
+scripts/sync-codex-global-config.sh --home /path/to/.codex
+```
+
+## 6) Recommended Practice
 
 - Keep `~/.codex/config.toml` for global model/MCP defaults.
-- Keep project instructions in project root (`AGENTS.md`, `codex.md`).
+- Keep project instructions in project root (`AGENTS.md`, `.codex/codex.md`).
 - Avoid global full-skill installs; inject only needed skills per project.
 
-## 6) Unified Runtime Paths (Codex + Claude)
+## 7) Unified Runtime Paths (Codex + Claude)
 
 `ai-code` hook scripts now support shared path/tool overrides:
 
