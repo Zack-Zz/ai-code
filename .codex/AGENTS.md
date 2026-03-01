@@ -31,9 +31,20 @@ Core skills:
 
 Language- and domain-specific skills are also available under `skills/`.
 
-## Java + Python Defaults
+## Polyglot Defaults
 
-When the repository contains Java or Python code, prioritize these workflows:
+When the repository contains multiple languages, detect the active stack first and run the matching workflow.
+
+### TypeScript / JavaScript
+
+1. Detect package manager from lock files.
+2. Before implementation, write/update tests first (TDD).
+3. Run:
+   - `npm test` / `pnpm test` / `yarn test` / `bun test`
+   - `npm run lint` (if configured)
+   - `npm run typecheck` or `tsc --noEmit` (if configured)
+4. Security/dependency checks:
+   - `npm audit` / `pnpm audit` (if configured)
 
 ### Java (Maven / Gradle)
 
@@ -49,7 +60,7 @@ When the repository contains Java or Python code, prioritize these workflows:
    - Maven: `mvn -q org.owasp:dependency-check-maven:check` (if plugin available)
    - Gradle: `./gradlew dependencyCheckAnalyze` (if plugin available)
 
-### Python (pytest)
+### Python
 
 1. Detect environment from `pyproject.toml`, `requirements*.txt`, or `poetry.lock`.
 2. Before implementation, write/update tests first (TDD).
@@ -59,6 +70,24 @@ When the repository contains Java or Python code, prioritize these workflows:
    - `mypy .` (if configured)
 4. Security/dependency checks:
    - `pip-audit` (if available)
+
+### Go
+
+1. Detect module from `go.mod`.
+2. Before implementation, write/update tests first (TDD).
+3. Run:
+   - `go test ./...`
+   - `go build ./...`
+   - `golangci-lint run` (if configured)
+
+### Rust
+
+1. Detect crate/workspace from `Cargo.toml`.
+2. Before implementation, write/update tests first (TDD).
+3. Run:
+   - `cargo test`
+   - `cargo build`
+   - `cargo clippy --all-targets --all-features -D warnings` (if configured)
 
 ## MCP Servers
 

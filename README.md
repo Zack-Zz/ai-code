@@ -1,4 +1,4 @@
-**Language:** [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](docs/zh-TW/README.md) | [日本語](docs/ja-JP/README.md)
+**Language:** [English](README.md) | [简体中文](README.zh-CN.md)
 
 # ai-code
 
@@ -17,7 +17,7 @@
 
 **🌐 Language / 语言 / 語言**
 
-[**English**](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](docs/zh-TW/README.md) | [日本語](docs/ja-JP/README.md)
+[**English**](README.md) | [简体中文](README.zh-CN.md)
 
 </div>
 
@@ -36,7 +36,7 @@ Production-ready agents, skills, hooks, commands, rules, and MCP configurations 
 - ChatGPT / Codex: project-level `AGENTS.md`, `.codex/config.toml`, `codex.md`
 - Claude Code: plugin/rules/hooks compatible assets
 - Cursor/OpenCode: compatible configs and command sets
-- Java/Python first-class workflows, with support for other stacks
+- Polyglot workflows: TypeScript/JavaScript, Java, Python, Go, and Rust
 
 ---
 
@@ -44,7 +44,7 @@ Production-ready agents, skills, hooks, commands, rules, and MCP configurations 
 
 - Choose your assistant stack first: Codex/ChatGPT, Claude Code, or Cursor/OpenCode.
 - Keep project-level instructions in `AGENTS.md`, and add language-specific workflow notes when needed.
-- For Java/Python projects, start from `codex.md` and run tests before implementation.
+- Start from `codex.md` for a polyglot Codex workflow and run tests before implementation.
 - Use only the directories you need (`agents/`, `skills/`, `rules/`, `commands/`) to keep setup minimal.
 
 ### Unified Runtime Config (Codex + Claude)
@@ -58,7 +58,7 @@ export AI_CODE_HOME=/path/to/assistant-home
 
 - `AI_CODE_HOME` has highest priority.
 - If `AI_CODE_HOME` is unset and `AI_CODE_TOOL=codex`, default path is `~/.codex`.
-- Otherwise default path is `$AI_CODE_HOME`.
+- Otherwise default path is `~/.claude`.
 - Hook scripts also support `--tool` and `--home` flags for one-off runs.
 
 ---
@@ -68,10 +68,12 @@ export AI_CODE_HOME=/path/to/assistant-home
 ### One-Command Bootstrap (New Project)
 
 ```bash
-scripts/bootstrap-project.sh --target /path/to/your-project --langs java
+scripts/bootstrap-project.sh --target /path/to/your-project --langs js
 scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,go
 # Optional tool mode: --tool auto|codex|kiro|claude|both|all
 # both = codex + kiro, all = codex + kiro + claude
+# Re-sync latest ai-code updates using target manifest:
+# scripts/sync-project.sh --target /path/to/your-project
 ```
 
 ### Option 1: Codex / ChatGPT Stack (Recommended)
@@ -83,7 +85,7 @@ cp .codex/config.toml ~/.codex/config.toml
 ```
 
 Then open the repo in Codex GUI and start with:
-`Read /codex.md and follow the Java/Python workflow defaults.`
+`Read /codex.md and follow the polyglot workflow defaults.`
 
 ### Option 2: Claude Code Stack
 
@@ -952,7 +954,7 @@ cp .codex/config.toml ~/.codex/config.toml
 codex
 ```
 
-### Quick Start (Codex GUI, Java/Python)
+### Quick Start (Codex GUI, Polyglot)
 
 ```bash
 # 1) Configure Codex once
@@ -960,10 +962,10 @@ cp .codex/config.toml ~/.codex/config.toml
 
 # 2) Open this repository in Codex GUI
 # 3) Start your first prompt with:
-#    "Read /codex.md and follow Java/Python workflow defaults."
+#    "Read /codex.md and follow polyglot workflow defaults."
 ```
 
-`codex.md` provides a practical Java/Python-first operating guide for Codex GUI sessions in this repo.
+`codex.md` provides a practical polyglot operating guide for Codex GUI sessions in this repo.
 
 ### What's Included
 
@@ -971,10 +973,10 @@ cp .codex/config.toml ~/.codex/config.toml
 |-----------|-------|---------|
 | Config | 1 | `.codex/config.toml` — model, permissions, MCP servers, persistent instructions |
 | AGENTS.md | 2 | Root (universal) + `.codex/AGENTS.md` (Codex-specific supplement) |
-| Session Guide | 1 | `codex.md` — Codex GUI startup guide with Java/Python defaults |
+| Session Guide | 1 | `codex.md` — Codex GUI startup guide with polyglot defaults |
 | Skills | 50 | `skills/` — SKILL.md + agents/openai.yaml per skill |
 | MCP Servers | 4 | GitHub, Context7, Memory, Sequential Thinking (command-based) |
-| Profiles | 3 | `strict` (read-only), `java-python` (recommended), `yolo` (full auto-approve) |
+| Profiles | 4 | `strict` (read-only), `polyglot` (recommended), `java-python` (compat), `yolo` (full auto-approve) |
 
 ### Skills
 

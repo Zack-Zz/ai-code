@@ -65,6 +65,8 @@
     "scripts/hooks/",
     "scripts/lib/",
     "scripts/claw.js",
+    "scripts/bootstrap-project.sh",
+    "scripts/sync-project.sh",
     "scripts/setup-package-manager.js",
     "scripts/skill-create-output.js",
     "templates/",

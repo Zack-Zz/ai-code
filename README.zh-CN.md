@@ -13,7 +13,7 @@
 
 **🌐 Language / 语言 / 語言**
 
-[**English**](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](docs/zh-TW/README.md) | [日本語](docs/ja-JP/README.md)
+[**English**](README.md) | [简体中文](README.zh-CN.md)
 
 </div>
 
@@ -32,7 +32,7 @@
 - ChatGPT/Codex：`AGENTS.md` + `.codex/config.toml` + `codex.md`
 - Claude Code：插件/规则/钩子工作流
 - Cursor/OpenCode：兼容配置和命令体系
-- Java/Python 优先，其他语言可按需扩展
+- 多语言工作流：TypeScript/JavaScript、Java、Python、Go、Rust
 
 ---
 
@@ -40,7 +40,7 @@
 
 - 先选择你要用的助手栈：Codex/ChatGPT、Claude Code，或 Cursor/OpenCode。
 - 在 `AGENTS.md` 维护项目级指令，按语言再补充具体工作流。
-- Java/Python 项目建议从 `codex.md` 启动，并坚持先测后改（TDD）。
+- 建议从 `codex.md` 启动并坚持先测后改（TDD）。
 - 按需启用目录（`agents/`、`skills/`、`rules/`、`commands/`），避免一次性全量接入。
 
 ### 统一运行时配置（Codex + Claude）
@@ -54,7 +54,7 @@ export AI_CODE_HOME=/path/to/assistant-home
 
 - `AI_CODE_HOME` 优先级最高。
 - 未设置 `AI_CODE_HOME` 且 `AI_CODE_TOOL=codex` 时，默认目录是 `~/.codex`。
-- 其他情况默认目录是 `$AI_CODE_HOME`。
+- 其他情况默认目录是 `~/.claude`。
 - 也可对单次执行使用 `--tool`、`--home` 参数。
 
 ---
@@ -64,10 +64,12 @@ export AI_CODE_HOME=/path/to/assistant-home
 ### 一键 Bootstrap（新项目）
 
 ```bash
-scripts/bootstrap-project.sh --target /path/to/your-project --langs java
+scripts/bootstrap-project.sh --target /path/to/your-project --langs js
 scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,go
 # 可选 tool 模式：--tool auto|codex|kiro|claude|both|all
 # both = codex + kiro，all = codex + kiro + claude
+# 使用 manifest 回放并覆盖更新：
+# scripts/sync-project.sh --target /path/to/your-project
 ```
 
 ### 方案 1：Codex / ChatGPT（推荐）
@@ -79,7 +81,7 @@ cp .codex/config.toml ~/.codex/config.toml
 ```
 
 在 Codex GUI 中打开仓库，首条消息建议：
-`请先阅读 /codex.md，并按 Java/Python 工作流执行`
+`请先阅读 /codex.md，并按多语言工作流执行`
 
 ### 方案 2：Claude Code
 
@@ -123,9 +125,9 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python 
 
 ---
 
-## Codex GUI 适配（Java / Python）
+## Codex GUI 适配（多语言）
 
-本仓库已补充 Codex GUI 可直接使用的配置与会话模板，适合以 Java、Python 为主的开发流程。
+本仓库已补充 Codex GUI 可直接使用的配置与会话模板，适合 TypeScript/JavaScript、Java、Python、Go、Rust 项目。
 
 ### 快速开始
 
@@ -135,13 +137,13 @@ cp .codex/config.toml ~/.codex/config.toml
 
 # 2) 在 Codex GUI 中打开本仓库
 # 3) 首条消息建议：
-#    "请先阅读 /codex.md，并按 Java/Python 工作流执行"
+#    "请先阅读 /codex.md，并按多语言工作流执行"
 ```
 
 ### 已包含内容
 
 - `.codex/config.toml`：Codex CLI/GUI 通用配置（权限、MCP、持久指令）
-- `.codex/AGENTS.md`：Codex 专用补充指引（含 Java/Python 默认流程）
+- `.codex/AGENTS.md`：Codex 专用补充指引（含多语言默认流程）
 - `codex.md`：Codex GUI 会话启动模板（测试优先、安全优先、验证命令）
 
 ---

@@ -82,7 +82,12 @@ sandbox_mode = "workspace-read"
 approval_policy = "never"
 sandbox_mode = "workspace-write"
 
-# Java/Python focused profile
+# Polyglot profile (TypeScript/Java/Python/Go/Rust)
+[profiles.polyglot]
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Backward-compatible profile name
 [profiles.java-python]
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
