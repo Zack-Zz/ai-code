@@ -70,6 +70,14 @@ function runTests() {
     assert.ok(content.includes('allow_implicit_invocation: true'), 'metadata should allow implicit invocation');
   })) passed++; else failed++;
 
+  if (test('writes bootstrap manifest to target project', () => {
+    const manifestPath = path.join(targetDir, '.ai-code', 'bootstrap.json');
+    assert.ok(fs.existsSync(manifestPath), '.ai-code/bootstrap.json should exist');
+    const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    assert.strictEqual(data.langs, 'java', 'manifest should record langs');
+    assert.strictEqual(data.tool, 'both', 'manifest should record tool');
+  })) passed++; else failed++;
+
   console.log('\n--langs java --tool all:');
 
   if (test('copies Claude bootstrap assets for --tool all', () => {

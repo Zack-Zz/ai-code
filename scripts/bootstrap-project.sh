@@ -17,6 +17,7 @@ APPLY_CODEX="false"
 APPLY_KIRO="false"
 APPLY_CLAUDE="false"
 HAS_JAVA="false"
+MANIFEST_PATH=""
 
 print_help() {
   cat <<'EOF'
@@ -135,6 +136,30 @@ copy_file() {
   fi
   cp "$src" "$dst"
   echo "copied file: $dst"
+}
+
+write_manifest() {
+  local manifest_dir="$TARGET_DIR/.ai-code"
+  MANIFEST_PATH="$manifest_dir/bootstrap.json"
+  mkdir -p "$manifest_dir"
+
+  local git_rev="unknown"
+  if git -C "$ROOT_DIR" rev-parse --short HEAD >/dev/null 2>&1; then
+    git_rev="$(git -C "$ROOT_DIR" rev-parse --short HEAD)"
+  fi
+
+  cat > "$MANIFEST_PATH" <<EOF
+{
+  "version": 1,
+  "tool": "$TOOL_MODE",
+  "langs": "$LANGS_RAW",
+  "force": "$FORCE_OVERWRITE",
+  "source_repo": "$ROOT_DIR",
+  "source_git_revision": "$git_rev",
+  "updated_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+}
+EOF
+  echo "wrote manifest: $MANIFEST_PATH"
 }
 
 copy_dir() {
@@ -317,6 +342,8 @@ done
 if [[ "$HAS_JAVA" == "true" ]]; then
   copy_file "$ROOT_DIR/templates/JAVA_WORKFLOW.md" "$TARGET_DIR/JAVA_WORKFLOW.md"
 fi
+
+write_manifest
 
 echo
 echo "Bootstrap complete."
