@@ -81,7 +81,7 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,
 ```bash
 git clone https://github.com/Zack-Zz/ai-code.git
 cd ai-code
-cp .codex/config.toml ~/.codex/config.toml
+scripts/sync-codex-global-config.sh
 ```
 
 在 Codex GUI 中打开仓库，首条消息建议：
@@ -137,7 +137,7 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python 
 
 ```bash
 # 1) 首次配置 Codex
-cp .codex/config.toml ~/.codex/config.toml
+scripts/sync-codex-global-config.sh
 
 # 2) 在 Codex GUI 中打开本仓库
 # 3) 首条消息建议：
