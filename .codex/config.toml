@@ -1,4 +1,4 @@
-# ai-code — Codex Reference Configuration (CLI + GUI)
+# ai-code - Codex reference configuration (CLI + GUI)
 #
 # Copy this file to ~/.codex/config.toml to apply globally.
 # Or keep it in your project root for project-level config.
@@ -10,20 +10,20 @@ model = "gpt-5.3-codex"
 model_provider = "openai"
 
 # Permissions
-[permissions]
 # "untrusted" = no writes, "on-request" = ask per action, "never" = full auto
 approval_policy = "on-request"
-# "off", "workspace-read", "workspace-write", "danger-full-access"
+# "read-only", "workspace-write", "danger-full-access"
 sandbox_mode = "workspace-write"
 
-# Notifications (macOS)
-[notify]
-command = "terminal-notifier -title 'Codex ai-code' -message 'Task completed!' -sound default"
-on_complete = true
+# Search behavior
+# "live", "cached", "disabled"
+web_search = "live"
 
 # History - persistent instructions applied to every session
 [history]
-# These are prepended to every conversation
+# Required by recent Codex versions.
+persistence = "save-all"
+# These are prepended to every conversation.
 persistent_instructions = """
 Follow ai-code principles:
 1. Test-Driven Development (TDD) - write tests first, 80%+ coverage required
@@ -69,14 +69,10 @@ args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
 # command = "npx"
 # args = ["-y", "@anthropic/railway-mcp"]
 
-# Features
-[features]
-web_search_request = true
-
-# Profiles — switch with CODEX_PROFILE=<name>
+# Profiles - switch with CODEX_PROFILE=<name>
 [profiles.strict]
 approval_policy = "on-request"
-sandbox_mode = "workspace-read"
+sandbox_mode = "read-only"
 
 [profiles.yolo]
 approval_policy = "never"

@@ -85,7 +85,7 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,
 ```bash
 git clone https://github.com/Zack-Zz/ai-code.git
 cd ai-code
-cp .codex/config.toml ~/.codex/config.toml
+scripts/sync-codex-global-config.sh
 ```
 
 Then open the repo in Codex GUI and start with:
@@ -952,7 +952,7 @@ ai-code provides **first-class Codex support** with a reference configuration, C
 
 ```bash
 # Copy the reference config to your home directory
-cp .codex/config.toml ~/.codex/config.toml
+scripts/sync-codex-global-config.sh
 
 # Run Codex in the repo — AGENTS.md is auto-detected
 codex
@@ -962,7 +962,7 @@ codex
 
 ```bash
 # 1) Configure Codex once
-cp .codex/config.toml ~/.codex/config.toml
+scripts/sync-codex-global-config.sh
 
 # 2) Open this repository in Codex GUI
 # 3) Start your first prompt with:

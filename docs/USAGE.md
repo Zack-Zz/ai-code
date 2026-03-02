@@ -62,7 +62,12 @@ Keep Codex config global to avoid copying sensitive/local preferences into each 
 scripts/sync-codex-global-config.sh
 # or custom codex home
 scripts/sync-codex-global-config.sh --home /path/to/.codex
+# optional: skip codex validation (not recommended)
+# scripts/sync-codex-global-config.sh --skip-validate
 ```
+
+The script validates config compatibility with local `codex` before and after write.
+If validation fails after write, it automatically restores the backup.
 
 ## 6) Recommended Practice
 
