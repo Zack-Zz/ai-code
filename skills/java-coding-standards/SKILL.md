@@ -1,6 +1,6 @@
 ---
 name: java-coding-standards
-description: "Java coding standards for Spring Boot services: naming, immutability, Optional usage, streams, exceptions, generics, and project layout."
+description: "Java coding standards for Spring Boot services: naming, immutability, Javadoc conventions, Optional usage, streams, exceptions, generics, and project layout."
 origin: ai-code
 ---
 
@@ -37,6 +37,57 @@ public Market findBySlug(String slug) {}
 // ✅ Constants: UPPER_SNAKE_CASE
 private static final int MAX_PAGE_SIZE = 100;
 ```
+
+## Documentation Comments (Javadoc)
+
+- Public classes/interfaces/enums/records must have class-level Javadoc.
+- Class Javadoc should describe business purpose and responsibility, not implementation details.
+- Include `@author` and `@since` for public top-level types.
+- Public/protected methods must have Javadoc when behavior is non-trivial, has side effects, or throws domain exceptions.
+- Public constants must have Javadoc when meaning is not obvious from the name alone.
+- Private methods/getters/setters do not require Javadoc unless logic is complex.
+
+```java
+/**
+ * Application service for market lifecycle operations.
+ * Coordinates validation, persistence, and domain events.
+ *
+ * @author ai-code
+ * @since 1.0.0
+ */
+public class MarketService {
+
+  /**
+   * Maximum number of records allowed in a single query page.
+   */
+  public static final int MAX_PAGE_SIZE = 100;
+
+  /**
+   * Creates a market and persists it atomically.
+   *
+   * @param request validated market creation request
+   * @return persisted market aggregate
+   * @throws MarketAlreadyExistsException when a market with the same slug already exists
+   */
+  public Market createMarket(CreateMarketRequest request) { ... }
+}
+```
+
+### Javadoc Tag Rules
+
+- `@param`: required for each parameter in documented methods/constructors.
+- `@return`: required when return value is not `void`; describe business meaning.
+- `@throws`: required for checked exceptions and meaningful domain/runtime exceptions.
+- `@since`: required on public top-level types and public APIs introduced in new versions.
+- `@author`: required on public top-level types (use team/org identifier, not personal PII).
+- `@implNote`/`@apiNote`: use when callers must know behavior contracts or extension constraints.
+
+### Javadoc Quality Rules
+
+- Do not repeat the method name literally (avoid low-value comments).
+- Describe intent, constraints, and side effects.
+- Keep comments in sync with code changes; stale comments are bugs.
+- Prefer English for API/Javadoc consistency unless project rules require otherwise.
 
 ## Immutability
 
