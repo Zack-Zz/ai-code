@@ -1,6 +1,6 @@
 ---
 name: java-coding-standards
-description: Java coding standards for Spring Boot services: naming, immutability, Optional usage, streams, exceptions, generics, and project layout.
+description: Java coding standards for Spring Boot services: naming, immutability, Javadoc conventions, Optional usage, streams, exceptions, generics, and project layout.
 ---
 
 # Java 编码规范
@@ -28,6 +28,57 @@ public Market findBySlug(String slug) {}
 // ✅ Constants: UPPER_SNAKE_CASE
 private static final int MAX_PAGE_SIZE = 100;
 ```
+
+## 文档注释规范（Javadoc）
+
+* 对外可见的类/接口/枚举/record 必须有类级 Javadoc。
+* 类级 Javadoc 应描述业务职责与边界，不要写实现细节。
+* 公共顶级类型应包含 `@author` 与 `@since`。
+* public/protected 方法在“行为非平凡、有副作用、会抛出领域异常”时必须写 Javadoc。
+* 公共常量若语义不是“看名字就完全明确”，必须写 Javadoc。
+* private 方法、getter/setter 一般可不写；仅在逻辑复杂时补充。
+
+```java
+/**
+ * 市场生命周期应用服务。
+ * 负责协调校验、持久化与领域事件发布。
+ *
+ * @author ai-code
+ * @since 1.0.0
+ */
+public class MarketService {
+
+  /**
+   * 单次查询允许的最大分页大小。
+   */
+  public static final int MAX_PAGE_SIZE = 100;
+
+  /**
+   * 原子化创建市场并持久化。
+   *
+   * @param request 已完成校验的创建请求
+   * @return 已持久化的市场聚合
+   * @throws MarketAlreadyExistsException 当 slug 已存在时抛出
+   */
+  public Market createMarket(CreateMarketRequest request) { ... }
+}
+```
+
+### Javadoc 标签规则
+
+* `@param`：文档化的方法/构造函数中，每个参数都要有。
+* `@return`：非 `void` 返回值必须写，说明业务语义而不是类型名。
+* `@throws`：受检异常必写；有业务意义的运行时异常也应写。
+* `@since`：公共顶级类型和新增公共 API 必写。
+* `@author`：公共顶级类型必写（建议团队/组织标识，避免个人隐私信息）。
+* `@implNote` / `@apiNote`：用于补充实现约束和调用约束。
+
+### Javadoc 质量要求
+
+* 不要机械复述方法名（低信息量注释应避免）。
+* 重点描述“意图、约束、副作用”。
+* 代码变更时同步更新注释；过期注释按缺陷处理。
+* 若无项目特殊约定，API/Javadoc 建议统一英文。
 
 ## 不可变性
 
