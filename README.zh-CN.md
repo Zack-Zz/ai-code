@@ -43,6 +43,35 @@
 - 建议从 `.codex/codex.md` 启动并坚持先测后改（TDD）。
 - 按需启用目录（`agents/`、`skills/`、`rules/`、`commands/`），避免一次性全量接入。
 
+### 组件适配矩阵（Claude / Codex / Kiro）
+
+状态说明：
+- 原生：该助手会直接加载/执行
+- 参考：可作为指引使用，但不是原生执行能力
+- 不支持：该助手不直接消费
+
+| 组件 | 主要作用 | Claude Code | Codex | Kiro |
+|------|----------|-------------|-------|------|
+| `commands/` | 斜杠命令工作流（`/tdd`、`/plan` 等） | 原生 | 不支持 | 不支持 |
+| `rules/` | 始终遵循的编码/安全/测试规则 | 原生 | 不支持 | 不支持（改用 `.kiro/steering/`） |
+| `skills/*/SKILL.md` | 可复用的工作流知识 | 原生 | 原生（通过项目 `.agents/skills/`） | 参考 |
+| `skills/*/agents/openai.yaml` | Codex 技能自动识别元数据 | 不支持 | 原生 | 不支持 |
+| `agents/` | 专项子代理角色说明 | 原生 | 参考 | 参考 |
+| `hooks/` + `scripts/hooks/` | 事件触发自动化 | 原生 | 不支持（Codex CLI 暂无 hooks） | 不支持（使用 `.kiro/hooks/hooks.json`） |
+| `.codex/*` | Codex 配置与会话引导 | 参考 | 原生 | 参考 |
+| `.kiro/steering/*` + `.kiro/hooks/*` + `.kiro/settings/mcp.json` | Kiro 的 steering/hooks/MCP 集成 | 参考 | 参考 | 原生 |
+| `mcp-configs/` | MCP 模板集合（主要面向 Claude 风格配置） | 原生/参考 | 参考（Codex 使用 `.codex/config.toml`） | 参考（Kiro 使用 `.kiro/settings/mcp.json`） |
+
+### Bootstrap 映射（`scripts/bootstrap-project.sh`）
+
+| `--tool` 模式 | 会复制的能力 |
+|---------------|--------------|
+| `claude` | `CLAUDE.md`、`agents/`、`commands/`、`rules/`、`hooks/`、hook 运行时脚本 |
+| `codex` | `.codex/codex.md`、`.codex/AGENTS.md`、可选 `.codex/config.toml`、选定 skills |
+| `kiro` | `.kiro/steering/*`、`.kiro/hooks/hooks.json`、`.kiro/settings/mcp.json`、选定 skills（参考用途） |
+| `both` | 同时复制 Codex + Kiro 资产 |
+| `all` | 同时复制 Codex + Kiro + Claude 资产 |
+
 ### 统一运行时配置（Codex + Claude）
 
 Hook/Session 脚本支持统一环境变量：

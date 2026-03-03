@@ -47,6 +47,35 @@ Production-ready agents, skills, hooks, commands, rules, and MCP configurations 
 - Start from `.codex/codex.md` for a polyglot Codex workflow and run tests before implementation.
 - Use only the directories you need (`agents/`, `skills/`, `rules/`, `commands/`) to keep setup minimal.
 
+### Component Compatibility Matrix (Claude / Codex / Kiro)
+
+Status legend:
+- Native: directly loaded/executed by the assistant
+- Reference: usable as guidance, but not natively executed
+- No: not consumed by that assistant
+
+| Component | Primary purpose | Claude Code | Codex | Kiro |
+|-----------|-----------------|-------------|-------|------|
+| `commands/` | Slash command workflows (`/tdd`, `/plan`, etc.) | Native | No | No |
+| `rules/` | Always-follow coding/security/testing rules | Native | No | No (use `.kiro/steering/`) |
+| `skills/*/SKILL.md` | Reusable workflow knowledge | Native | Native (via project `.agents/skills/`) | Reference |
+| `skills/*/agents/openai.yaml` | Skill metadata for Codex auto-recognition | No | Native | No |
+| `agents/` | Specialized subagent role instructions | Native | Reference | Reference |
+| `hooks/` + `scripts/hooks/` | Event-triggered automation | Native | No (Codex CLI lacks hooks) | No (uses `.kiro/hooks/hooks.json`) |
+| `.codex/*` | Codex config and session guide | Reference | Native | Reference |
+| `.kiro/steering/*` + `.kiro/hooks/*` + `.kiro/settings/mcp.json` | Kiro steering/hook/MCP integration | Reference | Reference | Native |
+| `mcp-configs/` | MCP template set (mainly for Claude-style config) | Native/Reference | Reference (Codex uses `.codex/config.toml`) | Reference (Kiro uses `.kiro/settings/mcp.json`) |
+
+### Bootstrap Mapping (`scripts/bootstrap-project.sh`)
+
+| `--tool` mode | Copied for this assistant |
+|---------------|---------------------------|
+| `claude` | `CLAUDE.md`, `agents/`, `commands/`, `rules/`, `hooks/`, hook runtime scripts |
+| `codex` | `.codex/codex.md`, `.codex/AGENTS.md`, optional `.codex/config.toml`, selected skills |
+| `kiro` | `.kiro/steering/*`, `.kiro/hooks/hooks.json`, `.kiro/settings/mcp.json`, selected skills (reference use) |
+| `both` | Codex + Kiro assets |
+| `all` | Codex + Kiro + Claude assets |
+
 ### Unified Runtime Config (Codex + Claude)
 
 For hook/session scripts, you can use one set of environment variables across assistants:
