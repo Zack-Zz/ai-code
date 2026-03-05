@@ -72,6 +72,9 @@
 | `both` | 同时复制 Codex + Kiro 资产 |
 | `all` | 同时复制 Codex + Kiro + Claude 资产 |
 
+当 `--langs` 包含 `go` 时，还会额外复制与工具无关的 Go 约束模板：
+`Makefile`、`.golangci.yml`、`.github/workflows/go-ci.yml`（不会影响非 Go 语言项目）。
+
 ### 统一运行时配置（Codex + Claude）
 
 Hook/Session 脚本支持统一环境变量：

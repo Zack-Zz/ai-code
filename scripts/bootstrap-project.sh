@@ -18,6 +18,7 @@ APPLY_KIRO="false"
 APPLY_CLAUDE="false"
 COPY_CODEX_CONFIG="false"
 HAS_JAVA="false"
+HAS_GO="false"
 MANIFEST_PATH=""
 
 print_help() {
@@ -277,6 +278,7 @@ for lang_raw in "${langs[@]}"; do
       for s in "${PYTHON_SKILLS[@]}"; do add_skill_unique "$s"; done
       ;;
     go|golang)
+      HAS_GO="true"
       for s in "${GO_SKILLS[@]}"; do add_skill_unique "$s"; done
       ;;
     rust)
@@ -352,6 +354,13 @@ done
 # Java workflow checklist
 if [[ "$HAS_JAVA" == "true" ]]; then
   copy_file "$ROOT_DIR/templates/JAVA_WORKFLOW.md" "$TARGET_DIR/JAVA_WORKFLOW.md"
+fi
+
+# Go project enforcement templates (language-specific, tool-agnostic)
+if [[ "$HAS_GO" == "true" ]]; then
+  copy_file "$ROOT_DIR/templates/go/Makefile" "$TARGET_DIR/Makefile"
+  copy_file "$ROOT_DIR/templates/go/.golangci.yml" "$TARGET_DIR/.golangci.yml"
+  copy_file "$ROOT_DIR/templates/go/workflows/go-ci.yml" "$TARGET_DIR/.github/workflows/go-ci.yml"
 fi
 
 write_manifest

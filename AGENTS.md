@@ -7,7 +7,7 @@ This is a **production-ready AI coding plugin** providing 13 specialized agents,
 1. **Agent-First** — Delegate to specialized agents for domain tasks
 2. **Test-Driven** — Write tests before implementation, 80%+ coverage required
 3. **Security-First** — Never compromise on security; validate all inputs
-4. **Immutability** — Always create new objects, never mutate existing ones
+4. **Safe State Management** — Prefer immutable-style updates where practical; for Go use explicit ownership and avoid shared mutable state
 5. **Plan Before Execute** — Plan complex features before writing code
 
 ## Available Agents
@@ -57,7 +57,10 @@ Use parallel execution for independent operations — launch multiple agents sim
 
 ## Coding Style
 
-**Immutability (CRITICAL):** Always create new objects, never mutate. Return new copies with changes applied.
+**State management (CRITICAL):**
+- TypeScript/Python/Frontend: prefer immutable updates and pure transforms.
+- Go: use clear ownership boundaries, avoid shared mutable state across goroutines, and guard shared state with synchronization.
+- In all stacks: avoid hidden side effects and keep data flow explicit.
 
 **File organization:** Many small files over few large ones. 200-400 lines typical, 800 max. Organize by feature/domain, not by type. High cohesion, low coupling.
 
@@ -114,17 +117,39 @@ Troubleshoot failures: check test isolation → verify mocks → fix implementat
 
 **Build troubleshooting:** Use build-error-resolver agent → analyze errors → fix incrementally → verify after each fix.
 
-## Project Structure
+## Runtime Layout (Bootstrapped Projects)
 
+Common (all tools):
 ```
-agents/          — 13 specialized subagents
-skills/          — 50+ workflow skills and domain knowledge
-commands/        — 33 slash commands
-hooks/           — Trigger-based automations
-rules/           — Always-follow guidelines (common + per-language)
-scripts/         — Cross-platform Node.js utilities
-mcp-configs/     — 14 MCP server configurations
-tests/           — Test suite
+AGENTS.md
+.agents/skills/  — Selected skills copied from ai-code
+.ai-code/        — Bootstrap manifest for sync replay
+```
+
+Codex mode:
+```
+.codex/AGENTS.md
+.codex/codex.md
+# optional
+.codex/config.toml
+```
+
+Claude mode:
+```
+CLAUDE.md
+agents/
+commands/
+rules/
+hooks/
+scripts/hooks/
+scripts/lib/
+```
+
+Kiro mode:
+```
+.kiro/steering/
+.kiro/hooks/hooks.json
+.kiro/settings/mcp.json
 ```
 
 ## Success Metrics

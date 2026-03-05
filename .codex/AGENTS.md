@@ -13,9 +13,11 @@ This supplements the root `AGENTS.md` with Codex-specific guidance for both CLI 
 
 ## Skills Discovery
 
-Skills are sourced from `skills/`. Each skill contains:
-- `SKILL.md` — Detailed instructions and workflow
-- `agents/openai.yaml` — Codex interface metadata
+In a bootstrapped target project, skills are loaded from `.agents/skills/`.
+In the ai-code source repository, canonical skill sources are under `skills/`.
+Each skill contains:
+- `SKILL.md` - Detailed instructions and workflow
+- `agents/openai.yaml` - Codex interface metadata
 
 Core skills:
 - tdd-workflow — Test-driven development with 80%+ coverage
@@ -29,7 +31,7 @@ Core skills:
 - api-design — REST API design patterns
 - verification-loop — Build, test, lint, typecheck, security
 
-Language- and domain-specific skills are also available under `skills/`.
+Language- and domain-specific skills are also available under `.agents/skills/` after bootstrap.
 
 ## Polyglot Defaults
 
@@ -99,7 +101,7 @@ Configure in `~/.codex/config.toml` under `[mcp_servers]`. See `.codex/config.to
 |---------|------------|------------------|
 | Hooks | 8+ event types | Not yet supported |
 | Context file | CLAUDE.md + AGENTS.md | AGENTS.md only |
-| Skills | Skills loaded via skill metadata | `skills/` directory |
+| Skills | Skills loaded via skill metadata | `.agents/skills/` in bootstrapped project |
 | Commands | `/slash` commands | Instruction-based |
 | Agents | Subagent Task tool | Single agent model |
 | Security | Hook-based enforcement | Instruction + sandbox |

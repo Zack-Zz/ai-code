@@ -35,6 +35,7 @@ scripts/bootstrap-project.sh --target /path/to/project --langs js --tool all
 - Java projects add Spring/Java-specific skills.
 - JS projects add frontend/e2e skills.
 - Python/Go projects add corresponding language skills.
+- Go projects also receive optional enforcement templates: `Makefile`, `.golangci.yml`, and `.github/workflows/go-ci.yml`.
 - Rust projects are supported in tool selection and workflow descriptions.
 
 ## 4) Sync Latest Capabilities to Existing Projects

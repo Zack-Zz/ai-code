@@ -41,8 +41,10 @@ function runTests() {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-code-bootstrap-test-'));
   const targetDir = path.join(tempRoot, 'target-java-project');
   const targetAllDir = path.join(tempRoot, 'target-all-project');
+  const targetGoDir = path.join(tempRoot, 'target-go-project');
   fs.mkdirSync(targetDir, { recursive: true });
   fs.mkdirSync(targetAllDir, { recursive: true });
+  fs.mkdirSync(targetGoDir, { recursive: true });
 
   console.log('--langs java --tool both:');
 
@@ -98,6 +100,20 @@ function runTests() {
     fs.mkdirSync(targetConfigDir, { recursive: true });
     runBootstrap(targetConfigDir, 'js', 'codex', ['--copy-codex-config']);
     assert.ok(fs.existsSync(path.join(targetConfigDir, '.codex', 'config.toml')), '.codex/config.toml should exist when --copy-codex-config is used');
+  })) passed++; else failed++;
+
+  console.log('\n--langs go --tool codex:');
+
+  if (test('copies Go enforcement templates when go is selected', () => {
+    runBootstrap(targetGoDir, 'go', 'codex');
+    assert.ok(fs.existsSync(path.join(targetGoDir, 'Makefile')), 'Makefile should exist for Go projects');
+    assert.ok(fs.existsSync(path.join(targetGoDir, '.golangci.yml')), '.golangci.yml should exist for Go projects');
+    assert.ok(
+      fs.existsSync(path.join(targetGoDir, '.github', 'workflows', 'go-ci.yml')),
+      '.github/workflows/go-ci.yml should exist for Go projects'
+    );
+    const makefileContent = fs.readFileSync(path.join(targetGoDir, 'Makefile'), 'utf8');
+    assert.ok(makefileContent.includes('test-race'), 'Makefile should include race test target');
   })) passed++; else failed++;
 
   // Cleanup temp directory

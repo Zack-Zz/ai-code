@@ -76,6 +76,9 @@ Status legend:
 | `both` | Codex + Kiro assets |
 | `all` | Codex + Kiro + Claude assets |
 
+When `--langs` includes `go`, bootstrap also copies tool-agnostic Go enforcement templates:
+`Makefile`, `.golangci.yml`, and `.github/workflows/go-ci.yml` (without affecting non-Go languages).
+
 ### Unified Runtime Config (Codex + Claude)
 
 For hook/session scripts, you can use one set of environment variables across assistants:
