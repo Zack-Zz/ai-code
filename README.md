@@ -321,6 +321,12 @@ ai-code/
 |   |   |-- agents.md          # When to delegate to subagents
 |   |   |-- security.md        # Mandatory security checks
 |   |-- typescript/          # TypeScript/JavaScript specific
+|   |   |-- coding-style.md    # Type safety, React/UI, validation
+|   |   |-- comments.md        # JSDoc, TODO/FIXME, comment guidance
+|   |   |-- testing.md         # TS/JS testing expectations
+|   |   |-- patterns.md        # Service boundaries, repositories, hooks
+|   |   |-- hooks.md           # TS/JS automation hooks
+|   |   |-- security.md        # TS/JS runtime and execution safety
 |   |-- python/              # Python specific
 |   |-- golang/              # Go specific
 |
@@ -517,15 +523,15 @@ This gives you instant access to all commands, agents, skills, and hooks.
 >
 > # Option A: User-level rules (applies to all projects)
 > mkdir -p $AI_CODE_HOME/rules
-> cp -r ai-code/rules/common/* $AI_CODE_HOME/rules/
-> cp -r ai-code/rules/typescript/* $AI_CODE_HOME/rules/   # pick your stack
-> cp -r ai-code/rules/python/* $AI_CODE_HOME/rules/
-> cp -r ai-code/rules/golang/* $AI_CODE_HOME/rules/
+> cp -r ai-code/rules/common $AI_CODE_HOME/rules/common
+> cp -r ai-code/rules/typescript $AI_CODE_HOME/rules/typescript   # pick your stack
+> cp -r ai-code/rules/python $AI_CODE_HOME/rules/python
+> cp -r ai-code/rules/golang $AI_CODE_HOME/rules/golang
 >
 > # Option B: Project-level rules (applies to current project only)
 > mkdir -p .claude/rules
-> cp -r ai-code/rules/common/* .claude/rules/
-> cp -r ai-code/rules/typescript/* .claude/rules/     # pick your stack
+> cp -r ai-code/rules/common .claude/rules/common
+> cp -r ai-code/rules/typescript .claude/rules/typescript     # pick your stack
 > ```
 
 ---
@@ -542,10 +548,10 @@ git clone https://github.com/Zack-Zz/ai-code.git
 cp ai-code/agents/*.md $AI_CODE_HOME/agents/
 
 # Copy rules (common + language-specific)
-cp -r ai-code/rules/common/* $AI_CODE_HOME/rules/
-cp -r ai-code/rules/typescript/* $AI_CODE_HOME/rules/   # pick your stack
-cp -r ai-code/rules/python/* $AI_CODE_HOME/rules/
-cp -r ai-code/rules/golang/* $AI_CODE_HOME/rules/
+cp -r ai-code/rules/common $AI_CODE_HOME/rules/common
+cp -r ai-code/rules/typescript $AI_CODE_HOME/rules/typescript   # pick your stack
+cp -r ai-code/rules/python $AI_CODE_HOME/rules/python
+cp -r ai-code/rules/golang $AI_CODE_HOME/rules/golang
 
 # Copy commands
 cp ai-code/commands/*.md $AI_CODE_HOME/commands/
@@ -716,7 +722,8 @@ Yes. Use Option 2 (manual installation) and copy only what you need:
 cp ai-code/agents/*.md $AI_CODE_HOME/agents/
 
 # Just rules
-cp -r ai-code/rules/common/* $AI_CODE_HOME/rules/
+cp -r ai-code/rules/common $AI_CODE_HOME/rules/common
+cp -r ai-code/rules/typescript $AI_CODE_HOME/rules/typescript   # optional, pick your stack
 ```
 
 Each component is fully independent.

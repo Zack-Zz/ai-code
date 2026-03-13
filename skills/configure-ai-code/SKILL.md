@@ -148,20 +148,20 @@ Use `AskUserQuestion` with `multiSelect: true`:
 Question: "Which rule sets do you want to install?"
 Options:
   - "Common rules (Recommended)" — "Language-agnostic principles: coding style, git workflow, testing, security, etc. (8 files)"
-  - "TypeScript/JavaScript" — "TS/JS patterns, hooks, testing with Playwright (5 files)"
+  - "TypeScript/JavaScript" — "TS/JS patterns, hooks, testing with Playwright, comments/JSDoc guidance (6 files)"
   - "Python" — "Python patterns, pytest, black/ruff formatting (5 files)"
   - "Go" — "Go patterns, table-driven tests, gofmt/staticcheck (5 files)"
 ```
 
 Execute installation:
 ```bash
-# Common rules (flat copy into rules/)
-cp -r $AI_CODE_ROOT/rules/common/* $TARGET/rules/
+# Common rules
+cp -r $AI_CODE_ROOT/rules/common $TARGET/rules/common
 
-# Language-specific rules (flat copy into rules/)
-cp -r $AI_CODE_ROOT/rules/typescript/* $TARGET/rules/   # if selected
-cp -r $AI_CODE_ROOT/rules/python/* $TARGET/rules/        # if selected
-cp -r $AI_CODE_ROOT/rules/golang/* $TARGET/rules/        # if selected
+# Language-specific rules
+cp -r $AI_CODE_ROOT/rules/typescript $TARGET/rules/typescript   # if selected
+cp -r $AI_CODE_ROOT/rules/python $TARGET/rules/python           # if selected
+cp -r $AI_CODE_ROOT/rules/golang $TARGET/rules/golang           # if selected
 ```
 
 **Important**: If the user selects any language-specific rules but NOT common rules, warn them:
@@ -270,7 +270,7 @@ Then print a summary report:
 
 ### Rules Installed ([count])
 - common (8 files)
-- typescript (5 files)
+- typescript (6 files)
 - ...
 
 ### Verification Results

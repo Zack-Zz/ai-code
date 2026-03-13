@@ -16,6 +16,12 @@ rules/
 │   ├── agents.md
 │   └── security.md
 ├── typescript/      # TypeScript/JavaScript specific
+│   ├── coding-style.md
+│   ├── comments.md
+│   ├── testing.md
+│   ├── patterns.md
+│   ├── hooks.md
+│   └── security.md
 ├── python/          # Python specific
 └── golang/          # Go specific
 ```
@@ -69,6 +75,7 @@ cp -r rules/golang $AI_CODE_HOME/rules/golang
 1. 创建一个 `rules/rust/` 目录
 2. 添加扩展通用规则的文件：
    * `coding-style.md` —— 格式化工具、习惯用法、错误处理模式
+   * `comments.md` —— 注释、JSDoc 与 TODO/FIXME 规范（可选但推荐）
    * `testing.md` —— 测试框架、覆盖率工具、测试组织
    * `patterns.md` —— 语言特定的设计模式
    * `hooks.md` —— 用于格式化工具、代码检查器、类型检查器的 PostToolUse 钩子

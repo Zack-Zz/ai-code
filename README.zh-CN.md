@@ -279,12 +279,18 @@ ai-code/
 |   |-- evolve.md           # /evolve - 将直觉聚类到技能中（新增）
 |
 |-- rules/            # 始终遵循的指南（复制到 $AI_CODE_HOME/rules/）
-|   |-- security.md         # 强制性安全检查
-|   |-- coding-style.md     # 不可变性、文件组织
-|   |-- testing.md          # TDD、80% 覆盖率要求
-|   |-- git-workflow.md     # 提交格式、PR 流程
-|   |-- agents.md           # 何时委托给子代理
-|   |-- performance.md      # 模型选择、上下文管理
+|   |-- README.md            # 结构说明与安装指南
+|   |-- common/              # 通用原则
+|   |   |-- security.md        # 强制性安全检查
+|   |   |-- coding-style.md    # 不可变性、文件组织
+|   |   |-- testing.md         # TDD、80% 覆盖率要求
+|   |   |-- git-workflow.md    # 提交格式、PR 流程
+|   |   |-- agents.md          # 何时委托给子代理
+|   |   |-- performance.md     # 模型选择、上下文管理
+|   |-- typescript/          # TypeScript/JavaScript 专用
+|   |   |-- comments.md        # 注释、JSDoc、TODO/FIXME 规范
+|   |-- python/              # Python 专用
+|   |-- golang/              # Go 专用
 |
 |-- hooks/            # 基于触发器的自动化
 |   |-- hooks.json                # 所有钩子配置（PreToolUse、PostToolUse、Stop 等）
@@ -505,13 +511,21 @@ model: opus
 
 ### 规则
 
-规则是始终遵循的指南。保持模块化：
+规则是始终遵循的指南。保持模块化，复制整个目录而不是扁平化文件：
 
-```
+```text
 $AI_CODE_HOME/rules/
-  security.md      # 无硬编码秘密
-  coding-style.md  # 不可变性、文件限制
-  testing.md       # TDD、覆盖率要求
+  common/
+    security.md
+    coding-style.md
+    testing.md
+  typescript/
+    coding-style.md
+    comments.md
+    patterns.md
+    hooks.md
+    security.md
+    testing.md
 ```
 
 ---

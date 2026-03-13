@@ -151,7 +151,7 @@ cp -r $AI_CODE_ROOT/skills/<skill-name> $TARGET/skills/
 Question: "Which rule sets do you want to install?"
 Options:
   - "Common rules (Recommended)" — "Language-agnostic principles: coding style, git workflow, testing, security, etc. (8 files)"
-  - "TypeScript/JavaScript" — "TS/JS patterns, hooks, testing with Playwright (5 files)"
+  - "TypeScript/JavaScript" — "TS/JS 模式、hooks、Playwright 测试、注释/JSDoc 规范（6 files）"
   - "Python" — "Python patterns, pytest, black/ruff formatting (5 files)"
   - "Go" — "Go patterns, table-driven tests, gofmt/staticcheck (5 files)"
 ```
@@ -159,13 +159,13 @@ Options:
 执行安装：
 
 ```bash
-# Common rules (flat copy into rules/)
-cp -r $AI_CODE_ROOT/rules/common/* $TARGET/rules/
+# Common rules
+cp -r $AI_CODE_ROOT/rules/common $TARGET/rules/common
 
-# Language-specific rules (flat copy into rules/)
-cp -r $AI_CODE_ROOT/rules/typescript/* $TARGET/rules/   # if selected
-cp -r $AI_CODE_ROOT/rules/python/* $TARGET/rules/        # if selected
-cp -r $AI_CODE_ROOT/rules/golang/* $TARGET/rules/        # if selected
+# Language-specific rules
+cp -r $AI_CODE_ROOT/rules/typescript $TARGET/rules/typescript   # if selected
+cp -r $AI_CODE_ROOT/rules/python $TARGET/rules/python           # if selected
+cp -r $AI_CODE_ROOT/rules/golang $TARGET/rules/golang           # if selected
 ```
 
 **重要**：如果用户选择了任何特定语言的规则但**没有**选择通用规则，警告他们：
@@ -282,7 +282,7 @@ rm -rf /tmp/ai-code
 
 ### Rules Installed ([count])
 - common (8 files)
-- typescript (5 files)
+- typescript (6 files)
 - ...
 
 ### Verification Results
