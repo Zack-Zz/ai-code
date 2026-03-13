@@ -374,7 +374,12 @@ async function runTests() {
     try {
       const result = await runHookWithInput(
         path.join(scriptsDir, 'evaluate-session.js'),
-        { transcript_path: transcriptPath }
+        { transcript_path: transcriptPath },
+        {
+          HOME: testDir,
+          USERPROFILE: testDir,
+          AI_CODE_HOME: path.join(testDir, '.claude')
+        }
       );
 
       assert.ok(result.stderr.includes('15 messages'), 'Should process session');

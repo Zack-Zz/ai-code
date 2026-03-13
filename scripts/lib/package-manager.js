@@ -149,7 +149,7 @@ function getAvailablePackageManagers() {
  * Get the package manager to use for current project
  *
  * Detection priority:
- * 1. Environment variable CLAUDE_PACKAGE_MANAGER
+ * 1. Environment variable AI_CODE_PACKAGE_MANAGER (fallback: CLAUDE_PACKAGE_MANAGER)
  * 2. Project-specific config (in .claude/package-manager.json)
  * 3. package.json packageManager field
  * 4. Lock file detection
@@ -164,7 +164,7 @@ function getPackageManager(options = {}) {
   const { projectDir = process.cwd() } = options;
 
   // 1. Check environment variable
-  const envPm = process.env.CLAUDE_PACKAGE_MANAGER;
+  const envPm = process.env.AI_CODE_PACKAGE_MANAGER || process.env.CLAUDE_PACKAGE_MANAGER;
   if (envPm && PACKAGE_MANAGERS[envPm]) {
     return {
       name: envPm,
@@ -280,9 +280,23 @@ function setProjectPackageManager(pmName, projectDir = process.cwd()) {
   return config;
 }
 
-// Allowed characters in script/binary names: alphanumeric, dash, underscore, dot, slash, @
-// This prevents shell metacharacter injection while allowing scoped packages (e.g., @scope/pkg)
-const SAFE_NAME_REGEX = /^[@a-zA-Z0-9_./-]+$/;
+// Allowed characters in script/binary names: alphanumeric, dash, underscore, dot, slash, colon, @
+// Path traversal segments are validated separately.
+const SAFE_NAME_REGEX = /^[@a-zA-Z0-9_./:-]+$/;
+
+function hasUnsafePathSegments(name) {
+  if (name.startsWith('/') || name.startsWith('./') || name.startsWith('../')) {
+    return true;
+  }
+
+  return name.split('/').some(segment => segment === '.' || segment === '..' || segment.length === 0);
+}
+
+function assertSafeCommandName(name, label) {
+  if (!SAFE_NAME_REGEX.test(name) || hasUnsafePathSegments(name)) {
+    throw new Error(`${label} contains unsafe characters: ${name}`);
+  }
+}
 
 /**
  * Get the command to run a script
@@ -294,9 +308,7 @@ function getRunCommand(script, options = {}) {
   if (!script || typeof script !== 'string') {
     throw new Error('Script name must be a non-empty string');
   }
-  if (!SAFE_NAME_REGEX.test(script)) {
-    throw new Error(`Script name contains unsafe characters: ${script}`);
-  }
+  assertSafeCommandName(script, 'Script name');
 
   const pm = getPackageManager(options);
 
@@ -314,9 +326,9 @@ function getRunCommand(script, options = {}) {
   }
 }
 
-// Allowed characters in arguments: alphanumeric, whitespace, dashes, dots, slashes,
-// equals, colons, commas, quotes, @. Rejects shell metacharacters like ; | & ` $ ( ) { } < > !
-const SAFE_ARGS_REGEX = /^[@a-zA-Z0-9\s_./:=,'"*+-]+$/;
+// Allowed characters in arguments: alphanumeric, spaces, dashes, dots, slashes,
+// equals, colons, commas, @, plus, star. Rejects shell metacharacters and shell quoting.
+const SAFE_ARGS_REGEX = /^[@a-zA-Z0-9 _./:=,+*-]+$/;
 
 /**
  * Get the command to execute a package binary
@@ -328,8 +340,13 @@ function getExecCommand(binary, args = '', options = {}) {
   if (!binary || typeof binary !== 'string') {
     throw new Error('Binary name must be a non-empty string');
   }
-  if (!SAFE_NAME_REGEX.test(binary)) {
-    throw new Error(`Binary name contains unsafe characters: ${binary}`);
+  assertSafeCommandName(binary, 'Binary name');
+
+  if (args !== '' && args !== null && args !== undefined && typeof args !== 'string') {
+    throw new Error('Arguments must be a string');
+  }
+  if (typeof args === 'string' && /[\r\n\t]/.test(args)) {
+    throw new Error(`Arguments contain unsafe whitespace: ${args}`);
   }
   if (args && typeof args === 'string' && !SAFE_ARGS_REGEX.test(args)) {
     throw new Error(`Arguments contain unsafe characters: ${args}`);
@@ -350,7 +367,8 @@ function getSelectionPrompt() {
   let message = '[PackageManager] No package manager preference detected.\n';
   message += 'Supported package managers: ' + Object.keys(PACKAGE_MANAGERS).join(', ') + '\n';
   message += '\nTo set your preferred package manager:\n';
-  message += '  - Global: Set CLAUDE_PACKAGE_MANAGER environment variable\n';
+  message += '  - Global: Set AI_CODE_PACKAGE_MANAGER environment variable\n';
+  message += '  - Backward compatible: CLAUDE_PACKAGE_MANAGER is also supported\n';
   message += '  - Or add to ~/.claude/package-manager.json: {"packageManager": "pnpm"}\n';
   message += '  - Or add to package.json: {"packageManager": "pnpm@8"}\n';
   message += '  - Or add a lock file to your project (e.g., pnpm-lock.yaml)\n';

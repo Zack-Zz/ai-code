@@ -56,7 +56,7 @@ export interface GetPackageManagerOptions {
  * Get the package manager to use for the current project.
  *
  * Detection priority:
- * 1. CLAUDE_PACKAGE_MANAGER environment variable
+ * 1. AI_CODE_PACKAGE_MANAGER environment variable (fallback: CLAUDE_PACKAGE_MANAGER)
  * 2. Project-specific config (.claude/package-manager.json)
  * 3. package.json `packageManager` field
  * 4. Lock file detection

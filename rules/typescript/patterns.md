@@ -24,6 +24,10 @@ interface ApiResponse<T> {
 }
 ```
 
+- Keep transport envelopes stable across endpoints
+- Separate transport DTOs from domain models when the shapes differ
+- Do not leak internal error objects or stack traces in API responses
+
 ## Custom Hooks Pattern
 
 ```typescript
@@ -39,6 +43,10 @@ export function useDebounce<T>(value: T, delay: number): T {
 }
 ```
 
+- Keep hooks focused on one concern
+- Return stable, well-typed values
+- Avoid mixing data fetching, storage mutation, and presentational state in a single hook
+
 ## Repository Pattern
 
 ```typescript
@@ -50,3 +58,36 @@ interface Repository<T> {
   delete(id: string): Promise<void>
 }
 ```
+
+- Keep business logic dependent on repository interfaces rather than storage implementations
+- Map storage records into domain types before returning them to application code
+
+## Service Boundary Pattern
+
+```typescript
+export async function createUser(input: unknown): Promise<UserDto> {
+  const parsed = CreateUserSchema.parse(input)
+  const user = await userRepository.create(parsed)
+  return toUserDto(user)
+}
+```
+
+- Parse `unknown` inputs at service boundaries
+- Return stable DTOs from service functions
+- Avoid passing ORM models, database rows, or third-party payloads directly into UI code
+
+## Async Workflow Pattern
+
+```typescript
+export async function processOrder(orderId: string): Promise<Result> {
+  const order = await orderRepository.findById(orderId)
+  if (!order) throw new Error('Order not found')
+
+  const payment = await paymentService.capture(order)
+  return buildResult(order, payment)
+}
+```
+
+- Make async sequencing explicit
+- Avoid hidden side effects inside utility helpers
+- Isolate retries, timeouts, and external IO behind named functions or services

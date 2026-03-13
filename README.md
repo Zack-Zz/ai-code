@@ -173,12 +173,12 @@ This toolkit fully supports **Windows, macOS, and Linux**. All hooks and scripts
 
 For Claude Code workflows, package-manager detection follows this priority:
 
-1. **Environment variable**: `AI_CODE_PACKAGE_MANAGER`
+1. **Environment variable**: `AI_CODE_PACKAGE_MANAGER` (`CLAUDE_PACKAGE_MANAGER` also supported for backward compatibility)
 2. **Project config**: `.claude/package-manager.json`
 3. **package.json**: `packageManager` field
 4. **Lock file**: Detection from package-lock.json, yarn.lock, pnpm-lock.yaml, or bun.lockb
 5. **Global config**: `$AI_CODE_HOME/package-manager.json`
-6. **Fallback**: First available package manager
+6. **Fallback**: `npm`
 
 To set your preferred package manager:
 

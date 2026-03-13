@@ -15,6 +15,12 @@ rules/
 │   ├── agents.md
 │   └── security.md
 ├── typescript/      # TypeScript/JavaScript specific
+│   ├── coding-style.md
+│   ├── comments.md
+│   ├── testing.md
+│   ├── patterns.md
+│   ├── hooks.md
+│   └── security.md
 ├── python/          # Python specific
 ├── golang/          # Go specific
 └── swift/           # Swift specific
@@ -73,6 +79,7 @@ To add support for a new language (e.g., `rust/`):
 1. Create a `rules/rust/` directory
 2. Add files that extend the common rules:
    - `coding-style.md` — formatting tools, idioms, error handling patterns
+   - `comments.md` — comment, JSDoc, and TODO/FIXME expectations (optional but recommended)
    - `testing.md` — test framework, coverage tools, test organization
    - `patterns.md` — language-specific design patterns
    - `hooks.md` — PostToolUse hooks for formatters, linters, type checkers

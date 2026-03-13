@@ -13,12 +13,12 @@ Set up package manager preference for the project or globally.
 
 ## Detection Order
 
-1. **Environment variable**: `AI_CODE_PACKAGE_MANAGER`
+1. **Environment variable**: `AI_CODE_PACKAGE_MANAGER` (`CLAUDE_PACKAGE_MANAGER` is still accepted)
 2. **Project config**: `.claude/package-manager.json`
 3. **package.json**: `packageManager` field
 4. **Lock file**: Auto-detect from lock files
 5. **Global config**: `$AI_CODE_HOME/package-manager.json`
-6. **Fallback**: First available
+6. **Fallback**: `npm`
 
 ## Configuration Options
 
