@@ -1,23 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Sync ai-code Codex reference config into ~/.codex/config.toml (or custom home).
+# Sync ai-code Codex global references into ~/.codex (or custom home).
 #
 # Usage:
 #   scripts/sync-codex-global-config.sh
 #   scripts/sync-codex-global-config.sh --home /custom/codex-home
+#   scripts/sync-codex-global-config.sh --apply-config
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TARGET_HOME="${HOME}/.codex"
 TARGET_FILE=""
+REFERENCE_FILE=""
 SKIP_VALIDATE="false"
+APPLY_CONFIG="false"
 
 print_help() {
   cat <<'EOF'
-Sync ai-code Codex global config.
+Sync ai-code Codex global references.
 
 Optional:
   --home <dir>         Codex home directory (default: ~/.codex)
+  --apply-config       Also overwrite ~/.codex/config.toml (default: off)
   --skip-validate      Skip Codex config validation
   --help               Show this help
 EOF
@@ -48,6 +52,10 @@ while [[ $# -gt 0 ]]; do
       TARGET_HOME="${2:-}"
       shift 2
       ;;
+    --apply-config)
+      APPLY_CONFIG="true"
+      shift
+      ;;
     --skip-validate)
       SKIP_VALIDATE="true"
       shift
@@ -66,6 +74,7 @@ done
 
 TARGET_HOME="${TARGET_HOME/#\~/$HOME}"
 TARGET_FILE="$TARGET_HOME/config.toml"
+REFERENCE_FILE="$TARGET_HOME/config.toml.reference"
 SOURCE_FILE="$ROOT_DIR/.codex/config.toml"
 BACKUP_FILE=""
 HAD_TARGET="false"
@@ -76,6 +85,23 @@ if [[ ! -f "$SOURCE_FILE" ]]; then
 fi
 
 mkdir -p "$TARGET_HOME"
+
+# Always update reference config without touching active config.
+cp "$SOURCE_FILE" "$REFERENCE_FILE"
+echo "Updated reference config: $REFERENCE_FILE"
+
+if [[ "$APPLY_CONFIG" != "true" ]]; then
+  if [[ -f "$TARGET_FILE" ]]; then
+    echo "Kept active config unchanged: $TARGET_FILE"
+    echo "Tip: compare with:"
+    echo "  diff -u \"$REFERENCE_FILE\" \"$TARGET_FILE\""
+  else
+    echo "No active config found at: $TARGET_FILE"
+    echo "Tip: apply reference when ready:"
+    echo "  cp \"$REFERENCE_FILE\" \"$TARGET_FILE\""
+  fi
+  exit 0
+fi
 
 # Validate source config in isolation before touching user config.
 VALIDATE_HOME="$(mktemp -d)"
@@ -107,4 +133,4 @@ if ! validate_config "$TARGET_HOME"; then
   exit 1
 fi
 
-echo "Synced global Codex config to: $TARGET_FILE"
+echo "Applied global Codex config to: $TARGET_FILE"

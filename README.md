@@ -126,8 +126,10 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,
 # scripts/bootstrap-project.sh --target /path/to/your-project --langs js --tool codex --copy-codex-config
 # Re-sync latest ai-code updates using target manifest:
 # scripts/sync-project.sh --target /path/to/your-project
-# Sync global Codex config (recommended):
+# Update global Codex config reference (safe default, no overwrite):
 # scripts/sync-codex-global-config.sh
+# Apply to active config only when needed:
+# scripts/sync-codex-global-config.sh --apply-config
 ```
 
 ### Option 1: Codex / ChatGPT Stack (Recommended)
@@ -136,6 +138,8 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,
 git clone https://github.com/Zack-Zz/ai-code.git
 cd ai-code
 scripts/sync-codex-global-config.sh
+# default behavior updates ~/.codex/config.toml.reference only
+# use --apply-config to overwrite ~/.codex/config.toml explicitly
 ```
 
 Then open the repo in Codex GUI and start with:
@@ -1025,6 +1029,8 @@ ai-code provides **first-class Codex support** with a reference configuration, C
 ```bash
 # Copy the reference config to your home directory
 scripts/sync-codex-global-config.sh
+# default behavior updates ~/.codex/config.toml.reference only
+# use --apply-config to overwrite ~/.codex/config.toml explicitly
 
 # Run Codex in the repo — AGENTS.md is auto-detected
 codex

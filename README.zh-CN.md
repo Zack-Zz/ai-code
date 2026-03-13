@@ -122,8 +122,10 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,
 # scripts/bootstrap-project.sh --target /path/to/your-project --langs js --tool codex --copy-codex-config
 # 使用 manifest 回放并覆盖更新：
 # scripts/sync-project.sh --target /path/to/your-project
-# 同步全局 Codex 配置（推荐）：
+# 更新全局 Codex 配置参考（安全默认，不覆盖 active config）：
 # scripts/sync-codex-global-config.sh
+# 仅在需要时显式覆盖 active config：
+# scripts/sync-codex-global-config.sh --apply-config
 ```
 
 ### 方案 1：Codex / ChatGPT（推荐）
@@ -132,6 +134,8 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,
 git clone https://github.com/Zack-Zz/ai-code.git
 cd ai-code
 scripts/sync-codex-global-config.sh
+# 默认仅更新 ~/.codex/config.toml.reference
+# 如需覆盖 ~/.codex/config.toml，请显式加 --apply-config
 ```
 
 在 Codex GUI 中打开仓库，首条消息建议：
@@ -203,6 +207,8 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python 
 ```bash
 # 1) 首次配置 Codex
 scripts/sync-codex-global-config.sh
+# 默认仅更新 ~/.codex/config.toml.reference
+# 如需覆盖 ~/.codex/config.toml，请显式加 --apply-config
 
 # 2) 在 Codex GUI 中打开本仓库
 # 3) 首条消息建议：
