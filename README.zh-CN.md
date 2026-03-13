@@ -36,6 +36,18 @@
 
 ---
 
+## 使用文档索引
+
+- 入门必读：[快速开始](#-快速开始)、[使用介绍](#使用介绍)、[跨平台支持](#-跨平台支持)
+- Bootstrap 与同步：[`scripts/bootstrap-project.sh`](scripts/bootstrap-project.sh)、[`scripts/sync-project.sh`](scripts/sync-project.sh)、[`scripts/sync-codex-global-config.sh`](scripts/sync-codex-global-config.sh)
+- 工具专章：[Codex GUI 适配（多语言）](#codex-gui-适配多语言)、[Kiro 集成指南](docs/KIRO_INTEGRATION.md)、[Claude 插件工作流](.claude-plugin/README.md)
+- 规则与命令：[规则总览](rules/README.md)、[`commands/` 命令目录](commands)、[`agents/` 代理目录](agents)
+- 技能体系：[`skills/` 技能目录](skills)、[技能生成命令](commands/skill-create.md)
+- 进阶文档：[用法细节](docs/USAGE.md)、[Token 优化](docs/token-optimization.md)、[示例集合](examples)
+- 中文文档入口：[中文总览](docs/zh-CN/README.md)、[中文规则](docs/zh-CN/rules/README.md)、[中文命令](docs/zh-CN/commands)
+
+---
+
 ## 使用介绍
 
 - 先选择你要用的助手栈：Codex/ChatGPT、Claude Code，或 Cursor/OpenCode。
@@ -66,11 +78,15 @@
 
 | `--tool` 模式 | 会复制的能力 |
 |---------------|--------------|
-| `claude` | `CLAUDE.md`、`agents/`、`commands/`、`rules/`、`hooks/`、hook 运行时脚本 |
-| `codex` | `.codex/codex.md`、`.codex/AGENTS.md`、可选 `.codex/config.toml`、选定 skills |
-| `kiro` | `.kiro/steering/*`、`.kiro/hooks/hooks.json`、`.kiro/settings/mcp.json`、选定 skills（参考用途） |
+| `claude` | `global-first`：`CLAUDE.md`、`.claude/package-manager.json`；`project-full`：额外复制 `agents/`、`commands/`、`rules/`、`hooks/`、`scripts/hooks`、`scripts/lib` |
+| `codex` | `global-first`：`.codex/codex.md`、`.codex/AGENTS.md`（可选 `.codex/config.toml`）；`project-full`：额外复制选定 `.agents/skills/*` |
+| `kiro` | `global-first`：`.kiro/steering/ai-code-core.md`；`project-full`：额外复制完整 steering/hooks/settings/docs |
 | `both` | 同时复制 Codex + Kiro 资产 |
 | `all` | 同时复制 Codex + Kiro + Claude 资产 |
+
+`--layout` 模式：
+- `global-first`（默认）：仅同步项目入口文件；`commands/rules/hooks/skills` 维持全局维护。
+- `project-full`：同步完整项目内资产。
 
 当 `--langs` 包含 `go` 时，还会额外复制与工具无关的 Go 约束模板：
 `Makefile`、`.golangci.yml`、`.github/workflows/go-ci.yml`（不会影响非 Go 语言项目）。
@@ -99,6 +115,8 @@ export AI_CODE_HOME=/path/to/assistant-home
 scripts/bootstrap-project.sh --target /path/to/your-project --langs js
 scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,go
 # 可选 tool 模式：--tool auto|codex|kiro|claude|both|all
+# auto 只会选择一个工具（优先已有目录，其次 AI_CODE_TOOL，否则 codex）
+# 可选 layout 模式：--layout global-first|project-full（默认：global-first）
 # both = codex + kiro，all = codex + kiro + claude
 # 可选复制项目级 codex 配置：
 # scripts/bootstrap-project.sh --target /path/to/your-project --langs js --tool codex --copy-codex-config
@@ -127,6 +145,8 @@ cd ai-code
 ./install.sh typescript python golang
 # 或直接对目标项目执行 bootstrap：
 # scripts/bootstrap-project.sh --target /path/to/project --langs java --tool claude
+# 全量同步到项目目录：
+# scripts/bootstrap-project.sh --target /path/to/project --langs java --tool claude --layout project-full
 ```
 
 ### 方案 3：Cursor / OpenCode
@@ -142,15 +162,20 @@ cd ai-code
 
 # 为新项目引导 Kiro 支持
 scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python --tool kiro
+# 全量同步到项目目录：
+# scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python --tool kiro --layout project-full
 
 # 或直接使用本仓库
 # 在 Kiro 中打开该目录 - steering 文件自动加载
 ```
 
-**安装内容：**
-- `.kiro/steering/` 中的 6 个 steering 文件（核心原则、安全、TDD、编码标准）
-- `.kiro/hooks/hooks.json` 中的 Hooks 配置（自动格式化、安全检查）
-- `.kiro/settings/mcp.json` 中的 MCP 模板（文件系统、GitHub、PostgreSQL、搜索）
+**默认安装内容（`global-first`）：**
+- `.kiro/steering/ai-code-core.md`（项目入口文件）
+
+**`--layout project-full` 额外内容：**
+- `.kiro/steering/` 全套 steering（核心原则、安全、TDD、编码标准）
+- `.kiro/hooks/hooks.json` Hooks 配置（自动格式化、安全检查）
+- `.kiro/settings/mcp.json` MCP 模板（文件系统、GitHub、PostgreSQL、搜索）
 
 **后续步骤：**
 1. 在 Kiro 中打开项目 - steering 文件自动加载
@@ -158,6 +183,14 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python 
 3. 查看 `.kiro/hooks/hooks.json` 中的 hooks（fileEdited、promptSubmit、agentStop）
 
 详细的 Kiro 配置指南请参阅 [`.kiro/README.md`](.kiro/README.md)。
+
+### 各工具单独维护（Global-First）
+
+- Codex：可复用资产维护在 `~/.codex`（或 `AI_CODE_HOME`），项目内保持最小入口（`AGENTS.md`、`.codex/*`）。
+- Claude：`commands/`、`rules/`、`hooks/`、`skills/` 维护在全局目录，项目默认仅保留入口文件。
+- Kiro：共享 steering/hook/MCP 模板维护在全局来源，项目默认仅保留 `.kiro/steering/ai-code-core.md`。
+
+当仓库需要完全自包含（离线、交接）时，使用 `--layout project-full`。
 
 ---
 

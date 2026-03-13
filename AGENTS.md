@@ -122,9 +122,12 @@ Troubleshoot failures: check test isolation → verify mocks → fix implementat
 Common (all tools):
 ```
 AGENTS.md
-.agents/skills/  — Selected skills copied from ai-code
-.ai-code/        — Bootstrap manifest for sync replay
+.ai-code.json    — Bootstrap manifest for sync replay
 ```
+
+`global-first` (default): keep only tool entry files in project, keep shared assets global.
+
+`project-full`: additionally sync tool-local directories (skills/commands/rules/hooks/etc.) into project.
 
 Codex mode:
 ```
@@ -134,9 +137,19 @@ Codex mode:
 .codex/config.toml
 ```
 
+Codex mode (`project-full` adds):
+```
+.agents/skills/
+```
+
 Claude mode:
 ```
 CLAUDE.md
+.claude/package-manager.json
+```
+
+Claude mode (`project-full` adds):
+```
 agents/
 commands/
 rules/
@@ -146,6 +159,11 @@ scripts/lib/
 ```
 
 Kiro mode:
+```
+.kiro/steering/ai-code-core.md
+```
+
+Kiro mode (`project-full` adds):
 ```
 .kiro/steering/
 .kiro/hooks/hooks.json

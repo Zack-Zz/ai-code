@@ -13,6 +13,7 @@ TARGET_DIR=""
 LANGS_RAW=""
 FORCE_OVERWRITE="false"
 TOOL_MODE="auto"
+LAYOUT_MODE="global-first"
 APPLY_CODEX="false"
 APPLY_KIRO="false"
 APPLY_CLAUDE="false"
@@ -30,7 +31,8 @@ Required:
   --langs <list>       Comma-separated languages (java,js,python,go,rust)
 
 Optional:
-  --tool <mode>        auto|codex|kiro|claude|both|all (default: auto)
+  --tool <mode>        auto|codex|kiro|claude|both|all (default: auto -> single tool)
+  --layout <mode>      global-first|project-full (default: global-first)
   --copy-codex-config  Copy .codex/config.toml into target project (default: off)
   --force              Overwrite existing files
   --help               Show this help
@@ -56,6 +58,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --tool)
       TOOL_MODE="${2:-}"
+      shift 2
+      ;;
+    --layout)
+      LAYOUT_MODE="${2:-}"
       shift 2
       ;;
     --force)
@@ -92,21 +98,41 @@ if [[ ! -d "$TARGET_DIR" ]]; then
 fi
 
 TOOL_MODE="$(echo "$TOOL_MODE" | tr '[:upper:]' '[:lower:]' | xargs)"
+LAYOUT_MODE="$(echo "$LAYOUT_MODE" | tr '[:upper:]' '[:lower:]' | xargs)"
+case "$LAYOUT_MODE" in
+  global-first|project-full)
+    ;;
+  *)
+    echo "Error: invalid --layout '$LAYOUT_MODE'. Use global-first|project-full." >&2
+    exit 1
+    ;;
+esac
+
 case "$TOOL_MODE" in
   auto)
+    # Auto mode selects a single tool only:
+    # 1) detect existing tool footprint in target
+    # 2) fallback to AI_CODE_TOOL (codex|kiro|claude)
+    # 3) default to codex
+    PREFERRED_TOOL="$(echo "${AI_CODE_TOOL:-}" | tr '[:upper:]' '[:lower:]' | xargs || true)"
     if [[ -d "$TARGET_DIR/.codex" || -f "$TARGET_DIR/.codex/codex.md" ]]; then
       APPLY_CODEX="true"
-    fi
-    if [[ -d "$TARGET_DIR/.kiro" ]]; then
+    elif [[ -d "$TARGET_DIR/.kiro" ]]; then
       APPLY_KIRO="true"
-    fi
-    if [[ -d "$TARGET_DIR/.claude" || -f "$TARGET_DIR/CLAUDE.md" ]]; then
+    elif [[ -d "$TARGET_DIR/.claude" || -f "$TARGET_DIR/CLAUDE.md" ]]; then
       APPLY_CLAUDE="true"
-    fi
-    if [[ "$APPLY_CODEX" != "true" && "$APPLY_KIRO" != "true" && "$APPLY_CLAUDE" != "true" ]]; then
-      APPLY_CODEX="true"
-      APPLY_KIRO="true"
-      APPLY_CLAUDE="true"
+    else
+      case "$PREFERRED_TOOL" in
+        kiro)
+          APPLY_KIRO="true"
+          ;;
+        claude)
+          APPLY_CLAUDE="true"
+          ;;
+        codex|*)
+          APPLY_CODEX="true"
+          ;;
+      esac
     fi
     ;;
   codex)
@@ -147,9 +173,7 @@ copy_file() {
 }
 
 write_manifest() {
-  local manifest_dir="$TARGET_DIR/.ai-code"
-  MANIFEST_PATH="$manifest_dir/bootstrap.json"
-  mkdir -p "$manifest_dir"
+  MANIFEST_PATH="$TARGET_DIR/.ai-code.json"
 
   local git_rev="unknown"
   if git -C "$ROOT_DIR" rev-parse --short HEAD >/dev/null 2>&1; then
@@ -160,6 +184,7 @@ write_manifest() {
 {
   "version": 1,
   "tool": "$TOOL_MODE",
+  "layout": "$LAYOUT_MODE",
   "langs": "$LANGS_RAW",
   "force": "$FORCE_OVERWRITE",
   "copy_codex_config": "$COPY_CODEX_CONFIG",
@@ -293,6 +318,7 @@ done
 echo "Target: $TARGET_DIR"
 echo "Languages: $LANGS_RAW"
 echo "Tool mode: $TOOL_MODE"
+echo "Layout mode: $LAYOUT_MODE"
 echo "Apply Codex: $APPLY_CODEX"
 echo "Apply Kiro: $APPLY_KIRO"
 echo "Apply Claude: $APPLY_CLAUDE"
@@ -314,42 +340,43 @@ fi
 
 # Kiro files
 if [[ "$APPLY_KIRO" == "true" ]]; then
-  # Core steering files
+  # Minimal project entry for Kiro is always synced.
   copy_file "$ROOT_DIR/.kiro/steering/ai-code-core.md" "$TARGET_DIR/.kiro/steering/ai-code-core.md"
-  copy_file "$ROOT_DIR/.kiro/steering/multi-language-workflow.md" "$TARGET_DIR/.kiro/steering/multi-language-workflow.md"
-  copy_file "$ROOT_DIR/.kiro/steering/agents-overview.md" "$TARGET_DIR/.kiro/steering/agents-overview.md"
-  copy_file "$ROOT_DIR/.kiro/steering/security-checklist.md" "$TARGET_DIR/.kiro/steering/security-checklist.md"
-  copy_file "$ROOT_DIR/.kiro/steering/tdd-workflow.md" "$TARGET_DIR/.kiro/steering/tdd-workflow.md"
-  copy_file "$ROOT_DIR/.kiro/steering/coding-standards.md" "$TARGET_DIR/.kiro/steering/coding-standards.md"
-  
-  # Hooks configuration
-  copy_file "$ROOT_DIR/.kiro/hooks/hooks.json" "$TARGET_DIR/.kiro/hooks/hooks.json"
-  
-  # MCP configuration template
-  copy_file "$ROOT_DIR/.kiro/settings/mcp.json" "$TARGET_DIR/.kiro/settings/mcp.json"
-  
-  # Documentation
-  copy_file "$ROOT_DIR/.kiro/README.md" "$TARGET_DIR/.kiro/README.md"
-  copy_file "$ROOT_DIR/.kiro/QUICK_START.md" "$TARGET_DIR/.kiro/QUICK_START.md"
-  copy_file "$ROOT_DIR/.kiro/CHANGELOG.md" "$TARGET_DIR/.kiro/CHANGELOG.md"
+  if [[ "$LAYOUT_MODE" == "project-full" ]]; then
+    copy_file "$ROOT_DIR/.kiro/steering/multi-language-workflow.md" "$TARGET_DIR/.kiro/steering/multi-language-workflow.md"
+    copy_file "$ROOT_DIR/.kiro/steering/agents-overview.md" "$TARGET_DIR/.kiro/steering/agents-overview.md"
+    copy_file "$ROOT_DIR/.kiro/steering/security-checklist.md" "$TARGET_DIR/.kiro/steering/security-checklist.md"
+    copy_file "$ROOT_DIR/.kiro/steering/tdd-workflow.md" "$TARGET_DIR/.kiro/steering/tdd-workflow.md"
+    copy_file "$ROOT_DIR/.kiro/steering/coding-standards.md" "$TARGET_DIR/.kiro/steering/coding-standards.md"
+
+    copy_file "$ROOT_DIR/.kiro/hooks/hooks.json" "$TARGET_DIR/.kiro/hooks/hooks.json"
+    copy_file "$ROOT_DIR/.kiro/settings/mcp.json" "$TARGET_DIR/.kiro/settings/mcp.json"
+    copy_file "$ROOT_DIR/.kiro/README.md" "$TARGET_DIR/.kiro/README.md"
+    copy_file "$ROOT_DIR/.kiro/QUICK_START.md" "$TARGET_DIR/.kiro/QUICK_START.md"
+    copy_file "$ROOT_DIR/.kiro/CHANGELOG.md" "$TARGET_DIR/.kiro/CHANGELOG.md"
+  fi
 fi
 
 # Claude files
 if [[ "$APPLY_CLAUDE" == "true" ]]; then
   copy_file "$ROOT_DIR/CLAUDE.md" "$TARGET_DIR/CLAUDE.md"
   copy_file "$ROOT_DIR/.claude/package-manager.json" "$TARGET_DIR/.claude/package-manager.json"
-  copy_dir "$ROOT_DIR/agents" "$TARGET_DIR/agents"
-  copy_dir "$ROOT_DIR/commands" "$TARGET_DIR/commands"
-  copy_dir "$ROOT_DIR/rules" "$TARGET_DIR/rules"
-  copy_dir "$ROOT_DIR/hooks" "$TARGET_DIR/hooks"
-  copy_dir "$ROOT_DIR/scripts/hooks" "$TARGET_DIR/scripts/hooks"
-  copy_dir "$ROOT_DIR/scripts/lib" "$TARGET_DIR/scripts/lib"
+  if [[ "$LAYOUT_MODE" == "project-full" ]]; then
+    copy_dir "$ROOT_DIR/agents" "$TARGET_DIR/agents"
+    copy_dir "$ROOT_DIR/commands" "$TARGET_DIR/commands"
+    copy_dir "$ROOT_DIR/rules" "$TARGET_DIR/rules"
+    copy_dir "$ROOT_DIR/hooks" "$TARGET_DIR/hooks"
+    copy_dir "$ROOT_DIR/scripts/hooks" "$TARGET_DIR/scripts/hooks"
+    copy_dir "$ROOT_DIR/scripts/lib" "$TARGET_DIR/scripts/lib"
+  fi
 fi
 
 # Copy selected skills
-for skill in "${SELECTED_SKILLS[@]}"; do
-  copy_skill "$skill"
-done
+if [[ "$LAYOUT_MODE" == "project-full" ]]; then
+  for skill in "${SELECTED_SKILLS[@]}"; do
+    copy_skill "$skill"
+  done
+fi
 
 # Java workflow checklist
 if [[ "$HAS_JAVA" == "true" ]]; then
@@ -367,6 +394,11 @@ write_manifest
 
 echo
 echo "Bootstrap complete."
+if [[ "$LAYOUT_MODE" == "global-first" ]]; then
+  echo "- Layout: global-first (only entry files synced; shared commands/rules/hooks/skills stay global)."
+else
+  echo "- Layout: project-full (full project-local assets synced)."
+fi
 echo "Next steps:"
 if [[ "$APPLY_CODEX" == "true" ]]; then
   echo "- Codex: open the target project in Codex GUI."

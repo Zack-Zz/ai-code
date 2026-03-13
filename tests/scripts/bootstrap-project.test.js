@@ -24,8 +24,8 @@ function test(name, fn) {
   }
 }
 
-function runBootstrap(target, langs = 'java', tool = 'both', extraArgs = []) {
-  return execFileSync('bash', [SCRIPT, '--target', target, '--langs', langs, '--tool', tool, ...extraArgs], {
+function runBootstrap(target, langs = 'java', tool = 'both', layout = 'project-full', extraArgs = []) {
+  return execFileSync('bash', [SCRIPT, '--target', target, '--langs', langs, '--tool', tool, '--layout', layout, ...extraArgs], {
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
     timeout: 20000
@@ -42,9 +42,11 @@ function runTests() {
   const targetDir = path.join(tempRoot, 'target-java-project');
   const targetAllDir = path.join(tempRoot, 'target-all-project');
   const targetGoDir = path.join(tempRoot, 'target-go-project');
+  const targetAutoDir = path.join(tempRoot, 'target-auto-project');
   fs.mkdirSync(targetDir, { recursive: true });
   fs.mkdirSync(targetAllDir, { recursive: true });
   fs.mkdirSync(targetGoDir, { recursive: true });
+  fs.mkdirSync(targetAutoDir, { recursive: true });
 
   console.log('--langs java --tool both:');
 
@@ -73,11 +75,12 @@ function runTests() {
   })) passed++; else failed++;
 
   if (test('writes bootstrap manifest to target project', () => {
-    const manifestPath = path.join(targetDir, '.ai-code', 'bootstrap.json');
-    assert.ok(fs.existsSync(manifestPath), '.ai-code/bootstrap.json should exist');
+    const manifestPath = path.join(targetDir, '.ai-code.json');
+    assert.ok(fs.existsSync(manifestPath), '.ai-code.json should exist');
     const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     assert.strictEqual(data.langs, 'java', 'manifest should record langs');
     assert.strictEqual(data.tool, 'both', 'manifest should record tool');
+    assert.strictEqual(data.layout, 'project-full', 'manifest should record layout');
     assert.strictEqual(data.copy_codex_config, 'false', 'manifest should record codex config copy mode');
   })) passed++; else failed++;
 
@@ -98,7 +101,7 @@ function runTests() {
   if (test('copies project .codex/config.toml only when explicitly requested', () => {
     const targetConfigDir = path.join(tempRoot, 'target-codex-config-project');
     fs.mkdirSync(targetConfigDir, { recursive: true });
-    runBootstrap(targetConfigDir, 'js', 'codex', ['--copy-codex-config']);
+    runBootstrap(targetConfigDir, 'js', 'codex', 'project-full', ['--copy-codex-config']);
     assert.ok(fs.existsSync(path.join(targetConfigDir, '.codex', 'config.toml')), '.codex/config.toml should exist when --copy-codex-config is used');
   })) passed++; else failed++;
 
@@ -114,6 +117,20 @@ function runTests() {
     );
     const makefileContent = fs.readFileSync(path.join(targetGoDir, 'Makefile'), 'utf8');
     assert.ok(makefileContent.includes('test-race'), 'Makefile should include race test target');
+  })) passed++; else failed++;
+
+  console.log('\n--langs js --tool auto (default):');
+
+  if (test('auto mode defaults to single-tool bootstrap (codex)', () => {
+    execFileSync('bash', [SCRIPT, '--target', targetAutoDir, '--langs', 'js'], {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      timeout: 20000
+    });
+    assert.ok(fs.existsSync(path.join(targetAutoDir, '.codex', 'codex.md')), 'auto should bootstrap codex assets');
+    assert.ok(!fs.existsSync(path.join(targetAutoDir, '.kiro')), 'auto should not bootstrap kiro by default');
+    assert.ok(!fs.existsSync(path.join(targetAutoDir, 'CLAUDE.md')), 'auto should not bootstrap claude by default');
+    assert.ok(!fs.existsSync(path.join(targetAutoDir, '.agents', 'skills')), 'auto global-first should not copy skills');
   })) passed++; else failed++;
 
   // Cleanup temp directory

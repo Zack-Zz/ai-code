@@ -40,6 +40,18 @@ Production-ready agents, skills, hooks, commands, rules, and MCP configurations 
 
 ---
 
+## Documentation Index
+
+- Getting Started: [Quick Start](#-quick-start), [Usage Overview](#usage-overview), [Cross-Platform Support](#-cross-platform-support)
+- Bootstrap and Sync: [`scripts/bootstrap-project.sh`](scripts/bootstrap-project.sh), [`scripts/sync-project.sh`](scripts/sync-project.sh), [`scripts/sync-codex-global-config.sh`](scripts/sync-codex-global-config.sh)
+- Tool Guides: [Codex GUI](#codex-gui-polyglot-adaptation), [Kiro Integration](docs/KIRO_INTEGRATION.md), [Claude plugin workflow](.claude-plugin/README.md)
+- Rules and Commands: [Rules Overview](rules/README.md), [`commands/` catalog](commands), [`agents/` catalog](agents)
+- Skills: [`skills/` catalog](skills), [Skill authoring command](commands/skill-create.md)
+- Advanced Docs: [Usage details](docs/USAGE.md), [Token optimization](docs/token-optimization.md), [Examples](examples)
+- Chinese Docs: [中文总览](docs/zh-CN/README.md), [中文规则](docs/zh-CN/rules/README.md), [中文命令](docs/zh-CN/commands)
+
+---
+
 ## Usage Overview
 
 - Choose your assistant stack first: Codex/ChatGPT, Claude Code, or Cursor/OpenCode.
@@ -70,11 +82,15 @@ Status legend:
 
 | `--tool` mode | Copied for this assistant |
 |---------------|---------------------------|
-| `claude` | `CLAUDE.md`, `agents/`, `commands/`, `rules/`, `hooks/`, hook runtime scripts |
-| `codex` | `.codex/codex.md`, `.codex/AGENTS.md`, optional `.codex/config.toml`, selected skills |
-| `kiro` | `.kiro/steering/*`, `.kiro/hooks/hooks.json`, `.kiro/settings/mcp.json`, selected skills (reference use) |
+| `claude` | `global-first`: `CLAUDE.md`, `.claude/package-manager.json`; `project-full`: + `agents/`, `commands/`, `rules/`, `hooks/`, `scripts/hooks`, `scripts/lib` |
+| `codex` | `global-first`: `.codex/codex.md`, `.codex/AGENTS.md` (+ optional `.codex/config.toml`); `project-full`: + selected `.agents/skills/*` |
+| `kiro` | `global-first`: `.kiro/steering/ai-code-core.md`; `project-full`: + full steering/hooks/settings/docs |
 | `both` | Codex + Kiro assets |
 | `all` | Codex + Kiro + Claude assets |
+
+`--layout` modes:
+- `global-first` (default): sync only project entry files; shared commands/rules/hooks/skills stay in global assistant home.
+- `project-full`: sync full project-local assets.
 
 When `--langs` includes `go`, bootstrap also copies tool-agnostic Go enforcement templates:
 `Makefile`, `.golangci.yml`, and `.github/workflows/go-ci.yml` (without affecting non-Go languages).
@@ -103,6 +119,8 @@ export AI_CODE_HOME=/path/to/assistant-home
 scripts/bootstrap-project.sh --target /path/to/your-project --langs js
 scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python,go
 # Optional tool mode: --tool auto|codex|kiro|claude|both|all
+# auto selects one tool only (prefer existing project footprint, then AI_CODE_TOOL, else codex)
+# Optional layout mode: --layout global-first|project-full (default: global-first)
 # both = codex + kiro, all = codex + kiro + claude
 # Optional project-level codex config copy:
 # scripts/bootstrap-project.sh --target /path/to/your-project --langs js --tool codex --copy-codex-config
@@ -131,6 +149,8 @@ cd ai-code
 ./install.sh typescript python golang
 # or bootstrap a target project directly:
 # scripts/bootstrap-project.sh --target /path/to/project --langs java --tool claude
+# full in-project sync:
+# scripts/bootstrap-project.sh --target /path/to/project --langs java --tool claude --layout project-full
 ```
 
 ### Option 3: Cursor / OpenCode Stack
@@ -146,13 +166,18 @@ cd ai-code
 
 # Bootstrap a new project with Kiro support
 scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python --tool kiro
+# full in-project sync:
+# scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python --tool kiro --layout project-full
 
 # Or use this repo directly
 # Open the folder in Kiro - steering files load automatically
 ```
 
-**What gets installed:**
-- 6 steering files in `.kiro/steering/` (core principles, security, TDD, coding standards)
+**Default install content (`global-first`):**
+- `.kiro/steering/ai-code-core.md` (project entry file)
+
+**`--layout project-full` adds:**
+- Full steering set in `.kiro/steering/` (core principles, security, TDD, coding standards)
 - Hooks configuration in `.kiro/hooks/hooks.json` (auto-format, security checks)
 - MCP template in `.kiro/settings/mcp.json` (filesystem, GitHub, PostgreSQL, search)
 
@@ -162,6 +187,14 @@ scripts/bootstrap-project.sh --target /path/to/your-project --langs java,python 
 3. Review hooks in `.kiro/hooks/hooks.json` (fileEdited, promptSubmit, agentStop)
 
 See [`.kiro/README.md`](.kiro/README.md) for detailed Kiro configuration guide.
+
+### Tool-Specific Maintenance (Global-First)
+
+- Codex: keep reusable assets in `~/.codex` (or `AI_CODE_HOME`), keep project files minimal (`AGENTS.md`, `.codex/*`).
+- Claude: keep `commands/`, `rules/`, `hooks/`, `skills/` in global assistant home; project keeps entry files by default.
+- Kiro: keep shared steering/hook/MCP templates globally; project keeps minimal `.kiro/steering/ai-code-core.md` by default.
+
+Use `--layout project-full` when a repository must be self-contained (offline use or handoff without shared global setup).
 
 ---
 
