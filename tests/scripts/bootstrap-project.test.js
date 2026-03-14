@@ -130,7 +130,8 @@ function runTests() {
     assert.ok(fs.existsSync(path.join(targetAutoDir, '.codex', 'codex.md')), 'auto should bootstrap codex assets');
     assert.ok(!fs.existsSync(path.join(targetAutoDir, '.kiro')), 'auto should not bootstrap kiro by default');
     assert.ok(!fs.existsSync(path.join(targetAutoDir, 'CLAUDE.md')), 'auto should not bootstrap claude by default');
-    assert.ok(!fs.existsSync(path.join(targetAutoDir, '.agents', 'skills')), 'auto global-first should not copy skills');
+    assert.ok(fs.existsSync(path.join(targetAutoDir, '.agents', 'skills')), 'auto global-first should copy selected skills');
+    assert.ok(fs.existsSync(path.join(targetAutoDir, '.agents', 'skills', 'frontend-patterns', 'SKILL.md')), 'auto js bootstrap should include frontend-patterns skill');
   })) passed++; else failed++;
 
   // Cleanup temp directory

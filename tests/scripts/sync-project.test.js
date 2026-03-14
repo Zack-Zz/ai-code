@@ -82,7 +82,8 @@ function runTests() {
     assert.ok(!fs.existsSync(path.join(targetDir, 'commands')), 'global-first sync should not copy commands');
     assert.ok(!fs.existsSync(path.join(targetDir, 'rules')), 'global-first sync should not copy rules');
     assert.ok(!fs.existsSync(path.join(targetDir, 'hooks')), 'global-first sync should not copy hooks');
-    assert.ok(!fs.existsSync(path.join(targetDir, '.agents', 'skills')), 'global-first sync should not copy skills');
+    assert.ok(fs.existsSync(path.join(targetDir, '.agents', 'skills')), 'global-first sync should copy selected skills');
+    assert.ok(fs.existsSync(path.join(targetDir, '.agents', 'skills', 'springboot-tdd', 'SKILL.md')), 'java sync should include springboot-tdd skill');
   })) passed++; else failed++;
 
   if (test('sync supports explicit codex config copy override', () => {

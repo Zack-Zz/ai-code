@@ -371,12 +371,10 @@ if [[ "$APPLY_CLAUDE" == "true" ]]; then
   fi
 fi
 
-# Copy selected skills
-if [[ "$LAYOUT_MODE" == "project-full" ]]; then
-  for skill in "${SELECTED_SKILLS[@]}"; do
-    copy_skill "$skill"
-  done
-fi
+# Copy selected skills (project-local in both layouts)
+for skill in "${SELECTED_SKILLS[@]}"; do
+  copy_skill "$skill"
+done
 
 # Java workflow checklist
 if [[ "$HAS_JAVA" == "true" ]]; then
@@ -395,7 +393,7 @@ write_manifest
 echo
 echo "Bootstrap complete."
 if [[ "$LAYOUT_MODE" == "global-first" ]]; then
-  echo "- Layout: global-first (only entry files synced; shared commands/rules/hooks/skills stay global)."
+  echo "- Layout: global-first (entry files synced; selected skills are also synced into project)."
 else
   echo "- Layout: project-full (full project-local assets synced)."
 fi
