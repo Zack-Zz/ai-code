@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="codevow-title">
+  <title id="codevow-title">CodeVow</title>
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="#0F172A"/>
+  <path d="M184 152H140V360H184M328 152H372V360H328" fill="none" stroke="#A5B4FC" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M204 265L244 305L310 218" fill="none" stroke="#34D399" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

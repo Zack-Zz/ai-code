@@ -12,11 +12,13 @@ from . import product as wproduct
 from .io import DataError
 
 PRODUCT_ID = "ai-code-workflow"
+MANIFEST_PATHS = {"claude": ".claude-plugin/plugin.json", "codex": "plugin.json", "zcode": ".zcode-plugin/plugin.json"}
+MARKETPLACE_PATHS = {"claude": ".claude-plugin/marketplace.json", "codex": ".agents/plugins/marketplace.json", "zcode": "marketplace.json"}
 SKILLS = ("workflow", "tdd", "debugging", "review", "verification", "review-results")
 REQUIRED_SHARED = {
     *(f"skills/{name}/SKILL.md" for name in SKILLS),
     "skills/review/references/reviewer-contract.md", "LICENSE", "NOTICE",
-    "LICENSES/backend-engineering-lite.txt", "tools/workflow_tool.py",
+    "LICENSES/backend-engineering-lite.txt", "tools/workflow_tool.py", "assets/codevow.svg", "assets/codevow.png",
     *(f"policies/{mode}.json" for mode in ("collaborative", "continuous")),
     *(f"schemas/{name}.schema.json" for name in ("product", "policy", "task", "evidence")),
     *(f"templates/{name}.json" for name in ("task", "evidence")),
@@ -27,7 +29,7 @@ REQUIRED_SHARED = {
 
 def marketplace_path(package_root: Path, host: str) -> Path:
     root = Path(package_root).parent
-    return root / (".agents/plugins/marketplace.json" if host == "codex" else "marketplace.json")
+    return root / MARKETPLACE_PATHS[host]
 
 
 def is_passive_cache(relative: str, registered) -> bool:
@@ -58,7 +60,7 @@ def _artifact_checks(package_root: Path):
             raise DataError(f"artifact {key} must be a string")
     if not wproduct.PRODUCT_ID_RE.fullmatch(artifact["product_id"]) or \
             not wproduct.VERSION_RE.fullmatch(artifact["version"]) or \
-            artifact["host"] not in ("zcode", "codex"):
+            artifact["host"] not in wproduct.HOSTS:
         raise DataError("artifact product_id/version/host format is invalid")
     if not isinstance(artifact["working_tree_dirty"], bool):
         raise DataError("artifact working_tree_dirty must be a boolean")
@@ -95,7 +97,7 @@ def _walk_files(root: Path):
 def check_package(package_root: Path, host: str) -> dict:
     """Verify a built package. Returns a report; ok=False means problems."""
     package_root = Path(package_root)
-    if host not in ("zcode", "codex"):
+    if host not in wproduct.HOSTS:
         raise DataError(f"unknown host: {host!r}")
     if not package_root.is_dir():
         raise DataError(f"package directory does not exist: {package_root}")
@@ -155,7 +157,7 @@ def check_package(package_root: Path, host: str) -> dict:
             continue
         problems.append(f"extra active file not registered in artifact: {rel}")
 
-    manifest_rel = ".zcode-plugin/plugin.json" if host == "zcode" else "plugin.json"
+    manifest_rel = MANIFEST_PATHS[host]
     manifest_path = package_root / manifest_rel
     if manifest_rel not in registered or not manifest_path.is_file():
         problems.append(f"host manifest missing or unregistered: {manifest_rel}")
@@ -166,13 +168,13 @@ def check_package(package_root: Path, host: str) -> dict:
         if manifest.get("version") != artifact["version"]:
             problems.append(f"{manifest_rel} version {manifest.get('version')!r} != artifact version")
 
-    if host == "zcode":
+    if host in ("claude", "zcode"):
         if "agents/workflow-reviewer.md" not in registered:
-            problems.append("zcode reviewer agent missing from artifact files")
+            problems.append(f"{host} reviewer agent missing from artifact files")
         elif "agents/workflow-reviewer.md" in safe_files and \
                 "skills/review/references/reviewer-contract.md" in safe_files:
             try:
-                wproduct.parse_reviewer_meta(safe_files["agents/workflow-reviewer.md"])
+                wproduct.parse_reviewer_meta(safe_files["agents/workflow-reviewer.md"], host=host)
             except DataError as exc:
                 problems.append(str(exc))
             agent_text = (package_root / "agents" / "workflow-reviewer.md").read_text(encoding="utf-8")
@@ -197,6 +199,10 @@ def check_package(package_root: Path, host: str) -> dict:
     else:
         wio.resolve_member(package_root.parent, marketplace.relative_to(package_root.parent).as_posix())
         market = wio.load_json(marketplace)
+        if host == "claude":
+            owner = market.get("owner")
+            if not isinstance(owner, dict) or not isinstance(owner.get("name"), str) or not owner["name"].strip():
+                problems.append("Claude marketplace requires an owner name")
         entries = market.get("plugins") or []
         entry = next((e for e in entries if e.get("name") == artifact["product_id"]), None)
         if entry is None:

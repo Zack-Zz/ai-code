@@ -138,7 +138,7 @@ def _checked_package(package_root) -> tuple[Path, dict, dict]:
         raise DataError("this action requires --package")
     package_root = Path(package_root).resolve()
     report = wpc.check_package(package_root, package_root.parent.name
-                               if package_root.parent.name in ("zcode", "codex")
+                               if package_root.parent.name in ("claude", "zcode", "codex")
                                else _host_of(package_root))
     if not report["ok"]:
         raise ToolError(f"package check failed: {report['problems']}")
@@ -152,6 +152,8 @@ def _checked_package(package_root) -> tuple[Path, dict, dict]:
 
 
 def _host_of(package_root: Path) -> str:
+    if (package_root / ".claude-plugin" / "plugin.json").is_file():
+        return "claude"
     if (package_root / ".zcode-plugin" / "plugin.json").is_file():
         return "zcode"
     if (package_root / "plugin.json").is_file():

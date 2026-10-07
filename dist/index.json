@@ -1,37 +1,48 @@
 {
   "hosts": {
+    "claude": {
+      "marketplace": "claude/.claude-plugin/marketplace.json",
+      "marketplace_sha256": "82c8bf2e71b412932d21e4a26a47a9f1e082637d55dfd07d0ef3061d520d9c48"
+    },
     "codex": {
       "marketplace": "codex/.agents/plugins/marketplace.json",
       "marketplace_sha256": "0e55ab4cfcd355d4b63ce164e5d535f3a4f1d3ff8d72508eccdc1db029f485f3"
     },
     "zcode": {
       "marketplace": "zcode/marketplace.json",
-      "marketplace_sha256": "6643bfa3c5b8fc1f190f4c800700f00887f6e8dfa280fc79773b7af30524c229"
+      "marketplace_sha256": "420a3de838dda2894134dbf9ae35b3c129d9e490680967aa26e889012b55b36d"
     }
   },
   "plugins": {
     "ai-code-workflow": {
       "hosts": {
+        "claude": {
+          "files_count": 34,
+          "package_content_hash": "5be8cf85303aa1920ec9a4e739eb1cb033a7c84f51ab5d4adfb6d6a1df6b8241",
+          "package_dir": "claude/ai-code-workflow",
+          "zip": "claude/ai-code-workflow-2.0.0.zip",
+          "zip_sha256": "8f85deb5ed6ca0a6e92b01d9f77ca724c5c1c19c27a5859254f5269f2e3b2d21"
+        },
         "codex": {
-          "files_count": 35,
-          "package_content_hash": "c35850748813514199274655acd2510d4b392800868c1b2eae93126d48f7a67a",
+          "files_count": 39,
+          "package_content_hash": "7ce1066f9222e03ba655ae9bcd058162337626e5ab2e39f4a5b4e322a2d26351",
           "package_dir": "codex/ai-code-workflow",
           "zip": "codex/ai-code-workflow-2.0.0.zip",
-          "zip_sha256": "f8ab6438f0b5ae14c4c42ac6f1b5d4969a857b43056b6adeb64f79cc7858082c"
+          "zip_sha256": "b3cfbab24651897d651dab46a1fb9303648ff14b63b05aabc742da189afb67c2"
         },
         "zcode": {
-          "files_count": 30,
-          "package_content_hash": "bb5150b1f6427c10a57912315c5dacdf7b9222a4fcc3ef36d12102616dac1ff5",
+          "files_count": 34,
+          "package_content_hash": "e180248bfd5434149c6512c88076d2b1df149bc6c288a234fbe860da1aa39472",
           "package_dir": "zcode/ai-code-workflow",
           "zip": "zcode/ai-code-workflow-2.0.0.zip",
-          "zip_sha256": "95837bdbd2037e39f3d601a956a5a164a078de74f7df736416eae8a1c1ed7fff"
+          "zip_sha256": "968b961ccd5700a0356dd28c228b326cac3f96bc150eea1416f52cc1e0596fbb"
         }
       },
-      "source_tree_hash": "f385b67713bcdd6450af123f1a650bcbb174896e07c38d0fde1f52cd336e1a0a",
+      "source_tree_hash": "7efd9a6c59da86c8771f5ff07c998381eaf8bec905d0a58cf3f9b843280e16d8",
       "version": "2.0.0"
     }
   },
   "schema_version": 2,
-  "source_revision": "2d90761dba57e90f40f21b3fd1dde9482e5a6aaa",
+  "source_revision": "dedd907fa8c5270c6503e869ba6c1dafdacce731",
   "working_tree_dirty": true
 }

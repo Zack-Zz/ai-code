@@ -1,0 +1,106 @@
+name: Prepare plugin release
+
+on:
+  workflow_dispatch:
+    inputs:
+      plugin:
+        description: Registered plugin ID
+        required: true
+        default: ai-code-workflow
+        type: string
+      ref:
+        description: Existing source ref (use ID/vVERSION for a tagged candidate)
+        required: true
+        default: main
+        type: string
+      mode:
+        description: Draft tolerates missing host acceptance; stable requires it
+        required: true
+        default: draft
+        type: choice
+        options: [draft, stable]
+      create_github_draft:
+        description: Explicitly create a GitHub draft at an existing tag
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  prepare:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    outputs:
+      revision: ${{ steps.source.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate and test the selected source
+        run: |
+          npm ci --no-audit --no-fund
+          python3 tooling/plugin_tool.py validate --all
+          npm test
+          npm run lint
+          python3 tooling/plugin_tool.py marketplace sync --check
+      - name: Check committed distributions independently
+        run: |
+          python3 tooling/plugin_tool.py build --all --host all --output "$RUNNER_TEMP/dist-check"
+          python3 .github/scripts/check_dist.py --committed dist --fresh "$RUNNER_TEMP/dist-check"
+      - name: Capture source revision
+        id: source
+        run: echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Prepare and reverify the release bundle
+        env:
+          PLUGIN_ID: ${{ inputs.plugin }}
+          RELEASE_MODE: ${{ inputs.mode }}
+        run: |
+          python3 tooling/plugin_tool.py release prepare --plugin "$PLUGIN_ID" --mode "$RELEASE_MODE" --output "$RUNNER_TEMP/release-bundle"
+          python3 tooling/plugin_tool.py release verify --plugin "$PLUGIN_ID" --mode "$RELEASE_MODE" --path "$RUNNER_TEMP/release-bundle"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugin-release-${{ github.run_id }}
+          path: ${{ runner.temp }}/release-bundle/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+
+  github-draft:
+    if: ${{ inputs.create_github_draft }}
+    needs: prepare
+    runs-on: macos-latest
+    timeout-minutes: 10
+    environment: plugin-release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.revision }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          name: plugin-release-${{ github.run_id }}
+          path: ${{ runner.temp }}/release-bundle/
+      - name: Create a draft from verified bytes (never publish)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PLUGIN_ID: ${{ inputs.plugin }}
+        run: python3 .github/scripts/create_release_draft.py --plugin "$PLUGIN_ID" --bundle "$RUNNER_TEMP/release-bundle" --repository "$GITHUB_REPOSITORY"

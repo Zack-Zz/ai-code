@@ -1,5 +1,6 @@
 """Deterministic native metadata generated solely from trusted plugin inputs."""
 
+import copy
 import json
 
 from . import io
@@ -28,8 +29,18 @@ def package_files(spec, host):
     if host not in spec.hosts:
         raise DataError(f"plugin {spec.product_id} does not support host {host}")
     files = {target: spec.inputs[source] for target, source in spec.files.items()}
-    manifest = dict(spec.adapters[host], name=spec.product_id, version=spec.version)
-    relative = "plugin.json" if host == "codex" else ".zcode-plugin/plugin.json"
+    manifest = copy.deepcopy(spec.adapters[host])
+    manifest.update(name=spec.product_id, version=spec.version)
+    if host == "claude":
+        manifest["displayName"] = spec.manifest["display_name"]
+    if "publisher" in spec.manifest:
+        manifest["author"] = copy.deepcopy(spec.manifest["publisher"])
+        if host == "codex":
+            extension = manifest.get("extensions", {}).get("com.openai", {})
+            interface = extension.get("interface", manifest.get("interface"))
+            if isinstance(interface, dict):
+                interface["developerName"] = spec.manifest["publisher"]["name"]
+    relative = manifest_path(host)
     files[relative] = io.dump_json(manifest)
     if host == "codex":
         for name, entry in spec.interfaces.items():
@@ -44,8 +55,18 @@ def file_hashes(files):
     return [[relative, io.sha256(payload)] for relative, payload in sorted(files.items())]
 
 
+def manifest_path(host):
+    paths = {"claude": ".claude-plugin/plugin.json", "codex": "plugin.json", "zcode": ".zcode-plugin/plugin.json"}
+    if host not in paths:
+        raise DataError(f"unknown host: {host}")
+    return paths[host]
+
+
 def marketplace_path(host):
-    return ".agents/plugins/marketplace.json" if host == "codex" else "marketplace.json"
+    paths = {"claude": ".claude-plugin/marketplace.json", "codex": ".agents/plugins/marketplace.json", "zcode": "marketplace.json"}
+    if host not in paths:
+        raise DataError(f"unknown host: {host}")
+    return paths[host]
 
 
 def marketplace_entry(spec, host):
@@ -60,5 +81,8 @@ def marketplace_entry(spec, host):
 
 
 def marketplace(specs, host):
-    return {"name": "ai-code-local", "plugins": [marketplace_entry(spec, host)
-                                                  for spec in sorted(specs, key=lambda item: item.product_id)]}
+    market = {"name": "ai-code-local", "plugins": [marketplace_entry(spec, host)
+                                                    for spec in sorted(specs, key=lambda item: item.product_id)]}
+    if host == "claude":
+        market["owner"] = {"name": "ai-code"}
+    return market

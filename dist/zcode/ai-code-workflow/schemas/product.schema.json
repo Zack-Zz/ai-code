@@ -88,13 +88,14 @@
     },
     "hosts": {
       "type": "array",
-      "minItems": 2,
-      "maxItems": 2,
+      "minItems": 1,
+      "maxItems": 3,
       "uniqueItems": true,
       "items": {
         "enum": [
-          "zcode",
-          "codex"
+          "claude",
+          "codex",
+          "zcode"
         ]
       }
     },
@@ -105,14 +106,59 @@
       ]
     },
     "generated_agents": {
-      "const": [
-        {
-          "host": "zcode",
-          "template": "adapters/zcode/agents/workflow-reviewer.md",
-          "body": "skills/review/references/reviewer-contract.md",
-          "target": "agents/workflow-reviewer.md"
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "host",
+          "template",
+          "body",
+          "target"
+        ],
+        "properties": {
+          "host": {
+            "enum": [
+              "claude",
+              "zcode"
+            ]
+          },
+          "template": {
+            "type": "string"
+          },
+          "body": {
+            "const": "skills/review/references/reviewer-contract.md"
+          },
+          "target": {
+            "const": "agents/workflow-reviewer.md"
+          }
         }
-      ]
+      }
+    },
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 320
+        }
+      }
     }
   },
   "notes": [
@@ -121,6 +167,6 @@
     "source and target are normalized relative paths: absolute paths, '..' segments and symlinked components are rejected.",
     "Each skill contributes exactly skills/<name>/SKILL.md as a packaged component; any extra file under a skill directory must be registered as an explicit resource entry.",
     "All resolved target paths must be unique (mapping conflicts are rejected).",
-    "Optional catalog packaging metadata must match this workflow: both hosts, both profiles and the shared ZCode reviewer composition. Other plugins use the generic tooling contract."
+    "Optional packaging metadata declares a supported host subset; native Claude/ZCode reviewer templates both use the single shared reviewer contract. Publisher metadata is injected into host output rather than duplicated in adapters."
   ]
 }

@@ -9,6 +9,7 @@ import zipfile
 
 from . import io
 from .io import ConflictError, DataError
+from .git_paths import reject_git_output
 from .package_check import check_package
 from .registry import HOSTS
 from .rendering import file_hashes, marketplace, marketplace_path, package_files
@@ -21,7 +22,11 @@ def _git_state(root):
         except (OSError, subprocess.TimeoutExpired):
             return None
         return result.stdout.strip() if result.returncode == 0 else None
-    return run("rev-parse", "HEAD"), bool(run("status", "--porcelain=v1", "-uall"))
+    head = run("rev-parse", "HEAD")
+    status = run("status", "--porcelain=v1", "-uall")
+    if head is not None and status is None:
+        raise DataError("Git status is unavailable; source cleanliness cannot be determined")
+    return head, bool(status)
 
 
 def _empty_output(output):
@@ -78,6 +83,7 @@ def _verify_zip(path, spec, host, artifact):
 
 def build_plugins(root, specs, output, hosts=HOSTS):
     output = Path(output).absolute()
+    reject_git_output(root, output)
     _empty_output(output)
     # The selected parent may use OS aliases (/tmp, /var) or an explicit
     # directory alias. Enforce containment on its canonical destination.

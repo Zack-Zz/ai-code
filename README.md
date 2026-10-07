@@ -7,8 +7,8 @@ version, resources, tests and support claims. Shared tooling registers plugins,
 validates their source, builds reproducible host packages and generates a local
 marketplace. Plugin behavior stays within its own directory.
 
-The first plugin is **AI Code Workflow** (`ai-code-workflow`), an engineering
-workflow for AI coding assistants. More plugin types can be added when their
+The first plugin is **CodeVow — AI Coding Workflow** (`ai-code-workflow`),
+an engineering workflow for AI coding assistants. More plugin types can be added when their
 requirements are concrete; the repository does not impose workflow skills,
 policies or task records on every plugin.
 
@@ -16,7 +16,7 @@ policies or task records on every plugin.
 
 | Plugin | Purpose | Version and support |
 |---|---|---|
-| [AI Code Workflow](plugins/ai-code-workflow/README.md) | Planning, TDD, debugging, review, verification and delivery evidence | Unpublished candidate `2.0.0`; [real-host acceptance remains unverified](plugins/ai-code-workflow/docs/support-matrix.md) |
+| [CodeVow](plugins/ai-code-workflow/README.md) | Planning, TDD, debugging, review, verification and delivery evidence | Self-hosted preview candidate `2.0.0`; [real-host acceptance remains unverified](plugins/ai-code-workflow/docs/support-matrix.md) |
 
 `catalog.json` registers plugin directories. Each directory's `product.json`
 is the sole source of its plugin ID, version and resource whitelist. The root
@@ -37,7 +37,7 @@ python3 tooling/plugin_tool.py package check \
 ```
 
 The output directory must be absent or empty. To work on one plugin, replace
-`--all` with `--plugin ai-code-workflow`. `--host` accepts `zcode`, `codex` or
+`--all` with `--plugin ai-code-workflow`. `--host` accepts `claude`, `codex`, `zcode` or
 `all`; only declared hosts are built for each selected plugin.
 
 A distribution contains a shared local marketplace named `ai-code-local`,
@@ -45,6 +45,9 @@ individual plugin packages and individual ZIPs. Each ZIP contains only its
 plugin and a matching single-plugin marketplace. Unzip to a stable directory,
 then register and install through the host's native plugin system. See the
 plugin's [installation guide](plugins/ai-code-workflow/docs/installation.md).
+See [three-host publishing](docs/publishing.md) for release check/prepare/verify,
+repository marketplaces and the manual GitHub draft workflow. Real host
+acceptance is required before preparing a stable release.
 
 Source checks and package integrity checks do not certify native loading or
 model behavior. Host acceptance and its evidence belong to each plugin.
@@ -55,10 +58,12 @@ model behavior. Host acceptance and its evidence belong to each plugin.
 |---|---|
 | `catalog.json` | Explicit list of registered plugin directories |
 | `plugins/<id>/` | Self-contained plugin source, manifest, resources, adapters, tests and documentation |
-| `tooling/plugin_tool.py` | Shared list, validate, build and package-check entry point |
+| `tooling/plugin_tool.py` | Shared list, validate, build, package check, marketplace sync and release commands |
 | `tooling/` | Shared source validation, packaging and marketplace generation |
 | `tests/` | Shared tooling tests and the unified test runner |
 | `docs/plugin-authoring.md` | How to add a plugin and declare its supported hosts |
+| `docs/publishing.md` | Three-host release inputs, artifacts, evidence and channel submission |
+| `.github/workflows/release.yml` | Manually prepare artifacts and optionally create a GitHub draft |
 | `docs/design/2026-10-07-multi-plugin-design.md` | Multi-plugin boundaries, contracts and migration plan |
 | `dist/` | Generated distributions, rebuildable from registered sources |
 
@@ -73,14 +78,14 @@ model behavior. Host acceptance and its evidence belong to each plugin.
 - Use [the authoring guide](docs/plugin-authoring.md) for a minimal addition.
   New runtime integrations require their own design and host verification.
 
-AI Code Workflow's policy resolution, task records and receipted file staging
+CodeVow's policy resolution, task records and receipted file staging
 remain at `plugins/ai-code-workflow/scripts/workflow_tool.py` in the source and
 `tools/workflow_tool.py` in its package. These are workflow-specific tools.
 
 ## License and provenance
 
 MIT — see [LICENSE](LICENSE) and [NOTICE](NOTICE). The repository's early history
-derives from Affaan Mustafa's ai-code. AI Code Workflow's migration history and
+derives from Affaan Mustafa's ai-code. CodeVow's migration history and
 preserved backend-engineering-lite license are documented in its
 [README](plugins/ai-code-workflow/README.md) and
 [migration guide](plugins/ai-code-workflow/docs/migration.md).

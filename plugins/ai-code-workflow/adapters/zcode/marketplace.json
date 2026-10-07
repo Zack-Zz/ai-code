@@ -1,12 +1,12 @@
 {
   "name": "ai-code-workflow-local",
-  "description": "Local marketplace root for AI Code Workflow (ZCode)",
+  "description": "Local marketplace root for CodeVow (ZCode)",
   "plugins": [
     {
       "name": "ai-code-workflow",
       "source": "./ai-code-workflow",
       "version": "2.0.0",
-      "description": "AI Code Workflow — plan-first collaboration, TDD, evidence-driven debugging, review and verification"
+      "description": "CodeVow — plan-first collaboration, TDD, evidence-driven debugging, review and verification"
     }
   ]
 }

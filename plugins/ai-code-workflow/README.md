@@ -1,13 +1,13 @@
-# AI Code Workflow
+# CodeVow — AI Coding Workflow
 
 English | [简体中文](README.zh-CN.md)
 
-A public, host-portable engineering workflow for AI coding assistants:
+CodeVow is a public, host-portable engineering workflow for AI coding assistants:
 **plan first, test-first, evidence-driven debugging, risk-focused review, and
-verification bound to the final code state.** First-release targets are
-ZCode and Codex; Claude Code is planned later.
+verification bound to the final code state.** Package targets are Claude Code,
+Codex and ZCode; native host acceptance remains unverified for all three.
 
-One source generates both host packages. The package ships six skills —
+One source generates all three host packages. The package ships six skills —
 `workflow`, `tdd`, `debugging`, `review`, `verification`, and the shared
 review-presentation contract `review-results` — plus two collaboration
 policies (`collaborative` default, `continuous` pacing-only), task/evidence
@@ -15,17 +15,35 @@ record tooling, and receipted file staging. It contains no agent runtime, no
 MCP scheduling, no background services, no model routing and no mandatory
 multi-role pipeline.
 
-**Status (2026-10-03): unpublished candidate bundles 2.0.0; implemented_with_acceptance_blocked.** Implemented
+**Historical verification baseline (2026-10-03): unpublished candidate bundles 2.0.0; implemented_with_acceptance_blocked.** Implemented
 and deterministically tested; all seven measured core modules exceed 80% statement coverage.
 real-host acceptance is blocked on the authoring machine and honestly marked
 `unverified` — see [docs/support-matrix.md](docs/support-matrix.md) and
 [evals/blocked-env-2026-10-02.md](evals/blocked-env-2026-10-02.md). Not yet
 host-verified anywhere; do not cite it as such.
 
+The display name changed from AI Code Workflow to CodeVow on 2026-10-07.
+Plugin ID `ai-code-workflow` and preview candidate version `2.0.0` stay the
+same. Earlier design and verification records retain their original names and
+dates; the rename adds no host-acceptance evidence.
+
 This directory is one plugin in the [ai-code collection](../../README.md).
 Paths below are relative to this plugin directory unless a command explicitly
 says to run from the repository root. Shared packaging and new-plugin guidance
 are in [the authoring guide](../../docs/plugin-authoring.md).
+
+## Current candidate metadata
+
+The publisher declaration is maintained in `product.json`; it is not an
+identity certification. The package includes a PNG listing icon, an SVG alternative and
+portable English/Chinese README files. `release.json` selects release notes,
+package guides and acceptance evidence; all three evidence slots are currently
+`null`. Draft packaging must remain distinct from stable promotion.
+
+Claude Code and ZCode reviewers use the same shared contract, with native
+read-only tool declarations, inherited model selection and twelve turns.
+Their actual enforcement is unverified. The existing A25 eval remains the
+historical Codex/ZCode matrix; it does not certify the new Claude target.
 
 ## What it gives you
 
@@ -59,8 +77,9 @@ python3 tooling/plugin_tool.py package check \
   --path dist-check/zcode/ai-code-workflow --host zcode --root .
 ```
 
-Install a built package into ZCode/Codex: [docs/installation.md](docs/installation.md).
+Install a built package into Claude Code/Codex/ZCode: [docs/installation.md](docs/installation.md).
 Day-to-day usage and policies: [docs/usage.md](docs/usage.md).
+Self-hosted distribution: [publishing preparation](../../docs/publishing.md).
 The source-specific tool remains `plugins/ai-code-workflow/scripts/workflow_tool.py`
 from the repository root; its installed entry remains `tools/workflow_tool.py`.
 Policy/task/files behavior belongs to this plugin. Its ID and candidate version
@@ -72,7 +91,8 @@ remain `ai-code-workflow` and `2.0.0`.
 |---|---|
 | `skills/`, `policies/`, `product.json` | The plugin source and its identity/whitelist |
 | `scripts/workflow_tool.py`, `scripts/workflow/` | Management tools (validate/policy/task/build/package/files), Python 3.11+ stdlib only |
-| `adapters/zcode/`, `adapters/codex/` | Host manifests, marketplace templates, interface metadata, capability notes |
+| `adapters/claude/`, `adapters/codex/`, `adapters/zcode/` | Native host manifests, market templates, reviewer declarations and interface metadata |
+| `assets/`, `release/`, `release.json` | PNG and SVG branding, portable package guides, draft notes and acceptance slots |
 | `schemas/`, `templates/` | Fixed data-contract documents and task/evidence input templates |
 | `evals/` | A01–A25 acceptance cases, one-shot fixtures, prepare/collect/grade tooling |
 | `../../dist/` | Generated host distributions at the repository root (rebuildable) |

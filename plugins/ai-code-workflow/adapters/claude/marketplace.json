@@ -1,0 +1,11 @@
+{
+  "name": "ai-code-workflow-local",
+  "description": "Local marketplace root for CodeVow (Claude Code)",
+  "plugins": [
+    {
+      "name": "ai-code-workflow",
+      "source": "./ai-code-workflow",
+      "description": "CodeVow — plan-first collaboration, TDD, evidence-driven debugging, review and verification"
+    }
+  ]
+}

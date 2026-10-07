@@ -13,6 +13,9 @@ import stat
 import zipfile
 from pathlib import Path
 
+MARKETPLACE_PATHS = {"claude": ".claude-plugin/marketplace.json", "codex": ".agents/plugins/marketplace.json",
+                     "zcode": "marketplace.json"}
+
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -37,8 +40,8 @@ def member(root, relative):
 def verify_workflow(root, index):
     """Verify the workflow plugin's own standalone builder output."""
     payload = {}
-    if set(index["hosts"]) != {"zcode", "codex"}:
-        raise ValueError("distribution must contain both hosts")
+    if not isinstance(index["hosts"], dict) or not index["hosts"] or set(index["hosts"]) - set(MARKETPLACE_PATHS):
+        raise ValueError("distribution must contain a nonempty supported host set")
     for host, entry in index["hosts"].items():
         package = member(root, entry["package_dir"])
         for path in package.rglob("*"):
@@ -66,6 +69,11 @@ def verify_workflow(root, index):
         archive = member(root, entry["zip"])
         if digest(market) != entry["marketplace_sha256"] or digest(archive) != entry["zip_sha256"]:
             raise ValueError(f"{host}: distribution checksum mismatch")
+        if host == "claude":
+            native = json.loads(member(package, ".claude-plugin/plugin.json").read_text())
+            owner = json.loads(market.read_text()).get("owner")
+            if not isinstance(owner, dict) or not isinstance(owner.get("name"), str) or not owner["name"].strip() or owner != native.get("author"):
+                raise ValueError("claude: invalid native marketplace owner/publisher")
         expected = {p.relative_to(root / host).as_posix(): p.read_bytes()
                     for p in package.rglob("*") if p.is_file()}
         expected[market.relative_to(root / host).as_posix()] = market.read_bytes()
@@ -87,7 +95,7 @@ def verify_workflow(root, index):
 def verify_collection(root, index):
     plugins, hosts = index["plugins"], index["hosts"]
     if not isinstance(plugins, dict) or not plugins or not isinstance(hosts, dict) or not hosts or \
-            set(hosts) - {"zcode", "codex"}:
+            set(hosts) - set(MARKETPLACE_PATHS):
         raise ValueError("distribution needs registered plugins and supported hosts")
     expected_host_ids = {host: set() for host in hosts}
     for identity, plugin in plugins.items():
@@ -99,13 +107,15 @@ def verify_collection(root, index):
     markets = {}
     registered_files = {"index.json"}
     for host, entry in hosts.items():
-        relative = f"{host}/" + (".agents/plugins/marketplace.json" if host == "codex" else "marketplace.json")
+        relative = f"{host}/{MARKETPLACE_PATHS[host]}"
         if entry["marketplace"] != relative or not expected_host_ids[host]:
             raise ValueError(f"{host}: invalid marketplace registration")
         market_path = member(root, relative)
         if digest(market_path) != entry["marketplace_sha256"]:
             raise ValueError(f"{host}: marketplace checksum mismatch")
         market = json.loads(market_path.read_text())
+        if host == "claude" and market.get("owner") != {"name": "ai-code"}:
+            raise ValueError("claude: invalid native marketplace owner")
         entries = market["plugins"]
         if not isinstance(entries, list) or len(entries) != len(expected_host_ids[host]) or \
                 {entry["name"] for entry in entries} != expected_host_ids[host]:

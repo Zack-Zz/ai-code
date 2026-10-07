@@ -2,7 +2,7 @@
   "schema_version": 1,
   "skills": {
     "workflow": {
-      "display_name": "AI Code Workflow",
+      "display_name": "CodeVow",
       "short_description": "Classify the request, plan with the user, and organize TDD, debugging, review and verification",
       "brand_color": "#2563EB",
       "default_prompt": "Use the workflow skill: classify this request, confirm scope and applicable authorization, then organize the work",

@@ -64,14 +64,14 @@ def _build_parser() -> argparse.ArgumentParser:
     tk.add_argument("--id", required=True)
 
     build_parser = sub.add_parser("build", help="build host packages deterministically")
-    build_parser.add_argument("--host", required=True, choices=["zcode", "codex", "all"])
+    build_parser.add_argument("--host", required=True, choices=["claude", "zcode", "codex", "all"])
     build_parser.add_argument("--output", required=True)
 
     pcheck = sub.add_parser("package", help="package operations")
     package_sub = pcheck.add_subparsers(dest="package_command", required=True)
     pc = package_sub.add_parser("check", help="verify a built package")
     pc.add_argument("--path", required=True)
-    pc.add_argument("--host", required=True, choices=["zcode", "codex"])
+    pc.add_argument("--host", required=True, choices=["claude", "zcode", "codex"])
 
     files_parser = sub.add_parser("files", help="owned-file management")
     files_sub = files_parser.add_subparsers(dest="files_command", required=True)
@@ -105,7 +105,7 @@ def _collect_explicit(args) -> dict:
 def _cmd_validate(args) -> int:
     root = Path(args.root)
     spec = wproduct.load_product(root)
-    wproduct.validate_adapters(root, spec.all_skills)
+    wproduct.validate_adapters(root, spec.all_skills, spec.hosts)
     profiles = {mode: wpolicy.load_profile(root, mode) for mode in wpolicy.MODES}
     for name in ("task.json", "evidence.json"):
         wio.load_json(root / "templates" / name)
@@ -158,7 +158,7 @@ def _cmd_build(args) -> int:
     # The source root is the tree containing product.json — derived from the
     # script location (repo: scripts/workflow/cli.py; package: tools/...).
     source_root = Path(__file__).resolve().parents[2]
-    hosts = list(wbuild.HOSTS) if args.host == "all" else [args.host]
+    hosts = [args.host]  # "all" is resolved from the captured source manifest by the builder.
     report = wbuild.build_packages(source_root, hosts, Path(args.output))
     _emit(report)
     return 0

@@ -1,8 +1,9 @@
 # ai-code — Agent Instructions
 
-本仓库承载多个面向公开发布的 **AI 相关插件**。当前首个插件为
-`plugins/ai-code-workflow/`；插件行为、测试和支持声明由各插件维护。
-公共层只负责插件注册、源校验、构建、包检查与本地市场生成。
+本仓库承载多个面向公开发布的 **AI 相关插件**。当前首个插件为 CodeVow
+（ID `ai-code-workflow`），源码位于 `plugins/ai-code-workflow/`；插件行为、
+测试和支持声明由各插件维护。
+公共层负责插件注册、源校验、构建、包检查、本地市场及三宿主发布准备。
 
 ## 仓库内容
 
@@ -11,9 +12,10 @@
 | `catalog.json` | 插件目录注册表，只登记相对路径 |
 | `plugins/<id>/product.json` | 该插件身份、版本、宿主与资源白名单的唯一来源 |
 | `plugins/<id>/` | 插件源码、适配、文档、测试和局部 AGENTS 规则 |
-| `tooling/plugin_tool.py`、`tooling/` | 通用 list、validate、build、package check 工具 |
+| `tooling/plugin_tool.py`、`tooling/` | 通用校验、构建、包检查、市场同步与 release 工具 |
 | `tests/` | 公共工具测试、插件测试汇总与统一门禁 |
 | `docs/plugin-authoring.md` | 最小接入要求与验证边界 |
+| `docs/publishing.md`、`docs/release-evidence.md` | 发布机制、渠道和证据契约 |
 | `docs/design/2026-10-07-multi-plugin-design.md` | 多插件改造规格与执行顺序 |
 | `dist/` | 可删除重建的宿主发行目录、聚合市场、独立插件 ZIP |
 
@@ -31,6 +33,8 @@
 - 同一插件的共同资源在不同宿主包中保持同哈希；适配及生成资源单独声明。
 - 不提前增加运行时、SDK、调度、任意代码 hook、插件依赖管理、自动安装器、
   固定模型分工或强制代理流水线。新插件形态有实际需求后单独设计。
+- publisher 只维护公开署名，不代表平台认证。release 配置不复制版本；
+  原始验收材料不入公开包，证据标记不构成安装、Git 或发布授权。
 - 保留历史报告的日期、命令和证据。迁移目录不会使历史验证成为本轮通过；
   更新当前操作导航时清楚区分历史基线与现行契约。
 
@@ -50,6 +54,9 @@
   文档。静态检查为 `npm run lint`，需本地 node_modules。
 - 区分静态校验、脚本测试、包完整性与真实宿主行为。原生加载、自动调用、
   运行工具或 MCP 的支持必须有实际宿主证据，不从清单或目录布局推导。
+- `release check/prepare/verify` 区分 draft 与 stable；stable 必须通过干净
+  Git、规范标签和全部声明宿主的字节绑定验收。`marketplace sync --check`
+  只读检查已生成市场；更新入口不能覆盖未知或用户编辑的内容。
 
 ## 授权边界
 

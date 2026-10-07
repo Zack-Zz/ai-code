@@ -7,7 +7,7 @@ import stat
 
 from . import io
 from .io import DataError
-from .registry import ID_PATTERN, VERSION_PATTERN
+from .registry import HOSTS, ID_PATTERN, VERSION_PATTERN
 from .rendering import file_hashes, marketplace_entry, marketplace_path, package_files
 
 ARTIFACT_FIELDS = {"schema_version", "product_id", "version", "host", "profiles", "source_revision",
@@ -25,7 +25,7 @@ def read_artifact(package):
                          ("content_hash", HASH_PATTERN), ("source_tree_hash", HASH_PATTERN)):
         if not isinstance(artifact[key], str) or not pattern.fullmatch(artifact[key]):
             raise DataError(f"invalid artifact {key}")
-    if artifact["host"] not in ("codex", "zcode"):
+    if artifact["host"] not in HOSTS:
         raise DataError("invalid artifact host")
     if (not isinstance(artifact["profiles"], list) or
             not all(isinstance(value, str) for value in artifact["profiles"])):
@@ -59,7 +59,7 @@ def _walk(root):
 
 def check_package(package_root, host, spec):
     package_root = Path(package_root).absolute()
-    if host not in ("codex", "zcode"):
+    if host not in HOSTS:
         raise DataError(f"unknown host: {host}")
     artifact = read_artifact(package_root)
     expected = package_files(spec, host)
@@ -109,8 +109,11 @@ def check_package(package_root, host, spec):
         problems.append(f"extra active file outside trusted closure: {relative}")
     try:
         market, _ = io.read_json(package_root.parent, marketplace_path(host))
-        if not isinstance(market, dict) or set(market) != {"name", "plugins"} or market["name"] != "ai-code-local":
-            raise DataError("marketplace must be ai-code-local with name/plugins fields")
+        fields = {"name", "plugins", "owner"} if host == "claude" else {"name", "plugins"}
+        if not isinstance(market, dict) or set(market) != fields or market["name"] != "ai-code-local":
+            raise DataError("marketplace must be ai-code-local with native fields")
+        if host == "claude" and market["owner"] != {"name": "ai-code"}:
+            raise DataError("Claude marketplace owner must be the ai-code collection")
         entries = market["plugins"]
         if not isinstance(entries, list) or not all(isinstance(entry, dict) for entry in entries):
             raise DataError("marketplace plugins must be a list of entries")

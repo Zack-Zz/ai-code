@@ -4,19 +4,21 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import re
 import stat
+from urllib.parse import urlsplit
 
 from . import io
 from .io import DataError
 from .references import validate_skill_references
+from .rendering import manifest_path
 
-HOSTS = ("codex", "zcode")
+HOSTS = ("claude", "codex", "zcode")
 ID_PATTERN = re.compile(r"[a-z0-9][a-z0-9-]{0,63}")
 VERSION_PATTERN = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
 INTERFACE_FIELDS = {"display_name", "short_description", "brand_color", "default_prompt",
                     "allow_implicit_invocation"}
 REQUIRED_PRODUCT_FIELDS = {"schema_version", "product_id", "display_name", "version",
                            "repository", "license", "hosts", "resources"}
-OPTIONAL_PRODUCT_FIELDS = {"core_skills", "shared_skills", "profiles", "generated_agents"}
+OPTIONAL_PRODUCT_FIELDS = {"core_skills", "shared_skills", "profiles", "generated_agents", "publisher"}
 
 
 @dataclass
@@ -103,14 +105,39 @@ def _load_json_input(spec, relative):
     return data
 
 
-def _generated_targets(spec):
+def _generated_targets(spec, host=None):
     targets = {"artifact.json"}
-    for host in spec.hosts:
-        targets.add("plugin.json" if host == "codex" else ".zcode-plugin/plugin.json")
-    if "codex" in spec.hosts:
+    hosts = [host] if host is not None else spec.hosts
+    for selected in hosts:
+        targets.add(manifest_path(selected))
+    if "codex" in hosts:
         targets.update(f"skills/{name}/agents/openai.yaml" for name in spec.all_skills)
-    targets.update(agent["target"] for agent in spec.manifest.get("generated_agents", []))
+    targets.update(agent["target"] for agent in spec.manifest.get("generated_agents", []) if agent["host"] in hosts)
     return targets
+
+
+def _validate_publisher(publisher):
+    if not isinstance(publisher, dict) or "name" not in publisher or set(publisher) - {"name", "url", "email"}:
+        raise DataError("publisher requires name and optional url/email only")
+    name = publisher["name"]
+    if not isinstance(name, str) or not name.strip() or len(name) > 120:
+        raise DataError("publisher.name must be a nonempty string of at most 120 characters")
+    if "email" in publisher:
+        email = publisher["email"]
+        if not isinstance(email, str) or len(email) > 320 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email):
+            raise DataError("publisher.email must be a valid address of at most 320 characters")
+    if "url" in publisher:
+        value = publisher["url"]
+        if not isinstance(value, str) or len(value) > 2048 or any(character.isspace() for character in value):
+            raise DataError("publisher.url must be an HTTPS URL of at most 2048 characters")
+        try:
+            parsed = urlsplit(value)
+            valid = parsed.scheme == "https" and bool(parsed.hostname) and not parsed.username and not parsed.password
+            parsed.port
+        except ValueError as exc:
+            raise DataError("publisher.url must be a valid HTTPS URL") from exc
+        if not valid:
+            raise DataError("publisher.url must be an HTTPS URL without credentials")
 
 
 def load_product(root, *, catalog_path="", boundary_root=None):
@@ -130,6 +157,8 @@ def load_product(root, *, catalog_path="", boundary_root=None):
     for key in ("display_name", "repository", "license"):
         if not isinstance(manifest[key], str) or not manifest[key].strip():
             raise DataError(f"product {key} must be a nonempty string")
+    if "publisher" in manifest:
+        _validate_publisher(manifest["publisher"])
     hosts = _string_list(manifest["hosts"], "hosts", nonempty=True)
     if set(hosts) - set(HOSTS):
         raise DataError("hosts contains an unsupported host")
@@ -144,19 +173,22 @@ def load_product(root, *, catalog_path="", boundary_root=None):
     for agent in agents:
         if not isinstance(agent, dict) or set(agent) != {"host", "template", "body", "target"}:
             raise DataError("generated_agents entries require host/template/body/target")
-        if agent["host"] != "zcode" or agent["host"] not in hosts:
-            raise DataError("generated_agents supports declared zcode host only")
+        if agent["host"] not in ("claude", "zcode") or agent["host"] not in hosts:
+            raise DataError("generated_agents supports declared claude/zcode hosts only")
         for key in ("template", "body", "target"):
             io.relative_path(agent[key], what=f"generated_agents.{key}")
         if not agent["target"].startswith("agents/") or not agent["target"].endswith(".md"):
             raise DataError("generated agent target must be agents/*.md")
     spec = PluginSpec(root, catalog_path, manifest, inputs={"product.json": raw}, boundary_root=boundary_root)
     generated = _generated_targets(spec)
-    if len(generated) != 1 + len(hosts) + (len(spec.all_skills) if "codex" in hosts else 0) + len(agents):
-        raise DataError("generated target collision")
-    for target in generated:
-        if any(target.startswith(other + "/") for other in generated if other != target):
-            raise DataError(f"generated target path overlap: {target}")
+    for host in hosts:
+        host_targets = _generated_targets(spec, host)
+        agent_count = sum(agent["host"] == host for agent in agents)
+        if len(host_targets) != 2 + (len(spec.all_skills) if host == "codex" else 0) + agent_count:
+            raise DataError(f"generated target collision for {host}")
+        for target in host_targets:
+            if any(target.startswith(other + "/") for other in host_targets if other != target):
+                raise DataError(f"generated target path overlap: {target}")
 
     def register(source, target):
         for relative in (source, target):

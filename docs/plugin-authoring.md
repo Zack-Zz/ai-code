@@ -49,7 +49,7 @@ kebab-case，建议目录名与 ID 一致。每个插件自有版本、许可证
 ```
 
 身份、版本和白名单只写在该清单。不要在 catalog、根 package.json 或市场
-中维护第二份版本。`hosts` 必填且非空，当前接受 `codex`、`zcode`；每个声明
+中维护第二份版本。`hosts` 必填且非空，当前接受 `claude`、`codex`、`zcode`；每个声明
 宿主都必须有真实 `adapters/<host>/plugin.json`。
 
 声明的技能自动贡献其 `skills/<name>/SKILL.md`。技能引用的参考文档、脚本
@@ -68,7 +68,7 @@ source 是文件时 include 必须为 `[]`；source 是目录时 include 必须�
 与技能目录名一致。`profiles` 与 `generated_agents` 也可省略或为空：只有
 需要 profile 标签或受控 Agent 文本合成的插件才声明。profiles 只是唯一名称列表，
 策略资源和实际行为由该插件自行校验，公共层不强制 policies 文件。生成 Agent 每项为
-`host/template/body/target`，当前仅接受已声明的 ZCode 宿主及 agents/*.md 目标，
+`host/template/body/target`，当前接受已声明的 Claude Code / ZCode 宿主及 agents/*.md 目标，
 只做数据化正文合成，不执行代码 hook。
 
 纯资源能被校验和打包，不能证明某个运行能力已可用。新的宿主组件形态必须
@@ -123,6 +123,11 @@ Describe the task, inputs, actions and evidence expected from the assistant.
 `skills/<name>/agents/openai.yaml`，不在源码技能目录维护第二份界面元数据。
 无技能插件不要求这份技能界面文件。声明 ZCode 时提供其原生 plugin.json；
 若需要 Agent，显式登记生成元数据并编写插件自己的行为检查。
+
+声明 Claude Code 时提供 `adapters/claude/plugin.json`，构建输出
+`.claude-plugin/plugin.json`。`displayName` 从 product 派生，namespace ID
+保持稳定。可选 `publisher` 只含公开 `name`、HTTPS `url` 和 `email`；工具
+统一生成 native author 与 Codex developerName，不在适配模板复制署名。
 
 公共市场由工具统一生成，不需要新插件提供 marketplace 模板。workflow
 保留的旧模板只供自己的专属 build 使用。
@@ -182,6 +187,10 @@ npm run lint
 根 `dist/index.json` 使用 schema_version 2，按 plugins/ID/hosts/HOST 记录
 各包路径和哈希，按 hosts/HOST 记录聚合市场。插件自己的 artifact 保持自身
 身份和来源。修改一个插件时核对兄弟插件内容和哈希不受影响。
+
+需要发行准备时增加插件 `release.json` 和可移植双语说明，见
+[发布指南](publishing.md) 与[验收契约](release-evidence.md)。这些输入属于
+发布机制；仅构建资源包的插件无需被强制套用当前 skills-only 上架 profile。
 
 ## 6. 交付与原生验收
 

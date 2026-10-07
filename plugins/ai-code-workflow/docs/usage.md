@@ -1,8 +1,13 @@
-# Using AI Code Workflow
+# Using CodeVow
 
-AI Code Workflow is a set of six skills — `workflow`, `tdd`, `debugging`,
+CodeVow is a set of six skills — `workflow`, `tdd`, `debugging`,
 `review`, `verification`, plus the shared presentation contract
 `review-results` — that organize how your coding assistant works with you.
+Packages target Claude Code, Codex and ZCode; native behavior remains
+unverified for each. Claude Code and ZCode reviewer declarations use the same
+contract, inherited models and read-only tool lists; this is configuration
+evidence until a real session confirms enforcement.
+
 Default collaboration mode: **plan first, implement after your confirmation**.
 
 This is the workflow plugin within [ai-code](../../../README.md). Its source

@@ -1,4 +1,33 @@
-# Migration from backend-engineering-lite (zcode-workflow)
+# CodeVow migration and provenance
+
+## Claude package and release metadata (2026-10-07)
+
+The current source declares Claude Code, Codex and ZCode, with a separate
+native Claude adapter at `adapters/claude/`. All host packages keep plugin ID
+`ai-code-workflow` and candidate version `2.0.0`. Publisher metadata supplies
+native author/developer fields; the PNG/SVG branding and curated package guides
+are explicit whitelist resources. `release.json` leaves each host acceptance
+slot null, so draft metadata is not evidence for stable promotion.
+
+Existing policy/task/files records and authorization boundaries are unchanged.
+The original A25 manager/package scenario remains a Codex/ZCode matrix. Its
+historical result does not prove the new Claude adapter or a three-host model
+behavior round. Original reports, dates, counts and hashes remain historical.
+
+## Display name change (2026-10-07)
+
+The active display name is now **CodeVow — AI Coding Workflow** (中文：
+**CodeVow · AI 编码工作流**), previously AI Code Workflow. Plugin ID
+`ai-code-workflow`, candidate version `2.0.0`, package paths, skill names and
+policy/task/files contracts remain the same. The candidate is intended for self-hosted preview distribution;
+real-host support remains `unverified`.
+
+Source manifests, host descriptions, interface labels and active usage guides
+use CodeVow. The dated v1 designs, probe reports and historical tables below
+keep the original AI Code Workflow name and evidence. Renaming the brand does
+not rewrite old hashes or turn prior probes into current acceptance.
+
+## Migration from backend-engineering-lite (2026-10-01)
 
 Status: **completed for the repository** on 2026-10-01 during the v1
 development round. The old in-repo entry `zcode-workflow/` was removed after

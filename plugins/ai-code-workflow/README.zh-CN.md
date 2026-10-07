@@ -1,27 +1,41 @@
-# AI Code Workflow
+# CodeVow · AI 编码工作流
 
 [English](README.md) | 简体中文
 
-面向公开发布、可跨宿主移植的 AI 编码助手工程工作流：**先确认计划再开发、
+CodeVow 是面向公开发布、可跨宿主移植的 AI 编码助手工程工作流：**先确认计划再开发、
 测试先行、证据驱动排查、聚焦风险的审查、绑定最终代码状态的验证**。
-首版目标平台为 ZCode 与 Codex，Claude Code 后续接入。
+候选包目标为 Claude Code、Codex 与 ZCode；三端真实宿主验收均为 unverified。
 
-同一份源码生成两个宿主的发行包。包内含六个技能——`workflow`、`tdd`、
+同一份源码生成三个宿主的发行包。包内含六个技能——`workflow`、`tdd`、
 `debugging`、`review`、`verification` 与共用审查呈现契约 `review-results`——
 以及两种协作策略（默认 `collaborative`；`continuous` 仅调整节奏）、任务/证据
 记录工具和带回执的文件暂存。不含自有 Agent 运行时、MCP 调度、后台服务、
 模型路由或强制多角色流水线。
 
-**状态（2026-10-03）：2.0.0 未发布候选产物，implemented_with_acceptance_blocked。** 已实现并通过确定性测试，
+**历史验证基线（2026-10-03）：2.0.0 未发布候选产物，implemented_with_acceptance_blocked。** 已实现并通过确定性测试，
 七个核心工具模块的语句覆盖率均超过 80% 目标；真实宿主验收
 在开发机上受环境阻塞，能力一律如实标注 `unverified`——见
 [docs/support-matrix.md](docs/support-matrix.md) 与
 [evals/blocked-env-2026-10-02.md](evals/blocked-env-2026-10-02.md)。
 在任何机器上完成真实会话验收之前，请勿声称本产品已被宿主验证。
 
+2026-10-07，展示名由 AI Code Workflow 更为 CodeVow。插件 ID
+`ai-code-workflow` 与试用候选版本 `2.0.0` 保持；早期设计和验证记录保留
+当时的名称与日期，本次品牌更名不增加真实宿主验收声明。
+
 本目录是 [ai-code 插件集合](../../README.zh-CN.md) 中的一个插件。除明确注明
 从仓库根执行的命令外，本文路径均相对本插件目录。公共构建与新插件接入见
 [作者指南](../../docs/plugin-authoring.md)。
+
+## 当前候选元数据
+
+publisher 声明在 product.json 维护，不代表身份认证。包内提供 PNG 发布图标和 SVG 备用标识
+与可移植中英文 README；release.json 选择说明、草稿发行备注和验收证据。
+Claude Code、Codex、ZCode 三个证据槽当前均为 null，草稿构建不能晋升为稳定版。
+
+Claude Code 与 ZCode 的 Reviewer 使用同一份共享职责正文，声明只读工具、
+继承模型和最多十二轮；实际限制是否生效仍未验证。现有 A25 是历史 Codex/
+ZCode 两端矩阵，不能将其结果用作新增 Claude 目标的验收证据。
 
 ## 你得到什么
 
@@ -39,7 +53,7 @@
 
 ## 快速开始
 
-尚未发布（无市场版本）。以下命令在 ai-code 仓库根目录执行：
+当前为自建市场试用候选，真实宿主验收未完成。以下命令在 ai-code 仓库根目录执行：
 
 ```sh
 npm test
@@ -49,8 +63,9 @@ python3 tooling/plugin_tool.py package check \
   --path dist-check/zcode/ai-code-workflow --host zcode --root .
 ```
 
-安装构建产物到 ZCode/Codex：[docs/installation.md](docs/installation.md)。
+安装构建产物到 Claude Code/Codex/ZCode：[docs/installation.md](docs/installation.md)。
 日常使用与策略：[docs/usage.md](docs/usage.md)。
+自建市场分发：[发布准备](../../docs/publishing.md)。
 插件源码入口仍为仓库根目录下的
 `plugins/ai-code-workflow/scripts/workflow_tool.py`，安装包入口仍为
 `tools/workflow_tool.py`；policy/task/files 行为属于该插件。插件 ID 和候选版本
@@ -62,7 +77,8 @@ python3 tooling/plugin_tool.py package check \
 |---|---|
 | `skills/`、`policies/`、`product.json` | 工作流源码与产品身份/资源白名单 |
 | `scripts/workflow_tool.py`、`scripts/workflow/` | 管理工具（validate/policy/task/build/package/files），仅 Python 3.11+ 标准库 |
-| `adapters/zcode/`、`adapters/codex/` | 两端清单、市场模板、界面元数据与能力说明 |
+| `adapters/claude/`、`adapters/codex/`、`adapters/zcode/` | 三端原生清单、市场模板、Reviewer 声明和界面元数据 |
+| `assets/`、`release/`、`release.json` | PNG/SVG 图标、可移植包说明、草稿备注与验收槽 |
 | `schemas/`、`templates/` | 固定数据契约文档与任务/证据输入模板 |
 | `evals/` | A01–A25 验收场景、一次性 fixture、prepare/collect/grade 工具 |
 | `../../dist/` | 仓库根目录生成的宿主发行目录（可随时重建） |

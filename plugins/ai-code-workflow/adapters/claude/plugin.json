@@ -1,0 +1,12 @@
+{
+  "description": "CodeVow — plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+  "license": "MIT",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "keywords": [
+    "workflow",
+    "tdd",
+    "review",
+    "verification",
+    "debugging"
+  ]
+}

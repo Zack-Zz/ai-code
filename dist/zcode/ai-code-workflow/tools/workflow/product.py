@@ -23,7 +23,8 @@ _PRODUCT_KEYS = {
     "schema_version", "product_id", "display_name", "version", "repository",
     "license", "core_skills", "shared_skills", "resources",
 }
-_PACKAGING_KEYS = {"hosts", "profiles", "generated_agents"}
+_PACKAGING_KEYS = {"hosts", "profiles", "generated_agents", "publisher"}
+HOSTS = ("claude", "codex", "zcode")
 _CACHE_PARTS = {"__pycache__"}
 _INTERFACE_FIELDS = {"display_name", "short_description", "brand_color", "default_prompt",
                      "allow_implicit_invocation"}
@@ -96,7 +97,7 @@ def parse_skill_interface(path: Path) -> dict:
     return validate_interface_entry(dict(sections["interface"], **sections["policy"]), what=str(path))
 
 
-def parse_reviewer_meta(path: Path) -> dict:
+def parse_reviewer_meta(path: Path, *, host="zcode") -> dict:
     """Validate the native reviewer template's limited frontmatter format."""
     try:
         lines = Path(path).read_text(encoding="utf-8").splitlines()
@@ -115,7 +116,9 @@ def parse_reviewer_meta(path: Path) -> dict:
             raise DataError(f"invalid or duplicate reviewer frontmatter: {path}")
         key, value = match.groups()
         value = value.strip()
-        if key in ("tools", "maxTurns") or value.startswith('"'):
+        if key == "tools" and host == "claude" and not value.startswith("["):
+            value = [tool.strip() for tool in value.split(",")]
+        elif key in ("tools", "maxTurns") or value.startswith('"'):
             try:
                 value = json.loads(value)
             except (ValueError, TypeError) as exc:
@@ -137,9 +140,12 @@ def parse_reviewer_meta(path: Path) -> dict:
     return meta
 
 
-def validate_adapters(root: Path, skills) -> dict:
-    interfaces = load_interfaces(root, skills)
-    parse_reviewer_meta(io.resolve_member(root, "adapters/zcode/agents/workflow-reviewer.md"))
+def validate_adapters(root: Path, skills, hosts=None) -> dict:
+    hosts = hosts if hosts is not None else ("zcode", "codex")
+    interfaces = load_interfaces(root, skills) if "codex" in hosts else {"schema_version": 1, "skills": {}}
+    for host in hosts:
+        if host in ("claude", "zcode"):
+            parse_reviewer_meta(io.resolve_member(root, f"adapters/{host}/agents/workflow-reviewer.md"), host=host)
     return interfaces
 
 
@@ -207,6 +213,8 @@ class ProductSpec:
     license: str
     core_skills: list
     shared_skills: list
+    hosts: list = field(default_factory=lambda: ["zcode", "codex"])
+    publisher: dict | None = None
     files: list = field(default_factory=list)  # [(source_abs, target_rel)] sorted by target
     manifest_bytes: bytes = field(default=b"", repr=False)
 
@@ -288,23 +296,47 @@ def _validate_packaging_metadata(data, root: Path) -> None:
     """
     if "hosts" in data:
         hosts = data["hosts"]
-        if not isinstance(hosts, list) or len(hosts) != 2 or \
+        if not isinstance(hosts, list) or not hosts or \
                 not all(isinstance(host, str) for host in hosts) or \
-                set(hosts) != {"zcode", "codex"}:
-            raise DataError("workflow hosts must declare zcode and codex exactly once")
+                len(set(hosts)) != len(hosts) or set(hosts) - set(HOSTS):
+            raise DataError("workflow hosts must declare unique supported hosts")
     if "profiles" in data and data["profiles"] != ["collaborative", "continuous"]:
         raise DataError("workflow profiles must be collaborative and continuous")
     if "generated_agents" in data:
+        declared = data.get("hosts", ["zcode", "codex"])
         expected = [{
-            "host": "zcode",
-            "template": "adapters/zcode/agents/workflow-reviewer.md",
+            "host": host,
+            "template": f"adapters/{host}/agents/workflow-reviewer.md",
             "body": "skills/review/references/reviewer-contract.md",
             "target": "agents/workflow-reviewer.md",
-        }]
+        } for host in ("claude", "zcode") if host in declared]
         if data["generated_agents"] != expected:
             raise DataError("workflow generated_agents must declare the shared reviewer contract")
-        for field in ("template", "body"):
-            io.resolve_member(root, expected[0][field])
+        for entry in expected:
+            for field in ("template", "body"):
+                io.resolve_member(root, entry[field])
+    if "publisher" in data:
+        publisher = data["publisher"]
+        if not isinstance(publisher, dict) or "name" not in publisher or set(publisher) - {"name", "url", "email"}:
+            raise DataError("publisher requires name and optional url/email only")
+        if not isinstance(publisher["name"], str) or not publisher["name"].strip() or len(publisher["name"]) > 120:
+            raise DataError("publisher.name must be a nonempty string of at most 120 characters")
+        if "email" in publisher:
+            email = publisher["email"]
+            if not isinstance(email, str) or len(email) > 320 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email):
+                raise DataError("publisher.email must be a valid address of at most 320 characters")
+        if "url" in publisher:
+            value = publisher["url"]
+            if not isinstance(value, str) or len(value) > 2048 or any(character.isspace() for character in value):
+                raise DataError("publisher.url must be an HTTPS URL of at most 2048 characters")
+            try:
+                url = urlsplit(value)
+                valid = url.scheme == "https" and bool(url.hostname) and not url.username and not url.password
+                url.port
+            except ValueError as exc:
+                raise DataError("publisher.url must be a valid HTTPS URL") from exc
+            if not valid:
+                raise DataError("publisher.url must be an HTTPS URL without credentials")
 
 
 def load_product(root: Path) -> ProductSpec:
@@ -353,6 +385,7 @@ def load_product(root: Path) -> ProductSpec:
         root=root, product_id=product_id, display_name=display_name,
         version=version, repository=data["repository"], license=data["license"],
         core_skills=core, shared_skills=shared,
+        hosts=list(data.get("hosts", ["zcode", "codex"])), publisher=data.get("publisher"),
         manifest_bytes=manifest_bytes,
     )
 

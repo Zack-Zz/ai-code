@@ -1,4 +1,4 @@
-"""Reproducible package builds for both hosts.
+"""Reproducible package builds for declared native hosts.
 
 Deterministic rules: every generated JSON uses fixed key order and encoding;
 ZIP entries use a fixed timestamp, permission bits and sort order; build time
@@ -22,7 +22,7 @@ from . import package_check as wpackage
 from . import product as wproduct
 from .io import DataError
 
-HOSTS = ("zcode", "codex")
+HOSTS = wproduct.HOSTS
 ZIP_EPOCH = (1980, 1, 1, 0, 0, 0)
 
 
@@ -30,26 +30,47 @@ def _dump_json(obj) -> bytes:
     return (json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("utf-8")
 
 
-def _git_state(source_root: Path):
-    def git(*args):
-        try:
-            result = subprocess.run(["git", *args], cwd=str(source_root),
-                                    capture_output=True, text=True, timeout=10)
-        except (OSError, subprocess.TimeoutExpired):
-            return None
-        return result.stdout.strip() if result.returncode == 0 else None
+def _git_output(source_root: Path, *args):
+    try:
+        result = subprocess.run(["git", *args], cwd=str(source_root),
+                                capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() if result.returncode == 0 else None
 
-    head = git("rev-parse", "HEAD")
-    status = git("status", "--porcelain=v1", "-uall")
+
+def _git_state(source_root: Path):
+    head = _git_output(source_root, "rev-parse", "HEAD")
+    status = _git_output(source_root, "status", "--porcelain=v1", "-uall")
+    if status is None and (head is not None or _git_output(source_root, "rev-parse", "--git-dir") is not None):
+        raise DataError("Git status is unavailable; source cleanliness cannot be determined")
     dirty = bool(status)
     return head, dirty
 
 
-def _adapter_inputs():
+def _git_metadata_directories(source_root: Path):
+    git_dir = _git_output(source_root, "rev-parse", "--git-dir")
+    if git_dir is None:
+        return []  # Retain standalone, non-Git draft support.
+    common_dir = _git_output(source_root, "rev-parse", "--git-common-dir")
+    if not git_dir or not common_dir:
+        raise DataError("Git metadata directory cannot be determined safely")
+    directories = []
+    for value in (git_dir, common_dir):
+        path = Path(value)
+        directories.append((path if path.is_absolute() else source_root / path).resolve())
+    return directories
+
+
+def _adapter_inputs(spec=None):
     adapter_files = []
-    for host in HOSTS:
+    hosts = spec.hosts if spec is not None else HOSTS
+    for host in hosts:
         adapter_files.extend([f"adapters/{host}/plugin.json", f"adapters/{host}/marketplace.json"])
-    adapter_files.extend(["adapters/codex/interfaces.json", "adapters/zcode/agents/workflow-reviewer.md"])
+        if host in ("claude", "zcode"):
+            adapter_files.append(f"adapters/{host}/agents/workflow-reviewer.md")
+    if "codex" in hosts:
+        adapter_files.append("adapters/codex/interfaces.json")
     return adapter_files
 
 
@@ -65,7 +86,7 @@ def _source_tree_hash(spec, inputs=None) -> str:
         "shared_skills": spec.shared_skills,
         "files": {target: digest(source.relative_to(spec.root).as_posix()) for source, target in spec.files},
         "product_json": digest("product.json"),
-        "adapters": {rel: digest(rel) for rel in _adapter_inputs()},
+        "adapters": {rel: digest(rel) for rel in _adapter_inputs(spec)},
     }
     return wio.sha256_bytes(wio.canonical_json(payload))
 
@@ -81,7 +102,7 @@ def _load_input_json(path: Path, root: Path, inputs):
 def _capture_inputs(spec) -> dict:
     """Retain exactly the registered bytes and adapter inputs for this build."""
     paths = {source.relative_to(spec.root).as_posix() for source, _ in spec.files}
-    paths.update(_adapter_inputs())
+    paths.update(_adapter_inputs(spec))
     paths.add("product.json")
     inputs = {"product.json": spec.manifest_bytes}
     for relative in sorted(paths - {"product.json"}):
@@ -98,10 +119,22 @@ def _verify_source_capture(root: Path, inputs) -> None:
             raise DataError(f"source input changed while capturing snapshot: {relative}")
 
 
-def _inject_identity(data: dict, spec) -> dict:
+def _inject_identity(data: dict, spec, *, host=None) -> dict:
     data = dict(data)
     data["name"] = spec.product_id
     data["version"] = spec.version
+    if spec.publisher:
+        data["author"] = dict(spec.publisher)
+        if host == "codex":
+            extensions = dict(data.get("extensions", {}))
+            openai = dict(extensions.get("com.openai", {}))
+            interface = dict(openai.get("interface", {}))
+            interface["developerName"] = spec.publisher["name"]
+            openai["interface"] = interface
+            extensions["com.openai"] = openai
+            data["extensions"] = extensions
+    if host == "claude":
+        data["displayName"] = spec.display_name
     return data
 
 
@@ -160,12 +193,13 @@ def _build_host(spec, host: str, staging: Path, adapters_root: Path, interfaces:
             raise DataError(f"copied source content differs from captured snapshot: {relative}")
 
     adapter = adapters_root / host
-    if host == "zcode":
-        manifest = _inject_identity(_load_input_json(adapter / "plugin.json", spec.root, inputs), spec)
-        target = package_dir / ".zcode-plugin" / "plugin.json"
+    if host in ("claude", "zcode"):
+        manifest = _inject_identity(_load_input_json(adapter / "plugin.json", spec.root, inputs), spec, host=host)
+        manifest_rel = f".{host}-plugin/plugin.json"
+        target = package_dir / manifest_rel
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(_dump_json(manifest))
-        extra_files.append((target, ".zcode-plugin/plugin.json"))
+        extra_files.append((target, manifest_rel))
 
         contract_source = next(source for source, target in spec.files
                                if target == "skills/review/references/reviewer-contract.md")
@@ -174,10 +208,10 @@ def _build_host(spec, host: str, staging: Path, adapters_root: Path, interfaces:
         agent.parent.mkdir(parents=True, exist_ok=True)
         agent.write_bytes(_compose_reviewer_agent(adapter / "agents" / "workflow-reviewer.md",
                                                   contract_body,
-                                                  inputs["adapters/zcode/agents/workflow-reviewer.md"]))
+                                                  inputs[f"adapters/{host}/agents/workflow-reviewer.md"]))
         extra_files.append((agent, "agents/workflow-reviewer.md"))
     elif host == "codex":
-        manifest = _inject_identity(_load_input_json(adapter / "plugin.json", spec.root, inputs), spec)
+        manifest = _inject_identity(_load_input_json(adapter / "plugin.json", spec.root, inputs), spec, host=host)
         target = package_dir / "plugin.json"
         target.write_bytes(_dump_json(manifest))
         extra_files.append((target, "plugin.json"))
@@ -217,15 +251,15 @@ def _build_packages_staged(source_root: Path, hosts, output_root: Path, provenan
     hosts = list(hosts)
     if not hosts:
         raise DataError("no hosts requested")
-    unknown = set(hosts) - set(HOSTS)
+    if hosts == ["all"]:
+        hosts = list(spec.hosts)
+    unknown = set(hosts) - set(spec.hosts)
     if unknown:
         raise DataError(f"unknown host(s): {sorted(unknown)}")
-    if "all" in hosts:
-        hosts = list(HOSTS)
-
     adapters_root = source_root / "adapters"
-    interfaces = wproduct.validate_adapters(source_root, spec.all_skills)
-    interfaces = _load_input_json(adapters_root / "codex/interfaces.json", source_root, inputs)
+    interfaces = wproduct.validate_adapters(source_root, spec.all_skills, spec.hosts)
+    if "codex" in spec.hosts:
+        interfaces = _load_input_json(adapters_root / "codex/interfaces.json", source_root, inputs)
 
     if output_root.exists() and any(output_root.iterdir()):
         raise DataError(f"output root is not empty: {output_root}")
@@ -259,7 +293,9 @@ def _build_packages_staged(source_root: Path, hosts, output_root: Path, provenan
             dict(entry, name=spec.product_id, version=spec.version)
             for entry in market_template["plugins"]
         ]
-        market_rel = ".agents/plugins/marketplace.json" if host == "codex" else "marketplace.json"
+        if host == "claude" and spec.publisher:
+            market_template["owner"] = dict(spec.publisher)
+        market_rel = wpackage.MARKETPLACE_PATHS[host]
         market_path = host_out / market_rel
         market_path.parent.mkdir(parents=True, exist_ok=True)
         market_path.write_bytes(_dump_json(market_template))
@@ -322,9 +358,14 @@ def build_packages(source_root: Path, hosts, output_root: Path) -> dict:
     publishes all hosts together. Failures only clean our private staging;
     pre-existing output directories and late user files are never removed.
     """
-    output_root = Path(output_root)
+    output_root = Path(output_root).absolute()
     _check_empty_output(output_root)
     source_root = Path(source_root)
+    output_root = output_root.parent.resolve() / output_root.name
+    _check_empty_output(output_root)
+    for metadata in _git_metadata_directories(source_root):
+        if output_root == metadata or metadata in output_root.parents:
+            raise DataError(f"build output cannot be inside a Git metadata directory: {metadata}")
     spec = wproduct.load_product(source_root)
     inputs = _capture_inputs(spec)
     # Observe actual Git context before any private directories can make this

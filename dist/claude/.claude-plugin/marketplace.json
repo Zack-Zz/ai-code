@@ -1,0 +1,14 @@
+{
+  "name": "ai-code-local",
+  "owner": {
+    "name": "ai-code"
+  },
+  "plugins": [
+    {
+      "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+      "name": "ai-code-workflow",
+      "source": "./ai-code-workflow",
+      "version": "2.0.0"
+    }
+  ]
+}

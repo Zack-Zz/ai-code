@@ -1,7 +1,7 @@
-# AI Code Workflow — Agent Instructions
+# CodeVow — Agent Instructions
 
-本目录是 ai-code 多插件仓库中的 **AI 工作流插件**：AI Code Workflow（插件 ID
-`ai-code-workflow`）。首版目标平台为 ZCode 与 Codex；Claude Code 后续接入。
+本目录是 ai-code 多插件仓库中的 **AI 工作流插件**：CodeVow（插件 ID
+`ai-code-workflow`）。当前候选目标为 Claude Code、Codex 与 ZCode，真实宿主状态均为 unverified。
 本目录维护工作流素材与专属管理工具，公共发行工具在仓库根 `tooling/`。
 同时遵守 [仓库规则](../../AGENTS.md)。下列源码路径均相对本插件目录。
 
@@ -13,7 +13,8 @@
 | `skills/` | 六个技能源码：workflow/tdd/debugging/review/verification + review-results 呈现契约 |
 | `policies/` | collaborative（默认）与 continuous 两份完整策略 |
 | `scripts/workflow_tool.py` + `scripts/workflow/` | 管理工具：validate、policy resolve、task create/update/check、build、package check、files plan/apply（Python 3.11+ 标准库） |
-| `adapters/` | 两端清单/市场模板/界面元数据与能力说明（含探测记录） |
+| `adapters/` | 三端原生清单/市场模板/界面元数据/Reviewer 声明与能力说明 |
+| `assets/`、`release/`、`release.json` | PNG 发布图标与 SVG 备用标识、可移植包说明、草稿备注和逐宿主验收证据槽 |
 | `schemas/`、`templates/` | 固定数据契约文档、任务/证据输入模板 |
 | `evals/` | A01–A25 验收场景、fixture 与 prepare/collect/grade |
 | `../../dist/` | 仓库根的可复现宿主发行目录（可删除重建） |
@@ -29,8 +30,10 @@
   白名单，未登记文件不进包，白名单文件必须真实存在。
 - 修改 `scripts/workflow/` 时保持各模块单一职责；错误类型与退出码语义
   （0/1/2/3/4/5）不得漂移。
-- 技能源码两端同哈希；`adapters/codex/interfaces.json` 是六个技能界面元数据
+- 技能源码在各宿主包中同哈希；`adapters/codex/interfaces.json` 是六个技能界面元数据
   的唯一来源，不得在技能目录下另建副本。
+- Publisher 来自 product.json，生成各端 author 与 Codex developerName，不维护源模板中的重复 author。
+- 发行状态由本轮真实证据决定；三个 acceptance 槽默认 null。旧 A25 两端矩阵不代表 Claude 或三端宿主验收。
 - 不新增固定模型分工、强制代理流水线或语言教程库。
 
 ## 验证

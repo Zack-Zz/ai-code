@@ -1,5 +1,9 @@
 {
-  "description": "AI Code Workflow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+  "author": {
+    "name": "Zack-Zz",
+    "url": "https://github.com/Zack-Zz"
+  },
+  "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
   "license": "MIT",
   "name": "ai-code-workflow",
   "version": "2.0.0"

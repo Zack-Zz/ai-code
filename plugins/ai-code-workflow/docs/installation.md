@@ -1,24 +1,59 @@
-# Installing AI Code Workflow
+# Installing CodeVow
 
-Run the shared build from the ai-code repository root:
+For GitHub marketplace distribution, see
+[publishing preparation](../../../docs/publishing.md).
+
+CodeVow uses plugin ID `ai-code-workflow`; the displayed brand does not change
+its package directory or installation commands. Run the shared build from the
+ai-code repository root:
 
 ```sh
 python3 tooling/plugin_tool.py build --plugin ai-code-workflow --host all --output dist-check
 ```
 
-The selected empty output receives `zcode/` and `codex/` host roots. Examples
+The selected empty output receives `claude/`, `codex/` and `zcode/` host roots. Examples
 below use `dist/` for a generated distribution at the repository root; replace
 it with your actual build output. Each host root contains plugin directories,
 a local marketplace named `ai-code-local`, and one ZIP per plugin. ZCode's
 marketplace is `marketplace.json`; Codex's is
 `.agents/plugins/marketplace.json`. Each ZIP contains only its plugin and a
-single-plugin marketplace. The repository's multi-plugin packaging contract
+single-plugin marketplace. Claude Code uses `.claude-plugin/marketplace.json`.
+The repository's multi-plugin packaging contract
 is in [the authoring guide](../../../docs/plugin-authoring.md).
 
-**The candidate distribution model is: download/unzip, then register the
-local marketplace root and install natively.** No host is assumed to install
-a ZIP directly, and this tool never writes into host caches or global config
-on its own.
+**The primary distribution is the self-hosted GitHub marketplace.** Once
+the generated root entries and matching packages are pushed, add
+`Zack-Zz/ai-code` through the host native marketplace flow. Download/unzip and
+local registration are also available for testing. The shared tool never
+writes into host caches or global config on its own. Native behavior remains
+unverified until an actual session is accepted.
+
+## Claude Code
+
+1. Take the generated `claude/` root or unzip its single-plugin candidate into
+   a stable directory. The market is `.claude-plugin/marketplace.json`, with
+   `source` relative to the directory containing `.claude-plugin/`.
+2. Register and install using the actual market name:
+
+   ```sh
+   claude plugin marketplace add /path/to/dist/claude
+   claude plugin install ai-code-workflow@ai-code-local
+   ```
+
+3. The native manifest is `.claude-plugin/plugin.json`; `agents/workflow-reviewer.md`
+   declares `tools: Read, Grep, Glob`, `model: inherit` and `maxTurns: 12`,
+   composed with the shared reviewer contract. No write-capable tool or
+   permission bypass is declared.
+4. Start a new session and inspect discovery and actual behavior. This new
+   adapter has no host session acceptance yet; a package check does not verify
+   model execution or enforcement. All current release acceptance slots are null.
+
+These paths, commands and frontmatter follow the official
+[plugin manifest](https://code.claude.com/docs/en/plugins-reference),
+[marketplace](https://code.claude.com/docs/en/plugin-marketplaces) and
+[subagent](https://code.claude.com/docs/en/sub-agents) documentation.
+The workflow-specific standalone builder keeps its legacy market name
+`ai-code-workflow-local`; use that name for its output.
 
 ## ZCode
 
@@ -40,14 +75,16 @@ on its own.
 2. Register the local marketplace root:
    `codex plugin marketplace add /path/to/dist/codex`
    (the marketplace file is `dist/codex/.agents/plugins/marketplace.json`, with
-   `source.path` relative to that root), then install `ai-code-workflow` via
-   the ChatGPT desktop app or, on CLI 0.159.2,
-   `codex plugin add ai-code-workflow@ai-code-local` for a distribution built
-   by the shared tool. Check your actual version's `plugin --help`; command
-   availability varies. The 2026-10-02 probes established that CLI command
-   shape for the older single-plugin market, not acceptance of this migrated
-   distribution. The workflow-specific legacy build retains its own market
-   template/name, which must be used when registering that output.
+   `source.path` relative to that root). Restart the supported desktop client,
+   choose `ai-code-local` in the Plugins Directory, and install CodeVow.
+   This follows the current [official marketplace guide](https://developers.openai.com/plugins/build/plugins).
+   CLI command availability varies; check the installed version's `plugin --help`.
+
+   Historical note: the 2026-10-02 probes used CLI 0.159.2 and
+   `codex plugin add` with an older single-plugin market. That evidence does
+   not establish current command availability or acceptance of this bundle.
+   The workflow-specific legacy build retains its own market name; use the
+   name actually declared in that output.
 3. Local installs are copied into `~/.codex/plugins/cache/...` and loaded
    from the cache copy — after updating, confirm the loaded copy matches this
    build's `artifact.json` `content_hash` (see below).
@@ -73,8 +110,11 @@ does not establish that the cache contains this build or that skills ran.
 The copy being examined must not provide its own initial verifier: Python
 imports run before the checker, so a damaged package or cache can fail or
 block at startup. Hash checks compare declared bytes; they do not
-authenticate the package author. Built ZIPs exclude bytecode caches; only
-regular, recognized cache files are passive during later checks.
+authenticate the package author. Shared builds and the public checker reject
+unregistered files, including bytecode caches; compare a clean distribution
+and do not treat an installed cache as a trusted source. The workflow-specific
+legacy checker separately recognizes its limited passive-cache format; that
+exception does not apply to the public checker shown above.
 
 The workflow-specific source entry is
 `plugins/ai-code-workflow/scripts/workflow_tool.py` from the repository root;
@@ -122,10 +162,13 @@ there is no force mode that bypasses user-edit protection.
 
 ## Requirements
 
-- Host: ZCode or Codex, versions actually verified (see
+- Host format targets: Claude Code, Codex and ZCode; actual version support
+  requires independent host verification (see
   [support matrix](support-matrix.md) — not yet host-verified on any machine at
   publication of this candidate).
-- Management tools: Python 3.11+ (3.13 baseline), standard library only.
+- Management tools: Python 3.11+ (3.13 baseline), standard library only;
+  controlled filesystem operations require POSIX directory-handle/no-follow
+  primitives. Other platform behavior remains unverified.
   Native Markdown skills need no Python at all; the tools are used for
   policy resolution, task records, staging and package checks.
 - Development/CI of this repository: Node 22+.

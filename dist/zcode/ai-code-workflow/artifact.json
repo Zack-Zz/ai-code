@@ -1,9 +1,9 @@
 {
-  "content_hash": "bb5150b1f6427c10a57912315c5dacdf7b9222a4fcc3ef36d12102616dac1ff5",
+  "content_hash": "e180248bfd5434149c6512c88076d2b1df149bc6c288a234fbe860da1aa39472",
   "files": [
     [
       ".zcode-plugin/plugin.json",
-      "8ebdcd6e2d3e21e7826ba03c21b55dbfbe43598f60b751f8029fe812979e995b"
+      "0930889a7b88685717a2d33098a5cccbf37c1ceb0a2fe2f81e1c915261ecca7c"
     ],
     [
       "LICENSE",
@@ -18,8 +18,24 @@
       "93a6cecdf6dd5827585564db87b0ee49730a1a4f1281c649b9b4ef8a513bcd01"
     ],
     [
+      "README.md",
+      "a31105af6f83176e603c9b19405678842354424dc82f40bc0689650cd3b6a9f3"
+    ],
+    [
+      "README_CN.md",
+      "786766aa1352a3fe0d6085f5f73ea8d32a989f2bd9e6ea33123eb2cb6c25731e"
+    ],
+    [
       "agents/workflow-reviewer.md",
       "2cb3ec07f69bd4998ca9af6a6accf94c180de6622fa3c6083750e1baff87cbac"
+    ],
+    [
+      "assets/codevow.png",
+      "cafe13bd54630667774e133a7f42e49331b06437c3e7141f30f08ea8e9789370"
+    ],
+    [
+      "assets/codevow.svg",
+      "96489d4de56ef2d3c0c573dc907ae486c0087ffa739fa436a50131840e5cbd58"
     ],
     [
       "policies/collaborative.json",
@@ -39,7 +55,7 @@
     ],
     [
       "schemas/product.schema.json",
-      "406b4b8e2464eba4ad1e3e4da638da76a973463da003ab41b5ace0f0a30912f7"
+      "eca6423648abb185901a7c7017cd474ca92198177d42cc8b6801662333efde0e"
     ],
     [
       "schemas/task.schema.json",
@@ -87,11 +103,11 @@
     ],
     [
       "tools/workflow/build.py",
-      "94390819fb6abee6cb73605b1134ddfe3e8923e58ae714029bfb7389ec133252"
+      "240380b77ee0a3095ee4acceb7227c3e64ce85e000aa3016705142e0686d4638"
     ],
     [
       "tools/workflow/cli.py",
-      "850db4fa10ac15aa322dd849715f1d1b51e1a2bf9351fe6f47d82b36c9d5d873"
+      "1dd0688834fccaa4330047ab7069ffa38d0184d0e454ab0a9ec19dd56847a83b"
     ],
     [
       "tools/workflow/io.py",
@@ -99,11 +115,11 @@
     ],
     [
       "tools/workflow/owned_files.py",
-      "36ea2f1a47ce01da455b8f60dde924b8e88f9bf5a450098ef0b76b33b48d8ca9"
+      "93523c065edcfa354e30682efe3c45636e8fbb4310efbb573570ef2f5827e597"
     ],
     [
       "tools/workflow/package_check.py",
-      "051b0607731d87ab2193800f9e9c927a3bd47920b6e567f2a86e7ac58df865fd"
+      "1c29601cb1b9082fa8b8c79e82fac1473c7f806f42ae6792294fb7fab1430d59"
     ],
     [
       "tools/workflow/policy.py",
@@ -111,7 +127,7 @@
     ],
     [
       "tools/workflow/product.py",
-      "5a761dd2c2b5a96e593746256feebb7794ac960ea8f332a6eea050ab10e81861"
+      "2b6d4d13cc0b969f7d523fd3fe75c533db71f0972fe43f7259a3fb907561466f"
     ],
     [
       "tools/workflow/state.py",
@@ -129,8 +145,8 @@
     "continuous"
   ],
   "schema_version": 1,
-  "source_revision": "2d90761dba57e90f40f21b3fd1dde9482e5a6aaa",
-  "source_tree_hash": "f385b67713bcdd6450af123f1a650bcbb174896e07c38d0fde1f52cd336e1a0a",
+  "source_revision": "dedd907fa8c5270c6503e869ba6c1dafdacce731",
+  "source_tree_hash": "7efd9a6c59da86c8771f5ff07c998381eaf8bec905d0a58cf3f9b843280e16d8",
   "version": "2.0.0",
   "working_tree_dirty": true
 }

@@ -1,5 +1,18 @@
 # Support matrix and current verification status
 
+## Current package targets (2026-10-07)
+
+| Target | Native package format | Runtime acceptance |
+|---|---|---|
+| Claude Code | .claude-plugin/plugin.json, .claude-plugin/marketplace.json and shared-contract reviewer | unverified; release acceptance is null |
+| Codex | plugin.json, .agents/plugins/marketplace.json and six native skill interfaces | unverified; release acceptance is null |
+| ZCode | .zcode-plugin/plugin.json, marketplace.json and shared-contract reviewer | unverified; release acceptance is null |
+
+Claude Code is a newly declared package target. Official format references and
+local script/package checks do not establish native loading or behavior. The
+existing A25 scenario still covers Codex/ZCode; it is not three-host acceptance.
+The dated evidence below retains its original scope, numbers and hashes.
+
 Directory note (2026-10-07): this is the dated workflow baseline, now under
 `plugins/ai-code-workflow/`. Original counts, commands and hashes below are
 historical evidence; they do not validate the migration. Current navigation

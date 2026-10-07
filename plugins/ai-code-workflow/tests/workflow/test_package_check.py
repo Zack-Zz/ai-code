@@ -182,13 +182,17 @@ class PackageCheckTests(unittest.TestCase):
         pkg = self.fresh_copy("codex") / "ai-code-workflow"
         path = pkg / "skills/workflow/agents/openai.yaml"
         original = path.read_text()
+        display_line = next(line for line in original.splitlines()
+                            if line.strip().startswith("display_name:"))
         for before, after in (
-                ('display_name: "AI Code Workflow"', 'display_name: "Use "workflow""'),
+                (display_line, '  display_name: "Use "workflow""'),
                 ("allow_implicit_invocation: true", 'allow_implicit_invocation: "false"'),
                 ("policy:\n", "unknown_section:\n"),
                 ("policy:\n", "interface:\n")):
             with self.subTest(after=after):
-                path.write_text(original.replace(before, after))
+                corrupted = original.replace(before, after)
+                self.assertNotEqual(corrupted, original, "the malformed fixture must actually change")
+                path.write_text(corrupted)
                 self.rehash(pkg)
                 result = wpc.check_package(pkg, "codex")
                 self.assertFalse(result["ok"])
