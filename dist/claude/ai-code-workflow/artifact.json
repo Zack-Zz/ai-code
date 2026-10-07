@@ -1,9 +1,9 @@
 {
-  "content_hash": "5be8cf85303aa1920ec9a4e739eb1cb033a7c84f51ab5d4adfb6d6a1df6b8241",
+  "content_hash": "3b1b55839150c450ffa84ff666cfde6cbfea5cd4b2ca6da48b37389016f81672",
   "files": [
     [
       ".claude-plugin/plugin.json",
-      "0d0c164de58b9c367db36274c83f9ee7d31518f0668962012b39686d909fb2c5"
+      "4103ac0f47b38b73eb43c0734ce489e62da993bb0bc662d9f9c65d1d7cd7885b"
     ],
     [
       "LICENSE",
@@ -145,8 +145,8 @@
     "continuous"
   ],
   "schema_version": 1,
-  "source_revision": "dedd907fa8c5270c6503e869ba6c1dafdacce731",
-  "source_tree_hash": "7efd9a6c59da86c8771f5ff07c998381eaf8bec905d0a58cf3f9b843280e16d8",
-  "version": "2.0.0",
+  "source_revision": "f7dbb3bd4dfbc371c5dcd4d012496e261ca1126a",
+  "source_tree_hash": "35f761dea77fec9c3201d164bfec76cdd5d3df33e794eba154a45592a2a4fb53",
+  "version": "1.0.0",
   "working_tree_dirty": true
 }

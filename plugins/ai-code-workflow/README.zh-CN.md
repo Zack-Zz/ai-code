@@ -20,8 +20,9 @@ CodeVow 是面向公开发布、可跨宿主移植的 AI 编码助手工程工�
 在任何机器上完成真实会话验收之前，请勿声称本产品已被宿主验证。
 
 2026-10-07，展示名由 AI Code Workflow 更为 CodeVow。插件 ID
-`ai-code-workflow` 与试用候选版本 `2.0.0` 保持；早期设计和验证记录保留
-当时的名称与日期，本次品牌更名不增加真实宿主验收声明。
+`ai-code-workflow` 保持；CodeVow 的初始版本定为 `1.0.0`，此前 `2.0.0` 为
+安装前的工程候选编号。早期设计和验证记录保留当时的版本、名称与日期，
+版本重新编号不增加真实宿主验收声明。
 
 本目录是 [ai-code 插件集合](../../README.zh-CN.md) 中的一个插件。除明确注明
 从仓库根执行的命令外，本文路径均相对本插件目录。公共构建与新插件接入见
@@ -69,7 +70,7 @@ python3 tooling/plugin_tool.py package check \
 插件源码入口仍为仓库根目录下的
 `plugins/ai-code-workflow/scripts/workflow_tool.py`，安装包入口仍为
 `tools/workflow_tool.py`；policy/task/files 行为属于该插件。插件 ID 和候选版本
-保持 `ai-code-workflow` 与 `2.0.0`。
+为 `ai-code-workflow` 与 `1.0.0`。
 
 ## 插件目录结构
 

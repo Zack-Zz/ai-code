@@ -1,5 +1,5 @@
 {
-  "content_hash": "7ce1066f9222e03ba655ae9bcd058162337626e5ab2e39f4a5b4e322a2d26351",
+  "content_hash": "a43ba7ad0c78b2e197dd257433d38fb2e106b873e19860039f3d1a911ebb0fe9",
   "files": [
     [
       "LICENSE",
@@ -31,7 +31,7 @@
     ],
     [
       "plugin.json",
-      "3f31cd2f4efce0c73f6af69a82f748f9758164a79466a0371486c9497823e7cd"
+      "c02397ebfa9f7cd6cd3e5a291c77d2aa812e4db41ce83da483cc61bfe59411f0"
     ],
     [
       "policies/collaborative.json",
@@ -165,8 +165,8 @@
     "continuous"
   ],
   "schema_version": 1,
-  "source_revision": "dedd907fa8c5270c6503e869ba6c1dafdacce731",
-  "source_tree_hash": "7efd9a6c59da86c8771f5ff07c998381eaf8bec905d0a58cf3f9b843280e16d8",
-  "version": "2.0.0",
+  "source_revision": "f7dbb3bd4dfbc371c5dcd4d012496e261ca1126a",
+  "source_tree_hash": "35f761dea77fec9c3201d164bfec76cdd5d3df33e794eba154a45592a2a4fb53",
+  "version": "1.0.0",
   "working_tree_dirty": true
 }

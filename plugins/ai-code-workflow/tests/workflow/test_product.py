@@ -54,7 +54,7 @@ class ValidProductTests(unittest.TestCase):
     def test_loads_real_repo_product(self):
         spec = wp.load_product(REPO_ROOT)
         self.assertEqual(spec.product_id, "ai-code-workflow")
-        self.assertEqual(spec.version, "2.0.0")
+        self.assertEqual(spec.version, wio.load_json(REPO_ROOT / "product.json")["version"])
         self.assertEqual(
             sorted(spec.core_skills),
             ["debugging", "review", "tdd", "verification", "workflow"],

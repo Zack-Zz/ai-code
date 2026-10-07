@@ -1,9 +1,9 @@
 {
-  "content_hash": "e180248bfd5434149c6512c88076d2b1df149bc6c288a234fbe860da1aa39472",
+  "content_hash": "c88b2fc4a3074a2fa7eca66b1acebc3f0a225d44c155e5e85d7250118361f664",
   "files": [
     [
       ".zcode-plugin/plugin.json",
-      "0930889a7b88685717a2d33098a5cccbf37c1ceb0a2fe2f81e1c915261ecca7c"
+      "0e4e0b3ed45aa5f1576216ba652f284c8af3f0306f636b8f859c16675bfb83a3"
     ],
     [
       "LICENSE",
@@ -145,8 +145,8 @@
     "continuous"
   ],
   "schema_version": 1,
-  "source_revision": "dedd907fa8c5270c6503e869ba6c1dafdacce731",
-  "source_tree_hash": "7efd9a6c59da86c8771f5ff07c998381eaf8bec905d0a58cf3f9b843280e16d8",
-  "version": "2.0.0",
+  "source_revision": "f7dbb3bd4dfbc371c5dcd4d012496e261ca1126a",
+  "source_tree_hash": "35f761dea77fec9c3201d164bfec76cdd5d3df33e794eba154a45592a2a4fb53",
+  "version": "1.0.0",
   "working_tree_dirty": true
 }

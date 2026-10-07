@@ -23,9 +23,10 @@ real-host acceptance is blocked on the authoring machine and honestly marked
 host-verified anywhere; do not cite it as such.
 
 The display name changed from AI Code Workflow to CodeVow on 2026-10-07.
-Plugin ID `ai-code-workflow` and preview candidate version `2.0.0` stay the
-same. Earlier design and verification records retain their original names and
-dates; the rename adds no host-acceptance evidence.
+The plugin ID remains `ai-code-workflow`. Its initial CodeVow version is
+`1.0.0`; the earlier `2.0.0` number belonged to the pre-installation candidate.
+Earlier design and verification records retain their original names and
+dates; the version reset adds no host-acceptance evidence.
 
 This directory is one plugin in the [ai-code collection](../../README.md).
 Paths below are relative to this plugin directory unless a command explicitly
@@ -67,7 +68,7 @@ historical Codex/ZCode matrix; it does not certify the new Claude target.
 
 ## Quick start
 
-Unpublished yet (no marketplace release). Run from the ai-code repository root:
+Self-hosted preview; real host acceptance is still unverified. Run from the ai-code repository root:
 
 ```sh
 npm test
@@ -83,7 +84,7 @@ Self-hosted distribution: [publishing preparation](../../docs/publishing.md).
 The source-specific tool remains `plugins/ai-code-workflow/scripts/workflow_tool.py`
 from the repository root; its installed entry remains `tools/workflow_tool.py`.
 Policy/task/files behavior belongs to this plugin. Its ID and candidate version
-remain `ai-code-workflow` and `2.0.0`.
+are `ai-code-workflow` and `1.0.0`.
 
 ## Plugin directory map
 

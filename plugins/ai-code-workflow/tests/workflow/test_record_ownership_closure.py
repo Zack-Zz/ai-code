@@ -102,7 +102,7 @@ class OwnershipClosure(unittest.TestCase):
         result = files.apply_operation(plan, plan["plan_hash"])
         self.assertTrue(result["changed"])
         actual = io.load_json(path)
-        self.assertEqual(actual["version"], "2.0.0")
+        self.assertEqual(actual["version"], io.load_json(self.package / "artifact.json")["version"])
         self.assertEqual(actual["artifact_hash"], io.load_json(self.package / "artifact.json")["content_hash"])
 
     def test_deleted_receipt_during_update_is_a_conflict(self):
@@ -128,6 +128,7 @@ class OwnershipClosure(unittest.TestCase):
         self.assertFalse(path.exists())
 
     def test_receipt_version_uses_validated_package_snapshot(self):
+        expected_version = io.load_json(self.package / "artifact.json")["version"]
         plan = files.plan_operation(self.package, self.target, "stage")
         real_pending = files._write_pending
 
@@ -139,7 +140,8 @@ class OwnershipClosure(unittest.TestCase):
 
         with patch.object(files, "_write_pending", side_effect=mutate_artifact_metadata):
             files.apply_operation(plan, plan["plan_hash"])
-        self.assertEqual(io.load_json(files.receipt_file(self.target))["version"], "2.0.0")
+        self.assertEqual(io.load_json(files.receipt_file(self.target))["version"],
+                         expected_version)
 
     def test_malformed_receipt_metadata_is_rejected(self):
         self.stage()

@@ -39,7 +39,7 @@ class PackageCheckTests(unittest.TestCase):
             self.assertEqual(result["problems"], [])
             self.assertEqual(result["caches"], [])
             self.assertEqual(result["product_id"], "ai-code-workflow")
-            self.assertEqual(result["version"], "2.0.0")
+            self.assertEqual(result["version"], wio.load_json(REPO_ROOT / "product.json")["version"])
             self.assertEqual(result["files_checked"],
                              len(wio.load_json(self.out / host / "ai-code-workflow" / "artifact.json")["files"]))
 

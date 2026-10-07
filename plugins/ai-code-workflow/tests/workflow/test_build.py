@@ -60,7 +60,7 @@ class BuildTests(unittest.TestCase):
             art = self.artifact(host)
             self.assertEqual(art["schema_version"], 1)
             self.assertEqual(art["product_id"], "ai-code-workflow")
-            self.assertEqual(art["version"], "2.0.0")
+            self.assertEqual(art["version"], wio.load_json(REPO_ROOT / "product.json")["version"])
             self.assertEqual(art["host"], host)
             self.assertEqual(art["profiles"], ["collaborative", "continuous"])
             self.assertIn("source_revision", art)
@@ -131,7 +131,7 @@ class BuildTests(unittest.TestCase):
     def test_index_records_paths_and_hashes_without_time(self):
         index = wio.load_json(self.out1 / "index.json")
         self.assertEqual(index["product_id"], "ai-code-workflow")
-        self.assertEqual(index["version"], "2.0.0")
+        self.assertEqual(index["version"], wio.load_json(REPO_ROOT / "product.json")["version"])
         for host in HOSTS:
             entry = index["hosts"][host]
             self.assertEqual(entry["package_content_hash"], self.artifact(host)["content_hash"])
@@ -147,7 +147,7 @@ class BuildTests(unittest.TestCase):
 
     def test_zip_deterministic_entry_metadata(self):
         import zipfile
-        zip_path = self.out1 / "zcode" / "ai-code-workflow-2.0.0.zip"
+        zip_path = self.out1 / "zcode" / f"ai-code-workflow-{self.artifact('zcode')['version']}.zip"
         with zipfile.ZipFile(zip_path) as zf:
             infos = zf.infolist()
             names = [i.filename for i in infos]

@@ -30,7 +30,7 @@ package_content_hash、host_version、summary、artifacts。例如未验收记�
   "schema_version": 1,
   "status": "unverified",
   "host": "codex",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "source_tree_hash": "REPLACE_WITH_CURRENT_SOURCE_SHA256",
   "package_content_hash": "REPLACE_WITH_CURRENT_CODEX_PACKAGE_SHA256",
   "host_version": null,

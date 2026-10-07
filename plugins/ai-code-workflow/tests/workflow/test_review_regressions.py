@@ -327,7 +327,8 @@ class ReviewRegressions(unittest.TestCase):
     def test_ci_rejects_a_corrupt_archive_even_if_index_hash_is_unchanged(self):
         for folder in ("dist", "dist-ci"):
             build.build_packages(REPO, ["zcode", "codex"], self.workspace / folder)
-        (self.workspace / "dist/zcode/ai-code-workflow-2.0.0.zip").write_bytes(b"corrupt zip")
+        index = io.load_json(self.workspace / "dist/index.json")
+        (self.workspace / "dist" / index["hosts"]["zcode"]["zip"]).write_bytes(b"corrupt zip")
         result = self.run_ci_dist_step()
         self.assertNotEqual(result.returncode, 0)
 

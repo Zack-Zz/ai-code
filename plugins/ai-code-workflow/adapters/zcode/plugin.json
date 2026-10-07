@@ -1,6 +1,6 @@
 {
   "name": "ai-code-workflow",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "CodeVow — plan-first collaboration, TDD, evidence-driven debugging, review and verification",
   "license": "MIT"
 }

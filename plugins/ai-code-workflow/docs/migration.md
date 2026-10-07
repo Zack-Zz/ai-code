@@ -1,5 +1,18 @@
 # CodeVow migration and provenance
 
+## CodeVow initial version (2026-10-07)
+
+The maintainer confirmed that the new plugin had not been installed and chose
+`1.0.0` as CodeVow's initial version. Plugin ID `ai-code-workflow` and market
+`ai-code-local` remain unchanged. The preceding `2.0.0` candidate and the dated
+records below are preserved as history; this is a one-time initialization,
+not an update path for installed 2.0.0 copies. Existing BEL 0.1.1 installations
+are separate plugins and are not modified by this source change.
+
+Future installed releases use increasing semantic versions. The existing
+immutable-content and downgrade checks remain in force. All real-host
+acceptance remains unverified.
+
 ## Claude package and release metadata (2026-10-07)
 
 The current source declares Claude Code, Codex and ZCode, with a separate
