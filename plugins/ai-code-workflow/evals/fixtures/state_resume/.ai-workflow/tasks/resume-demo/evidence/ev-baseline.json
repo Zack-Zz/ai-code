@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "evidence_id": "ev-baseline",
+  "kind": "test",
+  "workspace_root": "/absolute/path/set/by/prepare",
+  "subject_fingerprints": {
+    "calc.py": "7a21d420bd89c664339abde10da19b98a4a14f3a4d12389f34082da291cd392c"
+  },
+  "execution": {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "test_calc",
+      "-v"
+    ],
+    "cwd": "/absolute/path/set/by/prepare",
+    "exit_code": 0,
+    "signal": null,
+    "start_error": null
+  },
+  "host_context": null,
+  "capture": {
+    "origin": "tool_output",
+    "relative_path": "evidence/ev-baseline.out",
+    "content_sha256": "0dd3ed11e2f2e92ead28ddc06ae9ca5f023cc59cb7420b782f14cacb55c7309b"
+  },
+  "result": "pass",
+  "observations": [
+    "Baseline suite of 2 tests passed before the interruption."
+  ],
+  "started_at": "2026-09-28T10:00:00Z",
+  "finished_at": "2026-09-28T10:00:02Z"
+}

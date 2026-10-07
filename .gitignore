@@ -21,22 +21,17 @@ Thumbs.db
 # Node
 node_modules/
 
-# Build output
-dist/
+# Build output (dist/ is a reproducible, tracked deliverable in v1 — do not ignore;
+# dist-check/ and dist-ci/ are scratch outputs from the README quick start and CI)
+dist-check/
+dist-ci/
 
 # Python
 __pycache__/
 *.pyc
+*.cover
 
-# Task files (Claude Code teams)
-tasks/
-
-# Personal configs (if any)
+# Local drafts / personal notes
 personal/
 private/
-
-# Session templates (not committed)
-examples/sessions/*.tmp
-
-# Local drafts
 marketing/

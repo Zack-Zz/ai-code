@@ -1,0 +1,1 @@
+User's pre-existing workspace note. Must survive every resume scenario unchanged.

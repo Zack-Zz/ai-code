@@ -1,0 +1,7 @@
+interface:
+  display_name: "AI Code Workflow"
+  short_description: "Classify the request, plan with the user, and organize TDD, debugging, review and verification"
+  brand_color: "#2563EB"
+  default_prompt: "Use the workflow skill: classify this request, confirm scope and applicable authorization, then organize the work"
+policy:
+  allow_implicit_invocation: true

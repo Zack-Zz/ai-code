@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "skills": {
+    "workflow": {
+      "display_name": "AI Code Workflow",
+      "short_description": "Classify the request, plan with the user, and organize TDD, debugging, review and verification",
+      "brand_color": "#2563EB",
+      "default_prompt": "Use the workflow skill: classify this request, confirm scope and applicable authorization, then organize the work",
+      "allow_implicit_invocation": true
+    },
+    "tdd": {
+      "display_name": "TDD",
+      "short_description": "Valid RED first, minimal GREEN, refactor under a preserved baseline",
+      "brand_color": "#16A34A",
+      "default_prompt": "Use the tdd skill for this behavior change: write the failing test first and drive it green",
+      "allow_implicit_invocation": true
+    },
+    "debugging": {
+      "display_name": "Debugging",
+      "short_description": "Evidence-driven diagnosis with explicit hypotheses and minimal distinguishing experiments",
+      "brand_color": "#D97706",
+      "default_prompt": "Use the debugging skill: frame the symptom, then run minimal experiments that distinguish hypotheses",
+      "allow_implicit_invocation": true
+    },
+    "review": {
+      "display_name": "Review",
+      "short_description": "Risk-focused review of the final diff with independent review when required",
+      "brand_color": "#DC2626",
+      "default_prompt": "Use the review skill on the final diff, including an independent reviewer when risk requires it",
+      "allow_implicit_invocation": true
+    },
+    "verification": {
+      "display_name": "Verification",
+      "short_description": "Bind completion claims to the final code state with explicit verification levels",
+      "brand_color": "#0891B2",
+      "default_prompt": "Use the verification skill: report what was actually verified against the final state",
+      "allow_implicit_invocation": true
+    },
+    "review-results": {
+      "display_name": "Review Results",
+      "short_description": "Turn technical review findings into clear business flows, impact, decisions, and clickable evidence",
+      "brand_color": "#3B82F6",
+      "default_prompt": "Present these review findings using the review-results decision-first format",
+      "allow_implicit_invocation": true
+    }
+  }
+}

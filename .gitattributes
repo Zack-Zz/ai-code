@@ -1,0 +1,2 @@
+# Markdown hard breaks use trailing spaces; markdownlint checks their form.
+*.md whitespace=-blank-at-eol

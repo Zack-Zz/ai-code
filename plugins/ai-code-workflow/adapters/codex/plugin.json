@@ -1,0 +1,22 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ai-code-workflow",
+  "version": "2.0.0",
+  "description": "AI Code Workflow — plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+  "license": "MIT",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "keywords": ["workflow", "tdd", "review", "verification", "debugging"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "AI Code Workflow",
+        "shortDescription": "Plan-first collaboration, TDD, debugging, review and verification",
+        "category": "productivity",
+        "defaultPrompt": [
+          "Use the workflow skill: classify this request, confirm scope and applicable authorization, then organize the work"
+        ],
+        "brandColor": "#2563EB"
+      }
+    }
+  }
+}

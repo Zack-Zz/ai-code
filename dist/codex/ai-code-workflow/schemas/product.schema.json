@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ai-code-workflow/product.schema.json",
+  "title": "Product source manifest",
+  "description": "Describes the fixed product contract implemented by scripts/workflow/product.py. The dedicated validator is authoritative; this schema documents the same structure for consumers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "product_id",
+    "display_name",
+    "version",
+    "repository",
+    "license",
+    "core_skills",
+    "shared_skills",
+    "resources"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "product_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "repository": {
+      "type": "string",
+      "minLength": 1
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "core_skills": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "shared_skills": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "target",
+          "include"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "pattern": "^[^/].*$"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^[^/].*$"
+          },
+          "include": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "hosts": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "zcode",
+          "codex"
+        ]
+      }
+    },
+    "profiles": {
+      "const": [
+        "collaborative",
+        "continuous"
+      ]
+    },
+    "generated_agents": {
+      "const": [
+        {
+          "host": "zcode",
+          "template": "adapters/zcode/agents/workflow-reviewer.md",
+          "body": "skills/review/references/reviewer-contract.md",
+          "target": "agents/workflow-reviewer.md"
+        }
+      ]
+    }
+  },
+  "notes": [
+    "core_skills and shared_skills must be disjoint and each must correspond to skills/<name>/SKILL.md.",
+    "A file source requires include == []; a directory source requires an explicit relative file list (no wildcards, no caches); every listed file must exist.",
+    "source and target are normalized relative paths: absolute paths, '..' segments and symlinked components are rejected.",
+    "Each skill contributes exactly skills/<name>/SKILL.md as a packaged component; any extra file under a skill directory must be registered as an explicit resource entry.",
+    "All resolved target paths must be unique (mapping conflicts are rejected).",
+    "Optional catalog packaging metadata must match this workflow: both hosts, both profiles and the shared ZCode reviewer composition. Other plugins use the generic tooling contract."
+  ]
+}

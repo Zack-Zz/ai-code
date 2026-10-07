@@ -1,0 +1,136 @@
+{
+  "content_hash": "bb5150b1f6427c10a57912315c5dacdf7b9222a4fcc3ef36d12102616dac1ff5",
+  "files": [
+    [
+      ".zcode-plugin/plugin.json",
+      "8ebdcd6e2d3e21e7826ba03c21b55dbfbe43598f60b751f8029fe812979e995b"
+    ],
+    [
+      "LICENSE",
+      "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2"
+    ],
+    [
+      "LICENSES/backend-engineering-lite.txt",
+      "adc77fd0db182e6062199b35ff68b0994cbe0dae6ecd8511b4c3d887e6fb8f4b"
+    ],
+    [
+      "NOTICE",
+      "93a6cecdf6dd5827585564db87b0ee49730a1a4f1281c649b9b4ef8a513bcd01"
+    ],
+    [
+      "agents/workflow-reviewer.md",
+      "2cb3ec07f69bd4998ca9af6a6accf94c180de6622fa3c6083750e1baff87cbac"
+    ],
+    [
+      "policies/collaborative.json",
+      "1ff102c65d36209d09526d20324836e60038042db35a5f648b6fec04b435658a"
+    ],
+    [
+      "policies/continuous.json",
+      "9f617e7d1fa0bb964034b8555309a48c7cdee7a2707cca9c6892f2eec2485743"
+    ],
+    [
+      "schemas/evidence.schema.json",
+      "bcf648a0fda8ae407bc217aa3192f3a548493a9b40edf7b01ea3bf237bd9d5da"
+    ],
+    [
+      "schemas/policy.schema.json",
+      "f7c6ee0e2e7cd723bcc2b689d1e65f122f6c92b5c204070e9bad35098c646ee7"
+    ],
+    [
+      "schemas/product.schema.json",
+      "406b4b8e2464eba4ad1e3e4da638da76a973463da003ab41b5ace0f0a30912f7"
+    ],
+    [
+      "schemas/task.schema.json",
+      "87f799b10d154ca94302064cae787acbe34c78547301e1695eb947d632e97bed"
+    ],
+    [
+      "skills/debugging/SKILL.md",
+      "8e4f63329ff3e4e9f3b4db742051a7a1735373bdc8b4ce14014b014e6df9a207"
+    ],
+    [
+      "skills/review-results/SKILL.md",
+      "75733677abe6293f308d96ff131b57f5856b8c8af56beed33287b51249e14fb7"
+    ],
+    [
+      "skills/review/SKILL.md",
+      "7d2a43b91d65a7404f283487d8fae54b99f90b19ae1ad4acc591456bcb1060e6"
+    ],
+    [
+      "skills/review/references/reviewer-contract.md",
+      "7d789cb73c9196546255f31f2c0ceb875dc0cb1863e453c862c8551555306a82"
+    ],
+    [
+      "skills/tdd/SKILL.md",
+      "0edab30bffd33ca0e4d57dd1b63ccd60d701f104e4d4894e995484f05e373114"
+    ],
+    [
+      "skills/verification/SKILL.md",
+      "ddc59ed0e390975849d590fa9d9f81311692ef8bc7aa504eb6afb14f97e8993f"
+    ],
+    [
+      "skills/workflow/SKILL.md",
+      "1c653e464e1d6710eebb04a94203b8daa676bfc68f601abf214a8ccd7478851a"
+    ],
+    [
+      "templates/evidence.json",
+      "07f97ae6150db4fe732ff63411086963e120746d0dc5182cf54f26ab76c4261f"
+    ],
+    [
+      "templates/task.json",
+      "bcc3727ff0851b549bef5aa125b9fb1ba2194d2b47b78f9ac1739e494d03a58b"
+    ],
+    [
+      "tools/workflow/__init__.py",
+      "f411a04f448419e46e660821cdb432b37f6cd759a9dace3bddc57ed68453b94a"
+    ],
+    [
+      "tools/workflow/build.py",
+      "94390819fb6abee6cb73605b1134ddfe3e8923e58ae714029bfb7389ec133252"
+    ],
+    [
+      "tools/workflow/cli.py",
+      "850db4fa10ac15aa322dd849715f1d1b51e1a2bf9351fe6f47d82b36c9d5d873"
+    ],
+    [
+      "tools/workflow/io.py",
+      "b3b445373c5e52dc59c21ee198b7a600f14069101b4e65c897b714c5e400ba3a"
+    ],
+    [
+      "tools/workflow/owned_files.py",
+      "36ea2f1a47ce01da455b8f60dde924b8e88f9bf5a450098ef0b76b33b48d8ca9"
+    ],
+    [
+      "tools/workflow/package_check.py",
+      "051b0607731d87ab2193800f9e9c927a3bd47920b6e567f2a86e7ac58df865fd"
+    ],
+    [
+      "tools/workflow/policy.py",
+      "2db5c1e850566c0f4424fd990b0c97de47a057d78f02ab58b75746e1e0009cf1"
+    ],
+    [
+      "tools/workflow/product.py",
+      "5a761dd2c2b5a96e593746256feebb7794ac960ea8f332a6eea050ab10e81861"
+    ],
+    [
+      "tools/workflow/state.py",
+      "61c28004db9d8b403ffabc7119faa2fe71f2a02c7c343acf61b510254ecef41f"
+    ],
+    [
+      "tools/workflow_tool.py",
+      "37791464407e7f624df4feadc011d0177c71ec771978c69e8e4c8b0f88ae9077"
+    ]
+  ],
+  "host": "zcode",
+  "product_id": "ai-code-workflow",
+  "profiles": [
+    "collaborative",
+    "continuous"
+  ],
+  "schema_version": 1,
+  "source_revision": "2d90761dba57e90f40f21b3fd1dde9482e5a6aaa",
+  "source_tree_hash": "f385b67713bcdd6450af123f1a650bcbb174896e07c38d0fde1f52cd336e1a0a",
+  "version": "2.0.0",
+  "working_tree_dirty": true
+}

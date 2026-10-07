@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "product_id": "ai-code-workflow",
+  "display_name": "AI Code Workflow",
+  "version": "2.0.0",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "license": "MIT",
+  "hosts": ["zcode", "codex"],
+  "profiles": ["collaborative", "continuous"],
+  "generated_agents": [
+    {
+      "host": "zcode",
+      "template": "adapters/zcode/agents/workflow-reviewer.md",
+      "body": "skills/review/references/reviewer-contract.md",
+      "target": "agents/workflow-reviewer.md"
+    }
+  ],
+  "core_skills": ["workflow", "tdd", "debugging", "review", "verification"],
+  "shared_skills": ["review-results"],
+  "resources": [
+    {"source": "policies", "target": "policies", "include": ["collaborative.json", "continuous.json"]},
+    {"source": "schemas", "target": "schemas", "include": ["product.schema.json", "policy.schema.json", "task.schema.json", "evidence.schema.json"]},
+    {"source": "templates", "target": "templates", "include": ["task.json", "evidence.json"]},
+    {"source": "skills/review/references", "target": "skills/review/references", "include": ["reviewer-contract.md"]},
+    {"source": "scripts/workflow_tool.py", "target": "tools/workflow_tool.py", "include": []},
+    {"source": "scripts/workflow", "target": "tools/workflow", "include": ["__init__.py", "product.py", "policy.py", "state.py", "build.py", "package_check.py", "owned_files.py", "cli.py", "io.py"]},
+    {"source": "LICENSE", "target": "LICENSE", "include": []},
+    {"source": "NOTICE", "target": "NOTICE", "include": []},
+    {"source": "LICENSES", "target": "LICENSES", "include": ["backend-engineering-lite.txt"]}
+  ]
+}

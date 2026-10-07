@@ -1,179 +1,62 @@
 # ai-code — Agent Instructions
 
-This is a **production-ready AI coding plugin** providing 13 specialized agents, 50+ skills, 33 commands, and automated hook workflows for software development.
+本仓库承载多个面向公开发布的 **AI 相关插件**。当前首个插件为
+`plugins/ai-code-workflow/`；插件行为、测试和支持声明由各插件维护。
+公共层只负责插件注册、源校验、构建、包检查与本地市场生成。
 
-## Core Principles
+## 仓库内容
 
-1. **Agent-First** — Delegate to specialized agents for domain tasks
-2. **Test-Driven** — Write tests before implementation, 80%+ coverage required
-3. **Security-First** — Never compromise on security; validate all inputs
-4. **Safe State Management** — Prefer immutable-style updates where practical; for Go use explicit ownership and avoid shared mutable state
-5. **Plan Before Execute** — Plan complex features before writing code
+| 路径 | 说明 |
+|------|------|
+| `catalog.json` | 插件目录注册表，只登记相对路径 |
+| `plugins/<id>/product.json` | 该插件身份、版本、宿主与资源白名单的唯一来源 |
+| `plugins/<id>/` | 插件源码、适配、文档、测试和局部 AGENTS 规则 |
+| `tooling/plugin_tool.py`、`tooling/` | 通用 list、validate、build、package check 工具 |
+| `tests/` | 公共工具测试、插件测试汇总与统一门禁 |
+| `docs/plugin-authoring.md` | 最小接入要求与验证边界 |
+| `docs/design/2026-10-07-multi-plugin-design.md` | 多插件改造规格与执行顺序 |
+| `dist/` | 可删除重建的宿主发行目录、聚合市场、独立插件 ZIP |
 
-## Available Agents
+## 维护规则
 
-| Agent | Purpose | When to Use |
-|-------|---------|-------------|
-| planner | Implementation planning | Complex features, refactoring |
-| architect | System design and scalability | Architectural decisions |
-| tdd-guide | Test-driven development | New features, bug fixes |
-| code-reviewer | Code quality and maintainability | After writing/modifying code |
-| security-reviewer | Vulnerability detection | Before commits, sensitive code |
-| build-error-resolver | Fix build/type errors | When build fails |
-| e2e-runner | End-to-end Playwright testing | Critical user flows |
-| refactor-cleaner | Dead code cleanup | Code maintenance |
-| doc-updater | Documentation and codemaps | Updating docs |
-| go-reviewer | Go code review | Go projects |
-| go-build-resolver | Go build errors | Go build failures |
-| database-reviewer | PostgreSQL/Supabase specialist | Schema design, query optimization |
-| python-reviewer | Python code review | Python projects |
+- 修改目标插件前读取其 `AGENTS.md`；workflow 的行为规则只约束该插件。
+- 行为变更走 TDD：先写有意义的失败测试，环境错误不算有效 RED；再最小
+  实现、跑绿、按需重构。新增行为性保护逻辑同样先写失败测试。
+- `catalog.json` 不复制插件 ID、版本或资源；根 private `package.json`
+  不作为插件版本来源。不登记的插件不进入发行构建。
+- 入包资源以插件清单的显式白名单为准。拒绝目录逃逸、符号链接、资源目标
+  冲突、未登记活动文件和缓存入包；包检查独立重算实际文件与哈希。
+- 公共工具不强制 workflow 的技能、策略、Reviewer 或 `.ai-workflow`
+  任务状态。各插件保持独立身份、版本、资源闭包和源码哈希。
+- 同一插件的共同资源在不同宿主包中保持同哈希；适配及生成资源单独声明。
+- 不提前增加运行时、SDK、调度、任意代码 hook、插件依赖管理、自动安装器、
+  固定模型分工或强制代理流水线。新插件形态有实际需求后单独设计。
+- 保留历史报告的日期、命令和证据。迁移目录不会使历史验证成为本轮通过；
+  更新当前操作导航时清楚区分历史基线与现行契约。
 
-## Agent Orchestration
+## 验证
 
-Use agents proactively without user prompt:
-- Complex feature requests → **planner**
-- Code just written/modified → **code-reviewer**
-- Bug fix or new feature → **tdd-guide**
-- Architectural decision → **architect**
-- Security-sensitive code → **security-reviewer**
+- 统一门禁为仓库根目录 `npm test`（`tests/run-suite.js`），覆盖汇总器自身、
+  公共工具及已注册插件测试。按 catalog 发现插件 `tests/skills/run-skills.js`
+  或 `tests/run_python_tests.py`，每个正式插件至少一个；各组独立子进程运行，
+  不加载任意测试命令 hook。任一组失败、无法启动、异常退出或被信号终止
+  都返回非零；空测试组判失败；汇总只看退出状态，不解析输出。
+- 公共源校验：`python3 tooling/plugin_tool.py validate --all`；也可使用
+  `--plugin ID` 定向校验。
+- 构建：`python3 tooling/plugin_tool.py build --all --host all --output <空目录>`。
+- 包检查：`python3 tooling/plugin_tool.py package check --path <包> --host <端>
+  --root <可信源码仓库>`；不能把待检查包当作自己的初始验证器。
+- 公共工具 Python：`python3 tests/run_python_tests.py`；技能及局部测试入口见插件
+  文档。静态检查为 `npm run lint`，需本地 node_modules。
+- 区分静态校验、脚本测试、包完整性与真实宿主行为。原生加载、自动调用、
+  运行工具或 MCP 的支持必须有实际宿主证据，不从清单或目录布局推导。
 
-Use parallel execution for independent operations — launch multiple agents simultaneously.
+## 授权边界
 
-## Security Guidelines
-
-**Before ANY commit:**
-- No hardcoded secrets (API keys, passwords, tokens)
-- All user inputs validated
-- SQL injection prevention (parameterized queries)
-- XSS prevention (sanitized HTML)
-- CSRF protection enabled
-- Authentication/authorization verified
-- Rate limiting on all endpoints
-- Error messages don't leak sensitive data
-
-**Secret management:** NEVER hardcode secrets. Use environment variables or a secret manager. Validate required secrets at startup. Rotate any exposed secrets immediately.
-
-**If security issue found:** STOP → use security-reviewer agent → fix CRITICAL issues → rotate exposed secrets → review codebase for similar issues.
-
-## Coding Style
-
-**State management (CRITICAL):**
-- TypeScript/Python/Frontend: prefer immutable updates and pure transforms.
-- Go: use clear ownership boundaries, avoid shared mutable state across goroutines, and guard shared state with synchronization.
-- In all stacks: avoid hidden side effects and keep data flow explicit.
-
-**File organization:** Many small files over few large ones. 200-400 lines typical, 800 max. Organize by feature/domain, not by type. High cohesion, low coupling.
-
-**Error handling:** Handle errors at every level. Provide user-friendly messages in UI code. Log detailed context server-side. Never silently swallow errors.
-
-**Input validation:** Validate all user input at system boundaries. Use schema-based validation. Fail fast with clear messages. Never trust external data.
-
-**Code quality checklist:**
-- Functions small (<50 lines), files focused (<800 lines)
-- No deep nesting (>4 levels)
-- Proper error handling, no hardcoded values
-- Readable, well-named identifiers
-
-## Testing Requirements
-
-**Minimum coverage: 80%**
-
-Test types (all required):
-1. **Unit tests** — Individual functions, utilities, components
-2. **Integration tests** — API endpoints, database operations
-3. **E2E tests** — Critical user flows
-
-**TDD workflow (mandatory):**
-1. Write test first (RED) — test should FAIL
-2. Write minimal implementation (GREEN) — test should PASS
-3. Refactor (IMPROVE) — verify coverage 80%+
-
-Troubleshoot failures: check test isolation → verify mocks → fix implementation (not tests, unless tests are wrong).
-
-## Development Workflow
-
-1. **Plan** — Use planner agent, identify dependencies and risks, break into phases
-2. **TDD** — Use tdd-guide agent, write tests first, implement, refactor
-3. **Review** — Use code-reviewer agent immediately, address CRITICAL/HIGH issues
-4. **Commit** — Conventional commits format, comprehensive PR summaries
-
-## Git Workflow
-
-**Commit format:** `<type>: <description>` — Types: feat, fix, refactor, docs, test, chore, perf, ci
-
-**PR workflow:** Analyze full commit history → draft comprehensive summary → include test plan → push with `-u` flag.
-
-## Architecture Patterns
-
-**API response format:** Consistent envelope with success indicator, data payload, error message, and pagination metadata.
-
-**Repository pattern:** Encapsulate data access behind standard interface (findAll, findById, create, update, delete). Business logic depends on abstract interface, not storage mechanism.
-
-**Skeleton projects:** Search for battle-tested templates, evaluate with parallel agents (security, extensibility, relevance), clone best match, iterate within proven structure.
-
-## Performance
-
-**Context management:** Avoid last 20% of context window for large refactoring and multi-file features. Lower-sensitivity tasks (single edits, docs, simple fixes) tolerate higher utilization.
-
-**Build troubleshooting:** Use build-error-resolver agent → analyze errors → fix incrementally → verify after each fix.
-
-## Runtime Layout (Bootstrapped Projects)
-
-Common (all tools):
-```
-AGENTS.md
-.ai-code.json    — Bootstrap manifest for sync replay
-```
-
-`global-first` (default): keep only tool entry files in project, keep shared assets global.
-
-`project-full`: additionally sync tool-local directories (skills/commands/rules/hooks/etc.) into project.
-
-Codex mode:
-```
-.codex/AGENTS.md
-.codex/codex.md
-# optional
-.codex/config.toml
-```
-
-Codex mode (`project-full` adds):
-```
-.agents/skills/
-```
-
-Claude mode:
-```
-CLAUDE.md
-.claude/package-manager.json
-```
-
-Claude mode (`project-full` adds):
-```
-agents/
-commands/
-rules/
-hooks/
-scripts/hooks/
-scripts/lib/
-```
-
-Kiro mode:
-```
-.kiro/steering/ai-code-core.md
-```
-
-Kiro mode (`project-full` adds):
-```
-.kiro/steering/
-.kiro/hooks/hooks.json
-.kiro/settings/mcp.json
-```
-
-## Success Metrics
-
-- All tests pass with 80%+ coverage
-- No security vulnerabilities
-- Code is readable and maintainable
-- Performance is acceptable
-- User requirements are met
+- 未经用户针对本次变更的明确授权，不执行 commit（含 amend）、push、tag、
+  merge 或创建 PR，也不通过脚本代做。
+- 变更完成后默认保留未提交改动，交付摘要、关键 diff、验证结果与剩余风险，
+  等待用户 Review。
+- 不修改用户全局配置（如 `~/.zcode`、`~/.codex`）、宿主缓存或其他业务仓库；
+  安装类操作须用户明确要求并走宿主原生方式。
+- 任务记录、策略文件或任何 Agent 写入的 approved 标记都不构成用户授权。

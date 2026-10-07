@@ -1,0 +1,61 @@
+{
+  "diagnostics": [],
+  "skills": [
+    {
+      "description": "Use when reviewing backend changes, especially authentication, transactions, concurrency, persistence, messaging, cache consistency, or public API compatibility.",
+      "directory": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills/bel-backend-review",
+      "name": "bel-backend-review",
+      "path": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills/bel-backend-review/SKILL.md",
+      "pluginName": "backend-engineering-lite",
+      "qualifiedName": "backend-engineering-lite:bel-backend-review",
+      "rootPath": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills",
+      "scope": "user",
+      "source": "plugin"
+    },
+    {
+      "description": "Use when diagnosing errors, failed tests, intermittent behavior, performance regressions, or a suspected root cause without sufficient evidence.",
+      "directory": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills/bel-debugging",
+      "name": "bel-debugging",
+      "path": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills/bel-debugging/SKILL.md",
+      "pluginName": "backend-engineering-lite",
+      "qualifiedName": "backend-engineering-lite:bel-debugging",
+      "rootPath": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills",
+      "scope": "user",
+      "source": "plugin"
+    },
+    {
+      "description": "Use when starting backend development, a bug fix, a refactor, or discovering increased risk during implementation.",
+      "directory": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills/bel-task-flow",
+      "name": "bel-task-flow",
+      "path": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills/bel-task-flow/SKILL.md",
+      "pluginName": "backend-engineering-lite",
+      "qualifiedName": "backend-engineering-lite:bel-task-flow",
+      "rootPath": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills",
+      "scope": "user",
+      "source": "plugin"
+    },
+    {
+      "description": "Use before implementing any feature, bug fix, executable script, behavior change, or refactor, including one-line QUICK changes and urgent fixes.",
+      "directory": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills/bel-tdd",
+      "name": "bel-tdd",
+      "path": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills/bel-tdd/SKILL.md",
+      "pluginName": "backend-engineering-lite",
+      "qualifiedName": "backend-engineering-lite:bel-tdd",
+      "rootPath": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills",
+      "scope": "user",
+      "source": "plugin"
+    },
+    {
+      "description": "Use before reporting a change complete, claiming tests pass, handing off code, or after changing code that was already verified.",
+      "directory": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills/bel-verification",
+      "name": "bel-verification",
+      "path": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills/bel-verification/SKILL.md",
+      "pluginName": "backend-engineering-lite",
+      "qualifiedName": "backend-engineering-lite:bel-verification",
+      "rootPath": "~/.zcode/cli/plugins/cache/backend-engineering-local/backend-engineering-lite/0.1.1/skills",
+      "scope": "user",
+      "source": "plugin"
+    }
+  ],
+  "verification": "Five unique bel skills discovered from installed plugin; model behavior and reviewer invocation not tested."
+}

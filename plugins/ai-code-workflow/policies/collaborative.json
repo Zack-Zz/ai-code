@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "mode": "collaborative",
+  "review_level": "critical",
+  "max_parallel_tasks": 2,
+  "response_language": "auto",
+  "verification_notes": []
+}

@@ -1,32 +1,18 @@
 {
-  "name": "ai-code-universal",
-  "version": "1.6.0",
-  "description": "Multi-assistant developer toolkit for ChatGPT, Codex, Claude, Kiro, Cursor, and OpenCode",
+  "name": "ai-code",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Repository for AI-related plugins with shared validation, reproducible packaging and local marketplaces for ZCode and Codex",
   "keywords": [
-    "claude-code",
     "ai",
-    "agents",
-    "skills",
-    "hooks",
-    "mcp",
-    "rules",
-    "claude",
-    "anthropic",
+    "zcode",
+    "codex",
+    "workflow",
     "tdd",
     "code-review",
-    "security",
-    "automation",
-    "best-practices",
-    "codex",
-    "codex-gui",
-    "cursor",
-    "cursor-ide",
-    "opencode"
+    "skills",
+    "plugin"
   ],
-  "author": {
-    "name": "Affaan Mustafa",
-    "url": "https://x.com/affaanmustafa"
-  },
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -36,55 +22,9 @@
   "bugs": {
     "url": "https://github.com/Zack-Zz/ai-code/issues"
   },
-  "files": [
-    ".codex/",
-    ".cursor/",
-    ".opencode/commands/",
-    ".opencode/instructions/",
-    ".opencode/plugins/",
-    ".opencode/prompts/",
-    ".opencode/tools/",
-    ".opencode/index.ts",
-    ".opencode/opencode.json",
-    ".opencode/package.json",
-    ".opencode/tsconfig.json",
-    ".opencode/MIGRATION.md",
-    ".opencode/README.md",
-    "agents/",
-    "commands/",
-    "contexts/",
-    "examples/CLAUDE.md",
-    "examples/user-CLAUDE.md",
-    "examples/statusline.json",
-    "hooks/",
-    "mcp-configs/",
-    "plugins/",
-    "rules/",
-    "schemas/",
-    "scripts/ci/",
-    "scripts/hooks/",
-    "scripts/lib/",
-    "scripts/claw.js",
-    "scripts/bootstrap-project.sh",
-    "scripts/sync-project.sh",
-    "scripts/sync-codex-global-config.sh",
-    "scripts/setup-package-manager.js",
-    "scripts/skill-create-output.js",
-    "templates/",
-    "skills/",
-    ".claude-plugin/plugin.json",
-    ".claude-plugin/README.md",
-    "install.sh",
-    "llms.txt"
-  ],
-  "bin": {
-    "ai-code-install": "install.sh"
-  },
   "scripts": {
-    "postinstall": "echo '\\n  ai-code-universal installed!\\n  Run: npx ai-code-install typescript\\n  Docs: https://github.com/Zack-Zz/ai-code\\n'",
-    "lint": "eslint . && markdownlint '**/*.md' --ignore node_modules",
-    "claw": "node scripts/claw.js",
-    "test": "node scripts/ci/validate-agents.js && node scripts/ci/validate-commands.js && node scripts/ci/validate-rules.js && node scripts/ci/validate-skills.js && node scripts/ci/validate-hooks.js && node tests/run-all.js"
+    "test": "node tests/run-suite.js",
+    "lint": "eslint . && markdownlint '**/*.md' --ignore node_modules"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
@@ -93,6 +33,6 @@
     "markdownlint-cli": "^0.47.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   }
 }

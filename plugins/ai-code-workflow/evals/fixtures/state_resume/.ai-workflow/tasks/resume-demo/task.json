@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "record_revision": 3,
+  "task_id": "resume-demo",
+  "workspace": {
+    "root": "/absolute/path/set/by/prepare",
+    "repository_root": null,
+    "git_head": null
+  },
+  "baseline": {
+    "dirty_files": [
+      "user_notes.txt"
+    ],
+    "protected_fingerprints": {
+      "user_notes.txt": "ba929ee0ae0f7a22b02a9c97c7cf2cba597dc3d3711f11d2c3acb44a02835a95"
+    }
+  },
+  "plan": {
+    "revision": 1,
+    "goal": "Extend discount with a bulk tier (>=1000) at 20 percent for members, test-first",
+    "scope": [
+      "calc.py",
+      "test_calc.py"
+    ],
+    "acceptance": [
+      "bulk tier tests pass",
+      "existing discount behavior preserved"
+    ],
+    "change_type": "feature",
+    "risk": "normal",
+    "depth": "short"
+  },
+  "progress": {
+    "phase": "implementing",
+    "status": "in_progress",
+    "completed_steps": [
+      "plan-confirmed",
+      "baseline-suite-green"
+    ],
+    "next_action": "Write failing bulk-tier test, then implement discount bulk branch",
+    "unresolved": []
+  },
+  "authorization_refs": [
+    {
+      "message_ref": "user turn 1 of the interrupted session (see eval run records)",
+      "actions": [
+        "plan",
+        "implement",
+        "run_tests"
+      ],
+      "scope_summary": "bulk discount tier in calc.py only"
+    }
+  ],
+  "evidence_refs": [
+    {
+      "relative_path": "evidence/ev-baseline.json",
+      "content_sha256": "7b4bad9ef412a9e4f9d27bc6dc7d21f51c12c93fed582ce0e69a50c59732d6c9"
+    }
+  ],
+  "created_at": "2026-09-28T09:58:00Z",
+  "updated_at": "2026-09-28T10:00:03Z"
+}
