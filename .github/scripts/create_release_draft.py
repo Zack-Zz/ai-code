@@ -14,7 +14,7 @@ from plugin_tools import io
 from plugin_tools.registry import load_catalog, select_plugins
 from plugin_tools.release import verify_release
 from plugin_tools.release import metadata, source_git
-from plugin_tools.release.integrity import read_tree
+from plugin_tools.release.integrity import read_tree, record
 from plugin_tools.release.layout import zip_bytes
 
 
@@ -95,13 +95,18 @@ def create_draft(root, plugin_id, bundle, repository, run=None):
         complete.write_bytes(zip_bytes(payload))
         checksum = private / f"{complete.stem}.sha256"
         checksum.write_text(f"{io.sha256(complete.read_bytes())}  {complete.name}\n")
-        assets = [complete, checksum, captured / "release.json", captured / "release-notes.md"]
+        assets = [complete, checksum, captured / "release.json", captured / "release-notes.md",
+                  captured / "SHA256SUMS"]
         assets.extend(captured / f"downloads/{spec.product_id}-{spec.version}-{host}.zip" for host in spec.hosts)
+        if record(payload)["schema_version"] == 2:
+            assets.extend(captured / f"installers/{spec.product_id}-{spec.version}-{host}-plugin.zip"
+                          for host in spec.hosts)
         _bind_remote(gh, repository, tag, revision)
+        channel_flags = ["--prerelease"] if final.get("mode") == "draft" else []
         response = gh("release", "create", tag, *(str(path) for path in assets),
             "--repo", repository, "--draft", "--verify-tag", "--target", revision,
             "--title", f"{spec.manifest['display_name']} {spec.version}",
-            "--notes-file", str(captured / "release-notes.md"))
+            "--notes-file", str(captured / "release-notes.md"), *channel_flags)
         result = {"ok": True, "draft": True, "tag": tag, "url": response.strip(),
                   "assets": [path.name for path in assets]}
         try:

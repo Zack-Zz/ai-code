@@ -48,7 +48,23 @@ mode change or approved marker never grants user authorization.
 
 ## Install through the native host
 
-Download the candidate for your host and unzip it to a stable directory.
+The 1.0.2 candidate separates native installers from manual download packages.
+A schema 2 release bundle contains `installers/ID-VERSION-HOST-plugin.zip`,
+with one plugin root and its complete native package, including `artifact.json`.
+It contains no local marketplace. The manual `downloads/ID-VERSION-HOST.zip`
+still includes a marketplace; submission ZIPs remain separate source kits.
+
+The planned GitHub preview market is `ai-code-preview` on
+`codex/marketplace-preview`; stable is `ai-code-stable` on `codex/marketplace`.
+Claude uses a fixed Release archive URL/hash, ZCode uses a ZIP URL/hash/path,
+and Codex uses a version directory pinned to a distribution commit.
+Publication and reviewed market deployment are separate steps. These notes do
+not claim that either channel is remotely published or that native transport
+and upgrades have passed acceptance. Existing `dist/` and `ai-code-local`
+entry points remain during migration; use the source repository's publishing
+guide for the current channel status.
+
+For manual testing, download the local-market candidate for your host and unzip it to a stable directory.
 The host marketplace root is the directory containing the native market file,
 not the `ai-code-workflow` package directory. Default generated market name:
 `ai-code-local`; use the actual declared name if you received a different source kit.

@@ -33,20 +33,21 @@ env:
 
 jobs:
   prepare:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: macos-latest
     timeout-minutes: 20
     outputs:
       revision: ${{ steps.source.outputs.revision }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.13'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
       - name: Validate and test the selected source
@@ -70,7 +71,7 @@ jobs:
         run: |
           python3 tooling/plugin_tool.py release prepare --plugin "$PLUGIN_ID" --mode "$RELEASE_MODE" --output "$RUNNER_TEMP/release-bundle"
           python3 tooling/plugin_tool.py release verify --plugin "$PLUGIN_ID" --mode "$RELEASE_MODE" --path "$RUNNER_TEMP/release-bundle"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: plugin-release-${{ github.run_id }}
           path: ${{ runner.temp }}/release-bundle/
@@ -79,7 +80,7 @@ jobs:
           retention-days: 30
 
   github-draft:
-    if: ${{ inputs.create_github_draft }}
+    if: ${{ inputs.create_github_draft && github.ref == 'refs/heads/main' }}
     needs: prepare
     runs-on: macos-latest
     timeout-minutes: 10
@@ -87,15 +88,22 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ needs.prepare.outputs.revision }}
+          ref: ${{ github.sha }}
+          path: trusted
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.prepare.outputs.revision }}
+          path: source
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.13'
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: plugin-release-${{ github.run_id }}
           path: ${{ runner.temp }}/release-bundle/
@@ -103,4 +111,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PLUGIN_ID: ${{ inputs.plugin }}
-        run: python3 .github/scripts/create_release_draft.py --plugin "$PLUGIN_ID" --bundle "$RUNNER_TEMP/release-bundle" --repository "$GITHUB_REPOSITORY"
+        run: |
+          git -C source fetch --no-tags origin main:refs/remotes/origin/main
+          git -C source merge-base --is-ancestor HEAD origin/main
+          python3 trusted/.github/scripts/create_release_draft.py --root source --plugin "$PLUGIN_ID" --bundle "$RUNNER_TEMP/release-bundle" --repository "$GITHUB_REPOSITORY"

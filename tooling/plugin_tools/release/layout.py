@@ -5,6 +5,7 @@ import stat
 import zipfile
 
 from .. import io
+from ..io import DataError
 from ..registry import HOSTS
 from ..rendering import file_hashes, marketplace, marketplace_path, package_files
 
@@ -54,13 +55,24 @@ def package_outputs(spec, provenance):
     return files
 
 
-def payload(spec, capture, provenance, report):
+def _schema(schema_version):
+    if type(schema_version) is not int or schema_version not in (1, 2):
+        raise DataError("release manifest schema must be 1 or 2")
+
+
+def payload(spec, capture, provenance, report, schema_version=2):
+    _schema(schema_version)
     packages = package_outputs(spec, provenance)
     files = {f"packages/{relative}": data for relative, data in packages.items()}
     source_readmes = {"README.md": capture.inputs[capture.config["readmes"]["en"]],
                       "README_CN.md": capture.inputs[capture.config["readmes"]["zh-CN"]]}
     for host in spec.hosts:
         files[f"downloads/{spec.product_id}-{spec.version}-{host}.zip"] = packages[f"{host}/{spec.product_id}-{spec.version}.zip"]
+        if schema_version == 2:
+            base = f"{host}/{spec.product_id}/"
+            installer = {f"{spec.product_id}/{name.removeprefix(base)}": data
+                         for name, data in packages.items() if name.startswith(base)}
+            files[f"installers/{spec.product_id}-{spec.version}-{host}-plugin.zip"] = zip_bytes(installer)
         channel = "openai" if host == "codex" else host
         source = {**package_files(spec, host), **source_readmes}
         base = f"submissions/{channel}"
@@ -91,9 +103,10 @@ def payload(spec, capture, provenance, report):
     return files
 
 
-def record(spec, provenance, report, files):
+def record(spec, provenance, report, files, schema_version=2):
+    _schema(schema_version)
     pairs = file_hashes(files)
-    return {"schema_version": 1, "product_id": spec.product_id, "version": spec.version,
+    return {"schema_version": schema_version, "product_id": spec.product_id, "version": spec.version,
         "display_name": spec.manifest["display_name"], "mode": report["mode"], "tag": provenance["tag"],
         "source_revision": provenance["source_revision"], "working_tree_dirty": provenance["working_tree_dirty"],
         "source_tree_hash": spec.source_tree_hash, "readiness": report["readiness"],

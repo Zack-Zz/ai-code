@@ -21,12 +21,29 @@ single-plugin marketplace. Claude Code uses `.claude-plugin/marketplace.json`.
 The repository's multi-plugin packaging contract
 is in [the authoring guide](../../../docs/plugin-authoring.md).
 
-**The primary distribution is the self-hosted GitHub marketplace.** Once
-the generated root entries and matching packages are pushed, add
-`Zack-Zz/ai-code` through the host native marketplace flow. Download/unzip and
-local registration are also available for testing. The shared tool never
-writes into host caches or global config on its own. Native behavior remains
-unverified until an actual session is accepted.
+## GitHub channel migration (1.0.2 preview candidate)
+
+Schema 2 release bundles add `installers/ID-VERSION-HOST-plugin.zip`, containing
+one plugin root and its complete native package including `artifact.json`.
+Installer ZIPs have no marketplace. The ZIPs from shared `build` and the
+`downloads/` directory retain their local-market format; submission source
+kits remain separate.
+
+The new preview target is `ai-code-preview` on `codex/marketplace-preview`;
+stable targets `ai-code-stable` on `codex/marketplace`. Claude sources use a
+fixed Release archive URL/SHA256, ZCode sources a ZIP URL/SHA256/path, and
+Codex sources a version directory at a fixed distribution commit. Each plugin
+has its own Release; reviewed market deployment follows human Publish.
+These targets have not passed native transport, first-install or upgrade
+acceptance, and this guide does not assert remote publication. Follow the
+[publishing guide](../../../docs/publishing.md) for the current state.
+
+Existing main-branch roots pointing at `dist/` and `ai-code-local` stay
+available until the new transports pass real host acceptance. The steps below
+describe these retained local-market packages. Register an available source
+through the host native marketplace flow; the shared tool never writes into
+host caches or global config. Installation and workflow behavior need
+separate acceptance, with actual loaded bytes recorded.
 
 ## Claude Code
 

@@ -51,16 +51,50 @@ def main(argv=None):
     release_prepare.add_argument("--tag")
     release_verify.add_argument("--path", required=True)
     release_verify.add_argument("--mode", choices=("draft", "stable"))
+    distribution = commands.add_parser("distribution")
+    distribution_commands = distribution.add_subparsers(dest="distribution_command", required=True)
+    distribution_plan = distribution_commands.add_parser("plan")
+    distribution_plan.add_argument("--plugin", required=True)
+    distribution_plan.add_argument("--bundle", required=True)
+    distribution_plan.add_argument("--release-info", required=True)
+    distribution_plan.add_argument("--channel", choices=("preview", "stable"), required=True)
+    distribution_plan.add_argument("--market")
+    distribution_plan.add_argument("--base-commit", default="absent")
+    distribution_plan.add_argument("--output", required=True)
+    distribution_check = distribution_commands.add_parser("check")
+    distribution_check.add_argument("--plan", required=True)
+    distribution_check.add_argument("--expected-plan-hash")
+    distribution_check.add_argument("--expected-market-commit")
     for command in (listing, validating, building, checking, syncing,
-                    release_check, release_prepare, release_verify):
+                    release_check, release_prepare, release_verify, distribution_plan, distribution_check):
         command.add_argument("--root", default=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     try:
         if args.command == "marketplace":
             from .markets import sync_markets
             result = sync_markets(args.root, check=args.check)
-        else:
+        elif args.command != "distribution" or args.distribution_command == "plan":
             specs = load_catalog(args.root)
+        if args.command == "distribution":
+            from . import io
+            from .distribution import plan_distribution, check_plan
+            from .release.integrity import read_tree
+            if args.distribution_command == "check":
+                path = Path(args.plan).absolute()
+                plan = io.parse_json(io.read_file(path.parent, path.name, limit=256 * 1024 * 1024), what="distribution plan")
+                result = check_plan(plan, args.expected_plan_hash, args.expected_market_commit)
+            else:
+                metadata_path = Path(args.release_info).absolute()
+                public_release, _ = io.read_json(metadata_path.parent, metadata_path.name)
+                existing = read_tree(args.market) if args.market else None
+                result = plan_distribution(args.root, select_plugins(specs, args.plugin)[0], args.bundle,
+                    public_release, args.channel, existing, args.base_commit)
+                output = Path(args.output).absolute()
+                if output.exists() or output.is_symlink():
+                    raise io.ConflictError("distribution plan output already exists")
+                output.write_bytes(io.dump_json(result))
+                result = {"ok": True, "status": result["status"], "plan_hash": result["plan_hash"],
+                    "base_commit": result["base_commit"], "output": str(output)}
         if args.command == "release":
             from .release import check_release, prepare_release, verify_release
             spec = select_plugins(specs, args.plugin)[0]

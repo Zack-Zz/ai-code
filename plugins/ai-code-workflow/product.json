@@ -2,7 +2,7 @@
   "schema_version": 1,
   "product_id": "ai-code-workflow",
   "display_name": "CodeVow",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "license": "MIT",
   "hosts": [

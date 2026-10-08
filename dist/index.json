@@ -2,15 +2,15 @@
   "hosts": {
     "claude": {
       "marketplace": "claude/.claude-plugin/marketplace.json",
-      "marketplace_sha256": "5c9d5cb5af930f0c8674c203dc0d47a646a3e478fd02f68e4ecc36b1c4da6b93"
+      "marketplace_sha256": "afbf1683125fc2b0febd6222fd92023f70fcbcc89cd4378deff59296f6e87afb"
     },
     "codex": {
       "marketplace": "codex/.agents/plugins/marketplace.json",
-      "marketplace_sha256": "2a16857cd7d27449c6bd1913218890dc815ab9060262e3837476fc84c6fb3359"
+      "marketplace_sha256": "491201e92cf0aee8ce12376c95762692b1bb6b6aaba22f2ef16cf50a3d71ed42"
     },
     "zcode": {
       "marketplace": "zcode/marketplace.json",
-      "marketplace_sha256": "19c7c31bf6a33d6157061dd6e173c68eb19af7b994a871e1f5aa07fcaa12bda0"
+      "marketplace_sha256": "122fa0584fd66da14559e3327dc725d704fa0c7ed4b80d5da88ab7e94152e272"
     }
   },
   "plugins": {
@@ -18,31 +18,31 @@
       "hosts": {
         "claude": {
           "files_count": 34,
-          "package_content_hash": "5eaeab01d2fc5844fe4f05de6bb00c6db689233bd355c686d8528ce556bade3d",
+          "package_content_hash": "123b97ed42c1c95fccf9a9d91aa6c400a01b82b45c398abbdd8b14a18ae07f2c",
           "package_dir": "claude/ai-code-workflow",
-          "zip": "claude/ai-code-workflow-1.0.1.zip",
-          "zip_sha256": "839463d395a8ea5191d50f8979d6a7eedb6ecb5c358600a8fcb14ac233d7329f"
+          "zip": "claude/ai-code-workflow-1.0.2.zip",
+          "zip_sha256": "80f8cbc1da6d3d46d317bb6d6352931d1406212a99b76c76953cccb224681948"
         },
         "codex": {
           "files_count": 39,
-          "package_content_hash": "a8d4bfcce7e381390b3eaf6b8c9e046beefbcff54215db31c650b105eb78fc7f",
+          "package_content_hash": "8be1c00221e33f52aeacbbd378b7e4277adb3ee1b0bce95fb058a25f06eabab4",
           "package_dir": "codex/ai-code-workflow",
-          "zip": "codex/ai-code-workflow-1.0.1.zip",
-          "zip_sha256": "7285a2f6dd6c9911423176eb6bcdbae5742aab5b12966de4a11a3fcd9b37d929"
+          "zip": "codex/ai-code-workflow-1.0.2.zip",
+          "zip_sha256": "36eca310608086893998366e98fe6f61f061e2ba6ac918340e03987613c041e8"
         },
         "zcode": {
           "files_count": 34,
-          "package_content_hash": "2b6d6d1a69c6c0775a64674a2430ef8197bf71193427136dee061f083c95b835",
+          "package_content_hash": "14859e17e4d7c87a48998328b6d9125492e53fcf4c8a70c53933bce3dcf2eea1",
           "package_dir": "zcode/ai-code-workflow",
-          "zip": "zcode/ai-code-workflow-1.0.1.zip",
-          "zip_sha256": "154ca6b7edca8f1cf87cbddd503bde1a15bed230b1d23591d6e35ed2b7980775"
+          "zip": "zcode/ai-code-workflow-1.0.2.zip",
+          "zip_sha256": "65fbaf696862c76b2af8cafe6c3595b0244b83fc4fc7960bf20e216d09f11d35"
         }
       },
-      "source_tree_hash": "5a4c92e2b9bb26632c9eb0e6bf47c99ea83cafcdc795feabb45678d6586c942d",
-      "version": "1.0.1"
+      "source_tree_hash": "24793827cd6d0c2d2e890a12f671575afd1cf9ba5b1a68d7f4355e0b711e6ae9",
+      "version": "1.0.2"
     }
   },
   "schema_version": 2,
-  "source_revision": "0932e15d1036563da47d15b5795ad81ea1d3cca3",
+  "source_revision": "92ee5846ce202c04d2c5def1f49a0402bbcf23b7",
   "working_tree_dirty": true
 }

@@ -30,7 +30,7 @@ package_content_hash、host_version、summary、artifacts。例如未验收记�
   "schema_version": 1,
   "status": "unverified",
   "host": "codex",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "source_tree_hash": "REPLACE_WITH_CURRENT_SOURCE_SHA256",
   "package_content_hash": "REPLACE_WITH_CURRENT_CODEX_PACKAGE_SHA256",
   "host_version": null,
@@ -57,6 +57,18 @@ accepted 记录须包含非空 host_version、summary 和 artifacts，每项为
 白名单和文档内容，工具不识别任意文本片段中的敏感信息。
 
 ## 实际验收与 CI
+
+1.0.2 候选新增运输验收边界：分别验证 Claude 的固定 archive URL/SHA256、
+ZCode 的 ZIP URL/SHA256/path，以及 Codex 固定发行提交中的版本目录。
+每端至少两个连续版本，记录市场分支登记、发现、首次安装、刷新、升级、
+cache 字节及错误哈希拒绝。下载成功、渠道 deployed 和安装成功各自记录，
+不能据此把工作流行为写成 accepted。schema 2 installer 的完整性测试与
+schema 1 历史复验也只证明制品层，不证明宿主运输支持。
+
+Release、市场计划/部署与运行行为证据相互独立。计划哈希、记录文件、
+GitHub prerelease 或 accepted 标记均不产生 Git、Publish 或部署授权。
+既有 2026-10-08 的 1.0.1 验证记录保留原版本、日期和哈希；不作为 1.0.2
+候选或新运输协议本轮通过的证据。
 
 对每个宿主分别验证原生清单、市场发现、安装加载、技能触发、工作流授权
 边界、Reviewer 行为和包内工具的可用性。记录到达的验证层次及未完成项；

@@ -1,0 +1,135 @@
+name: Deploy plugin marketplace
+
+on:
+  workflow_dispatch:
+    inputs:
+      plugin:
+        description: One registered plugin ID
+        type: string
+        required: true
+        default: ai-code-workflow
+      source_tag:
+        description: Existing public Release tag (ID/vVERSION)
+        type: string
+        required: true
+      channel:
+        description: Published Release channel
+        type: choice
+        options: [preview, stable]
+        default: preview
+        required: true
+      action:
+        description: Plan first, then deploy the reviewed hash
+        type: choice
+        options: [plan, deploy]
+        default: plan
+        required: true
+      expected_plan_hash:
+        description: Required for deploy, from a reviewed plan run
+        type: string
+        required: false
+      expected_market_commit:
+        description: Required for deploy, reviewed base SHA or absent
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plugin-marketplace-${{ github.repository }}
+  cancel-in-progress: false
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  plan:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          path: trusted
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.source_tag }}
+          path: source
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.13'
+      - name: Read and verify public source and assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PLUGIN_ID: ${{ inputs.plugin }}
+          SOURCE_TAG: ${{ inputs.source_tag }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          git -C source fetch --no-tags origin main:refs/remotes/origin/main
+          python3 trusted/.github/scripts/deploy_marketplace.py --root source --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --channel "$CHANNEL" --action plan --output "$RUNNER_TEMP/marketplace-plan.json"
+      - name: Review bindings in job summary
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          plan = json.loads((Path(os.environ['RUNNER_TEMP']) / 'marketplace-plan.json').read_text())
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('Review the full plan artifact before deployment.\n\n')
+              for key in ('product_id', 'version', 'channel', 'branch', 'base_commit', 'source_revision', 'plan_hash'):
+                  summary.write(f'- {key}: `{plan[key]}`\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: marketplace-plan-${{ github.run_id }}
+          path: ${{ runner.temp }}/marketplace-plan.json
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy:
+    if: ${{ inputs.action == 'deploy' && github.ref == 'refs/heads/main' }}
+    needs: plan
+    environment: plugin-marketplace
+    permissions:
+      contents: write
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          path: trusted
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.source_tag }}
+          path: source
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.13'
+      - name: Reverify reviewed plan and deploy (never force push)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PLUGIN_ID: ${{ inputs.plugin }}
+          SOURCE_TAG: ${{ inputs.source_tag }}
+          CHANNEL: ${{ inputs.channel }}
+          REVIEWED_HASH: ${{ inputs.expected_plan_hash }}
+          REVIEWED_COMMIT: ${{ inputs.expected_market_commit }}
+        run: |
+          git -C source fetch --no-tags origin main:refs/remotes/origin/main
+          python3 trusted/.github/scripts/deploy_marketplace.py --root source --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --channel "$CHANNEL" --action deploy --expected-plan-hash "$REVIEWED_HASH" --expected-market-commit "$REVIEWED_COMMIT" --output "$RUNNER_TEMP/marketplace-result.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: ${{ always() }}
+        with:
+          name: marketplace-result-${{ github.run_id }}
+          path: ${{ runner.temp }}/marketplace-result.json
+          if-no-files-found: warn
+          retention-days: 30

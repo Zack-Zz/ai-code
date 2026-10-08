@@ -35,10 +35,15 @@ publisher 声明在 product.json 维护，不代表身份认证。包内提供 P
 Claude Code、Codex、ZCode 三个证据槽当前均为 null，草稿构建不能晋升为稳定版。
 
 Claude Code 与 ZCode 的 Reviewer 使用同一份共享职责正文，声明只读工具、
-继承模型和最多十二轮；实际限制是否生效仍未验证。当前 `1.0.1` 候选的
+继承模型和最多十二轮；实际限制是否生效仍未验证。当前 `1.0.2` 候选的
 A23/A24 为全部声明宿主准备样例，运行所选包的受管文件工具；A25 检查全部
 声明宿主的包和共享资源。它们不证明原生安装、技能行为或 Reviewer 限制，
 历史 Codex/ZCode 两端结果仍保留原有范围。
+
+1.0.2 试用候选新增 schema 2 发行安装包和经审阅的 GitHub 市场计划。
+每个 installer 仅含完整插件根及 artifact.json，本地市场下载包与投稿套件
+仍分开。Release 公开、市场部署、真实运输/升级验收分别记录；迁移期间
+保留现有 dist 与 ai-code-local，不宣称远端发布或宿主已验收。
 
 ## 你得到什么
 
@@ -72,7 +77,7 @@ python3 tooling/plugin_tool.py package check \
 插件源码入口仍为仓库根目录下的
 `plugins/ai-code-workflow/scripts/workflow_tool.py`，安装包入口仍为
 `tools/workflow_tool.py`；policy/task/files 行为属于该插件。插件 ID 和候选版本
-为 `ai-code-workflow` 与 `1.0.1`。
+为 `ai-code-workflow` 与 `1.0.2`。
 
 ## 插件目录结构
 

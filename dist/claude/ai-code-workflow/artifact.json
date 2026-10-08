@@ -1,9 +1,9 @@
 {
-  "content_hash": "5eaeab01d2fc5844fe4f05de6bb00c6db689233bd355c686d8528ce556bade3d",
+  "content_hash": "123b97ed42c1c95fccf9a9d91aa6c400a01b82b45c398abbdd8b14a18ae07f2c",
   "files": [
     [
       ".claude-plugin/plugin.json",
-      "8dcc6c0bc97f9c717a83f2ee671fccb9ef4892c33adc8fd6ba76f261e74252fe"
+      "e3e146238fca86ab712d4e1df3f24a6fb80eaa3ca5f530aa5cd498f4d951a6d5"
     ],
     [
       "LICENSE",
@@ -19,11 +19,11 @@
     ],
     [
       "README.md",
-      "db1563eab658cfe51bfea89a58f2e0542aeb06cfcb03a3d1f74dc3ce1dd97817"
+      "44ac6776a2272bce4c22b6f380e0dabdf3a4bc24b7bc763fb342ee7c44d261f3"
     ],
     [
       "README_CN.md",
-      "e912ab339120d19adf2c8aa0107804c868413518e6f881d1ec00a1ed3b7f21d1"
+      "ad0d5b6225b38aa0d75abfcdb2a070698d1b21701c58b24030468b0dee04cc3a"
     ],
     [
       "agents/workflow-reviewer.md",
@@ -145,8 +145,8 @@
     "continuous"
   ],
   "schema_version": 1,
-  "source_revision": "0932e15d1036563da47d15b5795ad81ea1d3cca3",
-  "source_tree_hash": "5a4c92e2b9bb26632c9eb0e6bf47c99ea83cafcdc795feabb45678d6586c942d",
-  "version": "1.0.1",
+  "source_revision": "92ee5846ce202c04d2c5def1f49a0402bbcf23b7",
+  "source_tree_hash": "24793827cd6d0c2d2e890a12f671575afd1cf9ba5b1a68d7f4355e0b711e6ae9",
+  "version": "1.0.2",
   "working_tree_dirty": true
 }

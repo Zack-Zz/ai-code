@@ -1,6 +1,6 @@
 # Support matrix and current verification status
 
-## Current package targets (1.0.1 candidate, 2026-10-08)
+## Current package targets (1.0.2 candidate, 2026-10-08)
 
 | Target | Native package format | Runtime acceptance |
 |---|---|---|
@@ -13,6 +13,14 @@ local script/package checks do not establish native loading or behavior.
 Current A23/A24/A25 fixtures include every host declared by this plugin, and
 A25 checks the shared bytes and source identity across those packages.
 Historical Codex/ZCode results below retain their original scope and hashes.
+
+The 1.0.2 candidate adds schema 2 native installer archives and reviewed
+GitHub market planning/deployment. Claude archive, ZCode ZIP URL/path and
+Codex pinned version directories still require real transport, registration,
+installation and two-version upgrade acceptance. No remote Release or market
+deployment result is asserted here. Existing dist and ai-code-local sources
+remain during migration. Installer integrity and distribution tests do not
+establish native transport or workflow behavior.
 
 Evidence input update (2026-10-08): task `host_run` records and the
 `collect.py`/`grade.py` input contracts accept `claude`, `codex` and `zcode`.
@@ -30,9 +38,10 @@ source verifier. Initial distribution verification separately uses the public
 checker from the trusted repository; a package must not validate itself as
 its initial trust source.
 
-[Current 1.0.1 verification record](reviews/2026-10-08-three-host-evals.md)
+[Historical 1.0.1 verification record](reviews/2026-10-08-three-host-evals.md)
 reports the executed three-host tool chains, source/package checks, repeated
-builds and draft verification. It does not complete real-host acceptance.
+builds and draft verification for its recorded bytes. It does not validate
+the 1.0.2 candidate or complete real-host acceptance.
 
 Directory note (2026-10-07): this is the dated workflow baseline, now under
 `plugins/ai-code-workflow/`. Original counts, commands and hashes below are

@@ -14,7 +14,7 @@
 
 | 插件 | 用途 | 版本与支持状态 |
 |---|---|---|
-| [CodeVow](plugins/ai-code-workflow/README.zh-CN.md) | 计划、TDD、排查、审查、验证与交付证据 | `1.0.1` 自建市场试用候选；[真实宿主验收仍未完成](plugins/ai-code-workflow/docs/support-matrix.md) |
+| [CodeVow](plugins/ai-code-workflow/README.zh-CN.md) | 计划、TDD、排查、审查、验证与交付证据 | `1.0.2` 自建市场试用候选；[真实宿主验收仍未完成](plugins/ai-code-workflow/docs/support-matrix.md) |
 
 `catalog.json` 只登记插件目录；各目录的 `product.json` 是插件 ID、版本和
 资源白名单的唯一来源。根目录的私有 Node 包用于仓库维护，其版本不作为
@@ -44,6 +44,14 @@ python3 tooling/plugin_tool.py package check \
 三端发布预检、制品准备/复验、仓库市场和手动 GitHub 草稿流程见
 [发布指南](docs/publishing.md)。稳定制品要求真实宿主验收证据。
 
+schema 2 发行套件新增 `installers/ID-VERSION-HOST-plugin.zip`，仅含一个
+插件根及完整原生包（含 artifact.json），不带市场；下载包和投稿包保持
+各自用途。每个插件独立 Release，经审阅的 distribution 计划为 Claude/ZCode
+选择固定资产，为 Codex 固定版本目录提交；人工 Publish 后再单独部署市场。
+试用/正式市场目标分支为 `codex/marketplace-preview` 与 `codex/marketplace`。
+远端发布、原生运输和升级仍未验收；新运输通过真实验收前，保留现有 dist
+和 ai-code-local 入口。
+
 源校验、包完整性和测试通过不代表原生加载成功或模型遵循技能。真实宿主验收
 及其证据由各插件分别维护。
 
@@ -52,8 +60,9 @@ python3 tooling/plugin_tool.py package check \
 | 路径 | 用途 |
 |---|---|
 | `catalog.json` | 显式注册的插件目录列表 |
+| `distribution.json` | 渠道分支、市场名及限定运输类型，不复制插件版本 |
 | `plugins/<id>/` | 插件自包含的源码、清单、资源、适配、测试与文档 |
-| `tooling/plugin_tool.py` | 公共校验、构建、包检查、市场同步与 release 入口 |
+| `tooling/plugin_tool.py` | 公共校验、构建、包检查、市场同步、release 和本地 distribution plan/check 入口 |
 | `tooling/` | 通用源校验、构建与市场生成工具 |
 | `tests/` | 公共工具测试与统一门禁 |
 | `docs/plugin-authoring.md` | 新插件接入及宿主声明指南 |

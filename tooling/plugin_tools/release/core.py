@@ -126,8 +126,10 @@ def _verify_payload(root, spec, bundle, mode=None, previous=None, context=None):
     # declared commit, even when the currently inspected checkout is dirty.
     if stored_report["publication_ready"]:
         source_git.validate_head_inputs(root, spec, capture, provenance["source_revision"])
-    expected = layout.payload(spec, capture, provenance, stored_report)
-    expected["release.json"] = io.dump_json(layout.record(spec, provenance, stored_report, expected))
+    schema_version = manifest["schema_version"]
+    expected = layout.payload(spec, capture, provenance, stored_report, schema_version=schema_version)
+    expected["release.json"] = io.dump_json(layout.record(spec, provenance, stored_report, expected,
+                                                       schema_version=schema_version))
     if set(actual) != set(expected):
         raise DataError("release closure differs from trusted source-derived payload")
     mismatched = [relative for relative in sorted(expected) if actual[relative] != expected[relative]]

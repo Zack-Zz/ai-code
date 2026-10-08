@@ -1,5 +1,14 @@
 # CodeVow release notes — preview
 
+## 1.0.2 — 2026-10-08 candidate
+
+- Prepares GitHub marketplace distribution with schema 2 release bundles and separate plugin-only native installer ZIPs, including artifact.json.
+- Preserves local-market download ZIPs and the existing submission source kits; schema 1 historical bundles remain explicitly verifiable.
+- Adds local distribution plans for independent plugin releases and channel-specific market sources: Claude archive, ZCode ZIP URL/path, and Codex version directories pinned to a distribution commit.
+- Separates draft preparation, human Publish and reviewed marketplace deployment. Plans bind release assets and the previous market snapshot; deployment preserves other plugins and immutable old version directories.
+- Keeps the candidate in preview with all native transport, installation, upgrade and workflow behavior acceptance unverified. Existing dist and ai-code-local entry points remain available until the new native transports pass acceptance.
+- Records no remote Release, marketplace deployment or host acceptance result in these notes. Dated 1.0.1 verification remains historical evidence for its own bytes.
+
 ## 1.0.1 — 2026-10-08
 
 - Accepts Claude Code, Codex and ZCode in task host-run evidence and evaluation input contracts while preserving conservative results for unverified runs.

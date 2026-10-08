@@ -12,7 +12,7 @@ import zipfile
 from plugin_tools.registry import load_catalog
 from plugin_tools.release import prepare_release
 from plugin_tools.release import source_git
-from tests.tooling.test_release import release_plugin
+from tests.tooling.test_release import refresh_record, release_plugin
 
 SCRIPT = Path(__file__).resolve().parents[1] / ".github/scripts/create_release_draft.py"
 module_spec = importlib.util.spec_from_file_location("release_draft", SCRIPT)
@@ -77,6 +77,30 @@ class DraftTests(unittest.TestCase):
         self.assertTrue(result["ok"])
         self.assertTrue(result["draft"])
         self.assertEqual(sum(args[1:3] == ["release", "create"] for args in self.calls), 1)
+        created = next(args for args in self.calls if args[1:3] == ["release", "create"])
+        self.assertIn('--prerelease', created)
+
+    def test_draft_uploads_installers_and_the_bundle_sha256sums(self):
+        with mock.patch.object(draft, "verify_release", return_value=self.report):
+            result = self.call()
+        expected = {"SHA256SUMS", "release.json", "release-notes.md",
+                    "ai-one-1.0.0-release-bundle.zip", "ai-one-1.0.0-release-bundle.sha256"}
+        expected.update(f"ai-one-1.0.0-{host}.zip" for host in ("claude", "codex", "zcode"))
+        expected.update(f"ai-one-1.0.0-{host}-plugin.zip" for host in ("claude", "codex", "zcode"))
+        self.assertEqual(set(result["assets"]), expected)
+
+    def test_schema_one_draft_retains_historical_assets_without_installers(self):
+        for path in (self.bundle / "installers").glob("*"):
+            path.unlink()
+        record = json.loads((self.bundle / "release.json").read_text())
+        record["schema_version"] = 1
+        (self.bundle / "release.json").write_text(json.dumps(record))
+        refresh_record(self.bundle)
+        with mock.patch.object(draft, "verify_release", return_value=self.report):
+            result = self.call()
+        self.assertTrue(result["ok"])
+        self.assertIn("SHA256SUMS", result["assets"])
+        self.assertFalse(any(name.endswith("-plugin.zip") for name in result["assets"]))
 
     def test_dirty_wrong_tag_or_unverified_source_prevents_remote_write(self):
         for update in ({"ok": False}, {"working_tree_dirty": True}, {"tag": "other/v1.0.0"}, {"source_revision": None}):

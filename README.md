@@ -16,7 +16,7 @@ policies or task records on every plugin.
 
 | Plugin | Purpose | Version and support |
 |---|---|---|
-| [CodeVow](plugins/ai-code-workflow/README.md) | Planning, TDD, debugging, review, verification and delivery evidence | Self-hosted preview candidate `1.0.1`; [real-host acceptance remains unverified](plugins/ai-code-workflow/docs/support-matrix.md) |
+| [CodeVow](plugins/ai-code-workflow/README.md) | Planning, TDD, debugging, review, verification and delivery evidence | Self-hosted preview candidate `1.0.2`; [real-host acceptance remains unverified](plugins/ai-code-workflow/docs/support-matrix.md) |
 
 `catalog.json` registers plugin directories. Each directory's `product.json`
 is the sole source of its plugin ID, version and resource whitelist. The root
@@ -49,6 +49,16 @@ See [three-host publishing](docs/publishing.md) for release check/prepare/verify
 repository marketplaces and the manual GitHub draft workflow. Real host
 acceptance is required before preparing a stable release.
 
+Schema 2 release bundles add `installers/ID-VERSION-HOST-plugin.zip`: one
+plugin root with its complete native package and `artifact.json`, without a
+marketplace. Download and submission ZIPs retain their separate purposes.
+Each plugin has its own Release. Reviewed distribution plans select fixed
+assets for Claude/ZCode and a pinned version directory for Codex; marketplace
+deployment follows human Publish as a separate step. Preview/stable markets
+target `codex/marketplace-preview` and `codex/marketplace`. Remote publication,
+native transport and upgrades remain unverified. Existing `dist/` and
+`ai-code-local` entries stay available until the new transports pass acceptance.
+
 Source checks and package integrity checks do not certify native loading or
 model behavior. Host acceptance and its evidence belong to each plugin.
 
@@ -57,8 +67,9 @@ model behavior. Host acceptance and its evidence belong to each plugin.
 | Path | Purpose |
 |---|---|
 | `catalog.json` | Explicit list of registered plugin directories |
+| `distribution.json` | Channel branches, market names and fixed transport choices; no duplicate plugin versions |
 | `plugins/<id>/` | Self-contained plugin source, manifest, resources, adapters, tests and documentation |
-| `tooling/plugin_tool.py` | Shared list, validate, build, package check, marketplace sync and release commands |
+| `tooling/plugin_tool.py` | Shared list, validate, build, package check, marketplace sync, release and local distribution plan/check commands |
 | `tooling/` | Shared source validation, packaging and marketplace generation |
 | `tests/` | Shared tooling tests and the unified test runner |
 | `docs/plugin-authoring.md` | How to add a plugin and declare its supported hosts |

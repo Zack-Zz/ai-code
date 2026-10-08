@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "channels": {
+    "stable": {"branch": "codex/marketplace", "marketplace_name": "ai-code-stable", "release_mode": "stable", "prerelease": false},
+    "preview": {"branch": "codex/marketplace-preview", "marketplace_name": "ai-code-preview", "release_mode": "draft", "prerelease": true}
+  },
+  "transports": {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip"}
+}

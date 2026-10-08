@@ -1,5 +1,5 @@
 {
-  "content_hash": "a8d4bfcce7e381390b3eaf6b8c9e046beefbcff54215db31c650b105eb78fc7f",
+  "content_hash": "8be1c00221e33f52aeacbbd378b7e4277adb3ee1b0bce95fb058a25f06eabab4",
   "files": [
     [
       "LICENSE",
@@ -15,11 +15,11 @@
     ],
     [
       "README.md",
-      "db1563eab658cfe51bfea89a58f2e0542aeb06cfcb03a3d1f74dc3ce1dd97817"
+      "44ac6776a2272bce4c22b6f380e0dabdf3a4bc24b7bc763fb342ee7c44d261f3"
     ],
     [
       "README_CN.md",
-      "e912ab339120d19adf2c8aa0107804c868413518e6f881d1ec00a1ed3b7f21d1"
+      "ad0d5b6225b38aa0d75abfcdb2a070698d1b21701c58b24030468b0dee04cc3a"
     ],
     [
       "assets/codevow.png",
@@ -31,7 +31,7 @@
     ],
     [
       "plugin.json",
-      "d2efbb5edbba9141e1c8fcb977dc8e31d36c6f590832f0838dfc742588b8103b"
+      "95e5bdcd276bf800a7bc23fa10986ee6834c29077a9e2c209d7243d09dba6b31"
     ],
     [
       "policies/collaborative.json",
@@ -165,8 +165,8 @@
     "continuous"
   ],
   "schema_version": 1,
-  "source_revision": "0932e15d1036563da47d15b5795ad81ea1d3cca3",
-  "source_tree_hash": "5a4c92e2b9bb26632c9eb0e6bf47c99ea83cafcdc795feabb45678d6586c942d",
-  "version": "1.0.1",
+  "source_revision": "92ee5846ce202c04d2c5def1f49a0402bbcf23b7",
+  "source_tree_hash": "24793827cd6d0c2d2e890a12f671575afd1cf9ba5b1a68d7f4355e0b711e6ae9",
+  "version": "1.0.2",
   "working_tree_dirty": true
 }

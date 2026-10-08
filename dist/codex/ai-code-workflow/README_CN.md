@@ -37,7 +37,19 @@ Python 工具不联网、不调用模型、不执行 Git 写操作。宿主可�
 
 ## 按宿主原生方式安装
 
-下载所需宿主的候选包，解压到稳定目录。市场根是包含原生市场文件的目录，
+1.0.2 候选区分原生安装包和手动下载包。schema 2 发行套件中的
+`installers/ID-VERSION-HOST-plugin.zip` 仅含一个插件根及完整原生包，包含
+`artifact.json`，不带本地市场。`downloads/ID-VERSION-HOST.zip` 仍带本地
+市场，投稿 ZIP 仍为独立源码套件。
+
+GitHub 试用市场目标为 `codex/marketplace-preview` 分支上的 `ai-code-preview`，
+正式市场目标为 `codex/marketplace` 上的 `ai-code-stable`。Claude 使用固定
+Release archive URL/哈希，ZCode 使用 ZIP URL/哈希/path，Codex 使用固定发行
+提交中的版本目录。公开 Release 和经审阅的市场部署分开执行。本说明不宣称
+远端渠道已经发布，也不宣称原生运输、安装或升级已验收。迁移期间继续保留
+现有 `dist/` 与 `ai-code-local` 入口；实际渠道状态见源码仓库发布指南。
+
+手动试用时，下载所需宿主的本地市场候选包，解压到稳定目录。市场根是包含原生市场文件的目录，
 不是 ai-code-workflow 插件目录。生成市场默认名为 ai-code-local；若获得
 另一种源码包，按其真实声明的市场名称安装。
 

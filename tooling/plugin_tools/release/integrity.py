@@ -63,7 +63,7 @@ def _json(files, relative):
 
 def record(files):
     manifest = _json(files, "release.json")
-    if not isinstance(manifest, dict) or set(manifest) != FIELDS or type(manifest["schema_version"]) is not int or manifest["schema_version"] != 1:
+    if not isinstance(manifest, dict) or set(manifest) != FIELDS or type(manifest["schema_version"]) is not int or manifest["schema_version"] not in (1, 2):
         raise DataError("release manifest fields/schema are invalid")
     for key, pattern in (("product_id", ID_PATTERN), ("version", VERSION_PATTERN), ("source_tree_hash", HASH), ("content_hash", HASH)):
         if not isinstance(manifest[key], str) or not pattern.fullmatch(manifest[key]):
@@ -182,6 +182,13 @@ def historical(previous):
         expected_zip = {f"{identity}/{name}": data for name, data in package.items()}
         expected_zip[marketplace_path(host)] = files[market_relative]
         verify_zip(files[raw_zip], expected_zip, "previous package")
+        if release["schema_version"] == 2:
+            installer = f"installers/{identity}-{version}-{host}-plugin.zip"
+            if installer not in files:
+                raise DataError(f"previous installer is missing: {installer}")
+            verify_zip(files[installer], {f"{identity}/{name}": data for name, data in package.items()},
+                       "previous installer")
+            allowed.add(installer)
         download = f"downloads/{identity}-{version}-{host}.zip"
         if files.get(download) != files[raw_zip]:
             raise DataError("previous qualified download differs from package ZIP")
