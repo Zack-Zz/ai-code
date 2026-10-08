@@ -20,7 +20,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 from _common import (GRADER_VERSION, REPO_ROOT, RUN_INDEX_KEYS, PREPARED_REF,
                      DataError, InvalidStateError, checked_scenario, exit_with, find_case)
 from _common import scenario_snapshot
+from workflow import build as wbuild
 from workflow import io as wio
+from workflow import package_check as wpackage
+from workflow import product as wproduct
+from workflow.product import HOSTS
 
 DETERMINISTIC = {"A23": "_grade_a23", "A24": "_grade_a24", "A25": "_grade_a25"}
 
@@ -30,8 +34,8 @@ def _validate_index(index):
         raise DataError("run index has missing or unknown fields")
     if not wio.is_strict_int(index["schema_version"]) or index["schema_version"] != 1:
         raise DataError("run index schema_version must be the integer 1")
-    if index["host"] not in ("zcode", "codex"):
-        raise DataError("run host must be zcode or codex")
+    if index["host"] not in HOSTS:
+        raise DataError(f"run host must be one of {HOSTS}")
     if index["comparison_mode"] not in ("native", "plugin") or index["capture_origin"] not in ("manual_annotation", "native_export"):
         raise DataError("invalid run comparison mode or capture origin")
     for field in ("package_content_hash", "policy_hash", "fixture_baseline_hash"):
@@ -124,11 +128,12 @@ class PackageRun:
         return {"relative_path": rel, "content_sha256": wio.sha256_bytes(payload),
                 "source_path": str(path)}
 
-    def command(self, args, fault=None):
+    def command(self, args, fault=None, entry=None):
+        entry = self.entry if entry is None else entry
         if fault is None:
-            return [sys.executable, str(self.entry), *map(str, args)]
+            return [sys.executable, str(entry), *map(str, args)]
         plan, target = fault
-        return [sys.executable, "-c", FAULT_DRIVER, str(self.entry), str(plan), str(target), *map(str, args)]
+        return [sys.executable, "-c", FAULT_DRIVER, str(entry), str(plan), str(target), *map(str, args)]
 
     def record(self, command, result, method="bound_package_cli"):
         number = len(self.commands) + 1
@@ -142,8 +147,8 @@ class PackageRun:
                               "method": method, **refs})
         return result
 
-    def call(self, args, expected=0, fault=None):
-        command = self.command(args, fault)
+    def call(self, args, expected=0, fault=None, entry=None):
+        command = self.command(args, fault, entry)
         result = self.record(command, subprocess.run(command, capture_output=True, text=True, timeout=60),
                              "bound_package_cli_with_concurrent_edit_fault" if fault else "bound_package_cli")
         if expected is not None and result.returncode != expected:
@@ -363,33 +368,74 @@ def _grade_a24(case, index, run):
 
 def _grade_a25(case, index, run):
     distribution = wio.load_json(run.scenario / "pkg/index.json")
+    spec = wproduct.load_product(REPO_ROOT)
+    inputs = wbuild._capture_inputs(spec)
+    wbuild._verify_source_capture(REPO_ROOT, inputs)
+    source_hash = wbuild._source_tree_hash(spec, inputs)
+    if source_hash != distribution["source_tree_hash"]:
+        raise InvalidStateError("trusted source_tree_hash differs from prepared distribution; prepare a new scenario")
+    hosts = spec.hosts
     reports, artifacts = {}, {}
+    shared_files = {}
     problems = []
-    for host in ("zcode", "codex"):
+    if set(distribution["hosts"]) != set(hosts):
+        problems.append("distribution hosts differ from declared product hosts")
+    for host in hosts:
+        if host not in distribution["hosts"]:
+            problems.append(f"{host}: declared host package missing")
+            continue
         package = run.scenario / "pkg" / host / "ai-code-workflow"
-        result = run.call(["package", "check", "--path", package, "--host", host])
-        reports[host] = json.loads(result.stdout)
+        entry = wio.resolve_member(run.scenario, f"pkg/{host}/ai-code-workflow/tools/workflow_tool.py")
+        result = run.call(["package", "check", "--path", package, "--host", host],
+                          expected=None, entry=entry)
+        if result.returncode != 0:
+            problems.append(f"{host}: package check exited {result.returncode}")
+        try:
+            report = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            report = None
+        if not isinstance(report, dict):
+            problems.append(f"{host}: package check report is not a JSON object")
+            report = {"ok": False, "problems": ["invalid package check report"]}
+        reports[host] = report
         artifacts[host] = wio.load_json(package / "artifact.json")
-        if reports[host].get("ok") is not True or reports[host]["content_hash"] != distribution["hosts"][host]["package_content_hash"]:
+        if report.get("ok") is not True or report.get("content_hash") != distribution["hosts"][host]["package_content_hash"]:
             problems.append(f"{host}: package check or distribution hash mismatch")
-    zcode = dict(artifacts["zcode"]["files"])
-    codex = dict(artifacts["codex"]["files"])
-    zcode_wrapping = {".zcode-plugin/plugin.json", "agents/workflow-reviewer.md"}
-    codex_wrapping = {"plugin.json", *(f"skills/{name}/agents/openai.yaml" for name in
-        ("workflow", "tdd", "debugging", "review", "verification", "review-results"))}
-    zcode_shared, codex_shared = set(zcode) - zcode_wrapping, set(codex) - codex_wrapping
-    if zcode_shared != codex_shared:
+        wrapping = {wpackage.MANIFEST_PATHS[host]}
+        # The standalone builder emits this reviewer even when a legacy
+        # product omits generated_agents. Explicit declarations are validated
+        # by load_product; both forms must use the producer's composition.
+        if host in ("claude", "zcode"):
+            target = "agents/workflow-reviewer.md"
+            template = f"adapters/{host}/agents/workflow-reviewer.md"
+            wrapping.add(target)
+            contract_source = next(source for source, target in spec.files
+                                   if target == "skills/review/references/reviewer-contract.md")
+            contract = inputs[contract_source.relative_to(spec.root).as_posix()].decode("utf-8")
+            expected = wbuild._compose_reviewer_agent(spec.root / template, contract, inputs[template])
+            actual = wio.read_owned(wio.resolve_member(package, target), root=package)
+            if actual != expected:
+                problems.append(f"{host}: generated reviewer differs from bound template and shared contract")
+        if host == "codex":
+            wrapping.update(f"skills/{name}/agents/openai.yaml"
+                            for name in spec.all_skills)
+        shared_files[host] = {rel: wio.sha256_file(wio.resolve_member(package, rel))
+                              for rel, _ in artifacts[host]["files"] if rel not in wrapping}
+    path_sets = [set(files) for files in shared_files.values()]
+    if path_sets and any(paths != path_sets[0] for paths in path_sets):
         problems.append("cross-host shared resource path sets differ")
-    shared = sorted(zcode_shared | codex_shared)
+    shared = sorted(set().union(*path_sets))
     for rel in shared:
-        if zcode.get(rel) != codex.get(rel):
+        if len({files.get(rel) for files in shared_files.values()}) != 1:
             problems.append(f"cross-host shared resource mismatch: {rel}")
+    reference = next(iter(artifacts.values()), None)
     for host, artifact in artifacts.items():
         for key in ("product_id", "version", "source_revision", "working_tree_dirty", "source_tree_hash", "profiles"):
-            expected = artifacts["zcode"][key] if key == "profiles" else distribution[key]
+            expected = reference[key] if key == "profiles" else distribution[key]
             if artifact[key] != expected or type(artifact[key]) is not type(expected):
                 problems.append(f"{host}: {key} mismatch")
     run.observations["traceability"] = {"reports": reports, "metadata_matches": not problems,
+                                        "source_tree_hash": source_hash,
                                         "shared_resources_checked": shared, "problems": problems}
     return [_result("A25-traceable-identical-core", "fail" if problems else "pass",
                     f"captured baseline, source metadata, package CLI checks and shared bytes checked; problems={problems}")]

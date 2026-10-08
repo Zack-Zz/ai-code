@@ -14,6 +14,7 @@ from pathlib import Path
 
 from . import io as wio
 from .io import ConflictError, DataError, InvalidStateError
+from .product import HOSTS
 
 TASK_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
 HEX64_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -32,7 +33,6 @@ ACTIONS = ("plan", "implement", "run_tests", "diagnose_write", "commit", "amend"
 EVIDENCE_KINDS = ("test", "review", "inspection", "host_run")
 EVIDENCE_RESULTS = ("pass", "fail", "not_run", "blocked_env", "needs_revalidation", "manual_review")
 CAPTURE_ORIGINS = ("tool_output", "native_export", "manual_annotation")
-HOSTS = ("zcode", "codex")
 
 _CREATE_KEYS = {"schema_version", "plan", "authorization_refs", "protected_paths"}
 _UPDATE_KEYS = {"schema_version", "plan", "progress", "append_authorization_refs", "append_evidence_refs"}

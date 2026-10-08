@@ -5,7 +5,7 @@
       "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
       "name": "ai-code-workflow",
       "source": "./ai-code-workflow",
-      "version": "1.0.0"
+      "version": "1.0.1"
     }
   ]
 }

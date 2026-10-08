@@ -67,6 +67,18 @@ def make_evidence(workspace: Path, *, result="pass", subject="calc.py", subject_
     }
 
 
+def make_host_evidence(workspace: Path, host: str, *, result="pass"):
+    evidence = make_evidence(workspace, result=result)
+    evidence["kind"] = "host_run"
+    evidence["execution"] = None
+    evidence["capture"]["origin"] = "manual_annotation"
+    evidence["host_context"] = {
+        "host": host, "host_version": "test-version", "model": "test-model",
+        "case_id": "A03", "package_content_hash": "a" * 64, "policy_hash": "b" * 64,
+    }
+    return evidence
+
+
 class TaskCreateTests(unittest.TestCase):
     def setUp(self):
         self.td = tempfile.TemporaryDirectory()
@@ -299,6 +311,60 @@ class EvidenceTests(unittest.TestCase):
             {"schema_version": 1, "append_evidence_refs": [ref]}, apply=True)
         self.assertTrue(result["applied"])
 
+    def test_register_and_check_host_run_for_each_declared_host(self):
+        hosts = json.loads((REPO_ROOT / "product.json").read_text())["hosts"]
+        revision = 1
+        for host in hosts:
+            with self.subTest(host=host):
+                ref = self.write_evidence(make_host_evidence(self.ws, host))
+                result = ws.update_task(
+                    self.ws, "demo", revision,
+                    {"schema_version": 1, "append_evidence_refs": [ref]}, apply=True)
+                self.assertTrue(result["applied"])
+                revision = result["record_revision"]
+                self.assertTrue(ws.check_task(self.ws, "demo")["consistent"])
+
+    def test_evidence_schema_hosts_match_declared_targets(self):
+        hosts = json.loads((REPO_ROOT / "product.json").read_text())["hosts"]
+        schema = json.loads((REPO_ROOT / "schemas/evidence.schema.json").read_text())
+        context = next(item for item in schema["properties"]["host_context"]["oneOf"]
+                       if item["type"] == "object")
+        self.assertEqual(set(context["properties"]["host"]["enum"]), set(hosts))
+
+    def test_host_run_rejects_unknown_host(self):
+        ref = self.write_evidence(make_host_evidence(self.ws, "unsupported"))
+        with self.assertRaisesRegex(DataError, "host_context.host must be one of"):
+            ws.update_task(self.ws, "demo", 1,
+                           {"schema_version": 1, "append_evidence_refs": [ref]}, apply=False)
+
+    def test_claude_host_run_keeps_unverified_results_when_metadata_is_missing(self):
+        revision = 1
+        for outcome in ("manual_review", "not_run", "blocked_env"):
+            with self.subTest(result=outcome):
+                evidence = make_host_evidence(self.ws, "claude", result=outcome)
+                for field in ("host_version", "model", "package_content_hash", "policy_hash"):
+                    evidence["host_context"][field] = None
+                evidence["started_at"] = evidence["finished_at"] = None
+                ref = self.write_evidence(evidence)
+                result = ws.update_task(
+                    self.ws, "demo", revision,
+                    {"schema_version": 1, "append_evidence_refs": [ref]}, apply=True)
+                revision = result["record_revision"]
+                self.assertTrue(ws.check_task(self.ws, "demo")["consistent"])
+                self.assertEqual(wio.load_json(self.evidence_path)["result"], outcome)
+
+    def test_claude_host_run_pass_rejects_failed_execution(self):
+        for field, value in (("exit_code", 1), ("signal", "SIGTERM"),
+                             ("start_error", "could not start")):
+            with self.subTest(field=field):
+                evidence = make_host_evidence(self.ws, "claude")
+                evidence["execution"] = make_evidence(self.ws)["execution"]
+                evidence["execution"][field] = value
+                ref = self.write_evidence(evidence)
+                with self.assertRaisesRegex(DataError, "host_run pass contradicts its execution failure"):
+                    ws.update_task(self.ws, "demo", 1,
+                                   {"schema_version": 1, "append_evidence_refs": [ref]}, apply=False)
+
     def test_register_rejects_wrong_hash(self):
         self.write_evidence(make_evidence(self.ws))
         bad = {"relative_path": "evidence/ev-1.json", "content_sha256": "0" * 64}
@@ -353,16 +419,15 @@ class EvidenceTests(unittest.TestCase):
                            {"schema_version": 1, "append_evidence_refs": [ref]}, apply=False)
 
     def test_host_run_with_unverified_host_info_cannot_pass(self):
-        evidence = make_evidence(self.ws)
-        evidence["kind"] = "host_run"
-        evidence["host_context"] = {
-            "host": "zcode", "host_version": None, "model": None,
-            "case_id": "A03", "package_content_hash": None, "policy_hash": None,
-        }
-        ref = self.write_evidence(evidence)
-        with self.assertRaises(DataError):
-            ws.update_task(self.ws, "demo", 1,
-                           {"schema_version": 1, "append_evidence_refs": [ref]}, apply=False)
+        for host in ("claude", "codex", "zcode"):
+            with self.subTest(host=host):
+                evidence = make_host_evidence(self.ws, host)
+                for field in ("host_version", "model", "package_content_hash", "policy_hash"):
+                    evidence["host_context"][field] = None
+                ref = self.write_evidence(evidence)
+                with self.assertRaisesRegex(DataError, "host_run pass requires complete host_context"):
+                    ws.update_task(self.ws, "demo", 1,
+                                   {"schema_version": 1, "append_evidence_refs": [ref]}, apply=False)
 
     def test_workspace_root_mismatch_rejected(self):
         evidence = make_evidence(self.ws)  # raw capture lives under our task dir

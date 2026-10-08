@@ -1,9 +1,9 @@
 {
-  "content_hash": "3b1b55839150c450ffa84ff666cfde6cbfea5cd4b2ca6da48b37389016f81672",
+  "content_hash": "5eaeab01d2fc5844fe4f05de6bb00c6db689233bd355c686d8528ce556bade3d",
   "files": [
     [
       ".claude-plugin/plugin.json",
-      "4103ac0f47b38b73eb43c0734ce489e62da993bb0bc662d9f9c65d1d7cd7885b"
+      "8dcc6c0bc97f9c717a83f2ee671fccb9ef4892c33adc8fd6ba76f261e74252fe"
     ],
     [
       "LICENSE",
@@ -19,11 +19,11 @@
     ],
     [
       "README.md",
-      "a31105af6f83176e603c9b19405678842354424dc82f40bc0689650cd3b6a9f3"
+      "db1563eab658cfe51bfea89a58f2e0542aeb06cfcb03a3d1f74dc3ce1dd97817"
     ],
     [
       "README_CN.md",
-      "786766aa1352a3fe0d6085f5f73ea8d32a989f2bd9e6ea33123eb2cb6c25731e"
+      "e912ab339120d19adf2c8aa0107804c868413518e6f881d1ec00a1ed3b7f21d1"
     ],
     [
       "agents/workflow-reviewer.md",
@@ -47,7 +47,7 @@
     ],
     [
       "schemas/evidence.schema.json",
-      "bcf648a0fda8ae407bc217aa3192f3a548493a9b40edf7b01ea3bf237bd9d5da"
+      "f8b8f455f760880cd63d04c6ab08781160a4e76a75f4e5fd426e762b7f1bebaf"
     ],
     [
       "schemas/policy.schema.json",
@@ -131,7 +131,7 @@
     ],
     [
       "tools/workflow/state.py",
-      "61c28004db9d8b403ffabc7119faa2fe71f2a02c7c343acf61b510254ecef41f"
+      "a6bb4e906a42ad856d18de0a5ba87dd4bdae54370b8d097c1ab6d8b693d19c32"
     ],
     [
       "tools/workflow_tool.py",
@@ -145,8 +145,8 @@
     "continuous"
   ],
   "schema_version": 1,
-  "source_revision": "f7dbb3bd4dfbc371c5dcd4d012496e261ca1126a",
-  "source_tree_hash": "35f761dea77fec9c3201d164bfec76cdd5d3df33e794eba154a45592a2a4fb53",
-  "version": "1.0.0",
+  "source_revision": "0932e15d1036563da47d15b5795ad81ea1d3cca3",
+  "source_tree_hash": "5a4c92e2b9bb26632c9eb0e6bf47c99ea83cafcdc795feabb45678d6586c942d",
+  "version": "1.0.1",
   "working_tree_dirty": true
 }

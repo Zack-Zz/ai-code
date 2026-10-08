@@ -16,7 +16,7 @@ policies or task records on every plugin.
 
 | Plugin | Purpose | Version and support |
 |---|---|---|
-| [CodeVow](plugins/ai-code-workflow/README.md) | Planning, TDD, debugging, review, verification and delivery evidence | Self-hosted preview candidate `1.0.0`; [real-host acceptance remains unverified](plugins/ai-code-workflow/docs/support-matrix.md) |
+| [CodeVow](plugins/ai-code-workflow/README.md) | Planning, TDD, debugging, review, verification and delivery evidence | Self-hosted preview candidate `1.0.1`; [real-host acceptance remains unverified](plugins/ai-code-workflow/docs/support-matrix.md) |
 
 `catalog.json` registers plugin directories. Each directory's `product.json`
 is the sole source of its plugin ID, version and resource whitelist. The root

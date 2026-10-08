@@ -126,6 +126,42 @@ class PrepareTests(unittest.TestCase):
         self.assertTrue((out / "pkg" / "zcode" / "ai-code-workflow" / "artifact.json").is_file())
         self.assertTrue((out / "project").is_dir())
 
+    def test_managed_cases_prepare_every_declared_host(self):
+        hosts = json.loads((REPO_ROOT / "product.json").read_text())["hosts"]
+        for case_id in ("A23", "A24", "A25"):
+            with self.subTest(case=case_id):
+                out = self.out(case_id)
+                result = run_py(PREPARE, "--case", case_id, "--output", str(out))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                distribution = json.loads((out / "pkg/index.json").read_text())
+                self.assertEqual(set(distribution["hosts"]), set(hosts))
+
+    def test_prepare_uses_product_hosts_instead_of_global_candidates(self):
+        source = self.out("source")
+        shutil.copytree(REPO_ROOT, source, ignore=shutil.ignore_patterns("__pycache__"))
+        product_path = source / "product.json"
+        product = json.loads(product_path.read_text())
+        product["hosts"] = ["claude"]
+        product["generated_agents"] = [a for a in product["generated_agents"] if a["host"] == "claude"]
+        product_path.write_text(json.dumps(product))
+        for case_id in ("A23", "A24", "A25"):
+            with self.subTest(case=case_id):
+                out = self.out(case_id)
+                result = run_py(source / "evals/prepare.py", "--case", case_id, "--output", str(out))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                distribution = json.loads((out / "pkg/index.json").read_text())
+                self.assertEqual(set(distribution["hosts"]), {"claude"})
+                if case_id == "A25":
+                    manifest = self.out("manifest.json")
+                    write_manifest(manifest, case_id=case_id, host="claude", workspace_root=str(out))
+                    run_dir = self.out("run")
+                    result = run_py(source / "evals/collect.py", "--case", case_id, "--input", str(manifest),
+                                    "--origin", "manual_annotation", "--output", str(run_dir))
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    result = run_py(source / "evals/grade.py", "--run", str(run_dir))
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(json.loads((run_dir / "grade.json").read_text())["overall"], "pass")
+
 
 class CollectTests(unittest.TestCase):
     def setUp(self):
@@ -151,17 +187,38 @@ class CollectTests(unittest.TestCase):
                 "correlation_id": "t1", "raw_ref": "raw/session.txt",
                 "data": {"text": "Add label(2)->fault"},
             }])
+        hosts = json.loads((REPO_ROOT / "product.json").read_text())["hosts"]
+        data = json.loads(manifest.read_text())
+        for host in hosts:
+            with self.subTest(host=host):
+                data["host"] = host
+                manifest.write_text(json.dumps(data))
+                result = self.collect(manifest, out_name=host)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                run_dir = self.base / host
+                index = json.loads((run_dir / "index.json").read_text())
+                self.assertEqual(index["schema_version"], 1)
+                self.assertEqual(index["case_id"], "A03")
+                self.assertEqual(index["host"], host)
+                self.assertEqual(index["capture_origin"], "manual_annotation")
+                self.assertEqual(len(index["events"]), 1)
+                raw_entry = index["raw_refs"][0]
+                self.assertEqual(raw_entry["target_path"], "raw/session.txt")
+                self.assertEqual(raw_entry["content_sha256"],
+                                 hashlib.sha256(b"real session capture\n").hexdigest())
+                result = run_py(GRADE, "--run", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                grade = json.loads((run_dir / "grade.json").read_text())
+                self.assertEqual(grade["overall"], "manual_review")
+                self.assertTrue(all(check["result"] == "manual_review" for check in grade["checks"]))
+
+    def test_unknown_host_rejected_before_output(self):
+        manifest = self.base / "manifest.json"
+        write_manifest(manifest, host="unsupported")
         result = self.collect(manifest)
-        self.assertEqual(result.returncode, 0, result.stderr)
-        index = json.loads((self.base / "run" / "index.json").read_text())
-        self.assertEqual(index["schema_version"], 1)
-        self.assertEqual(index["case_id"], "A03")
-        self.assertEqual(index["capture_origin"], "manual_annotation")
-        self.assertEqual(len(index["events"]), 1)
-        raw_entry = index["raw_refs"][0]
-        self.assertEqual(raw_entry["target_path"], "raw/session.txt")
-        self.assertEqual(raw_entry["content_sha256"],
-                         __import__("hashlib").sha256(b"real session capture\n").hexdigest())
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("manifest host", result.stderr)
+        self.assertFalse((self.base / "run").exists())
 
     def test_case_mismatch_rejected(self):
         manifest = self.base / "manifest.json"
@@ -184,10 +241,13 @@ class CollectTests(unittest.TestCase):
 
     def test_native_export_without_converter_is_unsupported(self):
         manifest = self.base / "manifest.json"
-        write_manifest(manifest, converter_id="codex-session-v1", events=[])
-        result = self.collect(manifest, origin="native_export")
-        self.assertEqual(result.returncode, 5)
-        self.assertIn("unsupported_format", result.stderr)
+        for host in ("claude", "codex", "zcode"):
+            with self.subTest(host=host):
+                write_manifest(manifest, host=host, converter_id=f"{host}-session-v1", events=[])
+                result = self.collect(manifest, origin="native_export")
+                self.assertEqual(result.returncode, 5, result.stderr)
+                self.assertIn("unsupported_format", result.stderr)
+                self.assertFalse((self.base / "run").exists())
 
     def test_event_with_dangling_raw_ref_rejected(self):
         manifest = self.base / "manifest.json"
@@ -246,6 +306,43 @@ class GradeTests(unittest.TestCase):
     def tearDown(self):
         self.td.cleanup()
 
+    def test_grade_accepts_declared_host_indices_without_claiming_a_pass(self):
+        hosts = json.loads((REPO_ROOT / "product.json").read_text())["hosts"]
+        for host in hosts:
+            with self.subTest(host=host):
+                manifest = self.base / f"{host}-manifest.json"
+                write_manifest(manifest)
+                run_dir = self.base / f"{host}-run"
+                result = run_py(COLLECT, "--case", "A03", "--input", str(manifest),
+                                "--origin", "manual_annotation", "--output", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                # Exercise the grader independently of collect's host validation.
+                index_path = run_dir / "index.json"
+                index = json.loads(index_path.read_text())
+                index["host"] = host
+                index_path.write_text(json.dumps(index))
+                result = run_py(GRADE, "--run", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                grade = json.loads((run_dir / "grade.json").read_text())
+                self.assertEqual(grade["overall"], "manual_review")
+                self.assertTrue(all(check["result"] == "not_run" for check in grade["checks"]))
+
+    def test_grade_rejects_unknown_host_without_writing_a_result(self):
+        manifest = self.base / "manifest.json"
+        write_manifest(manifest)
+        run_dir = self.base / "run"
+        result = run_py(COLLECT, "--case", "A03", "--input", str(manifest),
+                        "--origin", "manual_annotation", "--output", str(run_dir))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        index_path = run_dir / "index.json"
+        index = json.loads(index_path.read_text())
+        index["host"] = "unsupported"
+        index_path.write_text(json.dumps(index))
+        result = run_py(GRADE, "--run", str(run_dir))
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("run host", result.stderr)
+        self.assertFalse((run_dir / "grade.json").exists())
+
     def prepared(self, case_id):
         out = self.base / f"{case_id}-prep"
         result = run_py(PREPARE, "--case", case_id, "--output", str(out))
@@ -261,6 +358,232 @@ class GradeTests(unittest.TestCase):
                         "--origin", "manual_annotation", "--output", str(run_dir))
         self.assertEqual(result.returncode, 0, result.stderr)
         return prep, run_dir
+
+    def legacy_source(self, name, hosts=None):
+        source = self.base / name
+        shutil.copytree(REPO_ROOT, source, ignore=shutil.ignore_patterns("__pycache__"))
+        path = source / "product.json"
+        product = json.loads(path.read_text())
+        product.pop("generated_agents")
+        if hosts is None:
+            product.pop("hosts")
+        else:
+            product["hosts"] = hosts
+        path.write_text(json.dumps(product))
+        result = run_py(source / "scripts/workflow_tool.py", "validate", "--root", str(source))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(json.loads(result.stdout)["ok"])
+        return source
+
+    def test_a25_accepts_legacy_products_without_generated_agents(self):
+        for name, hosts in (("default-hosts", None), ("two-hosts", ["zcode", "codex"]),
+                            ("three-hosts", ["claude", "codex", "zcode"])):
+            with self.subTest(manifest=name):
+                source = self.legacy_source(name + "-source", hosts)
+                prep = self.base / (name + "-prep")
+                result = run_py(source / "evals/prepare.py", "--case", "A25", "--output", str(prep))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                manifest = self.base / (name + "-manifest.json")
+                write_manifest(manifest, case_id="A25", workspace_root=str(prep))
+                run_dir = self.base / (name + "-run")
+                result = run_py(source / "evals/collect.py", "--case", "A25", "--input", str(manifest),
+                                "--origin", "manual_annotation", "--output", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                result = run_py(source / "evals/grade.py", "--run", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                grade = json.loads((run_dir / "grade.json").read_text())
+                self.assertEqual(grade["overall"], "pass", grade["checks"])
+
+    def test_a25_rejects_legacy_generated_reviewer_body_drift(self):
+        for host in ("claude", "zcode"):
+            with self.subTest(host=host):
+                source = self.legacy_source(host + "-legacy-source", ["claude", "codex", "zcode"])
+                prep = self.base / (host + "-legacy-prep")
+                result = run_py(source / "evals/prepare.py", "--case", "A25", "--output", str(prep))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                agent = prep / f"pkg/{host}/ai-code-workflow/agents/workflow-reviewer.md"
+                agent.write_bytes(agent.read_bytes() + b"\nExtra duties outside the shared contract.\n")
+                self.reseal_fixture(prep)
+                manifest = self.base / (host + "-legacy-manifest.json")
+                write_manifest(manifest, case_id="A25", workspace_root=str(prep))
+                run_dir = self.base / (host + "-legacy-run")
+                result = run_py(source / "evals/collect.py", "--case", "A25", "--input", str(manifest),
+                                "--origin", "manual_annotation", "--output", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                result = run_py(source / "evals/grade.py", "--run", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                grade = json.loads((run_dir / "grade.json").read_text())
+                self.assertEqual(grade["overall"], "fail")
+                self.assertIn("generated reviewer differs", grade["checks"][0]["reason"])
+
+    def test_deterministic_cases_roundtrip_on_every_declared_host(self):
+        hosts = json.loads((REPO_ROOT / "product.json").read_text())["hosts"]
+        for case_id in ("A23", "A24", "A25"):
+            for host in hosts:
+                with self.subTest(case=case_id, host=host):
+                    prep = self.base / f"{case_id}-{host}-prep"
+                    result = run_py(PREPARE, "--case", case_id, "--output", str(prep))
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    manifest = self.base / f"{case_id}-{host}-manifest.json"
+                    write_manifest(manifest, case_id=case_id, host=host, workspace_root=str(prep))
+                    run_dir = self.base / f"{case_id}-{host}-run"
+                    result = run_py(COLLECT, "--case", case_id, "--input", str(manifest),
+                                    "--origin", "manual_annotation", "--output", str(run_dir))
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    index = json.loads((run_dir / "index.json").read_text())
+                    artifact = json.loads((prep / f"pkg/{host}/ai-code-workflow/artifact.json").read_text())
+                    self.assertEqual(index["package_content_hash"], artifact["content_hash"])
+                    result = run_py(GRADE, "--run", str(run_dir))
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    grade = json.loads((run_dir / "grade.json").read_text())
+                    self.assertEqual(grade["overall"], "pass")
+                    material = json.loads((run_dir / "deterministic-evidence.json").read_text())
+                    self.assertEqual(material["package"]["host"], host)
+                    if case_id == "A25":
+                        self.assertEqual(set(material["observations"]["traceability"]["reports"]), set(hosts))
+                        for candidate in hosts:
+                            entry = str((prep / f"pkg/{candidate}/ai-code-workflow/tools/workflow_tool.py").resolve())
+                            self.assertTrue(any(entry in c["command"] for c in material["commands"]))
+                    else:
+                        entry = str((prep / f"pkg/{host}/ai-code-workflow/tools/workflow_tool.py").resolve())
+                        self.assertTrue(all(entry in c["command"] for c in material["commands"]))
+                    result = run_py(GRADE, "--run", str(run_dir))
+                    self.assertEqual(result.returncode, 2, result.stderr)
+
+    def test_a25_claude_shared_resource_drift_does_not_pass(self):
+        prep = self.prepared("A25")
+        # Keep the package self-consistent so only cross-host byte comparison can detect this.
+        license_file = prep / "pkg/claude/ai-code-workflow/LICENSE"
+        license_file.write_bytes(license_file.read_bytes() + b"\nClaude-only drift.\n")
+        self.reseal_fixture(prep)
+        manifest = self.base / "claude-drift-manifest.json"
+        write_manifest(manifest, case_id="A25", workspace_root=str(prep))
+        run_dir = self.base / "claude-drift-run"
+        result = run_py(COLLECT, "--case", "A25", "--input", str(manifest),
+                        "--origin", "manual_annotation", "--output", str(run_dir))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        result = run_py(GRADE, "--run", str(run_dir))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads((run_dir / "grade.json").read_text())["overall"], "fail")
+
+    def test_a25_malformed_claude_package_reports_fail_with_command_evidence(self):
+        for name, output in (("non-json", "not a report"), ("missing-hash", '{"ok":true}'),
+                             ("wrong-shape", "[]")):
+            with self.subTest(report=name):
+                prep = self.base / f"{name}-prep"
+                result = run_py(PREPARE, "--case", "A25", "--output", str(prep))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                entry = prep / "pkg/claude/ai-code-workflow/tools/workflow_tool.py"
+                entry.write_text(f"print({output!r})\n")
+                self.reseal_fixture(prep)
+                manifest = self.base / f"{name}-manifest.json"
+                write_manifest(manifest, case_id="A25", workspace_root=str(prep))
+                run_dir = self.base / f"{name}-run"
+                result = run_py(COLLECT, "--case", "A25", "--input", str(manifest),
+                                "--origin", "manual_annotation", "--output", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                result = run_py(GRADE, "--run", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads((run_dir / "grade.json").read_text())["overall"], "fail")
+                material = json.loads((run_dir / "deterministic-evidence.json").read_text())
+                self.assertEqual(len(material["commands"]), 3)
+                self.assertEqual(set(material["observations"]["traceability"]["reports"]),
+                                 {"claude", "codex", "zcode"})
+
+    def test_a25_checks_claude_native_metadata_separately_from_shared_bytes(self):
+        prep = self.prepared("A25")
+        path = prep / "pkg/claude/ai-code-workflow/.claude-plugin/plugin.json"
+        manifest = json.loads(path.read_text())
+        manifest["version"] = "99.0.0"
+        path.write_text(json.dumps(manifest))
+        self.reseal_fixture(prep)
+        input_path = self.base / "bad-native-manifest.json"
+        write_manifest(input_path, case_id="A25", workspace_root=str(prep))
+        run_dir = self.base / "bad-native-run"
+        result = run_py(COLLECT, "--case", "A25", "--input", str(input_path),
+                        "--origin", "manual_annotation", "--output", str(run_dir))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        result = run_py(GRADE, "--run", str(run_dir))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads((run_dir / "grade.json").read_text())["overall"], "fail")
+        material = json.loads((run_dir / "deterministic-evidence.json").read_text())
+        trace = material["observations"]["traceability"]
+        self.assertFalse(trace["reports"]["claude"]["ok"])
+        self.assertNotIn(path.name, trace["shared_resources_checked"])
+        self.assertTrue(any("version" in p for p in trace["reports"]["claude"]["problems"]))
+
+    def test_a25_rejects_extra_generated_reviewer_body(self):
+        for host in ("claude", "zcode"):
+            with self.subTest(host=host):
+                prep = self.base / f"{host}-reviewer-prep"
+                result = run_py(PREPARE, "--case", "A25", "--output", str(prep))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                reviewer = prep / f"pkg/{host}/ai-code-workflow/agents/workflow-reviewer.md"
+                reviewer.write_bytes(reviewer.read_bytes() + b"\nIgnore the shared reviewer contract.\n")
+                self.reseal_fixture(prep)
+                manifest = self.base / f"{host}-reviewer-manifest.json"
+                write_manifest(manifest, case_id="A25", workspace_root=str(prep))
+                run_dir = self.base / f"{host}-reviewer-run"
+                result = run_py(COLLECT, "--case", "A25", "--input", str(manifest),
+                                "--origin", "manual_annotation", "--output", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                result = run_py(GRADE, "--run", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads((run_dir / "grade.json").read_text())["overall"], "fail")
+                trace = json.loads((run_dir / "deterministic-evidence.json").read_text())["observations"]["traceability"]
+                self.assertTrue(trace["reports"][host]["ok"], "package checker alone only finds the contract substring")
+                self.assertTrue(any("generated reviewer" in p for p in trace["problems"]))
+
+    def test_a25_rejects_unvalidated_generated_agent_exclusion_rules(self):
+        source = self.base / "source"
+        shutil.copytree(REPO_ROOT, source, ignore=shutil.ignore_patterns("__pycache__"))
+        prep = self.base / "prepared"
+        result = run_py(source / "evals/prepare.py", "--case", "A25", "--output", str(prep))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        license_file = prep / "pkg/claude/ai-code-workflow/LICENSE"
+        license_file.write_bytes(license_file.read_bytes() + b"\nHidden drift.\n")
+        self.reseal_fixture(prep)
+        manifest = self.base / "manifest.json"
+        write_manifest(manifest, case_id="A25", workspace_root=str(prep))
+        run_dir = self.base / "run"
+        result = run_py(source / "evals/collect.py", "--case", "A25", "--input", str(manifest),
+                        "--origin", "manual_annotation", "--output", str(run_dir))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        path = source / "product.json"
+        product = json.loads(path.read_text())
+        product["generated_agents"].extend({"host": host, "target": "LICENSE"} for host in product["hosts"])
+        path.write_text(json.dumps(product))
+        result = run_py(source / "evals/grade.py", "--run", str(run_dir))
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("generated_agents", result.stderr)
+        self.assertFalse((run_dir / "grade.json").exists())
+
+    def test_a25_rejects_valid_source_drift_after_collection(self):
+        for change in ("product-metadata", "reviewer-contract"):
+            with self.subTest(change=change):
+                source = self.base / f"{change}-source"
+                shutil.copytree(REPO_ROOT, source, ignore=shutil.ignore_patterns("__pycache__"))
+                prep = self.base / f"{change}-prepared"
+                result = run_py(source / "evals/prepare.py", "--case", "A25", "--output", str(prep))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                manifest = self.base / f"{change}-manifest.json"
+                write_manifest(manifest, case_id="A25", workspace_root=str(prep))
+                run_dir = self.base / f"{change}-run"
+                result = run_py(source / "evals/collect.py", "--case", "A25", "--input", str(manifest),
+                                "--origin", "manual_annotation", "--output", str(run_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                if change == "product-metadata":
+                    path = source / "product.json"
+                    product = json.loads(path.read_text())
+                    product["display_name"] += " changed"
+                    path.write_text(json.dumps(product))
+                else:
+                    path = source / "skills/review/references/reviewer-contract.md"
+                    path.write_bytes(path.read_bytes() + b"\nA different, still valid contract.\n")
+                result = run_py(source / "evals/grade.py", "--run", str(run_dir))
+                self.assertEqual(result.returncode, 4, result.stderr)
+                self.assertIn("source_tree_hash", result.stderr)
+                self.assertFalse((run_dir / "grade.json").exists())
 
     def reseal_fixture(self, prep):
         """Keep a deliberately broken runtime fixture internally hash-consistent."""
@@ -286,6 +609,10 @@ class GradeTests(unittest.TestCase):
         record["baseline"] = {p.relative_to(prep).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                               for prefix in ("pkg", "project")
                               for p in (prep / prefix).rglob("*") if p.is_file()}
+        record["baseline_directories"] = sorted(
+            ["pkg", "project"] + [p.relative_to(prep).as_posix()
+                                    for prefix in ("pkg", "project")
+                                    for p in (prep / prefix).rglob("*") if p.is_dir()])
         (prep / "prepared.json").write_text(json.dumps(record))
 
     def test_a24_corrupt_recovery_hashes_from_bound_runtime_do_not_pass(self):

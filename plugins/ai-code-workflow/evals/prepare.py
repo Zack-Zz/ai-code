@@ -100,8 +100,7 @@ def prepare(case_id: str, output: Path) -> dict:
         git_baselines = json.loads(result.stdout)["subcase_baselines"]
         prefixes = ["repo"]
     elif fixture == "managed_package":
-        hosts = ["zcode", "codex"] if case_id == "A25" else ["zcode"]
-        wbuild.build_packages(REPO_ROOT, hosts, output / "pkg")
+        wbuild.build_packages(REPO_ROOT, ["all"], output / "pkg")
         (output / "project").mkdir()
         prefixes = ["pkg", "project"]
     else:  # pragma: no cover - cases.json constrains fixture names

@@ -14,7 +14,7 @@
 
 | 插件 | 用途 | 版本与支持状态 |
 |---|---|---|
-| [CodeVow](plugins/ai-code-workflow/README.zh-CN.md) | 计划、TDD、排查、审查、验证与交付证据 | `1.0.0` 自建市场试用候选；[真实宿主验收仍未完成](plugins/ai-code-workflow/docs/support-matrix.md) |
+| [CodeVow](plugins/ai-code-workflow/README.zh-CN.md) | 计划、TDD、排查、审查、验证与交付证据 | `1.0.1` 自建市场试用候选；[真实宿主验收仍未完成](plugins/ai-code-workflow/docs/support-matrix.md) |
 
 `catalog.json` 只登记插件目录；各目录的 `product.json` 是插件 ID、版本和
 资源白名单的唯一来源。根目录的私有 Node 包用于仓库维护，其版本不作为

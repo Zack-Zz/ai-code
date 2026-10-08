@@ -43,8 +43,12 @@ package guides and acceptance evidence; all three evidence slots are currently
 
 Claude Code and ZCode reviewers use the same shared contract, with native
 read-only tool declarations, inherited model selection and twelve turns.
-Their actual enforcement is unverified. The existing A25 eval remains the
-historical Codex/ZCode matrix; it does not certify the new Claude target.
+Their actual enforcement is unverified. In the current `1.0.1` candidate,
+A23/A24 prepare packages for every declared host and exercise the selected
+package's owned-file tools; A25 checks all declared packages and their shared
+resources. These deterministic checks do not establish native installation,
+skill behavior or reviewer enforcement. Historical Codex/ZCode results retain
+their original scope.
 
 ## What it gives you
 
@@ -84,7 +88,7 @@ Self-hosted distribution: [publishing preparation](../../docs/publishing.md).
 The source-specific tool remains `plugins/ai-code-workflow/scripts/workflow_tool.py`
 from the repository root; its installed entry remains `tools/workflow_tool.py`.
 Policy/task/files behavior belongs to this plugin. Its ID and candidate version
-are `ai-code-workflow` and `1.0.0`.
+are `ai-code-workflow` and `1.0.1`.
 
 ## Plugin directory map
 

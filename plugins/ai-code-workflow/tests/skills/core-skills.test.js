@@ -161,6 +161,19 @@ function runTests() {
         'critical flag must mark exactly the acceptance-matrix key set');
     }],
 
+    ['deterministic cases describe declared hosts and the tool-only acceptance boundary', () => {
+      const cases = JSON.parse(read('evals/cases.json')).cases;
+      for (const id of ['A23', 'A24', 'A25']) {
+        const c = cases.find((entry) => entry.case_id === id);
+        const text = c.turns.map((t) => t.content).join(' ');
+        assert.match(text, /declared hosts/i, `${id}: use the product host declaration`);
+        assert.match(text, /native.*install.*not|not.*native.*install/i,
+          `${id}: deterministic tool evidence does not certify native installation`);
+      }
+      const a25 = cases.find((entry) => entry.case_id === 'A25');
+      assert.match(a25.checks[0].expected, /all declared host packages/i);
+    }],
+
     ['all six fixtures exist with their required props', () => {
       assert.ok(exists('evals/fixtures/python_labels/labels.py'));
       assert.ok(exists('evals/fixtures/python_labels/test_baseline.py'));

@@ -1,6 +1,6 @@
 # Support matrix and current verification status
 
-## Current package targets (2026-10-07)
+## Current package targets (1.0.1 candidate, 2026-10-08)
 
 | Target | Native package format | Runtime acceptance |
 |---|---|---|
@@ -9,9 +9,30 @@
 | ZCode | .zcode-plugin/plugin.json, marketplace.json and shared-contract reviewer | unverified; release acceptance is null |
 
 Claude Code is a newly declared package target. Official format references and
-local script/package checks do not establish native loading or behavior. The
-existing A25 scenario still covers Codex/ZCode; it is not three-host acceptance.
-The dated evidence below retains its original scope, numbers and hashes.
+local script/package checks do not establish native loading or behavior.
+Current A23/A24/A25 fixtures include every host declared by this plugin, and
+A25 checks the shared bytes and source identity across those packages.
+Historical Codex/ZCode results below retain their original scope and hashes.
+
+Evidence input update (2026-10-08): task `host_run` records and the
+`collect.py`/`grade.py` input contracts accept `claude`, `codex` and `zcode`.
+Claude session material can use `manual_annotation`; native-export converters
+remain unavailable. A23/A24 execute the selected host package's owned-file
+staging, update, removal and recovery CLI in an isolated fixture. A25 checks
+all declared packages, including shared licenses and reviewer content where
+applicable. Grader 1.2.0 binds a validated source snapshot to the scenario
+source hash and requires each generated reviewer to match its complete
+source-derived content. These are deterministic tool/package checks, not native plugin
+installation or live-host acceptance.
+
+The bound package CLI report remains execution evidence, not an independent
+source verifier. Initial distribution verification separately uses the public
+checker from the trusted repository; a package must not validate itself as
+its initial trust source.
+
+[Current 1.0.1 verification record](reviews/2026-10-08-three-host-evals.md)
+reports the executed three-host tool chains, source/package checks, repeated
+builds and draft verification. It does not complete real-host acceptance.
 
 Directory note (2026-10-07): this is the dated workflow baseline, now under
 `plugins/ai-code-workflow/`. Original counts, commands and hashes below are
@@ -26,7 +47,7 @@ official packaging references and actual native probes; no complete host
 acceptance matrix has passed. Native installation and
 partial smoke observations are reported separately below.
 
-## Deterministic verification (real, executed)
+## Historical deterministic verification (2026-10-03)
 
 | Area | Evidence |
 |---|---|

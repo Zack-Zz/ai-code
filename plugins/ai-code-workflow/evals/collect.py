@@ -32,6 +32,7 @@ from _common import (  # noqa: E402
 )
 
 from workflow import io as wio  # noqa: E402
+from workflow.product import HOSTS  # noqa: E402
 
 CONVERTERS: dict = {}  # converter_id -> callable; none implemented yet
 MAX_EVENT_DATA_BYTES = 64 * 1024
@@ -49,8 +50,8 @@ def _validate_manifest(data, expected_case: str) -> dict:
         raise DataError("manifest schema_version must be the integer 1")
     if data["case_id"] != expected_case:
         raise DataError(f"manifest case_id {data['case_id']!r} != --case {expected_case!r}")
-    if data["host"] not in ("zcode", "codex"):
-        raise DataError("manifest host must be zcode or codex")
+    if data["host"] not in HOSTS:
+        raise DataError(f"manifest host must be one of {HOSTS}")
     if data["comparison_mode"] not in ("native", "plugin"):
         raise DataError("manifest comparison_mode must be native or plugin")
     for field in ("host_version", "model", "package_content_hash", "policy_hash",

@@ -40,7 +40,7 @@
           "additionalProperties": false,
           "required": ["host", "host_version", "model", "case_id", "package_content_hash", "policy_hash"],
           "properties": {
-            "host": {"enum": ["zcode", "codex"]},
+            "host": {"enum": ["claude", "codex", "zcode"]},
             "host_version": {"type": ["string", "null"]},
             "model": {"type": ["string", "null"]},
             "case_id": {"type": "string", "pattern": "^A(0[1-9]|1[0-9]|2[0-5])$"},

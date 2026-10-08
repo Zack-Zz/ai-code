@@ -7,6 +7,12 @@
 原 workflow 行为与任务/证据契约仍由本插件维护。历史执行 Prompt 不构成
 当前授权，历史验证结果不因迁移获得新的通过声明。
 
+当前实现补充（2026-10-08，1.0.1 候选）：host_run、collect 与 grade 接受
+Claude Code、Codex 和 ZCode；A23/A24/A25 的准备范围来自插件实际声明的
+hosts，已有 prepared/index 字段不变。A25 对全部声明包校验共同资源与来源。
+下文历史两端示例保持原样，现行范围见
+[本轮设计](2026-10-08-codevow-three-host-evals.md)。
+
 本文固定实现规格中使用的数据字段、校验规则、模块接口和路径语义。JSON 示例用于说明格式；时间、消息引用和哈希必须来自实际运行，执行者不能复制示例值冒充证据。本插件任务、证据、策略与 artifact 使用 schema_version=1，并拒绝重复 JSON key、未知字段和不合法类型；公共发行 index 的 schema_version=2 见多插件规格。
 
 ## 产品来源
@@ -120,6 +126,9 @@ task create/update 默认只返回 proposed_record、changed、applied=false。-
 
 ## 证据结构和失效判断
 
+宿主枚举补齐（2026-10-08）：任务证据、验收采集与分级现接受 claude、codex、zcode，
+与当前产品声明和 evidence.schema.json 一致；此输入契约不构成真实宿主验收通过。
+
 模板 evidence.json 是填写事实的输入，不是通过证明。每条证据存为任务目录 evidence/<evidence_id>.json，raw 记录存为该任务目录内的独立文件；evidence_id 使用同 task_id 的名称规则。
 
 | 字段 | 约束 |
@@ -134,7 +143,7 @@ task create/update 默认只返回 proposed_record、changed、applied=false。-
 | observations | 已观察事实的简短字符串数组，不放无必要的完整会话或凭证 |
 | started_at、finished_at | 已实际运行的证据为工具观察时间；未运行允许 null |
 
-test 的 pass 要求 execution 非空、exit_code=0、signal 和 start_error 均为 null，并有实际结束时间和捕获记录。host_run 的 host_context 必须与实际材料索引一致，host 为 zcode 或 codex，case_id 为 A01 至 A25；没有取得的版本或模型信息填 null，并保持 manual_review/not_run/blocked_env，不能判 pass。还须有相应场景结果，只有进程启动不能判 pass。review/inspection 允许 execution=null，但须说明真实读取或审查来源；无法确认语义时用 manual_review。
+test 的 pass 要求 execution 非空、exit_code=0、signal 和 start_error 均为 null，并有实际结束时间和捕获记录。host_run 的 host_context 必须与实际材料索引一致，host 为 claude、codex 或 zcode，case_id 为 A01 至 A25；没有取得的版本或模型信息填 null，并保持 manual_review/not_run/blocked_env，不能判 pass。还须有相应场景结果，只有进程启动不能判 pass。review/inspection 允许 execution=null，但须说明真实读取或审查来源；无法确认语义时用 manual_review。
 
 host_run 提供 execution 时，pass 同样要求 exit_code=0、signal/start_error=null；不得将明确失败的运行登记成 pass。execution=null 仍可用于具有原生导出材料的宿主会话，是否真正通过场景由独立验收判断。哈希字段必须为字符串并完整匹配 64 位小写十六进制，布尔值、数字、对象或尾随换行均拒绝。
 

@@ -21,7 +21,7 @@ from workflow.io import (  # noqa: E402
 
 CASES_PATH = REPO_ROOT / "evals" / "cases.json"
 FIXTURES = REPO_ROOT / "evals" / "fixtures"
-GRADER_VERSION = "1.1.0"
+GRADER_VERSION = "1.2.0"
 PREPARED_REF = "scenario/prepared.json"
 
 EVENT_KINDS = ("user_message", "agent_message", "skill_load", "tool_call",

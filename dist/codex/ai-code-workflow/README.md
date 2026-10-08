@@ -22,6 +22,12 @@ acceptance is unverified**: packaging, hashes and script tests do not prove
 skill discovery, automatic invocation, policy loading or reviewer enforcement.
 Use a fresh, explicitly authorized host session to verify those behaviors.
 
+Task host-run evidence accepts all three targets. In the source repository,
+A23/A24 exercise each selected package's file staging and recovery tools, and
+A25 checks all declared host packages and common resource hashes. These are
+deterministic tool/package checks; they do not install into a host or run a
+model. The evaluation scripts themselves are source-only developer tools.
+
 ## Dependencies, network and writes
 
 Use your own host installation, account and selected model. Native Markdown

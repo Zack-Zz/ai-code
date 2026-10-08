@@ -254,7 +254,7 @@
     {
       "case_id": "A23", "kind": "manager", "fixture": "managed_package", "policy_mode": "collaborative", "critical": false,
       "turns": [
-        {"role": "user", "content": "Install the staged package, install it again over itself, update it with a new build, then remove it.", "phase": "request"}
+        {"role": "user", "content": "Prepare packages for all declared hosts. For the selected host's bound package CLI, stage it in the disposable project, repeat staging, update it, then remove it. Native installation is not certified by this deterministic tool scenario.", "phase": "request"}
       ],
       "checks": [
         {"check_id": "A23-no-duplicates", "method": "package_check", "expected": "repeat staging produces no duplicate components and refuses blind overwrite", "failure_effect": "blocking"},
@@ -265,7 +265,7 @@
     {
       "case_id": "A24", "kind": "manager", "fixture": "managed_package", "policy_mode": "collaborative", "critical": false,
       "turns": [
-        {"role": "user", "content": "Apply an update that gets interrupted mid-way, and run a concurrent apply against the same target.", "phase": "request"}
+        {"role": "user", "content": "Prepare packages for all declared hosts. For the selected host's bound package CLI, apply an update that gets interrupted mid-way, and run a concurrent apply against the same disposable target. Native installation is not certified by this deterministic tool scenario.", "phase": "request"}
       ],
       "checks": [
         {"check_id": "A24-interrupt-reported", "method": "package_check", "expected": "interrupted operation reports applied vs unapplied items with recovery basis; no claim of overall success; later user edits are not clobbered by recovery", "failure_effect": "blocking"},
@@ -276,10 +276,10 @@
     {
       "case_id": "A25", "kind": "package", "fixture": "managed_package", "policy_mode": "collaborative", "critical": false,
       "turns": [
-        {"role": "user", "content": "Generate ZCode and Codex packages from the same source and verify traceability.", "phase": "request"}
+        {"role": "user", "content": "Generate packages for all declared hosts from the same source and verify each bound package CLI, metadata and shared bytes, distinguishing native wrapping and generated resources. Native installation is not certified by this deterministic tool scenario.", "phase": "request"}
       ],
       "checks": [
-        {"check_id": "A25-traceable-identical-core", "method": "package_check", "expected": "both host packages carry identical skill/policy content hashes, consistent identity and version, and matching source records; no local sensitive records included", "failure_effect": "blocking"}
+        {"check_id": "A25-traceable-identical-core", "method": "package_check", "expected": "all declared host packages pass their actual bound CLI package check and carry identical shared resource bytes, consistent identity and version, and matching source records; host wrapping and generated resources are compared separately from shared content; no local sensitive records included", "failure_effect": "blocking"}
       ],
       "required_evidence": ["artifact manifests", "source revision", "hashes"]
     }
