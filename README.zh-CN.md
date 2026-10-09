@@ -20,7 +20,44 @@
 资源白名单的唯一来源。根目录的私有 Node 包用于仓库维护，其版本不作为
 任何插件的发行版本。
 
-## 快速开始
+## 从 Release 安装 CodeVow
+
+打开 [CodeVow 1.0.2](https://github.com/Zack-Zz/ai-code/releases/tag/ai-code-workflow%2Fv1.0.2)，
+在 **Assets** 中下载对应宿主的 ZIP；这些包无需下载源码或自行构建。
+此版本为 prerelease，真实宿主验收仍未完成。
+
+| 宿主 | 下载资产 |
+|---|---|
+| Claude Code | `ai-code-workflow-1.0.2-claude.zip` |
+| Codex | `ai-code-workflow-1.0.2-codex.zip` |
+| ZCode | `ai-code-workflow-1.0.2-zcode.zip` |
+
+同时下载 `SHA256SUMS`，解压前将 ZIP 的 SHA256 与其中
+`downloads/<资产文件名>` 条目比较。例如在 macOS/Linux 上执行：
+
+```sh
+shasum -a 256 ~/Downloads/ai-code-workflow-1.0.2-zcode.zip
+```
+
+将 ZIP 解压到长期保留的目录，并保留隐藏文件。每个下载包包含
+`ai-code-workflow/` 和名为 `ai-code-local` 的本地市场，然后按宿主安装：
+
+- **Claude Code：** 执行 `claude plugin marketplace add /path/to/extracted/claude`，
+  再执行 `claude plugin install ai-code-workflow@ai-code-local`。
+- **Codex：** 执行 `codex plugin marketplace add /path/to/extracted/codex`，
+  重启支持插件的桌面客户端，在插件目录中选择 `ai-code-local` 并安装 CodeVow。
+  CLI 不同时先查看 `codex plugin marketplace --help`。
+- **ZCode：** 在插件设置中添加解压后的 `marketplace.json` 或其所在目录为市场，
+  再安装并启用 CodeVow。
+
+上述路径应替换为对应宿主 ZIP 的实际解压目录。安装后新建宿主会话，确认插件
+加载。以 `-plugin.zip` 结尾的资产只包含插件，供发行市场使用，不含上述本地
+市场；GitHub 自动提供的 **Source code** 下载是开发源码。
+
+校验与更新的详细说明见[安装指南（英文）](plugins/ai-code-workflow/docs/installation.md)。
+Release 与 preview 市场分支分别发布；Release 可下载不代表远端市场已经部署。
+
+## 开发者快速开始
 
 在仓库根目录执行，需要 Python 3.11+ 与 Node 22+：
 
@@ -49,7 +86,7 @@ schema 2 发行套件新增 `installers/ID-VERSION-HOST-plugin.zip`，仅含一�
 各自用途。每个插件独立 Release，经审阅的 distribution 计划为 Claude/ZCode
 选择固定资产，为 Codex 固定版本目录提交；人工 Publish 后再单独部署市场。
 试用/正式市场目标分支为 `codex/marketplace-preview` 与 `codex/marketplace`。
-远端发布、原生运输和升级仍未验收；新运输通过真实验收前，保留现有 dist
+远端发布与市场部署分别记录，原生运输和升级仍未验收；新运输通过真实验收前，保留现有 dist
 和 ai-code-local 入口。
 
 源校验、包完整性和测试通过不代表原生加载成功或模型遵循技能。真实宿主验收

@@ -23,7 +23,49 @@ is the sole source of its plugin ID, version and resource whitelist. The root
 private Node package is maintenance tooling; its version is not a plugin
 release version.
 
-## Quick start
+## Install CodeVow from a Release
+
+Open [CodeVow 1.0.2](https://github.com/Zack-Zz/ai-code/releases/tag/ai-code-workflow%2Fv1.0.2)
+and download the ZIP for your host from **Assets**. No source checkout or build
+is needed for these packages. This is a prerelease; real-host acceptance is
+still unverified.
+
+| Host | Download asset |
+|---|---|
+| Claude Code | `ai-code-workflow-1.0.2-claude.zip` |
+| Codex | `ai-code-workflow-1.0.2-codex.zip` |
+| ZCode | `ai-code-workflow-1.0.2-zcode.zip` |
+
+Download `SHA256SUMS` too. Compare the ZIP's SHA256 with its
+`downloads/<asset-name>` entry before extracting; on macOS/Linux, for example:
+
+```sh
+shasum -a 256 ~/Downloads/ai-code-workflow-1.0.2-zcode.zip
+```
+
+Extract into a permanent directory, keeping hidden files. Each download ZIP
+contains `ai-code-workflow/` and an `ai-code-local` marketplace. Then:
+
+- **Claude Code:** run `claude plugin marketplace add /path/to/extracted/claude`,
+  then `claude plugin install ai-code-workflow@ai-code-local`.
+- **Codex:** run `codex plugin marketplace add /path/to/extracted/codex`, restart
+  your supported desktop client, and install CodeVow from the `ai-code-local`
+  marketplace in its plugin directory. Check `codex plugin marketplace --help`
+  if your CLI differs.
+- **ZCode:** in the plugin settings, add the extracted `marketplace.json` or its
+  containing directory as a marketplace, then install and enable CodeVow.
+
+Replace each example path with the directory where you extracted that host's
+ZIP. Start a new host session and confirm the plugin loads. Assets ending in
+`-plugin.zip` contain only the plugin and are intended for marketplace
+distribution; they do not contain the local marketplace used above. GitHub's
+automatic **Source code** downloads are development sources.
+
+For verification and updates, see the [installation guide](plugins/ai-code-workflow/docs/installation.md).
+The Release and the preview marketplace branch are published separately;
+availability of a Release does not mean the remote marketplace is deployed.
+
+## Developer quick start
 
 Run from the repository root with Python 3.11+ and Node 22+:
 
@@ -55,8 +97,8 @@ marketplace. Download and submission ZIPs retain their separate purposes.
 Each plugin has its own Release. Reviewed distribution plans select fixed
 assets for Claude/ZCode and a pinned version directory for Codex; marketplace
 deployment follows human Publish as a separate step. Preview/stable markets
-target `codex/marketplace-preview` and `codex/marketplace`. Remote publication,
-native transport and upgrades remain unverified. Existing `dist/` and
+target `codex/marketplace-preview` and `codex/marketplace`. Publication and market
+deployment are recorded separately; native transport and upgrades remain unverified. Existing `dist/` and
 `ai-code-local` entries stay available until the new transports pass acceptance.
 
 Source checks and package integrity checks do not certify native loading or
