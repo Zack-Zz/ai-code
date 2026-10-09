@@ -1,0 +1,8 @@
+{
+  "files": {
+    ".agents/plugins/marketplace.json": "00f46c76f3f796b148604c0824cecfc879aab1724ef1d164864ae2acff6b8612",
+    ".claude-plugin/marketplace.json": "83d52723a622bfb9b82335eb399117e3b1c23bea997f0ec40757619e560c0425",
+    "marketplace.json": "8cb8424fb1a538debfa3a3b8ccdec9501bbbbd2431b985b9db9a721f075f9044"
+  },
+  "schema_version": 1
+}

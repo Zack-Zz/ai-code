@@ -1,0 +1,128 @@
+{
+  "channel": "preview",
+  "codex_files": {
+    "plugins/codex/ai-code-workflow/1.0.2/LICENSE": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
+    "plugins/codex/ai-code-workflow/1.0.2/LICENSES/backend-engineering-lite.txt": "adc77fd0db182e6062199b35ff68b0994cbe0dae6ecd8511b4c3d887e6fb8f4b",
+    "plugins/codex/ai-code-workflow/1.0.2/NOTICE": "93a6cecdf6dd5827585564db87b0ee49730a1a4f1281c649b9b4ef8a513bcd01",
+    "plugins/codex/ai-code-workflow/1.0.2/README.md": "44ac6776a2272bce4c22b6f380e0dabdf3a4bc24b7bc763fb342ee7c44d261f3",
+    "plugins/codex/ai-code-workflow/1.0.2/README_CN.md": "ad0d5b6225b38aa0d75abfcdb2a070698d1b21701c58b24030468b0dee04cc3a",
+    "plugins/codex/ai-code-workflow/1.0.2/artifact.json": "fbf1ccf1a18001b55e9e0cf279a8dc9d592c3ddecc3ca67c94c05a1813f2a039",
+    "plugins/codex/ai-code-workflow/1.0.2/assets/codevow.png": "cafe13bd54630667774e133a7f42e49331b06437c3e7141f30f08ea8e9789370",
+    "plugins/codex/ai-code-workflow/1.0.2/assets/codevow.svg": "96489d4de56ef2d3c0c573dc907ae486c0087ffa739fa436a50131840e5cbd58",
+    "plugins/codex/ai-code-workflow/1.0.2/plugin.json": "95e5bdcd276bf800a7bc23fa10986ee6834c29077a9e2c209d7243d09dba6b31",
+    "plugins/codex/ai-code-workflow/1.0.2/policies/collaborative.json": "1ff102c65d36209d09526d20324836e60038042db35a5f648b6fec04b435658a",
+    "plugins/codex/ai-code-workflow/1.0.2/policies/continuous.json": "9f617e7d1fa0bb964034b8555309a48c7cdee7a2707cca9c6892f2eec2485743",
+    "plugins/codex/ai-code-workflow/1.0.2/schemas/evidence.schema.json": "f8b8f455f760880cd63d04c6ab08781160a4e76a75f4e5fd426e762b7f1bebaf",
+    "plugins/codex/ai-code-workflow/1.0.2/schemas/policy.schema.json": "f7c6ee0e2e7cd723bcc2b689d1e65f122f6c92b5c204070e9bad35098c646ee7",
+    "plugins/codex/ai-code-workflow/1.0.2/schemas/product.schema.json": "eca6423648abb185901a7c7017cd474ca92198177d42cc8b6801662333efde0e",
+    "plugins/codex/ai-code-workflow/1.0.2/schemas/task.schema.json": "87f799b10d154ca94302064cae787acbe34c78547301e1695eb947d632e97bed",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/debugging/SKILL.md": "8e4f63329ff3e4e9f3b4db742051a7a1735373bdc8b4ce14014b014e6df9a207",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/debugging/agents/openai.yaml": "4b83c6d49f11fb2ac668211971187535fd6bd7a7c31f6f42f03e64e76d24d611",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/review-results/SKILL.md": "75733677abe6293f308d96ff131b57f5856b8c8af56beed33287b51249e14fb7",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/review-results/agents/openai.yaml": "90cf4cb3f49f215d2d91079dc46f38ec53c4fb2690d583775fff122b12b7bf31",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/review/SKILL.md": "7d2a43b91d65a7404f283487d8fae54b99f90b19ae1ad4acc591456bcb1060e6",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/review/agents/openai.yaml": "ec1294dfbc06038e8f6a7384d497382f53f999b3b44111fced7f3e7fcc4cde27",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/review/references/reviewer-contract.md": "7d789cb73c9196546255f31f2c0ceb875dc0cb1863e453c862c8551555306a82",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/tdd/SKILL.md": "0edab30bffd33ca0e4d57dd1b63ccd60d701f104e4d4894e995484f05e373114",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/tdd/agents/openai.yaml": "78a90dd2bb7415472cd6b4c862bc085ced4cbea406897dc3b8c705b14ed1fd5e",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/verification/SKILL.md": "ddc59ed0e390975849d590fa9d9f81311692ef8bc7aa504eb6afb14f97e8993f",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/verification/agents/openai.yaml": "63908a2fb7be197e45e839d093e87a4834e070d4d9470fad098fca2e5f195d48",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/workflow/SKILL.md": "1c653e464e1d6710eebb04a94203b8daa676bfc68f601abf214a8ccd7478851a",
+    "plugins/codex/ai-code-workflow/1.0.2/skills/workflow/agents/openai.yaml": "5a1250eacbbc9ffc0a673de6ffb43e1d356270537ce7493371bf1cc18c0f45cf",
+    "plugins/codex/ai-code-workflow/1.0.2/templates/evidence.json": "07f97ae6150db4fe732ff63411086963e120746d0dc5182cf54f26ab76c4261f",
+    "plugins/codex/ai-code-workflow/1.0.2/templates/task.json": "bcc3727ff0851b549bef5aa125b9fb1ba2194d2b47b78f9ac1739e494d03a58b",
+    "plugins/codex/ai-code-workflow/1.0.2/tools/workflow/__init__.py": "f411a04f448419e46e660821cdb432b37f6cd759a9dace3bddc57ed68453b94a",
+    "plugins/codex/ai-code-workflow/1.0.2/tools/workflow/build.py": "240380b77ee0a3095ee4acceb7227c3e64ce85e000aa3016705142e0686d4638",
+    "plugins/codex/ai-code-workflow/1.0.2/tools/workflow/cli.py": "1dd0688834fccaa4330047ab7069ffa38d0184d0e454ab0a9ec19dd56847a83b",
+    "plugins/codex/ai-code-workflow/1.0.2/tools/workflow/io.py": "b3b445373c5e52dc59c21ee198b7a600f14069101b4e65c897b714c5e400ba3a",
+    "plugins/codex/ai-code-workflow/1.0.2/tools/workflow/owned_files.py": "93523c065edcfa354e30682efe3c45636e8fbb4310efbb573570ef2f5827e597",
+    "plugins/codex/ai-code-workflow/1.0.2/tools/workflow/package_check.py": "1c29601cb1b9082fa8b8c79e82fac1473c7f806f42ae6792294fb7fab1430d59",
+    "plugins/codex/ai-code-workflow/1.0.2/tools/workflow/policy.py": "2db5c1e850566c0f4424fd990b0c97de47a057d78f02ab58b75746e1e0009cf1",
+    "plugins/codex/ai-code-workflow/1.0.2/tools/workflow/product.py": "2b6d4d13cc0b969f7d523fd3fe75c533db71f0972fe43f7259a3fb907561466f",
+    "plugins/codex/ai-code-workflow/1.0.2/tools/workflow/state.py": "a6bb4e906a42ad856d18de0a5ba87dd4bdae54370b8d097c1ab6d8b693d19c32",
+    "plugins/codex/ai-code-workflow/1.0.2/tools/workflow_tool.py": "37791464407e7f624df4feadc011d0177c71ec771978c69e8e4c8b0f88ae9077"
+  },
+  "codex_revision": "acaea90f84690b2d9f074126d41217c2aeec2918",
+  "hosts": {
+    "claude": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-workflow%2Fv1.0.2/ai-code-workflow-1.0.2-claude-plugin.zip",
+        "id": 623643686,
+        "name": "ai-code-workflow-1.0.2-claude-plugin.zip",
+        "sha256": "343ad1e68cf1e5c246ffe76d74050b166603671921ac4e47021853ec1acaa533",
+        "size": 879793
+      },
+      "entry": {
+        "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+        "name": "ai-code-workflow",
+        "version": "1.0.2"
+      },
+      "package_content_hash": "123b97ed42c1c95fccf9a9d91aa6c400a01b82b45c398abbdd8b14a18ae07f2c"
+    },
+    "codex": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-workflow%2Fv1.0.2/ai-code-workflow-1.0.2-codex-plugin.zip",
+        "id": 623643764,
+        "name": "ai-code-workflow-1.0.2-codex-plugin.zip",
+        "sha256": "1bc06c203c061c44523d04f8496238d0f4a7273822ddb1537afe9f5cdb0c58a6",
+        "size": 881470
+      },
+      "entry": {
+        "category": "developer-tools",
+        "name": "ai-code-workflow",
+        "policy": {
+          "authentication": "ON_INSTALL",
+          "installation": "AVAILABLE"
+        },
+        "version": "1.0.2"
+      },
+      "package_content_hash": "8be1c00221e33f52aeacbbd378b7e4277adb3ee1b0bce95fb058a25f06eabab4"
+    },
+    "zcode": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-workflow%2Fv1.0.2/ai-code-workflow-1.0.2-zcode-plugin.zip",
+        "id": 623643773,
+        "name": "ai-code-workflow-1.0.2-zcode-plugin.zip",
+        "sha256": "1756d3a189755625d20242f714a4859ddd6c2590d5ba9311c02e241adff4ea28",
+        "size": 879743
+      },
+      "entry": {
+        "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+        "name": "ai-code-workflow",
+        "version": "1.0.2"
+      },
+      "package_content_hash": "14859e17e4d7c87a48998328b6d9125492e53fcf4c8a70c53933bce3dcf2eea1"
+    }
+  },
+  "mode": "draft",
+  "product_id": "ai-code-workflow",
+  "readiness": {
+    "accepted_hosts": [],
+    "limitations": [
+      "This is a local release bundle; no installation, upload, marketplace submission or Git change was performed.",
+      "Host evidence is a source-bound factual record, not user authorization or marketplace acceptance.",
+      "A previous bundle is caller-supplied trusted history with local integrity checks, not proof of a published release.",
+      "Raw host-session artifacts remain local; this bundle contains only their bindings and hashes.",
+      "Real host acceptance is unverified for: claude, codex, zcode"
+    ],
+    "package_content_hashes": {
+      "claude": "123b97ed42c1c95fccf9a9d91aa6c400a01b82b45c398abbdd8b14a18ae07f2c",
+      "codex": "8be1c00221e33f52aeacbbd378b7e4277adb3ee1b0bce95fb058a25f06eabab4",
+      "zcode": "14859e17e4d7c87a48998328b6d9125492e53fcf4c8a70c53933bce3dcf2eea1"
+    },
+    "pending_acceptance": [
+      "claude",
+      "codex",
+      "zcode"
+    ],
+    "publication_ready": false
+  },
+  "release_id": 407432151,
+  "release_url": "https://github.com/Zack-Zz/ai-code/releases/tag/ai-code-workflow%2Fv1.0.2",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "schema_version": 1,
+  "source_revision": "e11578a8981b9993c8aaca5a0d70f4570c48e117",
+  "source_tree_hash": "24793827cd6d0c2d2e890a12f671575afd1cf9ba5b1a68d7f4355e0b711e6ae9",
+  "tag": "ai-code-workflow/v1.0.2",
+  "version": "1.0.2"
+}

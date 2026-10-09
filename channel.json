@@ -1,0 +1,18 @@
+{
+  "channel": "preview",
+  "plugins": {
+    "ai-code-workflow": {
+      "codex_revision": "acaea90f84690b2d9f074126d41217c2aeec2918",
+      "installers": {
+        "claude": "343ad1e68cf1e5c246ffe76d74050b166603671921ac4e47021853ec1acaa533",
+        "codex": "1bc06c203c061c44523d04f8496238d0f4a7273822ddb1537afe9f5cdb0c58a6",
+        "zcode": "1756d3a189755625d20242f714a4859ddd6c2590d5ba9311c02e241adff4ea28"
+      },
+      "release_id": 407432151,
+      "source_revision": "e11578a8981b9993c8aaca5a0d70f4570c48e117",
+      "source_tree_hash": "24793827cd6d0c2d2e890a12f671575afd1cf9ba5b1a68d7f4355e0b711e6ae9",
+      "version": "1.0.2"
+    }
+  },
+  "schema_version": 1
+}
