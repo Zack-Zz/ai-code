@@ -1,4 +1,4 @@
-# CodeVow 三端发布（更新于 2026-10-08）
+# CodeVow 三端发布（更新于 2026-10-09）
 
 公开名称为 **CodeVow**，安装 ID 为 `ai-code-workflow`，当前候选版本 `1.0.2`。
 用户确认新插件尚未安装后，将首个 CodeVow 版本定为 `1.0.0`；此前工程
@@ -9,7 +9,12 @@
 
 ## 当前候选与发行渠道
 
-1.0.2 准备从源码分支与发行市场分支分离的 GitHub 分发。每个插件独立维护
+1.0.2 已公开 GitHub prerelease 并部署 preview 市场。三端的原生
+安装、启用和缓存字节已验证；完整工作流和跨版本升级尚未验收。逐端结果与
+部署方式见[原生安装记录](reviews/2026-10-09-preview-marketplace-native-installation.md)，
+用户命令见[根 README](../README.zh-CN.md#从-preview-市场安装-codevow)。
+
+源码分支与发行市场分支分离。每个插件独立维护
 版本、规范源码标签和 Release；市场聚合已发布插件，单插件部署保留其他
 插件及旧版本目录。`build --all` 不表示批准发布全部插件。
 
@@ -23,7 +28,7 @@
 SHA256，ZCode 使用 ZIP URL、SHA256 和 path，Codex 使用发行分支版本目录及
 固定发行提交。不能用整个仓库的 latest Release 代替某个插件的发行历史。
 
-新渠道的远端发布、权限设置和三端原生运输/升级均未验收。现有 main 上
+远端状态与逐端验收分别记录；不能把已完成的安装当成完整验收。现有 main 上
 指向 `dist/` 的三个根市场入口和 `ai-code-local` 继续保留；本轮不去跟踪或
 删除 dist，也不把本地新文件当成已上线。新入口完成真实宿主验收并公开迁移
 说明后，再单独切换旧入口。旧入口及本地安装步骤见
@@ -209,9 +214,10 @@ workflow 的 `source_tag`、`channel`、`action`、`expected_plan_hash` 和
 plan 不授权后续 deploy。
 
 deploy 需要经审阅的计划哈希和基础提交，并重新从可信套件生成计划。输入
-或远端状态改变则停止。先创建只增加版本目录和公开记录的 D 提交，再创建
-推进市场及 channel.json 的 C 提交，Codex 来源固定到实际 D；不用未来提交
-自引用。所有发行分支写入串行处理，正常推进失败或基础 ref 冲突时停止，
+或远端状态改变则停止。目标声明 Codex 时，先创建只增加其版本目录的 D
+提交，再在 C 更新公开记录、原生市场和 channel.json，Codex 来源固定到
+实际 D；未声明 Codex 时跳过 D。不用未来提交自引用。所有发行分支写入
+串行处理，正常推进失败或基础 ref 冲突时停止，
 不 force push，不删除旧版本、Release 或未知草稿。
 
 公开 Release 后市场失败时，旧市场仍可用，报告 published_pending_marketplace。
@@ -219,8 +225,11 @@ deploy 需要经审阅的计划哈希和基础提交，并重新从可信套件�
 报告 deployed；完全一致的重检返回 already_deployed。市场回退须另行授权
 新提交，不保证客户端自动降级。云端环境保护和实际权限仍需真实运行验证。
 
-目标宿主登记的是对应发行分支，具体客户端 ref、首次安装、刷新、连续两
-版本升级和 cache 字节必须逐端验证；当前不提供未经验证的新渠道安装命令。
+目标宿主登记的是发行分支上的对应清单。Codex 使用带 ref 的 Git 市场；
+Claude 使用 `.claude-plugin/marketplace.json` 的 HTTPS URL，也支持带 ref
+的 Git 市场；ZCode 使用根 `marketplace.json` 的 HTTPS URL，避免 Git 导入优先
+选中 `.claude-plugin/marketplace.json`。具体客户端 ref、首次安装、刷新、
+连续两版本升级和 cache 字节必须逐端验证；可复制命令及其验证状态见根 README。
 旧 main 市场继续可用于已明确授权的原生试用。实现设计见
 [GitHub 分发设计](design/2026-10-08-github-marketplace-distribution-design.md)。
 

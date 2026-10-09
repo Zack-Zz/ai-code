@@ -23,7 +23,75 @@ is the sole source of its plugin ID, version and resource whitelist. The root
 private Node package is maintenance tooling; its version is not a plugin
 release version.
 
-## Install CodeVow from a Release
+## Install CodeVow from the preview marketplace
+
+[CodeVow 1.0.2](https://github.com/Zack-Zz/ai-code/releases/tag/ai-code-workflow%2Fv1.0.2)
+and the [preview marketplace](https://github.com/Zack-Zz/ai-code/tree/codex/marketplace-preview)
+are published. This is a prerelease. The host retrieves the plugin for you;
+you do not need to download a ZIP, check out source or build it yourself.
+Installation and full workflow acceptance are tracked separately in the
+[native installation record](docs/reviews/2026-10-09-preview-marketplace-native-installation.md).
+
+### Codex
+
+Register the marketplace once, then install CodeVow:
+
+```sh
+codex plugin marketplace add Zack-Zz/ai-code --ref codex/marketplace-preview
+codex plugin add ai-code-workflow@ai-code-preview
+```
+
+These commands were verified with Codex CLI `0.154.0`: version `1.0.2` was
+installed and enabled, and all 40 installed files matched the published plugin
+package. Start a new host session to use it; workflow behavior remains pending.
+Marketplace refresh attempts timed out, so updates are not yet verified.
+
+### Claude Code
+
+For Claude Code `2.1.292` or later, register and install in one command:
+
+```sh
+claude plugin install ai-code-workflow --marketplace \
+  https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/codex/marketplace-preview/.claude-plugin/marketplace.json
+```
+
+For `2.1.224`–`2.1.291`, register and install separately:
+
+```sh
+claude plugin marketplace add \
+  https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/codex/marketplace-preview/.claude-plugin/marketplace.json
+claude plugin install ai-code-workflow@ai-code-preview
+```
+
+The archive source requires `2.1.224` or later. See the official
+[archive source reference](https://code.claude.com/docs/en/plugins/marketplace-reference#archive-plugin-source)
+and [installation commands](https://code.claude.com/docs/en/discover-plugins#add-and-install-from-your-shell).
+The single command was verified with the official `2.1.295` CLI: version `1.0.2`
+was installed and enabled, all 35 files matched the published Claude package,
+and a same-version marketplace refresh succeeded. Workflow behavior and version
+upgrades remain pending. The native installation record also tracks the local
+CLI launcher's update separately. The local default launcher is still `2.1.177`;
+its update has not passed verification. Use an updated compatible CLI for the
+commands above.
+
+### ZCode
+
+Register the ZCode JSON URL directly. Registering this multi-host Git repository
+selects the Claude marketplace first on ZCode `3.14.5`.
+
+The application's bundled native CLI was verified on macOS (`0.16.9`):
+
+```sh
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
+  https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/codex/marketplace-preview/marketplace.json
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code-preview
+```
+
+Version `1.0.2` was installed and enabled, six skills were discovered, and all
+35 installed files matched the ZCode Release package. Other installed plugins
+were preserved. Start a new ZCode session; workflow behavior remains pending.
+
+## Download a Release as a fallback
 
 Open [CodeVow 1.0.2](https://github.com/Zack-Zz/ai-code/releases/tag/ai-code-workflow%2Fv1.0.2)
 and download the ZIP for your host from **Assets**. No source checkout or build
@@ -62,8 +130,8 @@ distribution; they do not contain the local marketplace used above. GitHub's
 automatic **Source code** downloads are development sources.
 
 For verification and updates, see the [installation guide](plugins/ai-code-workflow/docs/installation.md).
-The Release and the preview marketplace branch are published separately;
-availability of a Release does not mean the remote marketplace is deployed.
+The Release and the preview marketplace branch are published separately.
+This version has both; full host acceptance and version upgrades remain pending.
 
 ## Developer quick start
 
@@ -98,8 +166,9 @@ Each plugin has its own Release. Reviewed distribution plans select fixed
 assets for Claude/ZCode and a pinned version directory for Codex; marketplace
 deployment follows human Publish as a separate step. Preview/stable markets
 target `codex/marketplace-preview` and `codex/marketplace`. Publication and market
-deployment are recorded separately; native transport and upgrades remain unverified. Existing `dist/` and
-`ai-code-local` entries stay available until the new transports pass acceptance.
+deployment are recorded separately. Installation and package bytes were verified
+on all three hosts; version upgrades and workflow behavior remain
+pending. Existing `dist/` and `ai-code-local` entries stay available during migration.
 
 Source checks and package integrity checks do not certify native loading or
 model behavior. Host acceptance and its evidence belong to each plugin.

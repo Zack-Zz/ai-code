@@ -20,7 +20,70 @@
 资源白名单的唯一来源。根目录的私有 Node 包用于仓库维护，其版本不作为
 任何插件的发行版本。
 
-## 从 Release 安装 CodeVow
+## 从 preview 市场安装 CodeVow
+
+[CodeVow 1.0.2](https://github.com/Zack-Zz/ai-code/releases/tag/ai-code-workflow%2Fv1.0.2)
+和 [preview 市场](https://github.com/Zack-Zz/ai-code/tree/codex/marketplace-preview)
+均已发布。这是 prerelease，宿主会自动获取插件，用户无需手工下载 ZIP、
+拉取源码或自行构建。安装验证与完整工作流验收分别记录，当前结果见
+[原生安装记录](docs/reviews/2026-10-09-preview-marketplace-native-installation.md)。
+
+### Codex
+
+首次注册市场，再安装 CodeVow：
+
+```sh
+codex plugin marketplace add Zack-Zz/ai-code --ref codex/marketplace-preview
+codex plugin add ai-code-workflow@ai-code-preview
+```
+
+已在 Codex CLI `0.154.0` 验证：安装并启用了 `1.0.2`，40 个安装文件与
+公开插件包逐字节一致。使用前新建宿主会话；工作流行为仍待验收。
+市场刷新尝试发生超时，更新能力尚未验证。
+
+### Claude Code
+
+Claude Code `2.1.292` 或更高版本，一条命令注册并安装：
+
+```sh
+claude plugin install ai-code-workflow --marketplace \
+  https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/codex/marketplace-preview/.claude-plugin/marketplace.json
+```
+
+`2.1.224`–`2.1.291` 使用注册、安装两步：
+
+```sh
+claude plugin marketplace add \
+  https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/codex/marketplace-preview/.claude-plugin/marketplace.json
+claude plugin install ai-code-workflow@ai-code-preview
+```
+
+archive 来源要求 `2.1.224` 或更高版本。参见官方
+[archive 来源说明](https://code.claude.com/docs/en/plugins/marketplace-reference#archive-plugin-source)
+与[安装命令](https://code.claude.com/docs/en/discover-plugins#add-and-install-from-your-shell)。
+已用官方 `2.1.295` CLI 验证一键安装：安装并启用了 `1.0.2`，35 个文件
+与公开 Claude 包逐字节一致，同版本市场刷新也成功。工作流行为和跨版本
+升级仍待验收；本机默认 CLI 启动器仍为 `2.1.177`，更新尚未通过验证。
+上述命令须使用已更新的兼容 CLI；启动器结果在原生安装记录中单独跟踪。
+
+### ZCode
+
+直接注册 ZCode 的 JSON 清单 URL。ZCode `3.14.5` 注册这个多宿主 Git
+仓库时会优先选 Claude 市场清单。
+
+已在 macOS 验证应用内置的原生 CLI（`0.16.9`）：
+
+```sh
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
+  https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/codex/marketplace-preview/marketplace.json
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code-preview
+```
+
+已安装并启用 `1.0.2`，发现了 6 个技能，35 个安装文件与 ZCode Release
+包逐字节一致，其他已安装插件保持原状态。使用前新建 ZCode 会话；
+工作流行为仍待验收。
+
+## 下载 Release 作为备用方式
 
 打开 [CodeVow 1.0.2](https://github.com/Zack-Zz/ai-code/releases/tag/ai-code-workflow%2Fv1.0.2)，
 在 **Assets** 中下载对应宿主的 ZIP；这些包无需下载源码或自行构建。
@@ -55,7 +118,8 @@ shasum -a 256 ~/Downloads/ai-code-workflow-1.0.2-zcode.zip
 市场；GitHub 自动提供的 **Source code** 下载是开发源码。
 
 校验与更新的详细说明见[安装指南（英文）](plugins/ai-code-workflow/docs/installation.md)。
-Release 与 preview 市场分支分别发布；Release 可下载不代表远端市场已经部署。
+Release 与 preview 市场分支分别发布，此版本两者均已完成；完整宿主验收
+和跨版本升级仍待验证。
 
 ## 开发者快速开始
 
@@ -86,8 +150,8 @@ schema 2 发行套件新增 `installers/ID-VERSION-HOST-plugin.zip`，仅含一�
 各自用途。每个插件独立 Release，经审阅的 distribution 计划为 Claude/ZCode
 选择固定资产，为 Codex 固定版本目录提交；人工 Publish 后再单独部署市场。
 试用/正式市场目标分支为 `codex/marketplace-preview` 与 `codex/marketplace`。
-远端发布与市场部署分别记录，原生运输和升级仍未验收；新运输通过真实验收前，保留现有 dist
-和 ai-code-local 入口。
+远端发布与市场部署分别记录。三端安装及制品字节均已验证，
+跨版本升级和工作流行为仍待验收；迁移期间保留现有 dist 和 ai-code-local 入口。
 
 源校验、包完整性和测试通过不代表原生加载成功或模型遵循技能。真实宿主验收
 及其证据由各插件分别维护。

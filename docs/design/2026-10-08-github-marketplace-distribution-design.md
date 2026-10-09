@@ -1,7 +1,9 @@
 # GitHub 插件市场与制品分发设计
 
-日期：2026-10-08（Asia/Shanghai）。状态：用户已同意实施，首阶段本地实现
-已完成；GitHub 公开发行及原生宿主验收尚未完成。
+设计日期：2026-10-08（Asia/Shanghai）；执行反馈更新于 2026-10-09。
+状态：已公开 CodeVow 1.0.2 prerelease 并部署 preview 市场；三端
+原生安装和制品字节已验证，完整宿主验收仍待完成。当前结果见
+[原生安装记录](../reviews/2026-10-09-preview-marketplace-native-installation.md)。
 [实施与验证记录](../reviews/2026-10-08-github-marketplace-implementation.md)
 分别记录代码、环境配置、Git、公开发行与安装状态。
 
@@ -31,7 +33,7 @@ Claude Code、Codex、ZCode 定义。这里的“GitHub 市场”是原生清单
 发行分支只含市场、安装内容和公开发行记录，不含开发工具、测试及私有材料。
 分支采用 `codex/` 前缀，与当前工作区默认分支命名约定一致。
 
-当前 CodeVow 为 `1.0.1`；三个 acceptance 槽均为空。本设计不把它变成
+2026-10-08 设计基线中 CodeVow 为 `1.0.1`；三个 acceptance 槽均为空。本设计不把它变成
 正式版：先验证试用市场的安装和升级链路，真实行为验收完成后才开放正式
 渠道。实际开始实施前重新读取版本、Git 状态和验收记录，不预定下一版本号。
 
@@ -42,7 +44,7 @@ Claude Code、Codex、ZCode 定义。这里的“GitHub 市场”是原生清单
 | 宿主 | 本设计的首选插件来源 | 宿主要求与验证边界 |
 |---|---|---|
 | Claude Code | `source.source=archive`，HTTPS ZIP，`sha256` | 官方要求 2.1.224+；在实际目标版本验证安装和更新 |
-| ZCode | `source.source=url`、`type=zip`，HTTPS ZIP、`sha256`、`path` | 按公开 ZIP 协议生成；验证自建 Git 市场中的该来源确实被安装器支持 |
+| ZCode | `source.source=url`、`type=zip`，HTTPS ZIP、`sha256`、`path` | 注册专用 JSON URL；2026-10-09 首次安装与字节已验证，升级和行为待验收 |
 | Codex | `source.source=git-subdir`，发行仓库 URL、版本目录、固定 `sha` | 文档支持 Git 和 npm；本轮不假定市场能直接安装任意 Release ZIP |
 
 官方文档是协议依据，不是当前机器或所有发行渠道的已验收声明。
@@ -513,16 +515,20 @@ Publish 保持用户在 GitHub 界面执行；首版不增加自动公开开关�
 
 ## 9. 用户安装和更新入口
 
-正式渠道：添加 `Zack-Zz/ai-code` 的 `codex/marketplace` 分支。
-试用渠道：添加同仓库的 `codex/marketplace-preview` 分支。
+正式渠道的目标发行分支为 `Zack-Zz/ai-code` 的 `codex/marketplace`。
+已部署的试用渠道为同仓库的 `codex/marketplace-preview` 分支。
+Codex 登记带 ref 的 Git 市场；Claude/ZCode 登记该分支各自 JSON 的 HTTPS URL。
+Claude 的带 ref Git 入口仍是官方支持的备选方式。
 具体客户端是否提供分支选择、是否接受 ref、如何刷新，应逐端实际验收。
 界面不能指定分支时，验证其原生 Git source 表达；若仍不支持，采用第 1 节
 的独立市场仓库方案，不要求用户手动下载开发仓库作为补救。
 
-Claude Code 验收目标：用原生 Git 市场带 ref 的入口登记，再以
-`ai-code-workflow@ai-code-stable` 或 preview 市场安装；验证首次安装、
+Claude Code 验收目标：用该分支的专用 JSON URL 登记，也可用带 ref 的
+原生 Git 市场，再以 `ai-code-workflow@ai-code-stable` 或 preview 市场安装；验证首次安装、
 市场刷新、升级和新会话加载。运行客户端必须支持 archive source。
-安装说明在实际版本帮助与原生测试通过后才给出可复制的最终命令。
+2026-10-09 已用官方 `2.1.295` CLI 的 `--marketplace <JSON URL>` 一步完成
+注册和安装，35 个缓存文件与 installer ZIP 一致；同版本市场刷新成功。
+当前可复制命令见根 README，两版升级与完整行为仍待验收。
 
 Codex 文档中的登记入口可作为待验收操作：
 
@@ -534,10 +540,19 @@ CLI 登记与桌面端安装分别验证；桌面插件目录中选择对应市�
 验证 git-subdir 的固定 SHA、版本目录、cache 内容和更新探测。
 文档里的 `url` 在这里是 Git URL，不是任意 Release ZIP URL。
 
-ZCode 从设置 → 插件 → 添加市场登记对应发行 ref，选择 CodeVow 安装；
-更新通过刷新市场、检查更新、点击更新。验证安装器下载的是 installer
-ZIP 及其 `path`，不误用手动下载 ZIP。当前未验证 ZCode CLI 的具体命令，
-不承诺一条跨三端通用命令，也不增加自行写宿主缓存的安装脚本。
+ZCode 的注册输入须使用该端专用清单。2026-10-09 在应用 `3.14.5` 的
+内置 CLI `0.16.9` 发现：Git 导入依次查找显式路径、
+`.claude-plugin/marketplace.json`、根 `marketplace.json`。同仓库三端布局
+因此会先选中 Claude archive，而 ZCode 安装器不支持该来源。直接添加
+以下 URL 绕过 Git 清单选择，保留单仓库、单发行分支和原生更新方式：
+
+```text
+https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/codex/marketplace-preview/marketplace.json
+```
+
+已通过内置原生 CLI 完成注册、安装、启用与同版本市场刷新；35 个缓存文件
+与 ZCode installer ZIP 相同，发现 6 个技能。可复制的 macOS 命令见根 README。
+两版升级、完整加载和行为另行验收；不增加自行写宿主缓存的安装脚本。
 
 试用和正式市场名不同，同一插件 ID 不表示跨市场自动迁移。切换渠道前
 记录现有版本与来源，避免两个市场同时启用重复技能；按宿主原生操作迁移。
