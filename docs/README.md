@@ -12,6 +12,8 @@
 
 ## 当前公共机制
 
+- [main 统一分发改造设计](design/2026-10-09-main-marketplace-distribution-design.md)：
+  已确认的单市场/单入口规则、preview 版本语法、正式版默认升级与工作流改造；尚未实现或部署。
 - [插件作者指南](plugin-authoring.md)：独立身份、资源闭包、宿主适配、注册、测试与验证边界。
 - [发布指南](publishing.md)、[发行证据契约](release-evidence.md)：区分包准备、宿主行为、Git 与发布授权。
 - [2026-10-07 多插件改造](design/2026-10-07-multi-plugin-design.md)、[三宿主发行设计](design/2026-10-07-three-host-release-mechanism.md)：保留历史方案；当前宿主范围结合作者指南及工具源码核对。

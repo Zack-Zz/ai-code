@@ -1,7 +1,0 @@
-interface:
-  display_name: "Debugging"
-  short_description: "Evidence-driven diagnosis with explicit hypotheses and minimal distinguishing experiments"
-  brand_color: "#D97706"
-  default_prompt: "Use the debugging skill: frame the symptom, then run minimal experiments that distinguish hypotheses"
-policy:
-  allow_implicit_invocation: true

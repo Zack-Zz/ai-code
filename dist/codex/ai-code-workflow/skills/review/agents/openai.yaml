@@ -1,7 +1,0 @@
-interface:
-  display_name: "Review"
-  short_description: "Risk-focused review of the final diff with independent review when required"
-  brand_color: "#DC2626"
-  default_prompt: "Use the review skill on the final diff, including an independent reviewer when risk requires it"
-policy:
-  allow_implicit_invocation: true

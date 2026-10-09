@@ -1,7 +1,0 @@
-interface:
-  display_name: "TDD"
-  short_description: "Valid RED first, minimal GREEN, refactor under a preserved baseline"
-  brand_color: "#16A34A"
-  default_prompt: "Use the tdd skill for this behavior change: write the failing test first and drive it green"
-policy:
-  allow_implicit_invocation: true
