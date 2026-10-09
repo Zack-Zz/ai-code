@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "skills": {
+    "agent-delegation": {
+      "display_name": "Agent Delegation",
+      "short_description": "Explicit handoff to an independent tool session",
+      "brand_color": "#0F766E",
+      "default_prompt": "Use $agent-delegation to hand this task to the tool I specify in an independent session.",
+      "allow_implicit_invocation": true
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "product_id": "ai-agent-delegation",
+  "display_name": "Agent Delegation",
+  "version": "0.1.0",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "license": "MIT",
+  "publisher": {"name": "Zack-Zz", "url": "https://github.com/Zack-Zz"},
+  "hosts": ["claude", "codex", "zcode"],
+  "core_skills": ["agent-delegation"],
+  "shared_skills": [],
+  "resources": [
+    {"source": "LICENSE", "target": "LICENSE", "include": []},
+    {"source": "release/README.md", "target": "README.md", "include": []},
+    {"source": "release/README_CN.md", "target": "README_CN.md", "include": []},
+    {"source": "skills/agent-delegation/references", "target": "skills/agent-delegation/references", "include": ["handoff-contract.md", "engine-compatibility.md", "bridge-client.md"]},
+    {"source": "scripts/bridge_client.py", "target": "tools/bridge_client.py", "include": []},
+    {"source": "docs", "target": "docs", "include": ["support-matrix.md", "host-evaluation.md"]},
+    {"source": "assets/delegation.svg", "target": "assets/delegation.svg", "include": []}
+  ]
+}

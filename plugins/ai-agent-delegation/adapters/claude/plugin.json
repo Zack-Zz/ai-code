@@ -1,0 +1,6 @@
+{
+  "description": "Explicit user-directed handoff to an independent Claude Code, ZCode or Codex session through external Agent Bridge",
+  "license": "MIT",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "keywords": ["delegation", "agent-bridge", "independent-session"]
+}

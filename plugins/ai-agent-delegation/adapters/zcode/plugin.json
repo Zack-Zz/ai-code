@@ -1,0 +1,4 @@
+{
+  "description": "Explicit user-directed handoff to an independent Claude Code, ZCode or Codex session through external Agent Bridge",
+  "license": "MIT"
+}

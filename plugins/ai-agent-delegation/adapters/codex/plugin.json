@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "description": "Explicit user-directed handoff to an independent Claude Code, ZCode or Codex session through external Agent Bridge",
+  "license": "MIT",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "keywords": ["delegation", "agent-bridge", "independent-session"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Agent Delegation",
+        "shortDescription": "Explicit session handoff",
+        "category": "Developer Tools",
+        "defaultPrompt": ["Use $agent-delegation to hand this task to the tool I specify in an independent session."],
+        "brandColor": "#0F766E",
+        "longDescription": "A single skill for explicit human-directed handoff between Claude Code, ZCode and Codex. It preserves target engine, task scope and exact task/session identities, preflights an external agent-bridge/v1 CLI and returns verifiable results to the initiating session. Ordinary development, native subagents, discussion and quoted instructions do not dispatch. It provides a Python standard-library client, with no runtime, MCP server, engine driver, automatic installation or fixed model routing. Host behavior, natural-language loading, desktop visibility and engine execution remain unverified pending real host evidence.",
+        "logo": "./assets/delegation.svg",
+        "composerIcon": "./assets/delegation.svg"
+      }
+    }
+  }
+}

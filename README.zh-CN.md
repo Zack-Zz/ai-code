@@ -15,10 +15,14 @@
 | 插件 | 用途 | 版本与支持状态 |
 |---|---|---|
 | [CodeVow](plugins/ai-code-workflow/README.zh-CN.md) | 计划、TDD、排查、审查、验证与交付证据 | `1.0.2` 自建市场试用候选；[真实宿主验收仍未完成](plugins/ai-code-workflow/docs/support-matrix.md) |
+| [Agent Delegation](plugins/ai-agent-delegation/README.md) | 通过外置Agent Bridge明确交接给其他工具或同工具独立会话 | `0.1.0`源码候选；[整包宿主验收未完成](plugins/ai-agent-delegation/docs/support-matrix.md)，未加入已发布preview市场 |
 
 `catalog.json` 只登记插件目录；各目录的 `product.json` 是插件 ID、版本和
 资源白名单的唯一来源。根目录的私有 Node 包用于仓库维护，其版本不作为
 任何插件的发行版本。
+
+项目边界见[总体架构](docs/architecture.md)与[文档导航](docs/README.md)。
+派发插件保持普通开发及原生子代理行为；运行时、CLI/MCP/API由ai-mcp承载。
 
 ## 从 preview 市场安装 CodeVow
 

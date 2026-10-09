@@ -17,11 +17,16 @@ policies or task records on every plugin.
 | Plugin | Purpose | Version and support |
 |---|---|---|
 | [CodeVow](plugins/ai-code-workflow/README.md) | Planning, TDD, debugging, review, verification and delivery evidence | Self-hosted preview candidate `1.0.2`; [real-host acceptance remains unverified](plugins/ai-code-workflow/docs/support-matrix.md) |
+| [Agent Delegation](plugins/ai-agent-delegation/README.md) | Explicit handoff to another agent tool or an independent same-tool session through an external Agent Bridge | Source candidate `0.1.0`; [full host acceptance remains unverified](plugins/ai-agent-delegation/docs/support-matrix.md); not included in the published preview marketplace |
 
 `catalog.json` registers plugin directories. Each directory's `product.json`
 is the sole source of its plugin ID, version and resource whitelist. The root
 private Node package is maintenance tooling; its version is not a plugin
 release version.
+
+See the [repository architecture](docs/architecture.md) and [documentation index](docs/README.md)
+for module boundaries. Agent Delegation leaves ordinary development and native subagents
+unchanged; its Bridge runtime and CLI/MCP/API live in the separate ai-mcp project.
 
 ## Install CodeVow from the preview marketplace
 

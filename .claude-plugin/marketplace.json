@@ -5,6 +5,12 @@
   },
   "plugins": [
     {
+      "description": "Explicit user-directed handoff to an independent Claude Code, ZCode or Codex session through external Agent Bridge",
+      "name": "ai-agent-delegation",
+      "source": "./dist/claude/ai-agent-delegation",
+      "version": "0.1.0"
+    },
+    {
       "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
       "name": "ai-code-workflow",
       "source": "./dist/claude/ai-code-workflow",

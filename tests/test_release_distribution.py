@@ -66,7 +66,8 @@ class ReleaseDistributionTests(unittest.TestCase):
                     index = json.loads((root / "index.json").read_text())
                     index["hosts"].pop("claude")
                     if kind == "public":
-                        index["plugins"]["ai-code-workflow"]["hosts"].pop("claude")
+                        for plugin in index["plugins"].values():
+                            plugin["hosts"].pop("claude", None)
                     (root / "index.json").write_text(json.dumps(index))
                     shutil.rmtree(root / "claude")
                 result = self.check(committed, fresh)

@@ -1,0 +1,10 @@
+{
+  "author": {
+    "name": "Zack-Zz",
+    "url": "https://github.com/Zack-Zz"
+  },
+  "description": "Explicit user-directed handoff to an independent Claude Code, ZCode or Codex session through external Agent Bridge",
+  "license": "MIT",
+  "name": "ai-agent-delegation",
+  "version": "0.1.0"
+}

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "notes": "release/NOTES.md",
+  "readmes": {"en": "release/README.md", "zh-CN": "release/README_CN.md"},
+  "acceptance": {"claude": null, "codex": null, "zcode": null}
+}
