@@ -25,6 +25,7 @@ node_modules/
 # dist-check/ and dist-ci/ are scratch outputs from the README quick start and CI)
 dist-check/
 dist-ci/
+dist/
 
 # Python
 __pycache__/
