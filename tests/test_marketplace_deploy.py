@@ -40,6 +40,20 @@ class DeploymentSafeguards(unittest.TestCase):
         self.assertIsNotNone(self.module, 'Hosted deployment must validate downloads before writing a market')
         return self.module
 
+    def test_repository_metadata_uses_the_canonical_rest_endpoint(self):
+        module = self.require_module()
+        with mock.patch.object(module, 'urlopen', return_value=bytes_io.BytesIO(b'{"visibility":"public"}')) as request:
+            self.assertEqual(module.GitHub('example/repo').get(''), {'visibility': 'public'})
+        self.assertEqual(request.call_args.args[0].full_url, 'https://api.github.com/repos/example/repo')
+
+    def test_rest_resource_paths_preserve_encoded_tags_and_queries(self):
+        module = self.require_module()
+        resource = 'releases/tags/ai-one%2Fv1.0.0?per_page=1'
+        with mock.patch.object(module, 'urlopen', return_value=bytes_io.BytesIO(b'{}')) as request:
+            module.GitHub('example/repo').get(resource)
+        self.assertEqual(request.call_args.args[0].full_url,
+                         'https://api.github.com/repos/example/repo/' + resource)
+
     def test_complete_bundle_extracts_exact_files(self):
         module = self.require_module()
         with tempfile.TemporaryDirectory() as temporary:

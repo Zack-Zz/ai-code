@@ -67,7 +67,8 @@ class GitHub:
         token = os.environ.get('GH_TOKEN') or os.environ.get('GITHUB_TOKEN')
         if token:
             headers['Authorization'] = 'Bearer ' + token
-        request = Request(f'https://api.github.com/repos/{self.repository}/{relative}', headers=headers)
+        endpoint = f'https://api.github.com/repos/{self.repository}'
+        request = Request(f'{endpoint}/{relative}' if relative else endpoint, headers=headers)
         try:
             with urlopen(request, timeout=30) as response:
                 raw = response.read(16 * 1024 * 1024 + 1)
