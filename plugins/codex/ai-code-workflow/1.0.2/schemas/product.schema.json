@@ -1,0 +1,172 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ai-code-workflow/product.schema.json",
+  "title": "Product source manifest",
+  "description": "Describes the fixed product contract implemented by scripts/workflow/product.py. The dedicated validator is authoritative; this schema documents the same structure for consumers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "product_id",
+    "display_name",
+    "version",
+    "repository",
+    "license",
+    "core_skills",
+    "shared_skills",
+    "resources"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "product_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "repository": {
+      "type": "string",
+      "minLength": 1
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "core_skills": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "shared_skills": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "target",
+          "include"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "pattern": "^[^/].*$"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^[^/].*$"
+          },
+          "include": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "hosts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "claude",
+          "codex",
+          "zcode"
+        ]
+      }
+    },
+    "profiles": {
+      "const": [
+        "collaborative",
+        "continuous"
+      ]
+    },
+    "generated_agents": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "host",
+          "template",
+          "body",
+          "target"
+        ],
+        "properties": {
+          "host": {
+            "enum": [
+              "claude",
+              "zcode"
+            ]
+          },
+          "template": {
+            "type": "string"
+          },
+          "body": {
+            "const": "skills/review/references/reviewer-contract.md"
+          },
+          "target": {
+            "const": "agents/workflow-reviewer.md"
+          }
+        }
+      }
+    },
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 320
+        }
+      }
+    }
+  },
+  "notes": [
+    "core_skills and shared_skills must be disjoint and each must correspond to skills/<name>/SKILL.md.",
+    "A file source requires include == []; a directory source requires an explicit relative file list (no wildcards, no caches); every listed file must exist.",
+    "source and target are normalized relative paths: absolute paths, '..' segments and symlinked components are rejected.",
+    "Each skill contributes exactly skills/<name>/SKILL.md as a packaged component; any extra file under a skill directory must be registered as an explicit resource entry.",
+    "All resolved target paths must be unique (mapping conflicts are rejected).",
+    "Optional packaging metadata declares a supported host subset; native Claude/ZCode reviewer templates both use the single shared reviewer contract. Publisher metadata is injected into host output rather than duplicated in adapters."
+  ]
+}
