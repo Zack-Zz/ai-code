@@ -15,6 +15,7 @@ from pathlib import Path
 
 from . import io as wio
 from . import package_check as wpc
+from . import product as wproduct
 from .io import ConflictError, DataError, ToolError
 
 PRODUCT_ID = "ai-code-workflow"
@@ -87,7 +88,7 @@ def _load_receipt(path: Path, *, root=None, with_bytes=False):
         raise DataError(f"receipt files must be an object: {path}")
     if not isinstance(data["managed_root"], str) or not Path(data["managed_root"]).is_absolute():
         raise DataError(f"receipt managed_root must be an absolute path: {path}")
-    if not isinstance(data["version"], str) or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", data["version"]):
+    if not isinstance(data["version"], str) or not wproduct.VERSION_RE.fullmatch(data["version"]):
         raise DataError(f"receipt version must be a version string: {path}")
     if not isinstance(data["artifact_hash"], str) or not re.fullmatch(r"[0-9a-f]{64}", data["artifact_hash"]):
         raise DataError(f"receipt artifact_hash must be a sha256 hex: {path}")

@@ -75,11 +75,39 @@ GitHub prerelease 或 accepted 标记均不产生 Git、Publish 或部署授权�
 脚本测试不能证明宿主实际遵循 Markdown。只做到了原生加载就不能据此将
 全部行为写成 accepted。旧双端场景不能替代 Claude Code 的真实记录。
 
-稳定准备要求这些材料在构建环境可读且绑定一致。当前 GitHub workflow
-不会自动获取私有验收材料：若材料未包含在选定 ref 的可公开源码中，CI 将
-因缺失而失败。含私密信息的会话日志应保留本地，在可控环境做 stable 检查；
-不得为让 CI 通过而提交敏感原文。可公开的证据须先由人审核，再决定是否
-提交。源码仓库公开与发布制品公开是两个不同边界。
+默认本地 `release check/prepare/verify` 仍要求验收 JSON 与原始材料可读，
+逐项检查实际字节。GitHub 的干净 checkout 使用维护者审核后随源码冻结的
+哈希声明，不从环境变量或文件缺失自动选择验收模式。
+
+完成全部宿主验收后，在保留私有文件的本地源码执行：
+
+```bash
+python3 tooling/plugin_tool.py release acceptance-export --plugin ai-code-workflow
+```
+
+命令按原本的严格规则读取所有验收记录和日志；任何宿主 pending、缺失文件
+或哈希不匹配都拒绝导出。结果固定为该插件的
+`release/acceptance-proof.json`，仅包含身份、版本、源哈希、所有宿主包哈希、
+精确公开输入哈希、验收文件与日志的规范路径和 SHA256。不包含 summary、
+日志或验收 JSON 的正文。导出与 CI 读取共用 1 MiB 上限；既有摘要内容变化
+时须先审阅，再显式使用 `--replace`，完全相同的导出幂等。
+
+审核摘要后，将它与最终公开输入一起提交并创建规范标签；原始材料留在
+被忽略的插件内 `private/` 路径。摘要不包含最终提交 SHA，避免文件与所在
+提交自引用；Actions 单独确认摘要字节等于标签所在 HEAD 的 Git blob，要求
+干净源码和规范标签，并重算所有公开输入与包哈希。源码、说明、配置或包
+字节改变后须重新执行验收与导出，旧摘要不能继续使用。
+
+Actions 的 Prepare、Draft、Publish、市场计划/部署及历史复验显式使用
+`committed_acceptance`。本地需要重现该模式时可传
+`--committed-acceptance`；普通本地命令继续检查实际私有文件。存在于工作区
+或 HEAD 的摘要不能因损坏、删除、未提交或过期而回退到本地模式；无摘要的
+历史调用仍只能使用完整私有材料通过原规则。公开制品保存原有私有输入
+摘要，不包含私有正文，两种模式对同一冻结源码生成相同的完整制品字节。
+
+这份摘要是维护者经过本地验证后提交的事实声明，不是签名服务或平台认证，
+CI 无法重新证明私有会话真实性。不得手写摘要代替验收。`plugin-release`
+和 `plugin-marketplace` 的人工审核继续承担各自的发布授权，不新增远端密钥。
 
 证据 JSON 的 accepted 是事实声明，工具无法自行证明会话真实性、平台审核
 或模型效果。由 Agent 写入 accepted 也不授权 tag、Release、投稿或 Publish。

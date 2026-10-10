@@ -19,6 +19,7 @@ import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tooling'))
 from plugin_tools import io
 from plugin_tools.registry import load_catalog, select_plugins
+from plugin_tools.versions import release_kind, version_key
 from plugin_tools.release import verify_release
 from plugin_tools.release.integrity import read_tree
 from plugin_tools.release.integrity import historical
@@ -133,6 +134,11 @@ class GitHub:
             if entry['type'] == 'tree':
                 continue
             name = io.relative_path(entry['path'])
+            from plugin_tools.distribution import in_scope
+            if name in {'published', '.agents', '.agents/plugins', '.claude-plugin'}:
+                raise io.DataError('publication parent is a link or non-directory file')
+            if not in_scope(name):
+                continue
             if entry['type'] != 'blob' or entry['mode'] not in ('100644', '100755') or name in files:
                 raise io.DataError('market contains a link, special or duplicate file')
             blob = self.get('git/blobs/' + entry['sha'])
@@ -168,7 +174,7 @@ def extract_bundle(raw, output):
 
 
 class GitWriter:
-    """Write a reviewed full tree using ordinary Git fast-forward pushes."""
+    """Apply only reviewed publication paths on main; preserve every other Git object."""
     def __init__(self, repository, origin=None):
         if not REPO.fullmatch(repository):
             raise io.DataError('invalid GitHub repository')
@@ -176,12 +182,20 @@ class GitWriter:
         self.origin = origin or f'https://github.com/{repository}.git'
 
     def publish(self, branch, expected, files, message, removals=()):
-        if branch not in ('codex/marketplace', 'codex/marketplace-preview'):
+        if branch != 'main':
             raise io.DataError('unsupported distribution branch')
-        if expected != 'absent' and not SHA.fullmatch(expected):
+        if not isinstance(expected, str) or not SHA.fullmatch(expected):
             raise io.DataError('expected market commit is invalid')
-        removable = {'.claude-plugin/marketplace.json', '.agents/plugins/marketplace.json', 'marketplace.json'}
-        if not set(removals).issubset(removable) or len(set(removals)) != len(removals) or expected == 'absent' and removals:
+        native = {'.claude-plugin/marketplace.json', '.agents/plugins/marketplace.json', 'marketplace.json'}
+        def allowed(name):
+            io.relative_path(name)
+            if '.git' in name.split('/'):
+                return False
+            return name in native or name in {'published/index.json', 'published/marketplaces.lock.json'} or bool(
+                re.fullmatch(r'published/(?:releases/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+\.json|codex/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+/.+)', name))
+        if not isinstance(files, dict) or any(not allowed(name) or not isinstance(raw, bytes) for name, raw in files.items()):
+            raise io.DataError('publication may write only declared main market paths; source and dist are forbidden')
+        if not set(removals).issubset(native) or len(set(removals)) != len(removals) or set(removals) & set(files):
             raise io.DataError('only explicitly reviewed managed market entries may be removed')
         env = dict(os.environ, GIT_TERMINAL_PROMPT='0')
         token = env.get('GH_TOKEN') or env.get('GITHUB_TOKEN')
@@ -204,32 +218,38 @@ class GitWriter:
             actual = current.split()[0] if current else 'absent'
             if actual != expected:
                 raise io.ConflictError('market changed since the approved plan')
-            if expected != 'absent':
-                git('fetch', '--quiet', '--depth=1', self.origin, 'refs/heads/' + branch)
-                if git('rev-parse', 'FETCH_HEAD').stdout.strip() != expected:
-                    raise io.ConflictError('market changed during fetch')
-                git('checkout', '--quiet', '--detach', expected)
-                tracked = set(filter(None, git('ls-files', '-z').stdout.split('\0')))
-                if tracked - set(files) != set(removals):
-                    raise io.DataError('removed files differ from the reviewed managed market entries')
-                if removals:
-                    git('rm', '--', *sorted(removals))
+            git('fetch', '--quiet', '--depth=1', self.origin, 'refs/heads/main')
+            if git('rev-parse', 'FETCH_HEAD').stdout.strip() != expected:
+                raise io.ConflictError('main changed during fetch')
+            git('checkout', '--quiet', '--detach', expected)
+            def inventory(revision):
+                return dict((entry.split('\t', 1)[1], entry.split('\t', 1)[0])
+                    for entry in git('ls-tree', '-r', '-z', revision).stdout.split('\0') if entry)
+            before = inventory(expected)
+            if not set(removals).issubset(before):
+                raise io.DataError('reviewed removal does not exist')
+            if removals:
+                git('rm', '--', *sorted(removals))
+            from plugin_tools.markets import _existing, _write_market
             for name, raw in files.items():
-                io.relative_path(name)
-                if name == '.git' or name.startswith('.git/'):
-                    raise io.DataError('distribution cannot write Git internals')
-                destination = work / name
-                destination.parent.mkdir(parents=True, exist_ok=True)
-                if destination.is_symlink():
-                    raise io.DataError('distribution destination is a symlink')
-                destination.write_bytes(raw)
-            git('add', '--all')
-            if expected != 'absent' and git('diff', '--cached', '--quiet', check=False).returncode == 0:
+                previous = _existing(work, name)
+                if previous != raw:
+                    _write_market(work, name, raw, previous)
+            if files:
+                git('add', '--', *sorted(files))
+            changed = set(filter(None, git('diff', '--cached', '--name-only', '-z').stdout.split('\0')))
+            if not changed.issubset(set(files) | set(removals)):
+                raise io.DataError('staged changes escape the reviewed publication patch')
+            if not changed:
                 return expected
             git('-c', 'user.name=ai-code-release', '-c',
                 'user.email=41898282+github-actions[bot]@users.noreply.github.com',
                 'commit', '--quiet', '-m', message)
             revision = git('rev-parse', 'HEAD').stdout.strip()
+            after = inventory(revision)
+            untouched = set(before) - changed
+            if any(after.get(name) != before[name] for name in untouched) or set(after) - set(before) - changed:
+                raise io.DataError('publication changed unreviewed source objects or modes')
             # No --force; concurrent commits cannot be replaced by this push.
             try:
                 git('push', '--quiet', self.origin, 'HEAD:refs/heads/' + branch)
@@ -245,7 +265,7 @@ class GitWriter:
 def verify_pinned_trees(api, previous):
     cached = {}
     for path, raw in previous.items():
-        if not path.startswith('records/'):
+        if not path.startswith('published/releases/'):
             continue
         record = io.parse_json(raw, what=path)
         revision = record['codex_revision']
@@ -253,7 +273,7 @@ def verify_pinned_trees(api, previous):
             continue
         if revision not in cached:
             _, cached[revision] = api.market(revision)
-        prefix = f"plugins/codex/{record['product_id']}/{record['version']}/"
+        prefix = f"published/codex/{record['product_id']}/{record['version']}/"
         actual = {name: value for name, value in cached[revision].items() if name.startswith(prefix)}
         expected = {name: previous[name] for name in record['codex_files']}
         if actual != expected:
@@ -262,11 +282,11 @@ def verify_pinned_trees(api, previous):
 
 def verify_history(api, spec, bundle, root, previous, directory, channel):
     """Bind the prior recorded version to its actual public bundle and Git content."""
-    paths = [name for name in previous if name.startswith(f'records/{spec.product_id}/')]
+    paths = [name for name in previous if name.startswith(f'published/releases/{spec.product_id}/')]
     if not paths:
         return
     records = [io.parse_json(previous[name], what=name) for name in paths]
-    record = max(records, key=lambda item: tuple(map(int, item['version'].split('.'))))
+    record = max(records, key=lambda item: version_key(item['version']))
     if record['version'] == spec.version:
         return  # Current bytes were already reverified from the public Release above.
     tag = record['tag']
@@ -289,25 +309,25 @@ def verify_history(api, spec, bundle, root, previous, directory, channel):
         raise io.DataError('previous bundle provenance differs from public record')
     if manifest['readiness']['package_content_hashes'] != record['readiness']['package_content_hashes']:
         raise io.DataError('previous bundle package hashes differ from public record')
-    report = verify_release(root, spec, bundle, previous=target / 'release.json')
+    report = verify_release(root, spec, bundle, previous=target / 'release.json', committed_acceptance=True)
     if not report['ok']:
         raise io.DataError('current version failed verified historical comparison')
 
 
 def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
-           expected_plan_hash=None, expected_market_commit=None, writer=None):
+           expected_plan_hash=None, expected_market_commit=None, writer=None, control_root=None):
     if action not in ('plan', 'deploy'):
         raise io.DataError('action must be plan or deploy')
     if action == 'deploy' and (not re.fullmatch(r'[0-9a-f]{64}', expected_plan_hash or '') or
-            not (expected_market_commit == 'absent' or SHA.fullmatch(expected_market_commit or ''))):
+            not SHA.fullmatch(expected_market_commit or '')):
         raise io.DataError('deploy requires reviewed plan hash and market commit')
     from plugin_tools.distribution import load_config, plan_distribution, stage_files, finalize_files, check_plan
     root = Path(root).resolve()
     spec = select_plugins(load_catalog(root), plugin_id)[0]
     if source_tag != f'{spec.product_id}/v{spec.version}':
         raise io.DataError('source tag differs from the selected plugin version')
-    config = load_config(root)
-    if channel not in config['channels']:
+    config = load_config(control_root or root)
+    if channel not in ('preview', 'stable'):
         raise io.DataError('unknown channel')
     source_sha = api.tag(source_tag)
     head = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=root, capture_output=True, text=True, timeout=10)
@@ -318,6 +338,13 @@ def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
     if ancestry.returncode:
         raise io.DataError('source release must be reachable from trusted origin/main')
     release = api.release(source_tag)
+    if release.get('draft') is not False or release.get('tag_name') != source_tag:
+        raise io.DataError('exact public Release is required')
+    if release.get('prerelease') is True:
+        return {'ok': True, 'status': 'preview_release_only', 'product_id': spec.product_id,
+                'version': spec.version, 'source_revision': source_sha, 'release_url': release['html_url']}
+    if channel != 'stable' or release_kind(spec.version) != 'stable' or release.get('prerelease') is not False:
+        raise io.DataError('only stable versions can update the default market')
     assets = release.get('assets', [])
     names = [a['name'] for a in assets]
     if len(names) != len(set(names)):
@@ -336,7 +363,7 @@ def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
     with tempfile.TemporaryDirectory(prefix='ai-market-bundle-') as temporary:
         bundle = Path(temporary) / 'bundle'
         extract_bundle(payload[archive], bundle)
-        report = verify_release(root, spec, bundle)
+        report = verify_release(root, spec, bundle, committed_acceptance=True)
         if not report['ok']:
             raise io.DataError('public Release differs from trusted source: ' + '; '.join(report['blockers']))
         for name in ('release.json', 'release-notes.md', 'SHA256SUMS'):
@@ -355,9 +382,9 @@ def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
         info['assets'] = [dict(id=a['id'], name=a['name'], size=a['size'],
             browser_download_url=f'https://github.com/{api.repository}/releases/download/{quote(source_tag, safe="")}/{quote(a["name"], safe="")}',
             sha256=io.sha256(payload[a['name']])) for a in assets if a['name'] in payload]
-        branch = config['channels'][channel]['branch']
+        branch = config['marketplace']['branch']
         base, previous = api.market(branch)
-        plan = plan_distribution(root, spec, bundle, info, channel, previous, base)
+        plan = plan_distribution(root, spec, bundle, info, channel, previous, base, control_root=control_root)
         verify_pinned_trees(api, previous)
         verify_history(api, spec, bundle, root, previous, Path(temporary), channel)
         if action == 'plan':
@@ -410,6 +437,7 @@ def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=Path.cwd())
+    parser.add_argument('--control-root', type=Path)
     parser.add_argument('--plugin', required=True)
     parser.add_argument('--source-tag', required=True)
     parser.add_argument('--channel', choices=('preview', 'stable'), required=True)
@@ -426,7 +454,7 @@ def main():
         repository = urlsplit(repository_url(spec.manifest['repository'])).path.strip('/')
         result = deploy(args.root, args.plugin, args.source_tag, args.channel, GitHub(repository),
             action=args.action, expected_plan_hash=args.expected_plan_hash,
-            expected_market_commit=args.expected_market_commit)
+            expected_market_commit=args.expected_market_commit, control_root=args.control_root)
         code = 0
     except (io.ToolError, OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as exc:
         result = getattr(exc, 'result', {'ok': False,

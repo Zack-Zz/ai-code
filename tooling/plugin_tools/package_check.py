@@ -7,8 +7,9 @@ import stat
 
 from . import io
 from .io import DataError
-from .registry import HOSTS, ID_PATTERN, VERSION_PATTERN
+from .registry import HOSTS, ID_PATTERN
 from .rendering import file_hashes, marketplace_entry, marketplace_path, package_files
+from .versions import VERSION_PATTERN
 
 ARTIFACT_FIELDS = {"schema_version", "product_id", "version", "host", "profiles", "source_revision",
                    "working_tree_dirty", "source_tree_hash", "files", "content_hash"}

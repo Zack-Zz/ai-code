@@ -1,6 +1,26 @@
-name: Deploy plugin marketplace
+name: Sync plugin marketplace
 
 on:
+  workflow_call:
+    inputs:
+      plugin:
+        type: string
+        required: true
+      source_tag:
+        type: string
+        required: true
+      action:
+        type: string
+        default: deploy
+      use_generated_plan:
+        type: boolean
+        default: true
+      expected_plan_hash:
+        type: string
+        default: ''
+      expected_market_commit:
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       plugin:
@@ -11,12 +31,6 @@ on:
       source_tag:
         description: Existing public Release tag (ID/vVERSION)
         type: string
-        required: true
-      channel:
-        description: Published Release channel
-        type: choice
-        options: [preview, stable]
-        default: preview
         required: true
       action:
         description: Plan first, then deploy the reviewed hash
@@ -29,7 +43,7 @@ on:
         type: string
         required: false
       expected_market_commit:
-        description: Required for deploy, reviewed base SHA or absent
+        description: Required for deploy, reviewed main base SHA
         type: string
         required: false
 
@@ -48,6 +62,12 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: macos-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+    outputs:
+      status: ${{ steps.bindings.outputs.status }}
+      plan_hash: ${{ steps.bindings.outputs.plan_hash }}
+      base_commit: ${{ steps.bindings.outputs.base_commit }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -69,16 +89,27 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PLUGIN_ID: ${{ inputs.plugin }}
           SOURCE_TAG: ${{ inputs.source_tag }}
-          CHANNEL: ${{ inputs.channel }}
         run: |
           git -C source fetch --no-tags origin main:refs/remotes/origin/main
-          python3 trusted/.github/scripts/deploy_marketplace.py --root source --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --channel "$CHANNEL" --action plan --output "$RUNNER_TEMP/marketplace-plan.json"
+          python3 trusted/.github/scripts/deploy_marketplace.py --root source --control-root trusted --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --channel stable --action plan --output "$RUNNER_TEMP/marketplace-plan.json"
       - name: Review bindings in job summary
+        id: bindings
         run: |
           python3 - <<'PY'
-          import json, os
+          import json, os, re, sys
           from pathlib import Path
           plan = json.loads((Path(os.environ['RUNNER_TEMP']) / 'marketplace-plan.json').read_text())
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f"status={plan['status']}\n")
+          if plan['status'] == 'preview_release_only':
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+                  summary.write('Preview Release only; the default marketplace remains unchanged.\n')
+              sys.exit(0)
+          if plan['branch'] != 'main' or not re.fullmatch(r'[0-9a-f]{40}', plan['base_commit']) or not re.fullmatch(r'[0-9a-f]{64}', plan['plan_hash']):
+              raise SystemExit('plan requires an existing main base and valid plan hash')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              for key in ('plan_hash', 'base_commit'):
+                  output.write(f'{key}={plan[key]}\n')
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
               summary.write('Review the full plan artifact before deployment.\n\n')
               for key in ('product_id', 'version', 'channel', 'branch', 'base_commit', 'source_revision', 'plan_hash'):
@@ -92,7 +123,7 @@ jobs:
           retention-days: 30
 
   deploy:
-    if: ${{ inputs.action == 'deploy' && github.ref == 'refs/heads/main' }}
+    if: ${{ inputs.action == 'deploy' && needs.plan.outputs.status == 'plan_ready' && github.ref == 'refs/heads/main' }}
     needs: plan
     environment: plugin-marketplace
     permissions:
@@ -120,12 +151,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PLUGIN_ID: ${{ inputs.plugin }}
           SOURCE_TAG: ${{ inputs.source_tag }}
-          CHANNEL: ${{ inputs.channel }}
-          REVIEWED_HASH: ${{ inputs.expected_plan_hash }}
-          REVIEWED_COMMIT: ${{ inputs.expected_market_commit }}
+          REVIEWED_HASH: ${{ inputs.use_generated_plan && needs.plan.outputs.plan_hash || inputs.expected_plan_hash }}
+          REVIEWED_COMMIT: ${{ inputs.use_generated_plan && needs.plan.outputs.base_commit || inputs.expected_market_commit }}
         run: |
           git -C source fetch --no-tags origin main:refs/remotes/origin/main
-          python3 trusted/.github/scripts/deploy_marketplace.py --root source --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --channel "$CHANNEL" --action deploy --expected-plan-hash "$REVIEWED_HASH" --expected-market-commit "$REVIEWED_COMMIT" --output "$RUNNER_TEMP/marketplace-result.json"
+          python3 - <<'PY'
+          import os, re
+          if not re.fullmatch(r'[0-9a-f]{64}', os.environ['REVIEWED_HASH']) or not re.fullmatch(r'[0-9a-f]{40}', os.environ['REVIEWED_COMMIT']):
+              raise SystemExit('deploy requires the reviewed plan hash and existing main base SHA')
+          PY
+          python3 trusted/.github/scripts/deploy_marketplace.py --root source --control-root trusted --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --channel stable --action deploy --expected-plan-hash "$REVIEWED_HASH" --expected-market-commit "$REVIEWED_COMMIT" --output "$RUNNER_TEMP/marketplace-result.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: ${{ always() }}
         with:

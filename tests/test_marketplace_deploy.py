@@ -19,6 +19,7 @@ from plugin_tools.release.integrity import read_tree
 from plugin_tools.registry import load_catalog
 from tests.tooling.test_release import release_plugin
 from tests.tooling.test_registry import write_json
+from tests.tooling.test_distribution import accept_fixture
 
 SCRIPT = Path(__file__).resolve().parents[1] / '.github/scripts/deploy_marketplace.py'
 
@@ -92,63 +93,6 @@ class DeploymentSafeguards(unittest.TestCase):
             module.deploy(Path('.'), 'ai-code-workflow', 'ai-code-workflow/v1.0.1',
                           'preview', API(), action='deploy')
 
-    def test_git_writer_creates_and_fast_forwards_only_the_reviewed_branch(self):
-        module = self.require_module()
-        with tempfile.TemporaryDirectory() as temporary:
-            bare = Path(temporary) / 'remote.git'
-            subprocess.run(['git', 'init', '--bare', str(bare)], check=True, capture_output=True)
-            writer = module.GitWriter('example/repo', origin=str(bare))
-            first = writer.publish('codex/marketplace-preview', 'absent', {'README.md': b'first\n'}, 'stage')
-            second = writer.publish('codex/marketplace-preview', first,
-                                    {'README.md': b'first\n', 'channel.json': b'{}\n'}, 'catalog')
-            actual = subprocess.check_output(['git', '--git-dir', str(bare), 'rev-parse',
-                                             'refs/heads/codex/marketplace-preview'], text=True).strip()
-            self.assertEqual(actual, second)
-            with self.assertRaises(io.ConflictError):
-                writer.publish('codex/marketplace-preview', first, {'README.md': b'overwrite'}, 'stale')
-            self.assertEqual(subprocess.check_output(['git', '--git-dir', str(bare), 'rev-parse',
-                                                      'refs/heads/codex/marketplace-preview'], text=True).strip(), second)
-
-    def test_git_writer_empty_post_push_read_preserves_an_uncertain_revision(self):
-        module = self.require_module()
-        original = subprocess.run
-        with tempfile.TemporaryDirectory() as temporary:
-            bare = Path(temporary) / 'remote.git'
-            original(['git', 'init', '--bare', str(bare)], check=True, capture_output=True)
-            reads = [0]
-            def runner(arguments, **options):
-                if 'ls-remote' in arguments:
-                    reads[0] += 1
-                    if reads[0] == 2:
-                        return subprocess.CompletedProcess(arguments, 0, '', '')
-                return original(arguments, **options)
-            with mock.patch.object(module.subprocess, 'run', side_effect=runner):
-                with self.assertRaises(Exception) as failure:
-                    module.GitWriter('example/repo', origin=str(bare)).publish(
-                        'codex/marketplace-preview', 'absent', {'README.md': b'bytes'}, 'stage')
-            self.assertIsInstance(failure.exception, io.ConflictError)
-            self.assertRegex(getattr(failure.exception, 'attempted_revision', ''), r'^[0-9a-f]{40}$')
-
-    def test_git_writer_removes_only_explicitly_reviewed_empty_market_entries(self):
-        module = self.require_module()
-        with tempfile.TemporaryDirectory() as temporary:
-            bare = Path(temporary) / 'remote.git'
-            subprocess.run(['git', 'init', '--bare', str(bare)], check=True, capture_output=True)
-            writer = module.GitWriter('example/repo', origin=str(bare))
-            base = writer.publish('codex/marketplace-preview', 'absent',
-                {'README.md': b'keep', 'marketplace.json': b'{}'}, 'old market')
-            with self.assertRaises(io.DataError):
-                writer.publish('codex/marketplace-preview', base, {'README.md': b'keep'}, 'unreviewed removal')
-            failure = None
-            try:
-                revision = writer.publish('codex/marketplace-preview', base, {'README.md': b'keep'},
-                    'reviewed empty host', removals=['marketplace.json'])
-            except Exception as exc:
-                failure = exc
-            self.assertIsNone(failure, f'Explicit managed market removal must be supported: {failure}')
-            self.assertNotEqual(revision, base)
-            with self.assertRaises(io.DataError):
-                writer.publish('codex/marketplace-preview', revision, {}, 'forbidden removal', removals=['README.md'])
 
 
 class FullDeploymentTests(unittest.TestCase):
@@ -165,6 +109,7 @@ class FullDeploymentTests(unittest.TestCase):
         write_json(plugin / 'product.json', product)
         source_config = Path(__file__).resolve().parents[1] / 'distribution.json'
         (self.root / 'distribution.json').write_bytes(source_config.read_bytes())
+        accept_fixture(self.root, "ai-one")
         def git(*arguments):
             return subprocess.check_output(['git', *arguments], cwd=self.root, stderr=subprocess.DEVNULL, text=True).strip()
         git('init', '-b', 'main')
@@ -179,7 +124,7 @@ class FullDeploymentTests(unittest.TestCase):
         git('update-ref', 'refs/remotes/origin/main', self.sha)
         bundle = self.base / 'bundle'
         self.bundle = bundle
-        result = prepare_release(self.root, load_catalog(self.root)[0], bundle)
+        result = prepare_release(self.root, load_catalog(self.root)[0], bundle, mode="stable")
         self.assertTrue(result['ok'], result)
         files = read_tree(bundle)
         archive_name = 'ai-one-1.0.0-release-bundle.zip'
@@ -190,7 +135,7 @@ class FullDeploymentTests(unittest.TestCase):
         for name, raw in files.items():
             if name.startswith(('installers/', 'downloads/')):
                 self.payloads[Path(name).name] = raw
-        self.release = {'id': 1, 'tag_name': 'ai-one/v1.0.0', 'draft': False, 'prerelease': True,
+        self.release = {'id': 1, 'tag_name': 'ai-one/v1.0.0', 'draft': False, 'prerelease': False,
             'html_url': 'https://github.com/example/repo/releases/tag/ai-one/v1.0.0', 'assets': []}
         for index, (name, raw) in enumerate(self.payloads.items(), 1):
             self.release['assets'].append({'id': index, 'name': name, 'size': len(raw),
@@ -200,7 +145,7 @@ class FullDeploymentTests(unittest.TestCase):
         owner = self
         class FakeGitHub:
             repository = 'example/repo'
-            revision = 'absent'
+            revision = owner.sha
             files = {}
             writes = 0
             revisions = {}
@@ -230,13 +175,13 @@ class FullDeploymentTests(unittest.TestCase):
         self.api = FakeGitHub()
 
     def call(self, **options):
-        return self.module.deploy(self.root, 'ai-one', self.tag, 'preview', self.api,
+        return self.module.deploy(self.root, 'ai-one', self.tag, 'stable', self.api,
                                   writer=self.api, **options)
 
     def test_plan_is_read_only_and_deploy_pins_the_staged_commit(self):
         plan = self.call()
         self.assertEqual(self.api.writes, 0)
-        result = self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit='absent')
+        result = self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit=self.sha)
         self.assertEqual(result['status'], 'marketplace_deployed')
         self.assertEqual(self.api.writes, 2)
         market = json.loads(self.api.files['.agents/plugins/marketplace.json'])
@@ -257,13 +202,13 @@ class FullDeploymentTests(unittest.TestCase):
     def test_stale_reviewed_hash_never_writes(self):
         self.call()
         with self.assertRaises(io.ConflictError):
-            self.call(action='deploy', expected_plan_hash='f' * 64, expected_market_commit='absent')
+            self.call(action='deploy', expected_plan_hash='f' * 64, expected_market_commit=self.sha)
         self.assertEqual(self.api.writes, 0)
 
     def test_exact_retry_is_read_only(self):
         plan = self.call()
-        self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit='absent')
-        result = self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit='absent')
+        self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit=self.sha)
+        result = self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit=self.sha)
         self.assertEqual(result['status'], 'already_deployed')
         self.assertEqual(self.api.writes, 2)
 
@@ -274,17 +219,18 @@ class FullDeploymentTests(unittest.TestCase):
         tool = Path(__file__).resolve().parents[1] / 'tooling/plugin_tool.py'
         result = subprocess.run([sys.executable, str(tool), 'distribution', 'check',
             '--plan', str(plan_path), '--expected-plan-hash', plan['plan_hash'],
-            '--expected-market-commit', 'absent', '--root', str(self.root)], capture_output=True, text=True)
+            '--expected-market-commit', self.sha, '--root', str(self.root)], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertTrue(json.loads(result.stdout)['ok'])
 
     def test_previous_public_bundle_is_reverified_before_new_plan(self):
         old_plan = self.call()
-        self.call(action='deploy', expected_plan_hash=old_plan['plan_hash'], expected_market_commit='absent')
+        self.call(action='deploy', expected_plan_hash=old_plan['plan_hash'], expected_market_commit=self.sha)
         product_path = self.root / 'plugins/ai-one/product.json'
         product = json.loads(product_path.read_text())
         product['version'] = '1.0.1'
         write_json(product_path, product)
+        accept_fixture(self.root, 'ai-one')
         self.git('add', '.')
         self.git('commit', '-m', 'next version')
         self.sha = self.git('rev-parse', 'HEAD')
@@ -292,7 +238,7 @@ class FullDeploymentTests(unittest.TestCase):
         self.git('tag', self.tag)
         self.git('update-ref', 'refs/remotes/origin/main', self.sha)
         bundle = self.base / 'next-bundle'
-        self.assertTrue(prepare_release(self.root, load_catalog(self.root)[0], bundle)['ok'])
+        self.assertTrue(prepare_release(self.root, load_catalog(self.root)[0], bundle, mode="stable")['ok'])
         files = read_tree(bundle)
         archive_name = 'ai-one-1.0.1-release-bundle.zip'
         raw = zip_bytes(files)
@@ -301,7 +247,7 @@ class FullDeploymentTests(unittest.TestCase):
         payloads.update({name: files[name] for name in ('release.json', 'release-notes.md', 'SHA256SUMS')})
         payloads.update({Path(name).name: value for name, value in files.items()
                          if name.startswith(('installers/', 'downloads/'))})
-        release = {'id': 2, 'tag_name': self.tag, 'draft': False, 'prerelease': True,
+        release = {'id': 2, 'tag_name': self.tag, 'draft': False, 'prerelease': False,
             'html_url': 'https://github.com/example/repo/releases/tag/' + self.tag,
             'assets': [{'id': number, 'name': name, 'size': len(value),
                 'browser_download_url': 'https://github.com/example/repo/releases/download/' + self.tag + '/' + name}
@@ -314,20 +260,20 @@ class FullDeploymentTests(unittest.TestCase):
 
     def test_current_market_cannot_self_rehash_a_missing_pinned_commit(self):
         plan = self.call()
-        self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit='absent')
-        record_path = 'records/ai-one/1.0.0.json'
+        self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit=self.sha)
+        record_path = 'published/releases/ai-one/1.0.0.json'
         record = json.loads(self.api.files[record_path])
         record['codex_revision'] = 'f' * 40
         self.api.files[record_path] = io.dump_json(record)
-        channel = json.loads(self.api.files['channel.json'])
+        channel = json.loads(self.api.files['published/index.json'])
         channel['plugins']['ai-one']['codex_revision'] = 'f' * 40
-        self.api.files['channel.json'] = io.dump_json(channel)
+        self.api.files['published/index.json'] = io.dump_json(channel)
         market = json.loads(self.api.files['.agents/plugins/marketplace.json'])
         market['plugins'][0]['source']['sha'] = 'f' * 40
         self.api.files['.agents/plugins/marketplace.json'] = io.dump_json(market)
-        receipt = json.loads(self.api.files['marketplaces.lock.json'])
+        receipt = json.loads(self.api.files['published/marketplaces.lock.json'])
         receipt['files']['.agents/plugins/marketplace.json'] = io.sha256(self.api.files['.agents/plugins/marketplace.json'])
-        self.api.files['marketplaces.lock.json'] = io.dump_json(receipt)
+        self.api.files['published/marketplaces.lock.json'] = io.dump_json(receipt)
         with self.assertRaises(io.DataError):
             self.call()
 
@@ -352,7 +298,7 @@ class FullDeploymentTests(unittest.TestCase):
             return original(branch, expected, files, message, **options)
         self.api.publish = fail_catalog
         with self.assertRaises(io.ToolError) as failure:
-            self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit='absent')
+            self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit=self.sha)
         result = getattr(failure.exception, 'result', {})
         self.assertEqual(result.get('status'), 'published_pending_marketplace')
         self.assertEqual(result.get('distribution_revision'), '1' * 40)
@@ -362,16 +308,25 @@ class FullDeploymentTests(unittest.TestCase):
         plan = self.call()
         original = self.api.market
         def fail_final(branch):
-            if self.api.writes == 2 and branch.startswith('codex/'):
+            if self.api.writes == 2 and branch == 'main':
                 raise io.DataError('read-back unavailable')
             return original(branch)
         self.api.market = fail_final
         with self.assertRaises(io.ToolError) as failure:
-            self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit='absent')
+            self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit=self.sha)
         result = getattr(failure.exception, 'result', {})
         self.assertEqual(result.get('market_commit'), '2' * 40)
         self.assertEqual(result.get('phase'), 'verifying_catalog')
         self.assertFalse(result.get('ok', True))
+
+    def test_preview_release_is_a_read_only_noop_before_market_reads(self):
+        self.release['prerelease'] = True
+        original = self.api.market
+        self.api.market = lambda branch: (_ for _ in ()).throw(AssertionError('preview cannot read or update main market'))
+        result = self.call()
+        self.assertEqual(result['status'], 'preview_release_only')
+        self.assertEqual(self.api.writes, 0)
+        self.api.market = original
 
     def test_entrypoint_normalizes_a_supported_git_repository_suffix(self):
         product_path = self.root / 'plugins/ai-one/product.json'
@@ -386,6 +341,79 @@ class FullDeploymentTests(unittest.TestCase):
                 mock.patch.object(self.module, 'print'):
             self.assertEqual(self.module.main(), 0)
         self.assertEqual(api_factory.call_args.args, ('example/repo',))
+
+
+class MainGitWriterTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix='main-publish-test-')
+        self.addCleanup(self.temp.cleanup)
+        self.base = Path(self.temp.name)
+        self.bare = self.base / 'remote.git'
+        self.source = self.base / 'source'
+        self.source.mkdir()
+        self.git('init', '--bare', str(self.bare))
+        self.git('init', '-b', 'main', cwd=self.source)
+        (self.source / 'README.md').write_bytes(b'Human maintained source README\n')
+        (self.source / 'script.sh').write_bytes(b'#!/bin/sh\nexit 0\n')
+        (self.source / 'script.sh').chmod(0o755)
+        (self.source / 'source-link').symlink_to('README.md')
+        self.git('add', '.', cwd=self.source)
+        self.git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+                 'commit', '-m', 'source', cwd=self.source)
+        self.git('push', str(self.bare), 'main', cwd=self.source)
+        self.head = self.git('rev-parse', 'HEAD', cwd=self.source)
+        self.writer = implementation().GitWriter('example/repo', origin=str(self.bare))
+
+    def git(self, *arguments, cwd=None):
+        result = subprocess.run(['git', *arguments], cwd=cwd, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout.strip()
+
+    def test_main_patch_preserves_source_bytes_modes_and_links(self):
+        before = self.git('--git-dir', str(self.bare), 'ls-tree', self.head)
+        revision = self.writer.publish('main', self.head,
+            {'published/codex/ai-one/1.0.0/plugin.json': b'{"name":"ai-one"}\n'}, 'stage package')
+        after = self.git('--git-dir', str(self.bare), 'ls-tree', revision)
+        self.assertEqual([line for line in after.splitlines() if not line.endswith('\tpublished')],
+                         before.splitlines())
+        self.assertEqual(self.git('--git-dir', str(self.bare), 'show', revision + ':README.md'),
+                         'Human maintained source README')
+        with self.assertRaises(io.ConflictError):
+            self.writer.publish('main', self.head, {'published/index.json': b'{}'}, 'stale')
+        self.assertEqual(self.git('--git-dir', str(self.bare), 'rev-parse', 'main'), revision)
+
+    def test_writer_rejects_source_dist_old_branches_and_absent_main(self):
+        for files in ({'README.md': b'overwrite'}, {'dist/package.zip': b'bytes'},
+                      {'published/../README.md': b'escape'}, {'.git/config': b'bad'}):
+            with self.subTest(files=files), self.assertRaises(io.DataError):
+                self.writer.publish('main', self.head, files, 'unsafe')
+        for branch, expected in (('codex/marketplace-preview', 'absent'), ('main', 'absent')):
+            with self.subTest(branch=branch), self.assertRaises(io.DataError):
+                self.writer.publish(branch, expected, {'published/index.json': b'{}'}, 'unsafe')
+
+    def test_empty_post_push_read_preserves_uncertain_revision(self):
+        module = implementation()
+        original = subprocess.run
+        reads = [0]
+        def runner(arguments, **options):
+            if 'ls-remote' in arguments:
+                reads[0] += 1
+                if reads[0] == 2:
+                    return subprocess.CompletedProcess(arguments, 0, '', '')
+            return original(arguments, **options)
+        with mock.patch.object(module.subprocess, 'run', side_effect=runner):
+            with self.assertRaises(io.ConflictError) as failure:
+                self.writer.publish('main', self.head, {'published/index.json': b'{}'}, 'stage')
+        self.assertRegex(getattr(failure.exception, 'attempted_revision', ''), r'^[0-9a-f]{40}$')
+
+    def test_only_explicit_native_market_removals_are_allowed(self):
+        initial = self.writer.publish('main', self.head, {'marketplace.json': b'{}'}, 'native')
+        with self.assertRaises(io.DataError):
+            self.writer.publish('main', initial, {}, 'source removal', removals=['README.md'])
+        removed = self.writer.publish('main', initial, {}, 'reviewed native removal', removals=['marketplace.json'])
+        self.assertNotEqual(initial, removed)
+        self.assertEqual(self.git('--git-dir', str(self.bare), 'show', removed + ':README.md'),
+                         'Human maintained source README')
 
 
 if __name__ == '__main__':

@@ -3,8 +3,8 @@
 [English](README.md) | 简体中文
 
 一个承载多个 **AI 相关插件** 的仓库。每个插件独立维护源码、身份、版本、
-资源、测试与支持声明；公共工具负责目录注册、源校验、可复现构建和本地市场
-生成，插件行为留在各自目录内。
+资源、测试与支持声明；公共工具负责目录注册、源校验、可复现构建、临时
+开发市场生成及 main 公开快照核验，插件行为留在各自目录内。
 
 首个插件是 **CodeVow · AI 编码工作流**（`ai-code-workflow`），用于 AI 编码助手的
 工程协作。其他插件形态在有具体需求时扩展；仓库不要求所有插件具备工作流
@@ -14,8 +14,8 @@
 
 | 插件 | 用途 | 版本与支持状态 |
 |---|---|---|
-| [CodeVow](plugins/ai-code-workflow/README.zh-CN.md) | 计划、TDD、排查、审查、验证与交付证据 | `1.0.2` 自建市场试用候选；[真实宿主验收仍未完成](plugins/ai-code-workflow/docs/support-matrix.md) |
-| [Agent Delegation](plugins/ai-agent-delegation/README.md) | 通过外置Agent Bridge明确交接给其他工具或同工具独立会话 | `0.1.0`源码候选；[整包宿主验收未完成](plugins/ai-agent-delegation/docs/support-matrix.md)，未加入已发布preview市场 |
+| [CodeVow](plugins/ai-code-workflow/README.zh-CN.md) | 计划、TDD、排查、审查、验证与交付证据 | 历史 GitHub Prerelease `1.0.2`，无正式发行；[真实宿主验收仍未完成](plugins/ai-code-workflow/docs/support-matrix.md) |
+| [Agent Delegation](plugins/ai-agent-delegation/README.md) | 通过外置Agent Bridge明确交接给其他工具或同工具独立会话 | `0.1.0`源码候选；[整包宿主验收未完成](plugins/ai-agent-delegation/docs/support-matrix.md)，无正式发行，未加入历史 preview 市场 |
 
 `catalog.json` 只登记插件目录；各目录的 `product.json` 是插件 ID、版本和
 资源白名单的唯一来源。根目录的私有 Node 包用于仓库维护，其版本不作为
@@ -24,7 +24,53 @@
 项目边界见[总体架构](docs/architecture.md)与[文档导航](docs/README.md)。
 派发插件保持普通开发及原生子代理行为；运行时、CLI/MCP/API由ai-mcp承载。
 
-## 从 preview 市场安装 CodeVow
+## 首个正式版本上线后从 main 市场安装
+
+新分发统一使用 `Zack-Zz/ai-code` 的 `main` 市场。每个插件 ID 只有一个
+当前入口，指向最新成功同步的正式版本。新 `X.Y.Z-preview.N` 只公开为
+GitHub Prerelease，不更新该入口。内部市场名继续沿用 `ai-code-preview`，
+这个名称不再表示发行种类。
+
+**以下 CodeVow main 安装示例仅在 CodeVow 首个正式版本通过验收并成功同步后可用。** 本次
+迁移后的根市场是空的正式快照；CodeVow 与 Agent Delegation 当前都没有正式
+入口，开发注册不等于公开发行。新 main 链路和跨版本升级尚未经过真实宿主
+验收，下方带日期的安装结果仅适用于旧 preview 来源。
+
+Codex 注册 main，再安装已上线的正式插件：
+
+```sh
+codex plugin marketplace add Zack-Zz/ai-code --ref main
+codex plugin add ai-code-workflow@ai-code-preview
+```
+
+兼容版本的 Claude Code CLI 使用 main 的 JSON 清单：
+
+```sh
+claude plugin marketplace add \
+  https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
+claude plugin install ai-code-workflow@ai-code-preview
+```
+
+macOS ZCode 的应用内置 CLI 使用自己的 main JSON 清单：
+
+```sh
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
+  https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code-preview
+```
+
+CLI 版本和来源格式限制保留在下方历史记录中，不构成上述新 main URL 的
+验收。main 迁移实际验证前保留旧市场注册；旧 preview 分支作为固定的历史
+试用来源保留，不接收新版本。
+
+这些是首次注册示例。已有用户需要单独验证宿主原生来源迁移，因为市场名
+沿用旧名称；添加 URL 不代表已有注册已经切换来源。
+
+更新分三步核对：先刷新市场，再通过宿主原生入口升级本机插件，最后重新
+加载或新建会话并核对版本与包字节。公开发行不会自动升级本机安装。连续
+两个正式版本的升级和 Codex 此前的刷新超时仍需实机验证。
+
+## 历史 CodeVow 1.0.2 preview 安装（2026-10-09）
 
 [CodeVow 1.0.2](https://github.com/Zack-Zz/ai-code/releases/tag/ai-code-workflow%2Fv1.0.2)
 和 [preview 市场](https://github.com/Zack-Zz/ai-code/tree/codex/marketplace-preview)
@@ -87,7 +133,7 @@ node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai
 包逐字节一致，其他已安装插件保持原状态。使用前新建 ZCode 会话；
 工作流行为仍待验收。
 
-## 下载 Release 作为备用方式
+## 下载历史 CodeVow 1.0.2 作为备用方式
 
 打开 [CodeVow 1.0.2](https://github.com/Zack-Zz/ai-code/releases/tag/ai-code-workflow%2Fv1.0.2)，
 在 **Assets** 中下载对应宿主的 ZIP；这些包无需下载源码或自行构建。
@@ -132,10 +178,11 @@ Release 与 preview 市场分支分别发布，此版本两者均已完成；完
 ```sh
 python3 tooling/plugin_tool.py list
 python3 tooling/plugin_tool.py validate --all
+npm ci --no-audit --no-fund
 npm test
-python3 tooling/plugin_tool.py build --all --host all --output dist-check
+python3 tooling/plugin_tool.py build --all --host all --output /tmp/ai-code-packages
 python3 tooling/plugin_tool.py package check \
-  --path dist-check/codex/ai-code-workflow --host codex --root .
+  --path /tmp/ai-code-packages/codex/ai-code-workflow --host codex --root .
 ```
 
 输出目录必须不存在或为空。只处理一个插件时，将 `--all` 替换为
@@ -146,16 +193,26 @@ python3 tooling/plugin_tool.py package check \
 每个 ZIP 只包含该插件与对应的单插件市场；解压到稳定目录后，通过宿主原生
 插件机制注册并安装。操作见插件的
 [安装文档](plugins/ai-code-workflow/docs/installation.md)。
-三端发布预检、制品准备/复验、仓库市场和手动 GitHub 草稿流程见
-[发布指南](docs/publishing.md)。稳定制品要求真实宿主验收证据。
+三端发布预检、制品准备/复验、Draft 上传、核验后公开和 main 市场同步见
+[发布指南](docs/publishing.md)。新的正式发行仍要求真实宿主字节绑定验收。
 
-schema 2 发行套件新增 `installers/ID-VERSION-HOST-plugin.zip`，仅含一个
-插件根及完整原生包（含 artifact.json），不带市场；下载包和投稿包保持
-各自用途。每个插件独立 Release，经审阅的 distribution 计划为 Claude/ZCode
-选择固定资产，为 Codex 固定版本目录提交；人工 Publish 后再单独部署市场。
-试用/正式市场目标分支为 `codex/marketplace-preview` 与 `codex/marketplace`。
-远端发布与市场部署分别记录。三端安装及制品字节均已验证，
-跨版本升级和工作流行为仍待验收；迁移期间保留现有 dist 和 ai-code-local 入口。
+开发市场只能生成到显式指定的空临时目录：
+
+```sh
+python3 tooling/plugin_tool.py marketplace sync --output /tmp/ai-code-development
+python3 tooling/plugin_tool.py marketplace check --root .
+```
+
+显式开发试用时注册 `/tmp/ai-code-development/<host>`。`marketplace check`
+只读检查公开快照的冻结源码 S 和固定 Codex 分发提交 D，不要求公开版本
+等于当前开发源码。`dist/` 是被忽略的本地/CI 临时输出，不得提交或推送。
+
+schema 2 套件包含 `installers/ID-VERSION-HOST-plugin.zip`，只有完整原生
+插件根和 `artifact.json`，不带市场；下载包和投稿包各有用途。新预览版在
+GitHub Prerelease 结束；正式公开成功后显式调用经过审核的 main 市场流程。
+Claude/ZCode 使用固定 Release 资产，Codex 使用
+`published/codex/ID/VERSION/` 并固定实际分发提交。源码、公开发行、市场同步
+及真实宿主验收分别报告。工作流代码已在本地实施，不代表远端运行已完成。
 
 源校验、包完整性和测试通过不代表原生加载成功或模型遵循技能。真实宿主验收
 及其证据由各插件分别维护。
@@ -165,23 +222,25 @@ schema 2 发行套件新增 `installers/ID-VERSION-HOST-plugin.zip`，仅含一�
 | 路径 | 用途 |
 |---|---|
 | `catalog.json` | 显式注册的插件目录列表 |
-| `distribution.json` | 渠道分支、市场名及限定运输类型，不复制插件版本 |
+| `distribution.json` | main 来源、单市场身份、latest-stable 规则及宿主运输方式 |
 | `plugins/<id>/` | 插件自包含的源码、清单、资源、适配、测试与文档 |
-| `tooling/plugin_tool.py` | 公共校验、构建、包检查、市场同步、release 和本地 distribution plan/check 入口 |
+| `tooling/plugin_tool.py` | 公共校验、构建、开发市场 sync、公开 check/initialize、release 和 distribution plan/check |
 | `tooling/` | 通用源校验、构建与市场生成工具 |
 | `tests/` | 公共工具测试与统一门禁 |
 | `docs/plugin-authoring.md` | 新插件接入及宿主声明指南 |
 | `docs/publishing.md` | 三端发布资料、制品、验收和渠道操作 |
-| `.github/workflows/release.yml` | 手动准备制品，可选创建 GitHub 草稿 |
+| `.github/workflows/release.yml` | 冻结标签准备；审核、上传并复验 Draft 后公开，正式成功调用市场同步 |
+| `.github/workflows/marketplace.yml` | 正式版 main 同步计划、环境审核及已审阅基准上的部署 |
 | `docs/design/2026-10-07-multi-plugin-design.md` | 多插件边界、数据契约与迁移计划 |
-| `dist/` | 从已注册源码生成、可重建的发行目录 |
+| `published/` | 正式发行记录、当前指针、所有权回执与固定 Codex 安装内容 |
+| `dist/` | 被忽略的可重建本地/CI 临时输出，不进入 Git 跟踪 |
 
 ## 开发与验证
 
 - 修改前读取根 `AGENTS.md` 和目标插件的局部维护规则。
 - 行为变更使用有意义的 RED、GREEN 测试；`npm test` 覆盖公共工具与全部
   已注册插件的测试组。
-- 安装本地维护依赖后执行 `npm run lint`。
+- 用 `npm ci` 安装锁定的本地维护依赖，再执行 `npm run lint`。
 - 插件 ID、版本独立维护；所有入包资源都必须登记；不同插件的源码和哈希
   边界保持清晰。
 - 接入步骤见[作者指南](docs/plugin-authoring.md)。新的运行集成需要独立设计

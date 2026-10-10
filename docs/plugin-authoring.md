@@ -5,7 +5,8 @@
 不必包含它的策略、任务记录、Reviewer 或六份技能。
 
 所有命令在仓库根运行。维护规则见 [AGENTS.md](../AGENTS.md)，公共字段和
-发行索引见 [多插件规格](design/2026-10-07-multi-plugin-design.md)。
+发行规则见 [发布指南](publishing.md)；目录迁移背景保留在
+[多插件规格](design/2026-10-07-multi-plugin-design.md)。
 
 ## 1. 建立独立源码目录
 
@@ -49,7 +50,12 @@ kebab-case，建议目录名与 ID 一致。每个插件自有版本、许可证
 ```
 
 身份、版本和白名单只写在该清单。不要在 catalog、根 package.json 或市场
-中维护第二份版本。`hosts` 必填且非空，当前接受 `claude`、`codex`、`zcode`；每个声明
+中维护第二份开发版本。新的公开版本仅使用 `X.Y.Z` 或 `X.Y.Z-preview.N`，
+数字禁止前导零，不接受其他后缀或 build metadata；preview 序号按数字比较，
+同核心正式版在所有 preview 之后。历史 numeric Prerelease 保留原状态，
+不能改标志成为新正式版。
+
+`hosts` 必填且非空，当前接受 `claude`、`codex`、`zcode`；每个声明
 宿主都必须有真实 `adapters/<host>/plugin.json`。
 
 声明的技能自动贡献其 `skills/<name>/SKILL.md`。技能引用的参考文档、脚本
@@ -129,7 +135,8 @@ Describe the task, inputs, actions and evidence expected from the assistant.
 保持稳定。可选 `publisher` 只含公开 `name`、HTTPS `url` 和 `email`；工具
 统一生成 native author 与 Codex developerName，不在适配模板复制署名。
 
-公共市场由工具统一生成，不需要新插件提供 marketplace 模板。workflow
+开发市场由工具统一生成，不需要新插件提供 marketplace 模板。公开 main
+市场从已核验正式发行记录生成，不从当前开发清单直接同步。workflow
 保留的旧模板只供自己的专属 build 使用。
 
 ## 4. 注册目录并接入测试
@@ -165,13 +172,13 @@ Python 入口独立运行以避免同名 tests 包冲突。不要新增任意命
 python3 tooling/plugin_tool.py list
 python3 tooling/plugin_tool.py validate --plugin ai-example
 npm test
-python3 tooling/plugin_tool.py build --plugin ai-example --host codex --output dist-example
+python3 tooling/plugin_tool.py build --plugin ai-example --host codex --output /tmp/ai-example-packages
 python3 tooling/plugin_tool.py package check \
-  --path dist-example/codex/ai-example --host codex --root .
+  --path /tmp/ai-example-packages/codex/ai-example --host codex --root .
 npm run lint
 ```
 
-`dist-example` 必须不存在或为空；重复验证使用新的空目录。`--all` 可校验
+`/tmp/ai-example-packages` 必须不存在或为空；重复验证使用新的空目录。`--all` 可校验
 或构建全部登记插件。`--host all` 按各插件 hosts 生成对应产物。
 
 包检查使用可信仓库 `--root` 独立重建预期资源闭包，重算实际文件哈希并
@@ -184,9 +191,21 @@ npm run lint
 替代公共可信源码检查。采集注册插件的输入及复查时始终从仓库根遍历目录，
 不把插件子目录重新作为允许跟随父目录链接的信任根。
 
-根 `dist/index.json` 使用 schema_version 2，按 plugins/ID/hosts/HOST 记录
+构建输出 `<output>/index.json` 使用 schema_version 2，按 plugins/ID/hosts/HOST 记录
 各包路径和哈希，按 hosts/HOST 记录聚合市场。插件自己的 artifact 保持自身
 身份和来源。修改一个插件时核对兄弟插件内容和哈希不受影响。
+
+开发市场使用显式空输出目录，注册对应的 `<output>/<host>`：
+
+```sh
+python3 tooling/plugin_tool.py marketplace sync --output /tmp/ai-example-development
+python3 tooling/plugin_tool.py marketplace check --root .
+```
+
+sync 在临时目录生成注册源码的三端开发市场；check 只读核验公开快照的
+冻结源码 S、安装内容与固定 Codex 分发提交 D，不要求正式版本等于当前
+开发版本。`dist/` 是被忽略的临时构建输出，不得提交或推送；CI 拒绝跟踪
+该目录，公开制品保存为 Release 附件。
 
 需要发行准备时增加插件 `release.json` 和可移植双语说明，见
 [发布指南](publishing.md) 与[验收契约](release-evidence.md)。这些输入属于
@@ -198,6 +217,11 @@ npm run lint
 单插件市场。解压到稳定目录后按宿主原生方式注册，见现有
 [安装说明](../plugins/ai-code-workflow/docs/installation.md) 中的市场路径约定。
 原生命令与版本支持仍需对应插件实际验证。
+
+catalog 登记和开发试用不等于正式发行。新预览版只进入 GitHub Prerelease；
+正式版本通过全部声明宿主的 stable 验收、公开并成功同步后才进入 main
+单市场。同一 ID 只有一个当前入口，没有正式版的插件暂不出现在公开市场。
+`published/index.json` 与正式记录描述已上线版本，不是第二份开发版本来源。
 
 插件支持说明要分别报告源校验、脚本测试、包检查、原生加载和实际行为。
 记录宿主版本、模型、包哈希及会话证据；尚未验收写 `unverified`。为 MCP

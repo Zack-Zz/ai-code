@@ -10,12 +10,37 @@ import tempfile
 from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tooling"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from plugin_tools import io
 from plugin_tools.registry import load_catalog, select_plugins
 from plugin_tools.release import verify_release
 from plugin_tools.release import metadata, source_git
 from plugin_tools.release.integrity import read_tree, record
 from plugin_tools.release.layout import zip_bytes
+from plugin_tools.versions import release_kind
+from plugin_tools.distribution import repository_url
+from prepare_release import source_binding
+
+
+def release_policy(spec, report):
+    kind = release_kind(spec.version)
+    mode = "draft" if kind == "preview" else "stable"
+    if report.get("mode") != mode or (kind == "stable" and report.get("publication_ready") is not True):
+        raise ValueError(f"new {kind} release requires {mode} verification and stable host acceptance where applicable")
+    return kind
+
+
+def release_assets(captured, private, spec):
+    payload = read_tree(captured)
+    complete = private / f"{spec.product_id}-{spec.version}-release-bundle.zip"
+    complete.write_bytes(zip_bytes(payload))
+    checksum = private / f"{complete.stem}.sha256"
+    checksum.write_text(f"{io.sha256(complete.read_bytes())}  {complete.name}\n")
+    assets = [complete, checksum, captured / "release.json", captured / "release-notes.md", captured / "SHA256SUMS"]
+    assets.extend(captured / f"downloads/{spec.product_id}-{spec.version}-{host}.zip" for host in spec.hosts)
+    if record(payload)["schema_version"] == 2:
+        assets.extend(captured / f"installers/{spec.product_id}-{spec.version}-{host}-plugin.zip" for host in spec.hosts)
+    return assets
 
 
 def _eligible(report, tag):
@@ -25,11 +50,12 @@ def _eligible(report, tag):
 
 
 def _current_source(root, spec, report, tag):
+    source_binding(root, spec, tag)
     current = metadata.git_provenance(root, spec.product_id, spec.version, tag)
     _eligible(dict(current, ok=True), tag)
     if current["source_revision"] != report["source_revision"]:
         raise ValueError("current Git source differs from the release bundle commit")
-    capture = metadata.capture_release(spec)
+    capture = metadata.capture_release(spec, committed_acceptance=True)
     source_git.validate_head_inputs(root, spec, capture, current["source_revision"])
 
 
@@ -52,11 +78,21 @@ def _bind_remote(gh, repository, tag, revision):
         raise ValueError("remote release tag does not match the reviewed source commit")
 
 
+def bind_repository(specs, repository):
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
+        raise ValueError("GitHub repository must be OWNER/REPO")
+    expected = f"https://github.com/{repository}".lower()
+    if any(repository_url(item.manifest["repository"]).lower() != expected for item in specs):
+        raise ValueError("publication repository differs from the registered source repository")
+
+
 def create_draft(root, plugin_id, bundle, repository, run=None):
     if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
         raise ValueError("GitHub repository must be OWNER/REPO")
     root = Path(root).resolve()
-    spec = select_plugins(load_catalog(root), plugin_id)[0]
+    specs = load_catalog(root)
+    spec = select_plugins(specs, plugin_id)[0]
+    bind_repository(specs, repository)
     tag = f"{spec.product_id}/v{spec.version}"
     run = subprocess.run if run is None else run
 
@@ -76,8 +112,9 @@ def create_draft(root, plugin_id, bundle, repository, run=None):
             path = captured / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(payload)
-        report = verify_release(root, spec, captured)
+        report = verify_release(root, spec, captured, committed_acceptance=True)
         _eligible(report, tag)
+        kind = release_policy(spec, report)
         _current_source(root, spec, report, tag)
         revision = report["source_revision"]
         releases = gh("api", "--paginate", f"repos/{repository}/releases", "--jq", ".[].tag_name")
@@ -85,30 +122,22 @@ def create_draft(root, plugin_id, bundle, repository, run=None):
             raise ValueError("a release already exists for this plugin version; refusing overwrite")
         _bind_remote(gh, repository, tag, revision)
         # Remote discovery may take time; recheck captured bytes and source before writing.
-        final = verify_release(root, spec, captured)
+        final = verify_release(root, spec, captured, committed_acceptance=True)
         _eligible(final, tag)
+        release_policy(spec, final)
         if final["source_revision"] != revision:
             raise ValueError("release source changed before draft creation")
         _current_source(root, spec, final, tag)
-        payload = read_tree(captured)
-        complete = private / f"{spec.product_id}-{spec.version}-release-bundle.zip"
-        complete.write_bytes(zip_bytes(payload))
-        checksum = private / f"{complete.stem}.sha256"
-        checksum.write_text(f"{io.sha256(complete.read_bytes())}  {complete.name}\n")
-        assets = [complete, checksum, captured / "release.json", captured / "release-notes.md",
-                  captured / "SHA256SUMS"]
-        assets.extend(captured / f"downloads/{spec.product_id}-{spec.version}-{host}.zip" for host in spec.hosts)
-        if record(payload)["schema_version"] == 2:
-            assets.extend(captured / f"installers/{spec.product_id}-{spec.version}-{host}-plugin.zip"
-                          for host in spec.hosts)
+        assets = release_assets(captured, private, spec)
         _bind_remote(gh, repository, tag, revision)
-        channel_flags = ["--prerelease"] if final.get("mode") == "draft" else []
+        channel_flags = ["--prerelease"] if kind == "preview" else []
         response = gh("release", "create", tag, *(str(path) for path in assets),
             "--repo", repository, "--draft", "--verify-tag", "--target", revision,
             "--title", f"{spec.manifest['display_name']} {spec.version}",
             "--notes-file", str(captured / "release-notes.md"), *channel_flags)
         result = {"ok": True, "draft": True, "tag": tag, "url": response.strip(),
-                  "assets": [path.name for path in assets]}
+                  "kind": kind, "revision": revision, "assets": [path.name for path in assets],
+                  "assets_sha256": {path.name: io.sha256(path.read_bytes()) for path in assets}}
         try:
             _bind_remote(gh, repository, tag, revision)
         except (io.ToolError, OSError, ValueError, TypeError, KeyError, AttributeError, subprocess.TimeoutExpired) as exc:

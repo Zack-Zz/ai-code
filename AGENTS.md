@@ -3,13 +3,15 @@
 本仓库承载多个面向公开发布的 **AI 相关插件**。当前首个插件为 CodeVow
 （ID `ai-code-workflow`），源码位于 `plugins/ai-code-workflow/`；插件行为、
 测试和支持声明由各插件维护。
-公共层负责插件注册、源校验、构建、包检查、本地市场及三宿主发布准备。
+公共层负责插件注册、源校验、构建、包检查、临时开发市场、main 公开快照
+及三宿主发布准备。
 
 ## 仓库内容
 
 | 路径 | 说明 |
 |------|------|
 | `catalog.json` | 插件目录注册表，只登记相对路径 |
+| `distribution.json` | main、单市场身份、latest-stable 策略及宿主运输方式 |
 | `plugins/<id>/product.json` | 该插件身份、版本、宿主与资源白名单的唯一来源 |
 | `plugins/<id>/` | 插件源码、适配、文档、测试和局部 AGENTS 规则 |
 | `tooling/plugin_tool.py`、`tooling/` | 通用校验、构建、包检查、市场同步与 release 工具 |
@@ -17,7 +19,8 @@
 | `docs/plugin-authoring.md` | 最小接入要求与验证边界 |
 | `docs/publishing.md`、`docs/release-evidence.md` | 发布机制、渠道和证据契约 |
 | `docs/design/2026-10-07-multi-plugin-design.md` | 多插件改造规格与执行顺序 |
-| `dist/` | 可删除重建的宿主发行目录、聚合市场、独立插件 ZIP |
+| `published/` | 正式发行记录、当前指针、所有权回执与固定 Codex 安装内容 |
+| `dist/` | 被忽略的本地/CI 临时构建输出，不进入 Git 跟踪 |
 
 ## 维护规则
 
@@ -31,6 +34,14 @@
 - 公共工具不强制 workflow 的技能、策略、Reviewer 或 `.ai-workflow`
   任务状态。各插件保持独立身份、版本、资源闭包和源码哈希。
 - 同一插件的共同资源在不同宿主包中保持同哈希；适配及生成资源单独声明。
+- 新公开版本只接受 `X.Y.Z` 或 `X.Y.Z-preview.N`，数字无前导零；统一按
+  数字比较 preview 序号，同核心正式版在其后。发行种类从版本派生，不能
+  自由组合 mode/prerelease。历史 numeric Prerelease 保留原记录和字节。
+- 源码与公开市场统一使用 main，每个插件 ID 只有一个当前正式入口；
+  preview 只公开 Release，不更新市场。没有正式版的插件不回退到 preview。
+  `product.json` 是开发权威，`published/` 是已上线来源，允许版本不同。
+- `dist/` 不得进入新提交或远端分支，CI 拒绝任何跟踪文件。公开 ZIP 是
+  Release 附件；`published/codex/` 仅保存正式宿主安装所需的固定目录。
 - 不提前增加运行时、SDK、调度、任意代码 hook、插件依赖管理、自动安装器、
   固定模型分工或强制代理流水线。新插件形态有实际需求后单独设计。
 - publisher 只维护公开署名，不代表平台认证。release 配置不复制版本；
@@ -55,8 +66,20 @@
 - 区分静态校验、脚本测试、包完整性与真实宿主行为。原生加载、自动调用、
   运行工具或 MCP 的支持必须有实际宿主证据，不从清单或目录布局推导。
 - `release check/prepare/verify` 区分 draft 与 stable；stable 必须通过干净
-  Git、规范标签和全部声明宿主的字节绑定验收。`marketplace sync --check`
-  只读检查已生成市场；更新入口不能覆盖未知或用户编辑的内容。
+  Git、规范标签和全部声明宿主的字节绑定验收。GitHub Draft 是公开状态，
+  不等于本地验收 mode；新发行公开前须回读完整附件并复核冻结源码标签。
+- 默认本地验收读取实际私有材料；`release acceptance-export` 全部核验后
+  只导出哈希声明，维护者审核并随源码标签冻结。Actions 显式使用 committed
+  验收，重验摘要 HEAD 字节、公开输入与所有包哈希，不读取或公开私有正文。
+  摘要是维护者事实声明，不是平台认证或发布授权，不可手写以绕过验收。
+- `marketplace sync --output <空目录>` 仅生成临时开发市场；
+  `marketplace check` 只读核验公开快照、冻结源码 S 与固定分发提交 D。
+  `marketplace initialize --migrate` 仅在旧根清单精确匹配 ownership 回执时
+  迁为空正式快照，拒绝未知内容、人工编辑及链接。
+- Release 的 Prepare 与测试只读；Publish 经 main 的 plugin-release 审核，
+  正式成功后显式调用 Sync。市场 plan 只读，deploy 经 plugin-marketplace
+  审核后按已审阅哈希及 main 基础 SHA 写入，不接受 absent 或 force push。
+  本地工作流验证不等于远端执行、环境权限或真实宿主升级通过。
 
 ## 授权边界
 

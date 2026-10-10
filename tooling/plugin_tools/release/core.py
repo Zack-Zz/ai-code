@@ -51,13 +51,13 @@ def _report(spec, mode, capture=None, provenance=None, blockers=()):
             for key in ("source_revision", "working_tree_dirty", "tag")}}
 
 
-def _context(root, spec, mode, previous=None, tag=None):
+def _context(root, spec, mode, previous=None, tag=None, *, committed_acceptance=False):
     if mode not in {"draft", "stable"}:
         raise DataError("release mode must be draft or stable")
     if spec.boundary_root is not None and Path(root).resolve() != spec.boundary_root:
         raise DataError("release repository differs from the trusted source boundary")
     metadata.validate_listing(spec)
-    capture = metadata.capture_release(spec)
+    capture = metadata.capture_release(spec, committed_acceptance=committed_acceptance)
     metadata.recheck_inputs(spec, capture)
     integrity.compare_previous(spec, capture, previous)
     provenance = metadata.git_provenance(root, spec.product_id, spec.version, tag)
@@ -71,9 +71,9 @@ def _failure(spec, mode, exc):
     return _report(spec, mode or "draft", blockers=[str(exc)])
 
 
-def check_release(root, spec, mode="draft", previous=None):
+def check_release(root, spec, mode="draft", previous=None, *, committed_acceptance=False):
     try:
-        return _context(root, spec, mode, previous)[2]
+        return _context(root, spec, mode, previous, committed_acceptance=committed_acceptance)[2]
     except (ToolError, OSError, UnicodeError, ValueError, TypeError, KeyError, AttributeError) as exc:
         return _failure(spec, mode, exc)
 
@@ -102,14 +102,15 @@ def _write_payload(root, files):
         destination.write_bytes(payload)
 
 
-def _verify_payload(root, spec, bundle, mode=None, previous=None, context=None):
+def _verify_payload(root, spec, bundle, mode=None, previous=None, context=None, *, committed_acceptance=False):
     actual = integrity.read_tree(bundle)
     manifest = integrity.record(actual)
     mode = manifest["mode"] if mode is None else mode
     if mode != manifest["mode"]:
         raise DataError("requested release mode differs from bundle mode")
     if context is None:
-        capture, current, report = _context(root, spec, mode, previous, manifest["tag"] if mode == "stable" else None)
+        capture, current, report = _context(root, spec, mode, previous,
+            manifest["tag"] if mode == "stable" else None, committed_acceptance=committed_acceptance)
     else:
         capture, current, report = context
     if not report["ok"]:
@@ -158,17 +159,18 @@ def _verify_payload(root, spec, bundle, mode=None, previous=None, context=None):
                 bundle=str(Path(bundle).absolute()), files_checked=len(actual))
 
 
-def verify_release(root, spec, bundle, mode=None, previous=None):
+def verify_release(root, spec, bundle, mode=None, previous=None, *, committed_acceptance=False):
     try:
-        return _verify_payload(root, spec, bundle, mode, previous)
+        return _verify_payload(root, spec, bundle, mode, previous, committed_acceptance=committed_acceptance)
     except (ToolError, OSError, UnicodeError, ValueError, TypeError, KeyError, AttributeError) as exc:
         return _failure(spec, mode, exc)
 
 
-def prepare_release(root, spec, output, mode="draft", tag=None, previous=None):
+def prepare_release(root, spec, output, mode="draft", tag=None, previous=None, *, committed_acceptance=False):
     try:
         output = _output(root, spec, output)
-        capture, provenance, report = _context(root, spec, mode, previous, tag)
+        capture, provenance, report = _context(root, spec, mode, previous, tag,
+                                             committed_acceptance=committed_acceptance)
         if not report["ok"]:
             return report
         # Build outside the checkout so private preparation cannot dirty stable provenance.

@@ -43,14 +43,14 @@ class ThreeHostCommandTests(unittest.TestCase):
         index = json.loads((output / "index.json").read_text())
         self.assertEqual(set(index["hosts"]), {"claude"})
 
-    def test_marketplace_sync_command_projects_a_built_native_package(self):
-        build_plugins(self.root, load_catalog(self.root), self.root / "dist", hosts=("claude",))
-        result = self.run_tool("marketplace", "sync")
+    def test_marketplace_sync_command_generates_explicit_development_output(self):
+        output = self.base / "developer-market"
+        before = {p.relative_to(self.root): p.read_bytes() for p in self.root.rglob("*") if p.is_file()}
+        result = self.run_tool("marketplace", "sync", "--output", output)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        market = json.loads((self.root / ".claude-plugin/marketplace.json").read_text())
-        self.assertEqual(market["plugins"][0]["source"], "./dist/claude/ai-one")
-        result = self.run_tool("marketplace", "sync", "--check")
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        market = json.loads((output / "claude/.claude-plugin/marketplace.json").read_text())
+        self.assertEqual(market["plugins"][0]["source"], "./ai-one")
+        self.assertEqual({p.relative_to(self.root): p.read_bytes() for p in self.root.rglob("*") if p.is_file()}, before)
 
 
 class ReleaseCommandTests(unittest.TestCase):

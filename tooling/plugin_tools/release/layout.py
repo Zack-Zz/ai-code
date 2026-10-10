@@ -87,7 +87,7 @@ def payload(spec, capture, provenance, report, schema_version=2):
     inputs = {"schema_version": 1, "product_id": spec.product_id, "version": spec.version,
         "source_tree_hash": spec.source_tree_hash, "product": spec.manifest, "release_config": capture.config,
         "source_files": [[name, io.sha256(data)] for name, data in sorted(spec.inputs.items())],
-        "release_files": [[name, io.sha256(data)] for name, data in sorted(capture.inputs.items())],
+        "release_files": [[name, digest] for name, digest in sorted(capture.input_hashes().items())],
         "package_content_hashes": capture.package_hashes}
     files["source-inputs.json"] = io.dump_json(inputs)
     notes = [f"# {spec.manifest['display_name']} {spec.version}", "", f"Plugin: {spec.product_id}",

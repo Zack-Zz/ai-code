@@ -21,11 +21,11 @@ Thumbs.db
 # Node
 node_modules/
 
-# Build output (dist/ is a reproducible, tracked deliverable in v1 — do not ignore;
-# dist-check/ and dist-ci/ are scratch outputs from the README quick start and CI)
+# Generated build output is local/CI-only and must not be committed.
 dist-check/
 dist-ci/
 dist/
+/.marketplace-initialize.json
 
 # Python
 __pycache__/

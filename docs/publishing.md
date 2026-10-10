@@ -1,244 +1,247 @@
-# CodeVow 三端发布（更新于 2026-10-09）
+# ai-code 三宿主发布（更新于 2026-10-09）
 
-后续 main 统一分发改造见
-[2026-10-09 设计](design/2026-10-09-main-marketplace-distribution-design.md)：同一市场、
-同一插件 ID、一个当前入口；预览版只发布 Release，正式版才更新市场。
-该改造尚未落地，本文的现行命令和既有发布结果仍按下文历史机制说明。
+当前实施采用[main 统一分发设计](design/2026-10-09-main-marketplace-distribution-design.md)：
+源码与公开市场都在 `main`，同一插件 ID 只有一个当前正式入口。新预览版只
+公开为 GitHub Prerelease；正式版通过验收并成功同步后才更新入口。本文描述
+本地已实施的工具与工作流职责，真实 Actions、环境审核、main 安装及升级
+仍需实际验证，不表示远端已经部署。
 
-公开名称为 **CodeVow**，安装 ID 为 `ai-code-workflow`，当前候选版本 `1.0.2`。
-用户确认新插件尚未安装后，将首个 CodeVow 版本定为 `1.0.0`；此前工程
-候选 `2.0.0` 留在历史记录中，后续发版正常递增。
+CodeVow `1.0.2` 是已经公开的历史 Prerelease，旧
+`codex/marketplace-preview` 分支保留为固定试用来源，不继续发布新版本。
+三端原生安装与包字节的历史结果见
+[2026-10-09 原生安装记录](reviews/2026-10-09-preview-marketplace-native-installation.md)。
+该结果不证明完整工作流、跨版本升级或新 main 链路。CodeVow 与 Agent
+Delegation 的开发注册都不等于正式发行；迁移后的根正式市场为空，首个正式
+版本通过验收并成功同步后才有可安装入口。用户示例见[根 README](../README.zh-CN.md)。
 
-分发主渠道是 GitHub 自建市场，覆盖 Claude Code、Codex、ZCode。当前为
-试用候选，三端真实宿主验收仍未完成；官方目录认证、投稿与审核没有执行。
+## 1. 身份、版本与发行状态
 
-## 当前候选与发行渠道
+各插件 `product.json` 是开发身份、版本、宿主、公开 publisher 与资源白名单
+的唯一来源，`release.json` 只配置说明和声明宿主的验收路径。根 Node 包为
+private 维护工具，不提供插件版本，也不执行 npm publish。
 
-1.0.2 已公开 GitHub prerelease 并部署 preview 市场。三端的原生
-安装、启用和缓存字节已验证；完整工作流和跨版本升级尚未验收。逐端结果与
-部署方式见[原生安装记录](reviews/2026-10-09-preview-marketplace-native-installation.md)，
-用户命令见[根 README](../README.zh-CN.md#从-preview-市场安装-codevow)。
+新的公开版本仅接受 `X.Y.Z` 与 `X.Y.Z-preview.N`，数字禁止前导零，不接受
+其他后缀或 build metadata。统一比较为 `preview.2 < preview.10 < 同核心正式版`；
+各插件独立推进版本、规范标签 `ID/vVERSION` 和 Release。同版本不同字节
+拒绝，新事件或旧版本不得倒退市场当前指针。
 
-源码分支与发行市场分支分离。每个插件独立维护
-版本、规范源码标签和 Release；市场聚合已发布插件，单插件部署保留其他
-插件及旧版本目录。`build --all` 不表示批准发布全部插件。
-
-| 渠道 | 发行分支 | 市场名 | 本地模式 / GitHub 属性 |
+| 新公开版本 | 本地验收模式 | GitHub Prerelease | 是否同步默认市场 |
 |---|---|---|---|
-| preview | `codex/marketplace-preview` | `ai-code-preview` | draft / prerelease |
-| stable | `codex/marketplace` | `ai-code-stable` | stable / 非 prerelease |
+| `X.Y.Z-preview.N` | draft | true | 否 |
+| `X.Y.Z` | stable | false | 全部 stable 门禁通过后同步 |
 
-渠道、分支和运输类型由根 `distribution.json` 维护；插件身份、版本和资源
-仍只来自各插件的 `product.json`。Claude 使用固定 Release archive URL 与
-SHA256，ZCode 使用 ZIP URL、SHA256 和 path，Codex 使用发行分支版本目录及
-固定发行提交。不能用整个仓库的 latest Release 代替某个插件的发行历史。
+GitHub Draft 只表示尚未公开，和本地 `mode=draft/stable` 的验收门禁分开。
+新发行种类从版本派生，不能任意组合版本、mode 和 prerelease 标志。历史
+`1.0.2` 的 numeric Prerelease 保留原标签、状态与附件，不改名、覆盖或改标志
+转为正式版；历史套件继续按原始 schema/mode 复验。下一版本另行确定，
+文中的版本语法不是创建标签或发布授权。
 
-远端状态与逐端验收分别记录；不能把已完成的安装当成完整验收。现有 main 上
-指向 `dist/` 的三个根市场入口和 `ai-code-local` 继续保留；本轮不去跟踪或
-删除 dist，也不把本地新文件当成已上线。新入口完成真实宿主验收并公开迁移
-说明后，再单独切换旧入口。旧入口及本地安装步骤见
-[安装说明](../plugins/ai-code-workflow/docs/installation.md)。
-
-发布顺序是本地检查与冻结源码 → 明确授权 commit/push/tag → 草稿及附件
-复验 → 人工 Publish → 只读市场 plan → 审阅并授权 deploy → 远端读回 →
-真实宿主安装/升级和行为验收。源码 push、Release Publish 和安装成功均不
-自动完成下一阶段；CodeVow 继续保持 preview/unverified。
-
-## 1. 准备资料与版本
-
-`plugins/ai-code-workflow/product.json` 是身份、版本、宿主、公开 publisher
-和白名单的唯一来源。当前署名采用 `Zack-Zz` 和公开 GitHub 主页，无邮箱；
-这只是展示资料，官方目录账号认证需另行完成；自建市场按原生方式分发。
-CodeVow 的 PNG 发布图标与 SVG 备用标识均已登记入包，三端共用品牌。
-
-插件的 `release.json` 配置发布说明、双语包说明及每个声明宿主的验收路径，
-不复制身份或版本。`release/NOTES.md` 维护当版变化；`release/README.md` 和
-`README_CN.md` 是供投稿源码套件使用的可移植说明。不要放入凭据或机器路径。
-
-版本使用 `X.Y.Z`，每个插件独立推进。首次公开版本内容确定后，后续改动应
-升版；同版本不得对应不同内容。候选规范标签为 `ai-code-workflow/v1.0.2`，必须
-指向冻结源码的 HEAD。稳定资格和 GitHub 草稿上传均核对公开输入与该提交
-的 Git blob 字节一致，被忽略但列入公开资源的文件不能漏在标签之外。原始
-私有验收材料只验证哈希，不要求提交。创建和推送标签需要用户单独授权。
+公开资源必须与冻结标签提交的 Git blob 字节一致；被忽略但登记入包的资源
+也不得漏在标签之外。原始私有验收材料只验证哈希，不要求公开或提交。
+publisher 仅是公开署名，不代表官方认证。commit、push、tag 与发布须分别
+取得本次明确授权，记录或 approved 标记不代替用户决定。
 
 ## 2. 本地预检、准备与复验
 
-在仓库根运行，输出目录必须不存在或为空。建议放到仓库外，避免干扰 Git
-工作区状态。Python 管理工具要求 3.11+ 和 POSIX 受控目录读写；其他系统
-尚未验收。原生技能文本不需要 Python。
+在仓库根运行，输出必须不存在或为空；建议放在仓库外。Python 工具要求
+3.11+ 和 POSIX 受控目录读写，其他系统未验收。原生技能文本不依赖 Python。
 
 ```sh
+npm ci --no-audit --no-fund
 python3 tooling/plugin_tool.py validate --all
 npm test
 npm run lint
+python3 .github/scripts/check_no_dist.py --root .
 python3 tooling/plugin_tool.py release check --plugin ai-code-workflow --mode draft
 python3 tooling/plugin_tool.py release prepare --plugin ai-code-workflow --mode draft --output /tmp/codevow-release
 python3 tooling/plugin_tool.py release verify --plugin ai-code-workflow --path /tmp/codevow-release
 ```
 
-`draft` 允许未提交和未验收事实，同时仍拒绝无效资料、错误路径、字节绑定
-及不完整制品。`stable` 要求干净 Git、规范现有标签和所有声明宿主的实际
-验收记录；缺少任何项返回非零。`ok: true` 仅表示该模式的检查通过；查看
-`publication_ready`、`pending_acceptance` 和 `limitations` 判断后续缺项。
+以上是本地候选检查，不是新公开发行。`draft` 可报告未提交和未验收事实，
+仍拒绝无效资料、错误路径、错误字节绑定及不完整制品。`stable` 必须有干净
+Git、规范现有标签和全部声明宿主的真实字节绑定验收。新的 numeric 正式
+发行不会因本地 draft 通过而获得公开资格。查看 `publication_ready`、
+`pending_acceptance` 和 `limitations`；`ok: true` 仅表示所选模式通过。
 
-`verify` 使用可信当前源码重建整个应有闭包和 ZIP 内容；仅重算制品自己的
-哈希无法通过。检查不安装、不上传、不操作 Git。
+`verify` 从可信源码独立重建闭包和 ZIP 内容；制品自报哈希不能替代它。
+旧套件的 `bundle_provenance` / `bundle_readiness` 保留历史，`current_source`
+报告当前状态，两者来源一致且都满足资格时才可报告 publication_ready。
 
-复验旧草稿时，`bundle_provenance` / `bundle_readiness` 保留包内历史记录，
-`current_source` 报告当前 Git 状态。顶层 `publication_ready` 只有在两者均
-满足资格且来源一致时才为 true，包内自报 clean 不能覆盖当前工作区的事实。
+准备下一版本时可为 `check/prepare/verify` 指定
+`--previous /可信旧发行套件/release.json`。工具核验旧包实际文件及归档，拒绝
+降级和同版本内容变化。调用者须选取可信历史，本地完整性不证明曾经公开；
+该参数不会自动查询 GitHub。所有本地步骤均不安装、上传或修改 Git。
 
-以后准备新版本时，给 `check`、`prepare`、`verify` 提供
-`--previous /可信旧发布包/release.json`：工具检查旧包实际文件及归档，拒绝
-同版本内容变化和版本降低。旧包由维护者选择并可信保存，本地完整性检查
-不能证明它曾公开发布；遗漏该参数不会自动查询平台历史。
-
-## 3. 制品和仓库市场
+## 3. 制品、临时开发市场和 dist
 
 | 产物 | 用途 |
 |---|---|
-| `packages/` | 标准三宿主目录、单插件 ZIP、市场与索引 |
-| `installers/ID-VERSION-HOST-plugin.zip` | 唯一插件根及完整 native package（含 artifact.json），供原生市场安装 |
-| `downloads/ID-VERSION-HOST.zip` | 解压后注册本地市场的试用下载包 |
+| `packages/` | 三宿主目录、单插件 ZIP、本地市场与索引 |
+| `installers/ID-VERSION-HOST-plugin.zip` | 单插件完整 native package 与 artifact.json，供原生市场安装 |
+| `downloads/ID-VERSION-HOST.zip` | 解压后注册本地市场的试用包 |
 | `submissions/openai/ID-VERSION.zip` | 唯一插件根的 OpenAI skills-only 投稿包 |
-| `submissions/claude/`、`submissions/zcode/` | 独立源码 ZIP、`plugins/ID/` 和原生市场，供渠道检查及人工提交 |
-| `release.json`、`SHA256SUMS`、`release-notes.md` | 来源、资格、文件闭包和字节哈希 |
+| `submissions/claude/`、`submissions/zcode/` | 渠道源码套件与登记项，供检查及人工提交 |
+| `release.json`、`SHA256SUMS`、`release-notes.md` | 来源、资格、文件闭包和哈希 |
 
-新 prepare 默认生成 release manifest schema 2，安装 ZIP 与 `packages/` 中已
-检查的 native package 逐字节一致，不带本地市场。下载 ZIP 带本地市场，
-投稿套件不含下载包、原始会话或 artifact.json。三种 ZIP 用途不同；哈希
-清单路径相对于完整发布包根。可信工具显式按 schema 1/2 复验，schema 1
-历史包不要求新 installer；未知 schema、额外成员及篡改均拒绝。
+新准备的 release manifest 为 schema 2。installer 不带本地市场，与已检查的
+native package 字节一致；下载 ZIP 带本地市场；投稿套件不含原始会话或
+artifact.json。schema 1 历史包继续复验，不补造新 installer。
 
-根市场指向已生成的 `./dist/HOST/ID`：
+开发市场只能生成到显式空输出目录，不覆盖公开根清单：
 
-| 宿主 | 仓库市场入口 |
+```sh
+python3 tooling/plugin_tool.py marketplace sync --output /tmp/ai-code-development
+```
+
+该目录包含注册源码的三端构建市场。显式试用时注册
+`/tmp/ai-code-development/<host>`，本地市场名为 `ai-code-local`；开发注册和
+构建成功不表示已上线。各插件 ZIP 只含自身包和匹配的单插件市场。
+
+`dist/` 是被忽略、可重建的本地/CI 临时输出，不能进入新 Git 提交或远端
+分支。CI 用 `git ls-files -z -- dist` 拒绝跟踪文件，包括 `git add -f` 强制
+加入的文件；不要求提交 dist 或将其与新构建比较。GitHub Actions 在临时
+目录构建并逐包核验，Actions artifact 用于任务留档，公开 ZIP 保存为
+Release 附件。既有历史标签与 Git 内容不因新排除规则而改写。
+
+## 4. main 公开快照与迁移
+
+根 `distribution.json` 维护 main、一个市场身份、latest-stable 策略和固定
+宿主运输方式，不复制插件版本。内部市场名沿用已上线的 `ai-code-preview`，
+不新建 stable 别名或第二个预览插件 ID，也不按整个仓库的最新 Release 时间
+替代逐插件版本比较。
+
+| 路径 | 权威或来源 |
 |---|---|
-| Claude Code | `.claude-plugin/marketplace.json` |
-| Codex | `.agents/plugins/marketplace.json` |
-| ZCode | `marketplace.json` |
+| `.agents/plugins/marketplace.json` | Codex 的 main 公开入口 |
+| `.claude-plugin/marketplace.json` | Claude Code 的 main 公开入口 |
+| `marketplace.json` | ZCode 的 main 公开入口 |
+| `published/index.json` | 各插件已成功同步的正式版本与记录引用 |
+| `published/releases/ID/VERSION.json` | 不可变的正式发行、冻结源码 S 与制品记录 |
+| `published/marketplaces.lock.json` | 受管公开清单的所有权和哈希回执 |
+| `published/codex/ID/VERSION/` | Codex 原生安装内容，清单固定实际分发提交 D |
 
-先用公共构建生成最终 `dist/`，再运行：
+`product.json` 是开发版本，`published/index.json` 是上线版本，两者允许不同。
+Claude 使用固定 Release archive URL/SHA256，ZCode 使用固定 ZIP URL/SHA256
+和 path；Codex 使用 main 仓库中的受管版本目录并固定 D。`published/codex/`
+仅保留宿主协议必需的正式安装内容，不是将完整 dist 改名入 Git。
 
-```sh
-python3 tooling/plugin_tool.py marketplace sync
-python3 tooling/plugin_tool.py marketplace sync --check
-```
-
-`marketplaces.lock.json` 只记生成文件的内容哈希，不是版本或授权来源。sync
-拒绝未知内容、用户编辑和符号链接；check 只读。提交并推送完整市场及匹配的
-`dist/` 后才能向用户提供远端仓库市场；本地文件存在不代表已上线。原生
-安装命令见[安装说明](../plugins/ai-code-workflow/docs/installation.md)。
-
-## 4. 真实宿主验收记录
-
-`release.json.acceptance` 的三个槽目前均为 `null`。在对应宿主真实加载、
-运行场景并核对结果后，记录宿主和模型版本、插件与包哈希、命令、会话和
-结论，再填本插件内证据 JSON 的相对路径。记录格式见
-[发布证据契约](release-evidence.md)。当前 A25 检查三端包的共同资源和来源，
-仍不证明宿主运行；旧双端 A25 记录不能冒充新的三端验收。
-
-工具核对源、包和原始材料哈希，不证明外部会话真实性，也不将 `accepted`
-解释为用户发布授权。原始材料只在本地验证，公开制品只含状态和绑定哈希；
-发布者仍需审阅全部白名单和说明，避免主动把敏感材料登记为公开资源。
-
-## 5. GitHub 手动流程
-
-[release.yml](../.github/workflows/release.yml) 仅接受 `workflow_dispatch`。默认
-`create_github_draft=false`，只校验、测试、构建和保存 30 天的 Actions artifact，
-使用 `contents: read`。源 ref 默认 main，也可选择已存在的规范版本标签。
-
-需要 GitHub 草稿时显式打开开关；独立 job 使用 `contents: write` 和
-`plugin-release` environment。仓库管理员应配置该 environment 的审核人、
-允许的 ref 与 tag 保护规则；代码声明 environment 不代表这些规则已启用。
-该 job 复验收到的完整制品、干净 Git、现有本地及远端标签指向的提交，拒绝
-已有 Release，并始终使用 `gh release create --draft --verify-tag`，不创建标签。
-[GitHub CLI 行为](https://cli.github.com/manual/gh_release_create)
-
-schema 2 草稿附件包括三端 installer、三端下载 ZIP、独立 SHA256SUMS、完整
-发布包 ZIP 及其 SHA256、发布记录和说明。schema 1 旧包保留原附件兼容。
-完整包包含投稿套件，避免同名投稿 ZIP 在 GitHub 附件中冲突。Actions 上传
-显式保留 native 隐藏目录，下载后再次复验。草稿和附件可由人审阅，正式
-Publish 不自动执行。云端权限、实际 workflow 运行和网络调用尚未验证。
-
-若远端调用中途失败，可能留下一份附件不全的草稿；流程失败退出、不自动
-重试或覆盖。人工核查和清理后再处理。远端标签读取与创建是独立请求，流程在
-创建前后复查；创建后发现移动或无法确认时失败退出并保留草稿链接，供人
-检查，不自动删除。需依赖仓库 tag 保护，直到人工 Publish 前再次核对绑定。
-
-## 6. 审阅市场计划与部署
-
-`distribution plan/check` 为纯本地入口：读取可信复验的发行套件、固定
-Release 资产信息和完整既有渠道树，检查原生来源、哈希、旧受管文件及版本
-不可变约束。plan 绑定渠道、Release ID、源码提交、资产哈希、旧目录和基础
-提交；check 重算计划哈希。计划文件和其中的标记不产生远端写入授权。
-
-例如首次渠道的本地计划，release-info.json 应来自已经读取并下载复验的
-固定 Release 资产，不能填写任意下载地址：
+公开快照检查只读核对冻结 S、安装内容、D 的固定引用及所有权回执：
 
 ```sh
-python3 tooling/plugin_tool.py distribution plan --plugin ai-code-workflow \
-  --bundle /tmp/codevow-release --release-info /tmp/release-info.json \
-  --channel preview --base-commit absent --output /tmp/market-plan.json
-python3 tooling/plugin_tool.py distribution check --plan /tmp/market-plan.json \
-  --expected-plan-hash <审阅的计划哈希> --expected-market-commit absent
+python3 tooling/plugin_tool.py marketplace check --root .
 ```
 
-已有渠道须增加 `--market /可信既有发行树`，并将 `--base-commit` 与检查的
-`--expected-market-commit` 替换为实际读取的基础 SHA。该入口不查询 GitHub、
-下载资产或执行远端写入；纯本地输入的正确性须由调用者建立。
-
-手动 workflow **Deploy plugin marketplace** 默认 action=plan，只读查询
-对应插件的公开 Release 并下载
-完整套件复验。GitHub draft 不可部署；preview 要求 prerelease，stable 要求
-非 prerelease 且全部声明宿主满足 stable 字节绑定门禁。首次创建渠道分支须
-显式 bootstrap（预期基础为 absent）；不能把空目录当成已检查历史。
-
-脚本从可信源码目录运行，source-tag 是数据输入，不执行下载包自己的工具。
-以下是候选标签已获授权创建且对应 prerelease 已公开后才适用的操作示例，
-不代表 1.0.2 已经公开：
+旧根开发市场仅在三个清单与既有 ownership 回执完全一致时，才能迁移为空
+正式快照；未知内容、人工编辑、链接或特殊文件均拒绝覆盖。审阅并授权
+迁移后使用：
 
 ```sh
-python3 .github/scripts/deploy_marketplace.py --root /path/to/trusted-source \
-  --plugin ai-code-workflow --source-tag ai-code-workflow/v1.0.2 \
-  --channel preview --action plan --output /tmp/remote-market-plan.json
+python3 tooling/plugin_tool.py marketplace initialize --migrate --root .
 ```
 
-审阅结果中的计划哈希、基础提交、Release ID、资产清单和变更范围后，只有
-明确授权 deploy 才使用同一输入：
+迁移使用被忽略的 `.marketplace-initialize.json` 保存最初已验证的字节基准；
+写入中断后重复同一命令可继续。恢复时各文件只能是原值或目标值，遇到人工
+修改即拒绝覆盖。完成前重验全部目标，成功后移除恢复记录；未完成的记录
+会使 `marketplace check` 失败。每个文件原子替换，不能保证多文件与外部编辑
+同时操作时具有整体事务性。
+
+迁移不删除历史 Release、旧 preview 分支或用户安装。空市场不回退到预览
+版；首个正式版本尚未上线前，main 用户安装命令暂不可用。旧试用步骤与
+宿主版本边界见[历史安装记录](reviews/2026-10-09-preview-marketplace-native-installation.md)。
+
+## 5. 真实宿主验收
+
+CodeVow 当前 `release.json.acceptance` 的三个槽仍为 `null`；本轮不修改这些
+实际状态。真实加载、运行场景并核对结果后，记录宿主、模型、插件与包哈希、
+命令、会话和结论，再填写本插件的相对证据路径。格式见
+[发行证据契约](release-evidence.md)。静态、脚本与包哈希通过不能证明宿主行为。
+
+工具核对绑定，不证明外部会话真实性，也不将 accepted 解释为发布授权。
+原始材料只在本地验证，公开包只含状态与绑定哈希；发布者仍须审阅资源
+白名单，避免主动把敏感材料登记为公开资源。新主线至少需要连续两个正式
+版本的安装、升级及最终加载验证；Codex 历史刷新超时须重新排查。
+
+## 6. Prepare、Publish 与显式 Sync
+
+[Release plugin](../.github/workflows/release.yml) 从 main 的
+`workflow_dispatch` 接收 `plugin`、已有 `source_tag` 和
+`operation=prepare|publish`。可信管理工具取自 main，冻结源码独立 checkout；
+先验证 `ID/vVERSION`、标签提交和 `origin/main` 可达性，再运行只读权限的
+测试/lint与准备。不会将 GitHub token 交给冻结源码的工具。
+
+`prepare` 推导 preview→draft、stable→stable，校验、准备并独立复验 bundle，
+保存 30 天 Actions artifact。`publish` 依赖准备结果，在 `plugin-release`
+环境审核后由独立写入 job 创建 Draft、上传全部附件，逐件回读字节并再次
+核对源码标签，然后由独立公开 helper 发布为对应的 Prerelease 或正式
+Release；公开后继续回读。已有同版本 Release 拒绝覆盖，不创建标签。
+
+正式标签须包含经维护者审核的 `release/acceptance-proof.json`。先在能读取
+私有材料的本地运行 `release acceptance-export --plugin ID`，再将仅含哈希
+的摘要与源码提交并冻结标签；Actions 显式复验其 Git 绑定、公开输入和所有
+宿主包哈希。原始日志与验收 JSON 正文不进入 Git、Actions artifact 或
+Release。默认本地验收仍要求实际私有材料，详见[证据契约](release-evidence.md)。
+
+Draft helper 的职责仍只创建草稿，公开步骤使用 `publish_release.py`。
+schema 2 附件含三端 installer、三端下载 ZIP、SHA256SUMS、完整套件 ZIP
+及其 SHA256、发行记录和说明。Actions artifact 保留 native 隐藏目录，
+公开前使用可信 main 工具验证下载后的完整闭包。
+
+公开动作后无法确认状态时返回 uncertain，不能报告已完成发布，也不自动
+重试、覆盖或删除；人工检查远端再决定后续。标签保护、环境审核和运行时
+contents:write 权限仍须实测，不能从 YAML 声明推导已经生效。
+
+正式公开成功后，发布流程显式调用本地可复用
+[Sync plugin marketplace](../.github/workflows/marketplace.yml)。preview 到
+Release 为止，不调用同步。不能依赖 GITHUB_TOKEN 公开 Release 或 push main
+自动触发后续工作流。调用同步的 job 授予 contents:write 权限上限，内部
+plan job 明确降为只读，deploy job 才在 `plugin-marketplace` 审核后写入。
+两个受保护环境的入口都是 main，不用标签事件替代 main 部署入口。
+
+## 7. 审阅 main 计划与部署
+
+Sync 支持 `workflow_call` 及 main 的手工 `workflow_dispatch`。手工入口默认
+`action=plan`；`deploy` 必须提供已审阅的计划哈希和 main 基础 SHA，不接受
+absent。可复用调用先产出可下载计划与 summary，审核后使用该次计划的
+hash/base 部署。全仓市场更新串行，不能让多插件同时覆盖基准。
+
+以下示例假定 `PLUGIN_ID` 和 `SOURCE_TAG` 已设为选定插件与既有、已公开的
+正式标签。`/path/to/frozen-source` 为标签 S 的 checkout，
+`/path/to/trusted-main` 为可信 main 管理代码：
 
 ```sh
-python3 .github/scripts/deploy_marketplace.py --root /path/to/trusted-source \
-  --plugin ai-code-workflow --source-tag ai-code-workflow/v1.0.2 \
-  --channel preview --action deploy --expected-plan-hash <审阅的计划哈希> \
-  --expected-market-commit <审阅的基础SHA或absent> --output /tmp/deploy-result.json
+python3 /path/to/trusted-main/.github/scripts/deploy_marketplace.py \
+  --root /path/to/frozen-source --control-root /path/to/trusted-main \
+  --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --channel stable \
+  --action plan --output /tmp/remote-market-plan.json
 ```
 
-workflow 的 `source_tag`、`channel`、`action`、`expected_plan_hash` 和
-`expected_market_commit` 与以上脚本参数含义一致；选择目标插件后执行，
-plan 不授权后续 deploy。
+审阅 Release ID、源码 S、附件哈希、完整路径变更、main 基准和计划哈希；
+明确授权后使用同一输入和实际已审阅值：
 
-deploy 需要经审阅的计划哈希和基础提交，并重新从可信套件生成计划。输入
-或远端状态改变则停止。目标声明 Codex 时，先创建只增加其版本目录的 D
-提交，再在 C 更新公开记录、原生市场和 channel.json，Codex 来源固定到
-实际 D；未声明 Codex 时跳过 D。不用未来提交自引用。所有发行分支写入
-串行处理，正常推进失败或基础 ref 冲突时停止，
-不 force push，不删除旧版本、Release 或未知草稿。
+```sh
+python3 /path/to/trusted-main/.github/scripts/deploy_marketplace.py \
+  --root /path/to/frozen-source --control-root /path/to/trusted-main \
+  --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --channel stable \
+  --action deploy --expected-plan-hash "$REVIEWED_HASH" \
+  --expected-market-commit "$REVIEWED_MAIN_SHA" --output /tmp/deploy-result.json
+```
 
-公开 Release 后市场失败时，旧市场仍可用，报告 published_pending_marketplace。
-只完成 D 时保留未引用版本目录；重试先读回并核对相同字节。完成 C 后才
-报告 deployed；完全一致的重检返回 already_deployed。市场回退须另行授权
-新提交，不保证客户端自动降级。云端环境保护和实际权限仍需真实运行验证。
+部署器用可信工具重验公开 Release、规范标签、全部附件和 stable 门禁，
+不会执行附件自带验证器。只更新选定插件、根公开清单及 published 受管内容，
+范围外文件与 Git 对象保持不变；未知内容或人工修改拒绝覆盖。计划标记
+不构成写入授权，输入、字节或基础 SHA 改变即停止。
 
-目标宿主登记的是发行分支上的对应清单。Codex 使用带 ref 的 Git 市场；
-Claude 使用 `.claude-plugin/marketplace.json` 的 HTTPS URL，也支持带 ref
-的 Git 市场；ZCode 使用根 `marketplace.json` 的 HTTPS URL，避免 Git 导入优先
-选中 `.claude-plugin/marketplace.json`。具体客户端 ref、首次安装、刷新、
-连续两版本升级和 cache 字节必须逐端验证；可复制命令及其验证状态见根 README。
-旧 main 市场继续可用于已明确授权的原生试用。实现设计见
-[GitHub 分发设计](design/2026-10-08-github-marketplace-distribution-design.md)。
+声明 Codex 的插件先形成安装目录提交 D，旧入口保持不变；再形成发行
+记录、当前指针、市场和回执提交 C，Codex 清单固定实际 D。未声明 Codex
+时跳过目录提交。使用普通 fast-forward，不 force push，不删旧发行。
+同版本同字节幂等成功；同版本不同字节或降级事件拒绝。
 
-## 7. 官方收录参考（当前不使用）
+Release 已公开但市场失败时，状态是“已发布，市场待更新”，旧入口保持
+可用。只写完 D 则保留未引用目录，重新计划前先回读相同字节；只有 C 完成
+并回读一致才报告市场部署完成。远端 main 更新和新宿主链路仍需实际运行
+验证，本轮本地测试不代替这些证据。
+
+## 8. 官方收录参考（当前不使用）
 
 **Claude Code**：先通过自身市场分发，原生清单为
 `.claude-plugin/plugin.json`。实际投稿前执行当地版本的

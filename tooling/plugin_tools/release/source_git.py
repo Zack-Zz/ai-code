@@ -30,6 +30,7 @@ def validate_head_inputs(root, spec, capture, revision):
     public = dict(spec.inputs)
     for relative in ("release.json", capture.config["notes"], *capture.config["readmes"].values()):
         public[relative] = capture.inputs[relative]
+    public.update(capture.proof_inputs)
     # Acceptance records and raw host-session artifacts stay private: their
     # local byte bindings are checked independently by metadata capture.
     for relative, expected in sorted(public.items()):

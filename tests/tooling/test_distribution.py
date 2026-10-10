@@ -17,14 +17,22 @@ from plugin_tools import distribution, io
 from plugin_tools.release import prepare_release
 from plugin_tools.registry import load_catalog
 from urllib.parse import quote
+from types import SimpleNamespace
+from unittest import mock
+
+
+def accept_fixture(root, identity):
+    spec = next(item for item in load_catalog(root) if item.product_id == identity)
+    holder = SimpleNamespace(plugin=root / spec.catalog_path, spec=lambda: spec)
+    release_fixtures.ReleaseTests.accept(holder, hosts=spec.hosts)
 
 
 class HostedConfigTests(unittest.TestCase):
-    def test_repository_config_selects_separate_channels_and_native_transports(self):
+    def test_repository_config_selects_main_latest_stable_and_native_transports(self):
         config = distribution.load_config(Path(__file__).resolve().parents[2])
-        self.assertEqual(config.get("channels", {}).get("preview", {}).get("branch"),
-                         "codex/marketplace-preview")
-        self.assertEqual(config["channels"]["stable"]["marketplace_name"], "ai-code-stable")
+        self.assertEqual(config.get("source_branch"), "main")
+        self.assertEqual(config.get("marketplace"), {"branch": "main", "name": "ai-code-preview",
+                                                   "version_policy": "latest-stable"})
         self.assertEqual(config["transports"], {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip"})
 
 
@@ -39,12 +47,13 @@ class HostedMarketTests(unittest.TestCase):
         release_fixtures.write_json(self.case.plugin / "product.json", product)
         self.config = distribution.load_config(Path(__file__).resolve().parents[2])
         (self.root / "distribution.json").write_bytes(io.dump_json(self.config))
+        accept_fixture(self.root, "ai-one")
         self.git("init", "-q", "-b", "main")
         self.git("add", "-A")
         self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
                  "commit", "--no-verify", "-qm", "test source")
         self.git("tag", "ai-one/v1.0.0")
-        report = prepare_release(self.root, self.case.spec(), self.case.output)
+        report = prepare_release(self.root, self.case.spec(), self.case.output, mode="stable")
         self.assertTrue(report["ok"], report)
         self.release_info = self.info(self.case.spec(), self.case.output)
 
@@ -62,18 +71,20 @@ class HostedMarketTests(unittest.TestCase):
             assets.append({"id": number, "name": path.name, "size": path.stat().st_size,
                 "sha256": io.sha256(path.read_bytes()),
                 "browser_download_url": f"{repository}/releases/download/{quote(tag, safe='')}/{path.name}"})
-        return {"id": 21, "tag_name": tag, "draft": False, "prerelease": True,
+        return {"id": 21, "tag_name": tag, "draft": False, "prerelease": False,
                 "html_url": f"{repository}/releases/tag/{quote(tag, safe='')}", "assets": assets}
 
     def plan(self, **options):
+        options.setdefault("base_commit", "b" * 40)
         return distribution.plan_distribution(self.root, self.case.spec(), self.case.output,
-            self.release_info, "preview", **options)
+            self.release_info, "stable", **options)
 
-    def test_preview_plan_uses_source_revision_and_does_not_claim_acceptance(self):
+    def test_stable_plan_uses_frozen_source_and_fixture_byte_bound_acceptance(self):
         plan = self.plan()
         self.assertEqual(plan.get("source_revision"), self.git("rev-parse", "HEAD"))
         self.assertEqual(plan["status"], "plan_ready")
-        self.assertEqual(plan["record"]["readiness"]["accepted_hosts"], [])
+        self.assertEqual(set(plan["record"]["readiness"]["accepted_hosts"]), {"claude", "codex", "zcode"})
+        self.assertEqual(plan["branch"], "main")
         self.assertTrue(plan["bootstrap"])
         self.assertEqual(json.loads(json.dumps(plan)), plan)
 
@@ -81,7 +92,7 @@ class HostedMarketTests(unittest.TestCase):
         plan = self.plan()
         stage = distribution.stage_files(plan)
         self.assertTrue(stage)
-        self.assertTrue(all(path.startswith("plugins/codex/ai-one/1.0.0/") for path in stage))
+        self.assertTrue(all(path.startswith("published/codex/ai-one/1.0.0/") for path in stage))
         final = distribution.finalize_files(plan, "d" * 40)
         claude = json.loads(final[".claude-plugin/marketplace.json"])["plugins"][0]
         zcode = json.loads(final["marketplace.json"])["plugins"][0]
@@ -91,13 +102,13 @@ class HostedMarketTests(unittest.TestCase):
         self.assertEqual(zcode["source"]["path"], "ai-one")
         self.assertEqual(zcode["source"]["type"], "zip")
         self.assertEqual(codex["source"]["sha"], "d" * 40)
-        self.assertEqual(codex["source"]["path"], "./plugins/codex/ai-one/1.0.0")
+        self.assertEqual(codex["source"]["path"], "./published/codex/ai-one/1.0.0")
         self.assertEqual(codex["policy"]["installation"], "AVAILABLE")
         self.assertNotIn("d" * 40, json.dumps(plan))
 
     def test_plan_hash_and_base_commit_are_review_leases(self):
         plan = self.plan()
-        self.assertTrue(distribution.check_plan(plan, plan["plan_hash"], "absent")["ok"])
+        self.assertTrue(distribution.check_plan(plan, plan["plan_hash"], "b" * 40)["ok"])
         with self.assertRaises(io.ConflictError):
             distribution.check_plan(plan, "0" * 64)
         with self.assertRaises(io.ConflictError):
@@ -107,7 +118,7 @@ class HostedMarketTests(unittest.TestCase):
             distribution.check_plan(plan)
 
     def test_public_release_visibility_channel_and_asset_binding_are_required(self):
-        for field, value in (("draft", True), ("prerelease", False), ("tag_name", "other/v1.0.0")):
+        for field, value in (("draft", True), ("prerelease", True), ("tag_name", "other/v1.0.0")):
             original = self.release_info[field]
             self.release_info[field] = value
             with self.subTest(field=field), self.assertRaises(io.DataError):
@@ -117,21 +128,29 @@ class HostedMarketTests(unittest.TestCase):
         with self.assertRaises(io.DataError):
             self.plan()
 
-    def test_preview_requires_clean_correctly_tagged_source(self):
+    def test_formal_market_requires_clean_correctly_tagged_source(self):
         (self.case.plugin / "release/NOTES.md").write_text("changed")
         with self.assertRaises(io.DataError):
             self.plan()
 
     def test_stable_rejects_unverified_bundle(self):
-        self.release_info["prerelease"] = False
-        with self.assertRaises(io.DataError):
+        with mock.patch.object(distribution, "verify_release", return_value={"ok": False,
+                "blockers": ["all declared hosts require byte-bound acceptance"]}):
+            with self.assertRaisesRegex(io.DataError, "acceptance"):
+                self.plan()
+
+    def test_preview_never_enters_the_default_market(self):
+        self.release_info["prerelease"] = True
+        with self.assertRaisesRegex(io.DataError, "preview"):
             distribution.plan_distribution(self.root, self.case.spec(), self.case.output,
-                self.release_info, "stable")
+                self.release_info, "preview", base_commit="b" * 40)
 
     def test_old_stable_record_cannot_claim_ready_with_pending_hosts(self):
         record = self.plan()['record']
         record.update(channel='stable', mode='stable', codex_revision='d' * 40)
         record['readiness']['publication_ready'] = True
+        record['readiness']['pending_acceptance'] = ['codex']
+        record['readiness']['accepted_hosts'] = ['claude', 'zcode']
         with self.assertRaises(io.DataError):
             distribution._record(record, 'stable', record['repository'])
 
@@ -141,7 +160,7 @@ class HostedMarketTests(unittest.TestCase):
         self.assertEqual(plan["status"], "already_deployed")
         self.assertEqual(distribution.stage_files(plan), {})
         self.assertEqual(distribution.finalize_files(plan, "d" * 40), final)
-        for path in ("README.md", "marketplace.json", "plugins/codex/ai-one/1.0.0/plugin.json"):
+        for path in ("README.md", "marketplace.json", "published/codex/ai-one/1.0.0/plugin.json"):
             changed = dict(final, **{path: b"user edit"})
             with self.subTest(path=path), self.assertRaises(io.DataError):
                 self.plan(market_files=changed, base_commit="c" * 40)
@@ -154,12 +173,12 @@ class HostedMarketTests(unittest.TestCase):
         retry = self.plan(market_files=staged, base_commit="d" * 40)
         self.assertEqual(distribution.stage_files(retry), {})
         final = distribution.finalize_files(retry, "d" * 40)
-        self.assertEqual(json.loads(final["channel.json"])["plugins"]["ai-one"]["codex_revision"], "d" * 40)
+        self.assertEqual(json.loads(final["published/index.json"])["plugins"]["ai-one"]["codex_revision"], "d" * 40)
         name = next(iter(staged))
         with self.assertRaises(io.DataError):
             self.plan(market_files=dict(staged, **{name: b"different bytes"}), base_commit="d" * 40)
         with self.assertRaises(io.DataError):
-            self.plan(market_files=dict(staged, **{"plugins/codex/unknown/1.0.0/plugin.json": b"unknown"}), base_commit="d" * 40)
+            self.plan(market_files=dict(staged, **{"published/codex/unknown/1.0.0/plugin.json": b"unknown"}), base_commit="d" * 40)
 
     def add_second(self, hosts):
         plugin = self.root / "plugins/ai-two"
@@ -172,13 +191,14 @@ class HostedMarketTests(unittest.TestCase):
         release_fixtures.write_json(plugin / "release.json", release)
         release_fixtures.write_json(self.root / "catalog.json", {"schema_version": 1, "plugins": [
             {"path": "plugins/ai-one"}, {"path": "plugins/ai-two"}]})
+        accept_fixture(self.root, "ai-two")
         self.git("add", "-A")
         self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
                  "commit", "--no-verify", "-qm", "independent plugin")
         self.git("tag", "ai-two/v3.2.1")
         spec = next(item for item in load_catalog(self.root) if item.product_id == "ai-two")
         bundle = self.case.base / "second-release"
-        result = prepare_release(self.root, spec, bundle)
+        result = prepare_release(self.root, spec, bundle, mode="stable")
         self.assertTrue(result["ok"], result)
         info = self.info(spec, bundle)
         info["id"] = 22
@@ -187,13 +207,13 @@ class HostedMarketTests(unittest.TestCase):
     def test_independent_version_and_host_subset_preserve_other_plugin_and_old_directory(self):
         first = distribution.finalize_files(self.plan(), "d" * 40)
         spec, bundle, info = self.add_second(["codex"])
-        plan = distribution.plan_distribution(self.root, spec, bundle, info, "preview",
+        plan = distribution.plan_distribution(self.root, spec, bundle, info, "stable",
             market_files=first, base_commit="c" * 40)
         self.assertIsNone(plan["previous_version"])
         self.assertFalse(plan["bootstrap"])
         final = distribution.finalize_files(plan, "e" * 40)
         for name, data in first.items():
-            if name.startswith(("plugins/", "records/")):
+            if name.startswith(("plugins/", "published/releases/")):
                 self.assertEqual(final[name], data)
         self.assertEqual(final[".claude-plugin/marketplace.json"], first[".claude-plugin/marketplace.json"])
         self.assertEqual(final["marketplace.json"], first["marketplace.json"])
@@ -203,14 +223,14 @@ class HostedMarketTests(unittest.TestCase):
 
     def test_plugin_without_codex_skips_D_and_undeployed_catalog_plugins(self):
         spec, bundle, info = self.add_second(["zcode"])
-        plan = distribution.plan_distribution(self.root, spec, bundle, info, "preview")
+        plan = distribution.plan_distribution(self.root, spec, bundle, info, "stable", base_commit="b" * 40)
         self.assertEqual(distribution.stage_files(plan), {})
         final = distribution.finalize_files(plan)
-        self.assertNotIn(".agents/plugins/marketplace.json", final)
-        self.assertNotIn(".claude-plugin/marketplace.json", final)
+        self.assertEqual(json.loads(final[".agents/plugins/marketplace.json"])["plugins"], [])
+        self.assertEqual(json.loads(final[".claude-plugin/marketplace.json"])["plugins"], [])
         market = json.loads(final["marketplace.json"])
         self.assertEqual([item["name"] for item in market["plugins"]], ["ai-two"])
-        record = json.loads(final["records/ai-two/3.2.1.json"])
+        record = json.loads(final["published/releases/ai-two/3.2.1.json"])
         self.assertIsNone(record["codex_revision"])
         with self.assertRaises(io.DataError):
             distribution.finalize_files(plan, "d" * 40)
@@ -222,13 +242,14 @@ class HostedMarketTests(unittest.TestCase):
         release = json.loads((self.case.plugin / "release.json").read_text())
         release["acceptance"] = {host: None for host in hosts}
         release_fixtures.write_json(self.case.plugin / "release.json", release)
+        accept_fixture(self.root, "ai-one")
         self.git("add", "-A")
         self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
                  "commit", "--no-verify", "-qm", "host subset upgrade")
         self.git("tag", f"ai-one/v{version}")
         spec = self.case.spec()
         bundle = self.case.base / f"upgrade-{version}"
-        report = prepare_release(self.root, spec, bundle)
+        report = prepare_release(self.root, spec, bundle, mode="stable")
         self.assertTrue(report["ok"], report)
         info = self.info(spec, bundle)
         info["id"] = 30
@@ -241,43 +262,43 @@ class HostedMarketTests(unittest.TestCase):
         for number, retained in enumerate(paths, 1):
             with self.subTest(retained=retained):
                 spec, bundle, info = self.upgraded_first([retained], f"1.0.{number}")
-                plan = distribution.plan_distribution(self.root, spec, bundle, info, "preview",
+                plan = distribution.plan_distribution(self.root, spec, bundle, info, "stable",
                     market_files=first, base_commit="c" * 40)
                 try:
                     final = distribution.finalize_files(plan, "e" * 40 if retained == "codex" else None)
                 except io.DataError as exc:
                     self.fail(f"host shrink must produce a valid final managed tree: {exc}")
                 for host, path in paths.items():
-                    self.assertEqual(path in final, host == retained)
-                lock = json.loads(final["marketplaces.lock.json"])
-                self.assertEqual(lock["files"], {paths[retained]: io.sha256(final[paths[retained]])})
+                    self.assertEqual(bool(json.loads(final[path])["plugins"]), host == retained)
+                lock = json.loads(final["published/marketplaces.lock.json"])
+                self.assertEqual(lock["files"], {path: io.sha256(final[path]) for path in paths.values()})
                 for name, data in first.items():
-                    if name.startswith(("records/", "plugins/")):
+                    if name.startswith(("published/releases/", "plugins/")):
                         self.assertEqual(final[name], data)
                 removed = next(path for host, path in paths.items() if host != retained)
                 with self.assertRaises(io.DataError):
-                    distribution.plan_distribution(self.root, spec, bundle, info, "preview",
+                    distribution.plan_distribution(self.root, spec, bundle, info, "stable",
                         market_files=dict(first, **{removed: b"user changed market"}), base_commit="c" * 40)
 
     def test_host_shrink_keeps_other_plugin_in_shared_market(self):
         first = distribution.finalize_files(self.plan(), "d" * 40)
         other_spec, other_bundle, other_info = self.add_second(["zcode"])
         other_plan = distribution.plan_distribution(self.root, other_spec, other_bundle, other_info,
-            "preview", market_files=first, base_commit="c" * 40)
+            "stable", market_files=first, base_commit="c" * 40)
         previous = distribution.finalize_files(other_plan)
         spec, bundle, info = self.upgraded_first(["codex"], "1.0.1")
-        plan = distribution.plan_distribution(self.root, spec, bundle, info, "preview",
+        plan = distribution.plan_distribution(self.root, spec, bundle, info, "stable",
             market_files=previous, base_commit="b" * 40)
         try:
             final = distribution.finalize_files(plan, "e" * 40)
         except io.DataError as exc:
             self.fail(f"host shrink must preserve the other plugin's market: {exc}")
-        self.assertNotIn(".claude-plugin/marketplace.json", final)
+        self.assertEqual(json.loads(final[".claude-plugin/marketplace.json"])["plugins"], [])
         zcode = json.loads(final["marketplace.json"])["plugins"]
         self.assertEqual([item["name"] for item in zcode], ["ai-two"])
         self.assertEqual(zcode[0], json.loads(previous["marketplace.json"])["plugins"][1])
         for name, data in previous.items():
-            if name.startswith(("records/", "plugins/")):
+            if name.startswith(("published/releases/", "plugins/")):
                 self.assertEqual(final[name], data)
 
 CHECKER = Path(__file__).resolve().parents[2] / ".github/scripts/check_dist.py"

@@ -28,15 +28,29 @@ class DraftTests(unittest.TestCase):
         self.base = Path(self.temp.name).resolve()
         self.root = self.base / "repo"
         release_plugin(self.root)
+        product_path = self.root / "plugins/ai-one/product.json"
+        product = json.loads(product_path.read_text())
+        product["repository"] = "https://github.com/example/ai-code"
+        product_path.write_text(json.dumps(product))
         self.bundle = self.base / "candidate"
         result = prepare_release(self.root, load_catalog(self.root)[0], self.bundle)
         self.assertTrue(result["ok"], result)
+        # Keep this candidate deliberately unbound, but give HEAD readers a real
+        # repository. These API-contract tests mock eligibility separately;
+        # clean tagged acceptance is exercised by the handoff integration tests.
+        subprocess.run(["git", "init", "-q", "-b", "main"], cwd=self.root, check=True)
+        subprocess.run(["git", "add", "."], cwd=self.root, check=True)
+        subprocess.run(["git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                        "commit", "-qm", "source without an acceptance statement"], cwd=self.root, check=True)
         self.calls = []
         self.remote = {"type": "commit", "sha": SHA}
         self.existing = ""
         self.failure = False
         self.report = {"ok": True, "source_revision": SHA, "working_tree_dirty": False,
-                       "tag": "ai-one/v1.0.0", "mode": "draft", "publication_ready": False}
+                       "tag": "ai-one/v1.0.0", "mode": "stable", "publication_ready": True}
+        binding = mock.patch.object(draft, "source_binding", return_value=SHA)
+        binding.start()
+        self.addCleanup(binding.stop)
         git = mock.patch.object(draft.metadata, "git_provenance", return_value=dict(self.report, tag_commit=SHA))
         git.start()
         self.addCleanup(git.stop)
@@ -71,6 +85,12 @@ class DraftTests(unittest.TestCase):
             self.call()
         self.assertEqual(self.calls, [])
 
+    def test_publication_cannot_target_a_repository_other_than_the_source(self):
+        with mock.patch.object(draft, "verify_release", return_value=self.report):
+            with self.assertRaisesRegex(ValueError, "repository"):
+                draft.create_draft(self.root, "ai-one", self.bundle, "other/repo", run=self.run_gh)
+        self.assertEqual(self.calls, [])
+
     def test_tagged_draft_remains_draft_and_uploads_complete_unique_assets(self):
         with mock.patch.object(draft, "verify_release", return_value=self.report):
             result = self.call()
@@ -78,7 +98,14 @@ class DraftTests(unittest.TestCase):
         self.assertTrue(result["draft"])
         self.assertEqual(sum(args[1:3] == ["release", "create"] for args in self.calls), 1)
         created = next(args for args in self.calls if args[1:3] == ["release", "create"])
-        self.assertIn('--prerelease', created)
+        self.assertNotIn('--prerelease', created)
+
+    def test_new_numeric_release_without_stable_acceptance_cannot_create_prerelease(self):
+        report = dict(self.report, mode="draft", publication_ready=False)
+        with mock.patch.object(draft, "verify_release", return_value=report):
+            with self.assertRaisesRegex(ValueError, "stable"):
+                self.call()
+        self.assertEqual(self.calls, [])
 
     def test_draft_uploads_installers_and_the_bundle_sha256sums(self):
         with mock.patch.object(draft, "verify_release", return_value=self.report):
@@ -181,7 +208,7 @@ class DraftTests(unittest.TestCase):
                     self.call()
             self.assertEqual(self.calls, [])
 
-    def test_unverified_host_draft_still_requires_public_inputs_bound_to_head(self):
+    def test_stable_draft_still_requires_public_inputs_bound_to_head(self):
         with mock.patch.object(draft, "verify_release", return_value=self.report), \
                 mock.patch.object(source_git, "_head_blob", return_value=b"different ignored source bytes"):
             with self.assertRaises(draft.io.DataError):

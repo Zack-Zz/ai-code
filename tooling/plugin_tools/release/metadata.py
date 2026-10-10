@@ -25,6 +25,11 @@ class Capture:
     pending: list = field(default_factory=list)
     accepted: dict = field(default_factory=dict)
     package_hashes: dict = field(default_factory=dict)
+    private_hashes: dict = field(default_factory=dict)
+    proof_inputs: dict = field(default_factory=dict)
+
+    def input_hashes(self):
+        return {**{name: io.sha256(raw) for name, raw in self.inputs.items()}, **self.private_hashes}
 
 
 def _read(spec, relative, captured, *, limit=32 * 1024 * 1024):
@@ -147,7 +152,9 @@ def validate_listing(spec):
             _icon(relative, files[relative])
 
 
-def capture_release(spec):
+def capture_release(spec, *, committed_acceptance=False):
+    if type(committed_acceptance) is not bool:
+        raise DataError("committed_acceptance must be boolean")
     inputs = {}
     config = io.parse_json(_read(spec, "release.json", inputs, limit=1024 * 1024), what="release.json")
     if not isinstance(config, dict) or set(config) != {"schema_version", "notes", "readmes", "acceptance"} or \
@@ -161,6 +168,11 @@ def capture_release(spec):
         _text(spec, relative, inputs)
     capture = Capture(config, inputs)
     capture.package_hashes = {host: io.sha256(io.canonical_json(file_hashes(package_files(spec, host)))) for host in spec.hosts}
+    if committed_acceptance:
+        from .acceptance import PROOF_PATH, capture_committed, proof_at_head
+        path = spec.root / PROOF_PATH
+        if path.exists() or path.is_symlink() or proof_at_head(spec):
+            return capture_committed(spec, capture)
     public_hashes = {io.sha256(value) for value in spec.inputs.values()} | \
         {io.sha256(inputs[relative]) for relative in ("release.json", config["notes"], *config["readmes"].values())} | \
         {io.sha256(value) for host in spec.hosts for value in package_files(spec, host).values()}
@@ -205,7 +217,7 @@ def capture_release(spec):
 
 
 def recheck_inputs(spec, capture):
-    for relative, expected in {**spec.inputs, **capture.inputs}.items():
+    for relative, expected in {**spec.inputs, **capture.inputs, **capture.proof_inputs}.items():
         if io.read_file(spec.root, relative, boundary_root=spec.boundary_root) != expected:
             raise DataError(f"source/release input changed before publication: {relative}")
 

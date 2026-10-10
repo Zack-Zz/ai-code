@@ -36,15 +36,22 @@ def main(argv=None):
     markets = commands.add_parser("marketplace")
     market_commands = markets.add_subparsers(dest="market_command", required=True)
     syncing = market_commands.add_parser("sync")
-    syncing.add_argument("--check", action="store_true")
+    syncing.add_argument("--output", required=True)
+    market_check = market_commands.add_parser("check")
+    market_initialize = market_commands.add_parser("initialize")
+    market_initialize.add_argument("--migrate", action="store_true")
     releases = commands.add_parser("release")
     release_commands = releases.add_subparsers(dest="release_command", required=True)
     release_check = release_commands.add_parser("check")
     release_prepare = release_commands.add_parser("prepare")
     release_verify = release_commands.add_parser("verify")
+    release_acceptance = release_commands.add_parser("acceptance-export")
+    release_acceptance.add_argument("--plugin", required=True)
+    release_acceptance.add_argument("--replace", action="store_true")
     for command in (release_check, release_prepare, release_verify):
         command.add_argument("--plugin", required=True)
         command.add_argument("--previous")
+        command.add_argument("--committed-acceptance", action="store_true")
     release_check.add_argument("--mode", choices=("draft", "stable"), default="draft")
     release_prepare.add_argument("--mode", choices=("draft", "stable"), default="draft")
     release_prepare.add_argument("--output", required=True)
@@ -59,20 +66,26 @@ def main(argv=None):
     distribution_plan.add_argument("--release-info", required=True)
     distribution_plan.add_argument("--channel", choices=("preview", "stable"), required=True)
     distribution_plan.add_argument("--market")
-    distribution_plan.add_argument("--base-commit", default="absent")
+    distribution_plan.add_argument("--base-commit", required=True)
+    distribution_plan.add_argument("--control-root")
     distribution_plan.add_argument("--output", required=True)
     distribution_check = distribution_commands.add_parser("check")
     distribution_check.add_argument("--plan", required=True)
     distribution_check.add_argument("--expected-plan-hash")
     distribution_check.add_argument("--expected-market-commit")
-    for command in (listing, validating, building, checking, syncing,
-                    release_check, release_prepare, release_verify, distribution_plan, distribution_check):
+    for command in (listing, validating, building, checking, syncing, market_check, market_initialize,
+                    release_check, release_prepare, release_verify, release_acceptance, distribution_plan, distribution_check):
         command.add_argument("--root", default=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     try:
         if args.command == "marketplace":
-            from .markets import sync_markets
-            result = sync_markets(args.root, check=args.check)
+            from .markets import sync_markets, check_public_markets, initialize_public_market
+            if args.market_command == "sync":
+                result = sync_markets(args.root, output=args.output)
+            elif args.market_command == "check":
+                result = check_public_markets(args.root)
+            else:
+                result = initialize_public_market(args.root, migrate=args.migrate)
         elif args.command != "distribution" or args.distribution_command == "plan":
             specs = load_catalog(args.root)
         if args.command == "distribution":
@@ -86,9 +99,10 @@ def main(argv=None):
             else:
                 metadata_path = Path(args.release_info).absolute()
                 public_release, _ = io.read_json(metadata_path.parent, metadata_path.name)
-                existing = read_tree(args.market) if args.market else None
+                from .markets import read_public_files
+                existing = read_public_files(args.market) if args.market else None
                 result = plan_distribution(args.root, select_plugins(specs, args.plugin)[0], args.bundle,
-                    public_release, args.channel, existing, args.base_commit)
+                    public_release, args.channel, existing, args.base_commit, control_root=args.control_root)
                 output = Path(args.output).absolute()
                 if output.exists() or output.is_symlink():
                     raise io.ConflictError("distribution plan output already exists")
@@ -98,14 +112,19 @@ def main(argv=None):
         if args.command == "release":
             from .release import check_release, prepare_release, verify_release
             spec = select_plugins(specs, args.plugin)[0]
-            if args.release_command == "check":
-                result = check_release(args.root, spec, mode=args.mode, previous=args.previous)
+            if args.release_command == "acceptance-export":
+                from .release.acceptance import export_acceptance
+                result = export_acceptance(spec, replace=args.replace)
+            elif args.release_command == "check":
+                result = check_release(args.root, spec, mode=args.mode, previous=args.previous,
+                                       committed_acceptance=args.committed_acceptance)
             elif args.release_command == "prepare":
                 result = prepare_release(args.root, spec, args.output, mode=args.mode,
-                                         tag=args.tag, previous=args.previous)
+                                         tag=args.tag, previous=args.previous,
+                                         committed_acceptance=args.committed_acceptance)
             else:
                 result = verify_release(args.root, spec, args.path, mode=args.mode,
-                                        previous=args.previous)
+                                        previous=args.previous, committed_acceptance=args.committed_acceptance)
         elif args.command == "list":
             result = {"plugins": [{"product_id": spec.product_id, "version": spec.version,
                                   "display_name": spec.manifest["display_name"],

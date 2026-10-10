@@ -14,6 +14,7 @@ import zipfile
 
 from . import io
 from .io import ConflictError, DataError
+from .versions import release_kind, version_key
 from .registry import HOSTS, ID_PATTERN, VERSION_PATTERN, load_catalog
 from .release import verify_release
 from .release import integrity, metadata, source_git
@@ -22,16 +23,16 @@ from .rendering import marketplace_entry, marketplace_path
 HASH = re.compile(r"[0-9a-f]{64}")
 REVISION = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 TRANSPORTS = {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip"}
-CHANNELS = {
-    "stable": {"branch": "codex/marketplace", "marketplace_name": "ai-code-stable", "release_mode": "stable", "prerelease": False},
-    "preview": {"branch": "codex/marketplace-preview", "marketplace_name": "ai-code-preview", "release_mode": "draft", "prerelease": True},
-}
+MARKETPLACE = {"branch": "main", "name": "ai-code-preview", "version_policy": "latest-stable"}
+INDEX_PATH = "published/index.json"
+LOCK_PATH = "published/marketplaces.lock.json"
+NATIVE_PATHS = {marketplace_path(host) for host in HOSTS}
 RECORD_FIELDS = {"schema_version", "channel", "product_id", "version", "repository", "source_revision",
                  "source_tree_hash", "tag", "release_id", "release_url", "mode", "readiness", "hosts",
                  "codex_revision", "codex_files"}
 PLAN_FIELDS = {"schema_version", "status", "channel", "branch", "marketplace_name", "base_commit",
                "repository", "product_id", "version", "source_revision", "release_id", "release_tag",
-               "bootstrap", "previous_version", "record", "existing_files", "codex_files", "plan_hash"}
+               "bootstrap", "previous_version", "record", "existing_files", "codex_files", "config_hash", "plan_hash"}
 HOST_FIELDS = {"asset", "package_content_hash", "entry"}
 ASSET_FIELDS = {"id", "name", "size", "browser_download_url", "sha256"}
 READINESS_FIELDS = {"publication_ready", "pending_acceptance", "accepted_hosts", "package_content_hashes", "limitations"}
@@ -42,9 +43,9 @@ def _object(value, fields, what):
         raise DataError(f"{what} requires exactly {sorted(fields)}")
 
 
-def _schema(value, what):
-    if type(value) is not int or value != 1:
-        raise DataError(f"{what} requires schema 1")
+def _schema(value, what, version=1):
+    if type(value) is not int or value != version:
+        raise DataError(f"{what} requires schema {version}")
 
 
 def _hash(value, what):
@@ -75,12 +76,13 @@ def repository_url(value):
 
 def load_config(root):
     config, _ = io.read_json(root, "distribution.json")
-    _object(config, {"schema_version", "channels", "transports"}, "distribution config")
-    _schema(config["schema_version"], "distribution config")
+    _object(config, {"schema_version", "source_branch", "marketplace", "transports"}, "distribution config")
+    if type(config["schema_version"]) is not int or config["schema_version"] != 2:
+        raise DataError("distribution config requires schema 2")
     if config["transports"] != TRANSPORTS:
         raise DataError("unsupported distribution transports")
-    if config["channels"] != CHANNELS or any(type(config["channels"][key]["prerelease"]) is not bool for key in CHANNELS):
-        raise DataError("distribution channels require fixed stable/preview contracts")
+    if config["source_branch"] != "main" or config["marketplace"] != MARKETPLACE:
+        raise DataError("distribution requires main and one latest-stable marketplace")
     return config
 
 
@@ -121,14 +123,17 @@ def _decode(files):
     return result
 
 
-def _readme(channel):
-    return (f"# {CHANNELS[channel]['marketplace_name']}\n\n"
-            "Managed plugin distribution. Installation and host behavior require separate acceptance.\n"
-            f"Channel: {channel}.\n").encode()
+def in_scope(path):
+    io.relative_path(path)
+    return path in NATIVE_PATHS or path.startswith("published/")
 
 
 def _record_path(identity, version):
-    return f"records/{identity}/{version}.json"
+    return f"published/releases/{identity}/{version}.json"
+
+
+def _codex_prefix(identity, version):
+    return f"published/codex/{identity}/{version}/"
 
 
 def _snapshot(record):
@@ -143,7 +148,7 @@ def _entry(record, host):
     asset = record["hosts"][host]["asset"]
     if host == "codex":
         entry["source"] = {"source": "git-subdir", "url": record["repository"] + ".git",
-                           "path": f"./plugins/codex/{record['product_id']}/{record['version']}",
+                           "path": f"./published/codex/{record['product_id']}/{record['version']}",
                            "sha": record["codex_revision"]}
     else:
         source = {"source": "archive" if host == "claude" else "url",
@@ -162,22 +167,21 @@ def _markets(channel, records, pointers):
             record = records[_record_path(identity, pointer["version"])]
             if host in record["hosts"]:
                 entries.append(_entry(record, host))
-        if entries:
-            market = {"name": CHANNELS[channel]["marketplace_name"], "plugins": entries}
-            if host == "claude":
-                market["owner"] = {"name": "ai-code"}
-            result[marketplace_path(host)] = io.dump_json(market)
+        market = {"name": MARKETPLACE["name"], "plugins": entries}
+        if host == "claude":
+            market["owner"] = {"name": "ai-code"}
+        result[marketplace_path(host)] = io.dump_json(market)
     return result
 
 
 def _record(record, channel, repository, *, staged=False):
     _object(record, RECORD_FIELDS, "distribution record")
-    _schema(record["schema_version"], "distribution record")
+    _schema(record["schema_version"], "distribution record", 2)
     identity, version = record["product_id"], record["version"]
     if not isinstance(identity, str) or not ID_PATTERN.fullmatch(identity) or not isinstance(version, str) or not VERSION_PATTERN.fullmatch(version):
         raise DataError("record identity/version is invalid")
     tag = f"{identity}/v{version}"
-    if record["channel"] != channel or record["repository"] != repository or record["tag"] != tag or record["mode"] != CHANNELS[channel]["release_mode"]:
+    if record["channel"] != channel or record["repository"] != repository or record["tag"] != tag or record["mode"] != "stable" or channel != "stable" or release_kind(version) != "stable":
         raise DataError("record channel/repository/tag/mode binding differs")
     if type(record["release_id"]) is not int or record["release_id"] <= 0 or record["release_url"] != f"{repository}/releases/tag/{quote(tag, safe='')}":
         raise DataError("record Release identity/URL differs")
@@ -224,7 +228,7 @@ def _record(record, channel, repository, *, staged=False):
     hashes = record["codex_files"]
     if not isinstance(hashes, dict) or ("codex" in hosts) != bool(hashes):
         raise DataError("record Codex file inventory differs from hosts")
-    prefix = f"plugins/codex/{identity}/{version}/"
+    prefix = _codex_prefix(identity, version)
     for path, digest in hashes.items():
         io.relative_path(path)
         if not path.startswith(prefix):
@@ -237,7 +241,7 @@ def _record(record, channel, repository, *, staged=False):
 def _codex_package(record, files):
     if "codex" not in record["hosts"]:
         return
-    prefix = f"plugins/codex/{record['product_id']}/{record['version']}/"
+    prefix = _codex_prefix(record["product_id"], record["version"])
     artifact = io.parse_json(files[prefix + "artifact.json"], what="managed Codex artifact")
     fields = {"schema_version", "product_id", "version", "host", "profiles", "source_revision", "working_tree_dirty", "source_tree_hash", "files", "content_hash"}
     _object(artifact, fields, "managed Codex artifact")
@@ -253,19 +257,30 @@ def _codex_package(record, files):
         raise DataError("managed Codex native identity/version differs")
 
 
-def _existing(files, channel, repository, candidate, candidate_files):
-    if not isinstance(files, dict) or any(not isinstance(data, bytes) for data in files.values()):
-        raise DataError("market_files must contain the entire path-to-bytes tree")
-    for path in files:
-        io.relative_path(path)
+def _catalog_files(records, pointers):
+    markets = _markets("stable", records, pointers)
+    return dict(markets, **{
+        INDEX_PATH: io.dump_json({"schema_version": 2, "plugins": pointers}),
+        LOCK_PATH: io.dump_json({"schema_version": 1,
+            "files": {name: io.sha256(raw) for name, raw in sorted(markets.items())}})})
+
+
+def bootstrap_files():
+    """An empty public market exposes no unverified development or preview plugin."""
+    return _catalog_files({}, {})
+
+
+def _existing(files, channel, repository, candidate=None, candidate_files=None):
+    if not isinstance(files, dict) or any(not isinstance(raw, bytes) or not in_scope(path)
+                                         for path, raw in files.items()):
+        raise DataError("market_files must contain only managed publication paths")
     if not files:
         return {}, {}, False
-    expected = {}
-    records = {}
-    for path, data in files.items():
-        if path.startswith("records/"):
-            record = io.parse_json(data, what=path)
-            _record(record, channel, repository)
+    records, expected = {}, {}
+    for path, raw in files.items():
+        if path.startswith("published/releases/"):
+            record = io.parse_json(raw, what=path)
+            _record(record, "stable", repository)
             if path != _record_path(record["product_id"], record["version"]):
                 raise DataError("record path differs from its identity/version")
             records[path] = record
@@ -275,40 +290,37 @@ def _existing(files, channel, repository, candidate, candidate_files):
                     raise DataError(f"managed Codex bytes missing or changed: {name}")
                 expected[name] = files[name]
             _codex_package(record, files)
-    if "channel.json" in files:
-        snapshot = io.parse_json(files["channel.json"], what="channel.json")
-        _object(snapshot, {"schema_version", "channel", "plugins"}, "channel snapshot")
-        _schema(snapshot["schema_version"], "channel snapshot")
-        if snapshot["channel"] != channel or not isinstance(snapshot["plugins"], dict) or not snapshot["plugins"]:
-            raise DataError("channel snapshot differs or has no published plugins")
+    pointers = {}
+    if INDEX_PATH in files:
+        snapshot = io.parse_json(files[INDEX_PATH], what=INDEX_PATH)
+        _object(snapshot, {"schema_version", "plugins"}, "published snapshot")
+        _schema(snapshot["schema_version"], "published snapshot", 2)
+        if not isinstance(snapshot["plugins"], dict):
+            raise DataError("published plugin pointers must be an object")
         pointers = snapshot["plugins"]
+        identities = {record["product_id"] for record in records.values()}
+        if set(pointers) != identities:
+            raise DataError("published pointers differ from released plugin inventory")
         for identity, pointer in pointers.items():
             if not isinstance(pointer, dict) or not isinstance(pointer.get("version"), str):
-                raise DataError("invalid channel plugin pointer")
+                raise DataError("invalid published plugin pointer")
             record = records.get(_record_path(identity, pointer["version"]))
-            if record is None or pointer != _snapshot(record):
-                raise DataError("channel pointer differs from its public record")
-        expected["channel.json"] = io.dump_json(snapshot)
-        markets = _markets(channel, records, pointers)
-        expected.update(markets)
-        expected["marketplaces.lock.json"] = io.dump_json({"schema_version": 1, "files": {name: io.sha256(data) for name, data in sorted(markets.items())}})
-    else:
-        if records:
-            raise DataError("public records require a channel snapshot")
-        pointers = {}
-    # A retry may recognize only this candidate's byte-identical staged D tree.
-    candidate_prefix = f"plugins/codex/{candidate['product_id']}/{candidate['version']}/"
-    pending = {path: data for path, data in files.items() if path.startswith(candidate_prefix) and path not in expected}
-    if pending:
-        if pending != candidate_files:
-            raise DataError("same-version staged Codex bytes differ from verified bundle")
-        expected.update(pending)
-    # The initial D commit may contain only installation bytes; finalization
-    # creates README and the channel snapshot together with the first markets.
-    if pointers or "README.md" in files or not pending:
-        expected["README.md"] = _readme(channel)
+            versions = [item["version"] for item in records.values() if item["product_id"] == identity]
+            if record is None or pointer != _snapshot(record) or pointer["version"] != max(versions, key=version_key):
+                raise DataError("published pointer must equal its latest stable record")
+        expected.update(_catalog_files(records, pointers))
+    elif records:
+        raise DataError("public records require a published snapshot")
+    pending = {}
+    if candidate is not None:
+        prefix = _codex_prefix(candidate["product_id"], candidate["version"])
+        pending = {path: raw for path, raw in files.items() if path.startswith(prefix) and path not in expected}
+        if pending:
+            if pending != candidate_files:
+                raise DataError("same-version staged Codex bytes differ from verified bundle")
+            expected.update(pending)
     if files != expected:
-        raise DataError("managed market contains unknown, missing or user-edited files")
+        raise DataError("managed publication contains unknown, missing or user-edited files")
     return records, pointers, bool(pending)
 
 
@@ -318,18 +330,20 @@ def _digest(plan):
 
 def check_plan(plan, expected_hash=None, expected_commit=None):
     _object(plan, PLAN_FIELDS, "distribution plan")
-    _schema(plan["schema_version"], "distribution plan")
+    _schema(plan["schema_version"], "distribution plan", 2)
     if plan["plan_hash"] != _digest(plan):
         raise DataError("distribution plan hash differs from its actual content")
     if expected_hash is not None and expected_hash != plan["plan_hash"]:
         raise ConflictError("reviewed distribution plan hash is stale")
     if expected_commit is not None and expected_commit != plan["base_commit"]:
         raise ConflictError("reviewed marketplace base commit is stale")
-    if plan["base_commit"] != "absent":
-        _revision(plan["base_commit"], "market base commit")
+    _revision(plan["base_commit"], "main base commit")
     channel = plan["channel"]
-    if not isinstance(channel, str) or channel not in CHANNELS or plan["branch"] != CHANNELS[channel]["branch"] or plan["marketplace_name"] != CHANNELS[channel]["marketplace_name"]:
-        raise DataError("plan channel/branch/market name differs")
+    expected_config = {"schema_version": 2, "source_branch": "main",
+                       "marketplace": MARKETPLACE, "transports": TRANSPORTS}
+    if channel != "stable" or plan["branch"] != "main" or plan["marketplace_name"] != MARKETPLACE["name"] or \
+            plan["config_hash"] != io.sha256(io.canonical_json(expected_config)):
+        raise DataError("plan requires trusted main/latest-stable policy")
     repository = _repository(plan["repository"])
     record = plan["record"]
     _record(record, channel, repository, staged=True)
@@ -346,20 +360,19 @@ def check_plan(plan, expected_hash=None, expected_commit=None):
     previous = pointers.get(record["product_id"], {}).get("version")
     if plan["previous_version"] != previous or plan["bootstrap"] != (not pointers):
         raise DataError("plan history/bootstrap differs from validated channel")
-    if not existing and plan["base_commit"] != "absent" or existing and plan["base_commit"] == "absent":
-        raise DataError("market base commit must describe the complete existing tree")
     return {"ok": True, "plan_hash": plan["plan_hash"], "base_commit": plan["base_commit"], "status": plan["status"]}
 
 
-def plan_distribution(root, spec, bundle, release_info, channel, market_files=None, base_commit="absent"):
-    config = load_config(root)
-    if not isinstance(channel, str) or channel not in config["channels"]:
-        raise DataError("distribution channel must be preview or stable")
-    channel_config = config["channels"][channel]
+def plan_distribution(root, spec, bundle, release_info, channel, market_files=None, base_commit="absent", *, control_root=None):
+    config = load_config(control_root or root)
+    if channel != "stable" or release_kind(spec.version) != "stable":
+        raise DataError("preview releases are Release-only and cannot update the default market")
+    _revision(base_commit, "main base commit")
+    channel_config = {"release_mode": "stable", "prerelease": False}
     repository = _repository(spec.manifest["repository"])
     if any(_repository(item.manifest["repository"]) != repository for item in load_catalog(root)):
         raise DataError("all registered plugins must share this GitHub repository")
-    report = verify_release(root, spec, bundle, mode=channel_config["release_mode"])
+    report = verify_release(root, spec, bundle, mode=channel_config["release_mode"], committed_acceptance=True)
     if not report["ok"]:
         raise DataError("trusted release verification failed: " + "; ".join(report["blockers"]))
     canonical = f"{spec.product_id}/v{spec.version}"
@@ -367,7 +380,7 @@ def plan_distribution(root, spec, bundle, release_info, channel, market_files=No
     bundle_provenance = report["bundle_provenance"]
     if provenance["working_tree_dirty"] or provenance["tag"] != canonical or any(provenance[key] != bundle_provenance[key] for key in ("source_revision", "working_tree_dirty", "tag")):
         raise DataError("distribution requires a clean correctly tagged source matching the bundle")
-    source_git.validate_head_inputs(root, spec, metadata.capture_release(spec), provenance["source_revision"])
+    source_git.validate_head_inputs(root, spec, metadata.capture_release(spec, committed_acceptance=True), provenance["source_revision"])
     if channel == "stable" and not report["publication_ready"]:
         raise DataError("stable distribution requires every declared host's byte-bound acceptance")
     _object(release_info, {"id", "tag_name", "draft", "prerelease", "html_url", "assets"}, "public Release info")
@@ -387,7 +400,7 @@ def plan_distribution(root, spec, bundle, release_info, channel, market_files=No
     manifest = integrity.record(contents)
     if manifest["schema_version"] != 2:
         raise DataError("hosted distribution requires release schema 2 installers")
-    record = {"schema_version": 1, "channel": channel, "product_id": spec.product_id, "version": spec.version,
+    record = {"schema_version": 2, "channel": channel, "product_id": spec.product_id, "version": spec.version,
               "repository": repository, "source_revision": provenance["source_revision"], "source_tree_hash": spec.source_tree_hash,
               "tag": canonical, "release_id": release_info["id"], "release_url": release_info["html_url"],
               "mode": channel_config["release_mode"], "readiness": copy.deepcopy(manifest["readiness"]),
@@ -404,12 +417,12 @@ def plan_distribution(root, spec, bundle, release_info, channel, market_files=No
         record["hosts"][host] = {"asset": copy.deepcopy(asset), "package_content_hash": manifest["readiness"]["package_content_hashes"][host], "entry": entry}
         if host == "codex":
             with zipfile.ZipFile(BytesIO(installer)) as archive:
-                codex_files = {f"plugins/codex/{spec.product_id}/{spec.version}/{path.removeprefix(spec.product_id + '/')}": archive.read(path) for path in archive.namelist()}
+                codex_files = {f"published/codex/{spec.product_id}/{spec.version}/{path.removeprefix(spec.product_id + '/')}": archive.read(path) for path in archive.namelist()}
             record["codex_files"] = {path: io.sha256(data) for path, data in sorted(codex_files.items())}
     existing = {} if market_files is None else dict(market_files)
     records, pointers, _ = _existing(existing, channel, repository, record, codex_files)
     previous = pointers.get(spec.product_id, {}).get("version")
-    if previous is not None and tuple(map(int, spec.version.split("."))) < tuple(map(int, previous.split("."))):
+    if previous is not None and version_key(spec.version) < version_key(previous):
         raise DataError("channel version downgrade is rejected")
     prior = records.get(_record_path(spec.product_id, spec.version))
     status = "plan_ready"
@@ -420,12 +433,12 @@ def plan_distribution(root, spec, bundle, release_info, channel, market_files=No
         if previous == spec.version:
             record["codex_revision"] = prior["codex_revision"]
             status = "already_deployed"
-    plan = {"schema_version": 1, "status": status, "channel": channel,
-            "branch": channel_config["branch"], "marketplace_name": channel_config["marketplace_name"],
+    plan = {"schema_version": 2, "status": status, "channel": channel,
+            "branch": "main", "marketplace_name": config["marketplace"]["name"],
             "base_commit": base_commit, "repository": repository, "product_id": spec.product_id,
             "version": spec.version, "source_revision": provenance["source_revision"], "release_id": release_info["id"],
             "release_tag": canonical, "bootstrap": not pointers, "previous_version": previous,
-            "record": record, "existing_files": _encode(existing), "codex_files": _encode(codex_files)}
+            "record": record, "config_hash": io.sha256(io.canonical_json(config)), "existing_files": _encode(existing), "codex_files": _encode(codex_files)}
     plan["plan_hash"] = _digest(plan)
     check_plan(plan)
     return plan
@@ -456,18 +469,7 @@ def finalize_files(plan, codex_revision=None):
     pointers[record["product_id"]] = _snapshot(record)
     files.update(codex)
     files[_record_path(record["product_id"], record["version"])] = io.dump_json(record)
-    files["channel.json"] = io.dump_json({"schema_version": 1, "channel": plan["channel"], "plugins": pointers})
-    markets = _markets(plan["channel"], records, pointers)
-    # _existing authenticated the complete old tree before any update. Only
-    # its three owned native entrances may disappear when no current plugin
-    # supports that host; all historical records and package bytes stay put.
-    for host in HOSTS:
-        path = marketplace_path(host)
-        if path not in markets:
-            files.pop(path, None)
-    files.update(markets)
-    files["marketplaces.lock.json"] = io.dump_json({"schema_version": 1, "files": {name: io.sha256(data) for name, data in sorted(markets.items())}})
-    files["README.md"] = _readme(plan["channel"])
+    files.update(_catalog_files(records, pointers))
     # Recompute the entire managed tree to catch closure mistakes before delivery.
     _existing(files, plan["channel"], plan["repository"], record, codex)
     return files

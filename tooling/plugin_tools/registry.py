@@ -10,10 +10,10 @@ from . import io
 from .io import DataError
 from .references import validate_skill_references
 from .rendering import manifest_path
+from .versions import VERSION_PATTERN
 
 HOSTS = ("claude", "codex", "zcode")
 ID_PATTERN = re.compile(r"[a-z0-9][a-z0-9-]{0,63}")
-VERSION_PATTERN = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
 INTERFACE_FIELDS = {"display_name", "short_description", "brand_color", "default_prompt",
                     "allow_implicit_invocation"}
 REQUIRED_PRODUCT_FIELDS = {"schema_version", "product_id", "display_name", "version",

@@ -13,7 +13,10 @@ from . import io
 from .io import DataError
 
 PRODUCT_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
-VERSION_RE = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
+_VERSION_NUMBER = r"(0|[1-9][0-9]*)"
+VERSION_RE = re.compile(
+    rf"{_VERSION_NUMBER}\.{_VERSION_NUMBER}\.{_VERSION_NUMBER}"
+    rf"(?:-preview\.{_VERSION_NUMBER})?")
 SKILL_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 WILDCARD_RE = re.compile(r"[*?\[\]]")
 FRONTMATTER_LINE_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):[ \t]*(\S.*)$")
@@ -365,7 +368,7 @@ def load_product(root: Path) -> ProductSpec:
         raise DataError("display_name must be a non-empty string")
     version = data["version"]
     if not isinstance(version, str) or not VERSION_RE.fullmatch(version):
-        raise DataError(f"invalid version (expected X.Y.Z): {version!r}")
+        raise DataError(f"invalid version (expected X.Y.Z or X.Y.Z-preview.N): {version!r}")
     for key in ("repository", "license"):
         if not isinstance(data[key], str) or not data[key]:
             raise DataError(f"{key} must be a non-empty string")

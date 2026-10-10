@@ -1,7 +1,17 @@
 # main 统一源码与插件分发改造
 
-日期：2026-10-09（Asia/Shanghai）。状态：改造设计，尚未实现或部署。
+日期：2026-10-09（Asia/Shanghai）。状态：已按本稿实施本地代码与空正式市场，
+最终验证见[实施记录](../reviews/2026-10-09-main-marketplace-implementation.md)；
+尚未提交、推送或验证远端 Actions 与新 main 宿主链路。
 本稿替代旧设计中的双市场分支目标；旧设计与验收报告保留各自日期的事实。
+
+Review 后补齐的执行契约：本地严格验收通过后，由 `release acceptance-export`
+生成仅含哈希的 `release/acceptance-proof.json`，维护者审核后随公开源码标签
+冻结；GitHub 使用显式 committed 验收模式，重验摘要的 HEAD 字节、公开输入
+和全部宿主包哈希，私有正文不上传。摘要是维护者事实声明，不是平台认证。
+根市场初始化以已验证快照为写入基准，持久化临时恢复记录，中断可重试，
+未知回执与人工修改拒绝覆盖，完成前全量复验。具体格式与命令见
+[证据契约](../release-evidence.md)和[发布流程](../publishing.md)。
 
 ## 1. 已确认的发布规则
 
@@ -18,6 +28,8 @@
    内部市场名称不再决定版本状态；将来的重命名需要单独设计原生迁移。
 7. 先保留旧 `codex/marketplace-preview` 及其固定提交，停止向它发布新版本。
    切换来源与删除旧分支是不同操作，迁移不默认删除任何历史引用。
+8. `dist/` 及其内容不得进入新的 Git 提交或远端分支。插件包由 GitHub Actions
+   从冻结源码构建，公开 ZIP 保存为 Release 附件，不把 dist 回写到仓库。
 
 “一个当前入口”不删除历史 Release。不同历史版本可以留档，但不能在根
 市场中通过重复的插件 ID 冒充版本选择器。当前 Codex CLI `0.154.0` 的
@@ -37,6 +49,10 @@ CodeVow 与 Agent Delegation；源码注册不等于插件已经公开或正式�
 | `distribution.py` 验证发行分支的完整树 | 验证 main 的明确受管路径，保持源码与其他内容不变 |
 | `GitWriter` 只允许两条旧分支，按完整文件树写入 | 仅发布 main 的已审阅路径差异，验证基准提交和回读 |
 | CI/release 要求提交的 dist 与最新源码构建一致 | 临时构建验证源码；另行验证公开市场与冻结发行版本一致 |
+
+补充核对：用户新增 dist 排除约束时，工作区已推进至 `fbb3614`；
+`.gitignore` 已包含 `dist/`，`git ls-files dist` 为空。原先“dist 不应忽略”的
+注释已过时，本次修正。CI/release 的 committed-dist 校验仍需在实施时移除。
 
 ## 3. 项目目录与数据责任
 
@@ -85,6 +101,36 @@ dist/                                   本地/CI 临时构建，不再跟踪
 开发市场保留在构建输出中，供作者显式加载。`marketplace sync` 不再用最新
 开发源码覆盖根公开市场；命令及 `--check` 分别明确开发生成与公开快照检查。
 根市场的哈希回执迁入 `published/`，不同时保留两个所有权权威。
+
+### 3.1 dist 排除与 GitHub 构建
+
+源码提交无需附带本地生成包。GitHub Actions 的职责为：
+
+```text
+冻结源码标签 S
+  → GitHub runner 检出源码、安装锁定依赖
+  → 测试、构建三端包、独立检查、计算哈希
+  → Actions artifact 传递已验证的完整发行套件
+  → 审核后上传并公开 GitHub Release 附件
+  → 仅正式版本同步 main 的市场入口
+```
+
+runner 上可以生成 `dist/`，也可以构建到 `RUNNER_TEMP` 下的空目录；两者都
+只是任务的工作文件，不执行 dist 的 git add、commit 或 push。Actions
+artifact 具有保留期限，用于 job 间传递与验证留档，不作为公开市场的长期
+下载链接；Release 附件保存固定版本的安装 ZIP、校验和及公开发行材料。
+
+忽略规则不自动撤销既有 Git 跟踪；本次工作区已完成该目录的排除，实施时
+仍要核对最终索引与提交树。CI 增加独立检查，拒绝任何已跟踪的 `dist/`
+文件，包括经 `git add -f` 加入的文件；市场写入器也不得允许该路径。
+现有版本标签与历史提交不因排除目录而改写。
+
+本约束针对临时输出 `dist/`。Claude/ZCode 安装内容直接取自 Release ZIP；
+当前已验证的 Codex 传输仍需要固定 Git 子目录，因此 `published/codex/`
+只保存那个正式版本必需的原生安装文件，不复制整个 dist 或 ZIP。它是
+宿主协议要求的分发内容，不能将任意构建输出换个目录名后绕过排除规则。
+如果后续要求所有生成内容均不得进入 Git，Codex 传输需另外选型并实际
+验证，不能假定它已支持任意 Release ZIP。
 
 ## 4. 版本与发行状态
 
@@ -264,6 +310,8 @@ push，则生成受管内容 PR，通过现有保护要求后合并，再回读�
 - 基准改变拒绝；D 已写入但 C 失败时旧入口可用、回执准确且能重新计划。
 - 冻结源码 S、Release 附件、D 的目录与 C 的清单跨层字节一致。
 - 正式发布后的显式工作流调用、环境审核、写入权限与公开回读实际通过。
+- dist 已被忽略且没有跟踪文件；干净 runner 无预置 dist 也能构建发行套件；
+  CI 对强制加入的 dist 文件失败，部署器拒绝写入 dist。
 
 运行 `npm test`、公共源校验、临时构建、独立包检查与 lint；验证集对最终
 代码状态有效。文档或脚本检查不代替真实 Actions 执行和原生宿主验收。
@@ -285,6 +333,9 @@ Codex 先前刷新超时必须重新排查并验收。
   GITHUB_TOKEN 事件的防递归限制与显式调用需求。
 - [GitHub 依赖图](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependency-graph-data)：
   GitHub 管理的依赖图任务，与本项目发布无关。
+- [GitHub Actions artifact](https://docs.github.com/en/actions/tutorials/store-and-share-data)
+  与 [Release](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)：
+  runner 构建输出可独立上传；任务留档与公开插件分发分开存储。
 
 本稿来自当前工具/YAML、只读 GitHub workflow 与 rulesets 查询，以及一个
 只读 code_explorer 对 Codex 单入口能力的补充核对。还读取了 main 分支、

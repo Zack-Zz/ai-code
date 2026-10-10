@@ -10,8 +10,9 @@ import zipfile
 from .. import io
 from ..io import DataError
 from ..package_check import read_artifact
-from ..registry import ID_PATTERN, VERSION_PATTERN, HOSTS
+from ..registry import ID_PATTERN, HOSTS
 from ..rendering import marketplace_path, manifest_path
+from ..versions import VERSION_PATTERN, version_key
 
 FIELDS = {"schema_version", "product_id", "version", "display_name", "mode", "tag", "source_revision",
           "working_tree_dirty", "source_tree_hash", "readiness", "files", "content_hash"}
@@ -222,8 +223,8 @@ def compare_previous(spec, capture, previous):
     old, hashes = historical(previous)
     if old["product_id"] != spec.product_id:
         raise DataError("previous release belongs to another plugin")
-    old_version = tuple(map(int, old["version"].split(".")))
-    version = tuple(map(int, spec.version.split(".")))
+    old_version = version_key(old["version"])
+    version = version_key(spec.version)
     if version < old_version:
         raise DataError("release version would downgrade the previous version")
     if version == old_version and (old["source_tree_hash"] != spec.source_tree_hash or hashes != capture.package_hashes):

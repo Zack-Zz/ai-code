@@ -1,7 +1,9 @@
 # ai-code 架构与责任边界
 
-日期：2026-10-08（Asia/Shanghai）。本文说明现行多插件结构与候选扩展；
-实现与真实宿主验收分别见[本轮记录](reviews/2026-10-08-agent-delegation-implementation.md)。
+更新：2026-10-09（Asia/Shanghai）。本文说明多插件结构与 main 单市场责任。
+派发插件的历史实现与宿主边界见
+[2026-10-08 记录](reviews/2026-10-08-agent-delegation-implementation.md)；新分发
+工作流的本地实施不构成远端部署或新主线宿主验收。
 
 ai-code 是承载多个 AI 相关插件的仓库。公共层提供注册、源校验、构建、
 包检查、市场生成和发布准备；插件各自定义用途、资源与支持声明。CodeVow
@@ -12,6 +14,7 @@ ai-code 是承载多个 AI 相关插件的仓库。公共层提供注册、源�
 ```text
 ai-code/
   catalog.json                    插件路径注册
+  distribution.json               main、单市场身份、latest-stable 与宿主运输
   tooling/plugin_tool.py          公共 CLI
   tooling/plugin_tools/           通用校验、构建、检查、市场与 release
   tests/                          公共测试和已注册插件测试汇总
@@ -19,7 +22,9 @@ ai-code/
   plugins/
     ai-code-workflow/             CodeVow 独立源码、清单、适配和测试
     ai-agent-delegation/          明确派发技能、三宿主资源和 Bridge 薄客户端
-  dist/                           生成包、ZIP、聚合市场与发行索引
+  published/                      正式记录、当前指针、回执与固定 Codex 安装目录
+  .github/workflows/              CI、Release plugin、Sync plugin marketplace
+  dist/                           被忽略的临时包、ZIP、开发市场与发行索引
 ```
 
 | 层       | 权威输入及职责                                                   | 验证范围                                                     |
@@ -37,6 +42,37 @@ ai-code/
 公共层不读取 CodeVow 的策略来决定其他插件行为，也不强制其他插件拥有
 Reviewer、六份技能或 `.ai-workflow` 状态。插件目录中的 `AGENTS.md` 与
 行为测试只约束该插件。`dist/` 是可重建产物，不能反向成为元数据权威。
+
+## main 单市场与发行权威
+
+源码和公开市场都使用 `Zack-Zz/ai-code` 的 main。三个根原生清单只展示
+各自宿主支持的已同步正式插件；同一插件 ID 只有一个当前入口。内部市场名
+沿用 `ai-code-preview`，不再代表发行种类。开发 catalog 登记与公开市场成员
+分别判断；无正式版本的插件不回退到 preview，迁移后的根市场为空。
+
+`product.json` 维护开发版本和资源；`published/index.json` 与
+`published/releases/ID/VERSION.json` 记录已上线版本、冻结源码 S、Release
+和制品绑定，两者允许不同。`marketplace sync --output <空目录>` 只生成
+临时开发构建市场；`marketplace check` 只读核验公开快照，不用开发源码版本
+覆盖线上指针。旧根开发清单仅精确匹配 ownership 回执时才可迁移为空快照。
+
+新公开版本仅接受规范 `X.Y.Z` 或 `X.Y.Z-preview.N`。preview 只公开 GitHub
+Prerelease；正式版本通过全部 stable 门禁并成功同步后更新市场。CodeVow
+历史 `1.0.2` numeric Prerelease 和旧 preview 分支按原记录保留，不能改状态
+成为新正式版；Agent Delegation 候选登记也不表示已经正式发布。
+
+Claude/ZCode 从固定 Release 附件安装；Codex 使用 main 的
+`published/codex/ID/VERSION/` 并固定实际分发提交 D。市场更新先准备目录 D，
+再用提交 C 更新正式记录、指针、根清单与回执。两个阶段都限定受管路径，
+保留兄弟插件与范围外内容，基准或字节变化即停止。`dist/` 不进入 Git，
+仅有宿主必需的正式 Codex 安装目录进入 published。
+
+Release 流程用 main 的可信工具读取独立冻结源码，先核验规范标签与 main
+可达性。Prepare/test 只读；Publish 经 plugin-release 的 main 环境审核，
+先上传 Draft、回读完整附件、核验标签再公开。正式成功显式调用可复用 Sync，
+其 plan 只读、deploy 经 plugin-marketplace 审核后写入。不能依赖
+GITHUB_TOKEN 事件自动启动下一工作流。源码提交、公开发行、市场同步与
+真实宿主安装/升级验收分别报告；当前新 main 链路尚未实际验收。
 
 ## 宿主与执行引擎是两种标识
 
@@ -123,6 +159,7 @@ Claude Code、ZCode 的模型由各工具当前可用的原生配置决定，官
 | 新插件最小接入及现行字段 | [插件作者指南](plugin-authoring.md)                                                                         | 宿主和资源声明以现行指南及校验源码为准           |
 | 多插件迁移背景           | [2026-10-07 多插件规格](design/2026-10-07-multi-plugin-design.md)                                           | 保留历史日期；其中两宿主表述已早于现行三宿主契约 |
 | 发行渠道与证据           | [发布指南](publishing.md)、[验收契约](release-evidence.md)                                                  | 区分 draft/stable、包完整性与真实宿主行为        |
+| main 单市场发行           | [2026-10-09 设计](design/2026-10-09-main-marketplace-distribution-design.md)、[发布指南](publishing.md) | 设计日期与本地实施、远端部署及升级验收分开记录 |
 | CodeVow 自身行为         | [CodeVow AGENTS](../plugins/ai-code-workflow/AGENTS.md) 及插件文档                                          | 不扩散为兄弟插件的公共契约                       |
 | 独立派发插件             | [2026-10-08 插件设计](design/2026-10-08-agent-delegation-plugin-design.md)                                  | 候选源码已登记；完整宿主派发闭环未验收           |
 | 技术运行时及模块         | [ai-mcp 架构](../../ai-mcp/docs/architecture.md)、[Agent Bridge](../../ai-mcp/docs/modules/agent-bridge.md) | 运行时和状态语义由对应模块维护                   |
@@ -136,3 +173,4 @@ Claude Code、ZCode 的模型由各工具当前可用的原生配置决定，官
 明确授权完成开发、review通过后commit/push，不扩展为安装或正式发布。
 Bridge默认Codex app-server、停止确认和ZCode宿主入口限制见
 [开发收口记录](../../ai-mcp/docs/reviews/2026-10-09-agent-bridge-development-delivery.md)。
+该段说明派发插件当时的交付范围，不构成本轮分发改造的 Git、安装或发布授权。

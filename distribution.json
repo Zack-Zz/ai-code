@@ -1,8 +1,6 @@
 {
-  "schema_version": 1,
-  "channels": {
-    "stable": {"branch": "codex/marketplace", "marketplace_name": "ai-code-stable", "release_mode": "stable", "prerelease": false},
-    "preview": {"branch": "codex/marketplace-preview", "marketplace_name": "ai-code-preview", "release_mode": "draft", "prerelease": true}
-  },
+  "schema_version": 2,
+  "source_branch": "main",
+  "marketplace": {"branch": "main", "name": "ai-code-preview", "version_policy": "latest-stable"},
   "transports": {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip"}
 }

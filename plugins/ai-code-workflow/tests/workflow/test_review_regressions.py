@@ -6,7 +6,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import textwrap
 import unittest
 import zipfile
 from pathlib import Path
@@ -274,37 +273,31 @@ class ReviewRegressions(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertNotEqual(io.load_json(run / "grade.json")["overall"], "pass")
 
-    def run_ci_dist_step(self):
-        text = (COLLECTION_REPO / ".github/workflows/ci.yml").read_text()
-        step = text.split("      - name: Verify committed dist/", 1)[1].split("\n      - name:", 1)[0]
-        run = step.split("        run:", 1)[1]
-        command = textwrap.dedent(run.split("|", 1)[1]) if run.lstrip().startswith("|") else run.strip()
+    def run_local_dist_comparison(self):
+        # Historical standalone package checks remain useful; dist is no longer
+        # committed or a prerequisite of the live CI workflow.
         helper = COLLECTION_REPO / ".github/scripts/check_dist.py"
-        if helper.exists():
-            dest = self.workspace / ".github/scripts/check_dist.py"
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(helper, dest)
-        return subprocess.run(["/bin/sh", "-c", command], cwd=self.workspace,
-                              capture_output=True, text=True)
+        return subprocess.run([sys.executable, str(helper), "--committed", "dist", "--fresh", "dist-ci"],
+                              cwd=self.workspace, capture_output=True, text=True)
 
-    def test_ci_allows_identical_payload_across_git_metadata_changes(self):
+    def test_local_comparison_allows_identical_payload_across_git_metadata_changes(self):
         for folder, head, dirty in (("dist", "1" * 40, True), ("dist-ci", "2" * 40, False)):
             with patch.object(build, "_git_state", return_value=(head, dirty)):
                 build.build_packages(REPO, ["zcode", "codex"], self.workspace / folder)
-        result = self.run_ci_dist_step()
+        result = self.run_local_dist_comparison()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_ci_rejects_consistent_boolean_standalone_index_schema(self):
+    def test_local_comparison_rejects_consistent_boolean_standalone_index_schema(self):
         for folder in ("dist", "dist-ci"):
             root = self.workspace / folder
             build.build_packages(REPO, ["zcode", "codex"], root)
             index = io.load_json(root / "index.json")
             index["schema_version"] = True
             (root / "index.json").write_text(json.dumps(index))
-        result = self.run_ci_dist_step()
+        result = self.run_local_dist_comparison()
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_ci_rejects_consistent_boolean_standalone_artifact_schema(self):
+    def test_local_comparison_rejects_consistent_boolean_standalone_artifact_schema(self):
         for folder in ("dist", "dist-ci"):
             root = self.workspace / folder
             build.build_packages(REPO, ["zcode", "codex"], root)
@@ -321,15 +314,15 @@ class ReviewRegressions(unittest.TestCase):
                     output.writestr(info, metadata.read_bytes() if name == "ai-code-workflow/artifact.json" else data)
             index["hosts"]["zcode"]["zip_sha256"] = io.sha256_file(zipped)
             (root / "index.json").write_text(json.dumps(index))
-        result = self.run_ci_dist_step()
+        result = self.run_local_dist_comparison()
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_ci_rejects_a_corrupt_archive_even_if_index_hash_is_unchanged(self):
+    def test_local_comparison_rejects_a_corrupt_archive_even_if_index_hash_is_unchanged(self):
         for folder in ("dist", "dist-ci"):
             build.build_packages(REPO, ["zcode", "codex"], self.workspace / folder)
         index = io.load_json(self.workspace / "dist/index.json")
         (self.workspace / "dist" / index["hosts"]["zcode"]["zip"]).write_bytes(b"corrupt zip")
-        result = self.run_ci_dist_step()
+        result = self.run_local_dist_comparison()
         self.assertNotEqual(result.returncode, 0)
 
     def test_policy_directory_does_not_silently_fall_back(self):
@@ -337,7 +330,7 @@ class ReviewRegressions(unittest.TestCase):
         with self.assertRaises(io.DataError):
             policy.resolve_policy(REPO, self.workspace)
 
-    def test_ci_rejects_unregistered_nested_artifact_json(self):
+    def test_local_comparison_rejects_unregistered_nested_artifact_json(self):
         for folder in ("dist", "dist-ci"):
             build.build_packages(REPO, ["zcode", "codex"], self.workspace / folder)
         root = self.workspace / "dist"
@@ -349,9 +342,9 @@ class ReviewRegressions(unittest.TestCase):
             zipped.write(extra, "ai-code-workflow/skills/workflow/artifact.json")
         index["hosts"]["zcode"]["zip_sha256"] = io.sha256_file(archive)
         (root / "index.json").write_text(json.dumps(index))
-        self.assertNotEqual(self.run_ci_dist_step().returncode, 0)
+        self.assertNotEqual(self.run_local_dist_comparison().returncode, 0)
 
-    def test_ci_rejects_corrupt_stable_artifact_metadata(self):
+    def test_local_comparison_rejects_corrupt_stable_artifact_metadata(self):
         for folder in ("dist", "dist-ci"):
             build.build_packages(REPO, ["zcode", "codex"], self.workspace / folder)
         root = self.workspace / "dist"
@@ -368,7 +361,7 @@ class ReviewRegressions(unittest.TestCase):
                 zipped.writestr(info, metadata.read_bytes() if name == "ai-code-workflow/artifact.json" else data)
         index["hosts"]["zcode"]["zip_sha256"] = io.sha256_file(archive)
         (root / "index.json").write_text(json.dumps(index))
-        self.assertNotEqual(self.run_ci_dist_step().returncode, 0)
+        self.assertNotEqual(self.run_local_dist_comparison().returncode, 0)
 
     def test_a25_invalid_host_cannot_bypass_package_binding(self):
         import importlib.util
@@ -390,7 +383,7 @@ class ReviewRegressions(unittest.TestCase):
         with self.assertRaises(io.DataError):
             grader.grade(run)
 
-    def test_ci_does_not_equate_boolean_and_integer_metadata(self):
+    def test_local_comparison_does_not_equate_boolean_and_integer_metadata(self):
         for folder in ("dist", "dist-ci"):
             build.build_packages(REPO, ["zcode", "codex"], self.workspace / folder)
         root = self.workspace / "dist"
@@ -407,16 +400,16 @@ class ReviewRegressions(unittest.TestCase):
                 zipped.writestr(info, metadata.read_bytes() if name == "ai-code-workflow/artifact.json" else data)
         index["hosts"]["zcode"]["zip_sha256"] = io.sha256_file(archive)
         (root / "index.json").write_text(json.dumps(index))
-        self.assertNotEqual(self.run_ci_dist_step().returncode, 0)
+        self.assertNotEqual(self.run_local_dist_comparison().returncode, 0)
 
-    def test_ci_rejects_symlinked_package_payload(self):
+    def test_local_comparison_rejects_symlinked_package_payload(self):
         for folder in ("dist", "dist-ci"):
             build.build_packages(REPO, ["zcode", "codex"], self.workspace / folder)
         notice = self.workspace / "dist/zcode/ai-code-workflow/NOTICE"
         outside = self.base / "outside-notice"
         notice.rename(outside)
         notice.symlink_to(outside)
-        self.assertNotEqual(self.run_ci_dist_step().returncode, 0)
+        self.assertNotEqual(self.run_local_dist_comparison().returncode, 0)
 
     def test_policy_symlink_is_not_loaded_from_outside_workspace(self):
         outside = self.base / "foreign.json"

@@ -81,6 +81,17 @@ class RegistryTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertTrue(json.loads(result.stdout)["ok"])
 
+    def test_catalog_accepts_preview_versions(self):
+        add_plugin(self.root, version="1.0.4-preview.10")
+        self.assertEqual(load_catalog(self.root)[0].version, "1.0.4-preview.10")
+
+    def test_catalog_rejects_version_leading_zeroes(self):
+        for version in ("01.0.4", "1.00.4", "1.0.04", "1.0.4-preview.01"):
+            with self.subTest(version=version):
+                add_plugin(self.root, version=version)
+                with self.assertRaisesRegex(io.DataError, "invalid product version"):
+                    load_catalog(self.root)
+
     def test_catalog_rejects_escape_noncanonical_duplicate_and_overlap_paths(self):
         cases = ["../elsewhere", "/elsewhere", "plugins//ai-one", "plugins/./ai-one",
                  "plugins/ai-one/", "plugins\\ai-one", "other/ai-one", "plugins/ai-one/nested"]
