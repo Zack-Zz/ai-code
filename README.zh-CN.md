@@ -28,9 +28,19 @@ ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 Z
 
 通过 ai-code 插件市场安装，或从 GitHub Release 下载对应编码助手的安装包。
 插件市场名为 `ai-code`，来源是 `Zack-Zz/ai-code` 的 `main` 分支。
-可安装插件以市场列表为准，当前市场暂无可安装插件。
+截至 **2026-10-12**，正式市场包含 **CodeVow**（`ai-code-workflow`）**1.0.3**。
+Agent Delegation 在本仓库中已有源码，尚未进入正式市场。最新可安装插件以
+当前市场列表为准。
 
-- [安装指南](docs/installation.zh-CN.md)：Claude Code、Codex、ZCode 的市场安装、下载包安装、更新和卸载。
+按所用编码助手选择市场来源：
+
+- **Codex：** `codex plugin marketplace add Zack-Zz/ai-code --ref main`。
+- **Claude Code 2.1.224+：** 推荐使用[专用市场 JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json)。也支持 GitHub 简写，详见安装指南。
+- **ZCode 桌面端：** 添加[专用市场 JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json)。只填仓库会优先读取 Claude 清单，而 ZCode 不支持其中的 `archive` 分发方式，因此请使用此 URL。
+
+完整安装步骤和插件用法见以下指南：
+
+- [安装指南](docs/installation.zh-CN.md)：Claude Code、Codex、ZCode 的完整市场注册与安装步骤、下载包安装、更新、卸载及故障处理。
 - [CodeVow 使用说明](plugins/ai-code-workflow/README.zh-CN.md)：任务示例、协作模式和项目配置。
 - [Agent Delegation 使用说明](plugins/ai-agent-delegation/README.zh-CN.md)：依赖准备、任务派发、续接和取消。
 

@@ -2,66 +2,102 @@
 
 English | [简体中文](installation.zh-CN.md)
 
-Choose a plugin and install it through Claude Code, Codex or ZCode:
+Install published plugins through Claude Code, Codex or ZCode. Stable marketplace
+availability, checked on **2026-10-12**:
 
-| Plugin | ID | Purpose |
-|---|---|---|
-| [CodeVow](../plugins/ai-code-workflow/README.md) | `ai-code-workflow` | Planning, TDD, debugging, review and verification |
-| [Agent Delegation](../plugins/ai-agent-delegation/README.md) | `ai-agent-delegation` | Handoff to an independent coding assistant session |
+| Plugin | ID | Purpose | Stable marketplace |
+|---|---|---|---|
+| [CodeVow](../plugins/ai-code-workflow/README.md) | `ai-code-workflow` | Planning, TDD, debugging, review and verification | Available: `1.0.3` |
+| [Agent Delegation](../plugins/ai-agent-delegation/README.md) | `ai-agent-delegation` | Handoff to an independent coding assistant session | Not yet published |
 
-The current marketplace has no installable plugins. Available plugins are
-determined by its list; the commands below register the source and show how to
-install a listed plugin.
+The marketplace listing determines current availability and versions. The commands
+below install CodeVow. Agent Delegation exists in the source repository but cannot
+currently be installed as `ai-agent-delegation@ai-code`; see the
+[development guide](../CONTRIBUTING.md) for local development and trials.
 
 ## Install from the marketplace
 
-The source is `Zack-Zz/ai-code` at `main`; its marketplace name is
-`ai-code`. Register it once, then choose either or both plugins.
+The source is `Zack-Zz/ai-code` at `main`; its marketplace name is `ai-code`.
+You do not need to clone the source repository or build packages. Your coding
+assistant fetches the registered source itself. Register the source once, then
+install a plugin listed in that marketplace.
+
+Each host has its own marketplace manifest and installation source:
+
+| Host | Registration method | Manifest in this repository | Plugin installation source |
+|---|---|---|---|
+| Codex | GitHub repository at `main` | `.agents/plugins/marketplace.json` | `git-subdir` |
+| Claude Code | Direct manifest URL, or GitHub repository at `main` | `.claude-plugin/marketplace.json` | `archive` |
+| ZCode | Direct manifest URL | `marketplace.json` | `url` with `type: zip` |
 
 ### Codex
 
-Register the marketplace:
+Use a Codex version that supports native plugin marketplaces. Register the
+GitHub source; `owner/repo` is a supported GitHub shorthand:
 
 ```sh
 codex plugin marketplace add Zack-Zz/ai-code --ref main
 ```
 
-In the desktop client's Plugins Directory, select `ai-code`, choose
-the plugin, and install and enable it. The CLI installation commands are:
+Codex reads `.agents/plugins/marketplace.json`. In the desktop client's Plugins
+Directory, select `ai-code`, choose CodeVow, and install and enable it. The CLI
+installation command is:
 
 ```sh
 codex plugin add ai-code-workflow@ai-code
-codex plugin add ai-agent-delegation@ai-code
 ```
 
 ### Claude Code
+
+Use **Claude Code 2.1.224 or later**. This marketplace uses the `archive`
+plugin source, which requires that minimum version according to the
+[Claude Code marketplace reference](https://code.claude.com/docs/en/plugins/marketplace-reference#plugin-sources).
+Check your version with `claude --version` before installing.
+
+Register the Claude-specific manifest URL, then install CodeVow:
 
 ```sh
 claude plugin marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
 claude plugin install ai-code-workflow@ai-code
-claude plugin install ai-agent-delegation@ai-code
 ```
 
-Choose only the installation command for the plugin you want, then enable it
-in the native plugin controls.
+As an alternative to the URL registration, Claude Code also supports GitHub
+shorthand and reads `.claude-plugin/marketplace.json`:
+
+```sh
+claude plugin marketplace add "Zack-Zz/ai-code#main"
+```
+
+Choose one registration method for the `ai-code` marketplace, then install and
+enable CodeVow in the native plugin controls.
 
 ### ZCode
 
-In the native plugin marketplace, add this URL:
+In the ZCode desktop app, open a workspace, then go to **Settings → Plugins →
+Create → Add plugin marketplace**. Add this direct manifest URL:
 
 ```text
 https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
 ```
 
-Select `ai-code`, choose the plugin, and install and enable it.
-With the macOS bundled CLI:
+Use the direct URL for this repository. ZCode's Git import can select
+`.claude-plugin/marketplace.json` before the root manifest when you add only
+`Zack-Zz/ai-code`. The Claude manifest uses `archive`, which the ZCode installer
+does not support. The root manifest uses ZCode's `url` / `type: zip` source.
+
+If you already added the repository and see
+`Plugin source is invalid or unsupported for ai-code-workflow@ai-code: archive`,
+remove that `ai-code` source in the marketplace-source panel, add the direct URL
+above, and refresh it before opening the plugin details or installing.
+
+Select `ai-code`, choose CodeVow, and install and enable it. With the macOS
+bundled CLI:
 
 ```sh
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-agent-delegation@ai-code
 ```
 
 After installation in any host, start a new session. Your host continues to
@@ -70,8 +106,9 @@ manage the account and selected model.
 ## Downloaded package installation
 
 Open [GitHub Releases](https://github.com/Zack-Zz/ai-code/releases), choose the
-plugin's Release, and select the file for your host:
-`claude`, `codex` or `zcode`. Use the version shown on that Release.
+published plugin's Release, and select the file for your host: `claude`, `codex`
+or `zcode`. CodeVow has a stable `1.0.3` Release; only use a public Release that
+actually exists for the plugin you want. Use the version shown on that Release.
 
 | Download | When to choose it |
 |---|---|
@@ -95,7 +132,7 @@ Select the registered source and install the plugin. Local downloads use
 
 ```sh
 claude plugin install ai-code-workflow@ai-code-local
-codex plugin add ai-agent-delegation@ai-code-local
+codex plugin add ai-code-workflow@ai-code-local
 ```
 
 `-plugin.zip` archives serve marketplace distribution. For manual local
@@ -118,6 +155,7 @@ Agent Bridge.
 | Plugin or feature | Requirements |
 |---|---|
 | Both plugins | A host with native plugin support, its account and selected model |
+| Claude Code stable marketplace installation | Claude Code **2.1.224+** for `archive` sources |
 | CodeVow Markdown skills | No additional Node.js or Python runtime |
 | CodeVow optional tools | Python 3.11+; file staging needs a platform supporting POSIX file operations |
 | Agent Delegation | Python 3 and a separately configured `agent-bridge/v1` CLI |

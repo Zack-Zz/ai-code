@@ -30,10 +30,20 @@ features and configuration, with shared tooling for packaging and distribution.
 
 Install through the ai-code marketplace or download a package for your coding
 assistant from GitHub Releases. The marketplace name is `ai-code`, from
-`Zack-Zz/ai-code` at `main`. Available plugins are listed in the marketplace;
-it currently has no installable plugins.
+`Zack-Zz/ai-code` at `main`. As of **2026-10-12**, the stable marketplace contains
+**CodeVow** (`ai-code-workflow`) **1.0.3**. Agent Delegation has source in this
+repository but has not entered the stable marketplace. Check the current
+marketplace list for the latest installable plugins.
 
-- [Installation guide](docs/installation.md): marketplace installation, downloaded packages, updates and removal for Claude Code, Codex and ZCode.
+Register the marketplace using the source for your coding assistant:
+
+- **Codex:** `codex plugin marketplace add Zack-Zz/ai-code --ref main`.
+- **Claude Code 2.1.224+:** use the [dedicated marketplace JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json). GitHub shorthand is also supported; see the installation guide.
+- **ZCode desktop:** add the [dedicated marketplace JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json). A repository-only source selects the Claude manifest first, whose `archive` transport ZCode does not support, so use this URL.
+
+For detailed installation steps and plugin usage:
+
+- [Installation guide](docs/installation.md): full marketplace registration and installation steps, downloaded packages, updates, removal and troubleshooting for Claude Code, Codex and ZCode.
 - [CodeVow guide](plugins/ai-code-workflow/README.md): task examples, collaboration modes and project configuration.
 - [Agent Delegation guide](plugins/ai-agent-delegation/README.md): requirements, handoffs, continuation and cancellation.
 

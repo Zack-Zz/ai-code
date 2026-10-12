@@ -2,71 +2,106 @@
 
 [English](installation.md) | 简体中文
 
-选择插件，通过 Claude Code、Codex 或 ZCode 安装：
+通过 Claude Code、Codex 或 ZCode 安装已发布的插件。
+截至 **2026-10-12**，正式市场的可安装情况如下：
 
-| 插件 | ID | 用途 |
-|---|---|---|
-| [CodeVow](../plugins/ai-code-workflow/README.zh-CN.md) | `ai-code-workflow` | 计划、TDD、排查、审查和验证 |
-| [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md) | `ai-agent-delegation` | 将任务交给独立编码助手会话 |
+| 插件 | ID | 用途 | 正式市场 |
+|---|---|---|---|
+| [CodeVow](../plugins/ai-code-workflow/README.zh-CN.md) | `ai-code-workflow` | 计划、TDD、排查、审查和验证 | 可安装：`1.0.3` |
+| [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md) | `ai-agent-delegation` | 将任务交给独立编码助手会话 | 尚未发布 |
 
-当前市场暂无可安装插件，可安装项以市场列表为准。以下步骤用于注册来源，
-并说明插件出现在列表后如何安装。
+当前可安装项和版本以市场列表为准。下面的命令用于安装 CodeVow。
+Agent Delegation 已有源码，但目前无法通过 `ai-agent-delegation@ai-code` 安装；
+本地开发和试用见[开发指南](../CONTRIBUTING.zh-CN.md)。
 
 ## 从插件市场安装
 
 来源为 `Zack-Zz/ai-code` 的 `main`，市场名称为 `ai-code`。
-注册一次后，可以按需要选择其中一个或两个插件。
+用户无需手动克隆源码仓库或构建安装包，编码助手会自行获取所登记的来源。
+注册一次后，再安装市场列表中已有的插件。
+
+三个宿主分别使用自己的市场清单和安装来源：
+
+| 宿主 | 添加方式 | 本仓库中的清单 | 插件安装来源 |
+|---|---|---|---|
+| Codex | `main` 分支的 GitHub 仓库 | `.agents/plugins/marketplace.json` | `git-subdir` |
+| Claude Code | 清单的完整 URL，或 `main` 分支的 GitHub 仓库 | `.claude-plugin/marketplace.json` | `archive` |
+| ZCode | 清单的完整 URL | `marketplace.json` | `url`，`type: zip` |
 
 ### Codex
 
-注册市场：
+使用支持原生插件市场的 Codex 版本。注册 GitHub 来源，
+其中 `owner/repo` 是客户端支持的 GitHub 仓库简写：
 
 ```sh
 codex plugin marketplace add Zack-Zz/ai-code --ref main
 ```
 
-在桌面客户端的插件目录选择 `ai-code`，选择插件并安装、启用。
+Codex 读取 `.agents/plugins/marketplace.json`。
+在桌面客户端的插件目录选择 `ai-code`，选择 CodeVow 并安装、启用。
 CLI 安装命令为：
 
 ```sh
 codex plugin add ai-code-workflow@ai-code
-codex plugin add ai-agent-delegation@ai-code
 ```
 
 ### Claude Code
+
+使用 **Claude Code 2.1.224 或以上版本**。本市场使用 `archive` 插件来源，
+根据 [Claude Code 官方市场参考](https://code.claude.com/docs/en/plugins/marketplace-reference#plugin-sources)，
+这种来源要求该最低版本。安装前执行 `claude --version` 核对版本。
+
+添加 Claude 专用清单的完整 URL，再安装 CodeVow：
 
 ```sh
 claude plugin marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
 claude plugin install ai-code-workflow@ai-code
-claude plugin install ai-agent-delegation@ai-code
 ```
 
-只执行你需要的插件安装命令，再通过原生插件管理界面启用。
+也可以用 GitHub 简写替代上面的 URL 添加方式；
+Claude Code 会读取 `.claude-plugin/marketplace.json`：
+
+```sh
+claude plugin marketplace add "Zack-Zz/ai-code#main"
+```
+
+为 `ai-code` 市场选择其中一种添加方式，再通过原生插件管理安装、启用 CodeVow。
 
 ### ZCode
 
-在原生插件市场中添加以下 URL：
+在 ZCode 桌面端先打开工作区，再进入 **设置 → 插件 → 创建 → 添加插件市场**，
+填写以下清单的完整 URL：
 
 ```text
 https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
 ```
 
-选择 `ai-code`，选择插件并安装、启用。macOS 自带 CLI 可使用：
+本仓库应使用这个完整 URL。ZCode 的 Git 导入在只填写 `Zack-Zz/ai-code` 时，
+可能优先选择 `.claude-plugin/marketplace.json`，再考虑根目录清单。
+Claude 清单中的 `archive` 安装来源不受 ZCode 安装器支持；
+根目录清单使用 ZCode 的 `url`、`type: zip` 安装来源。
+
+如果已添加仓库并出现
+`Plugin source is invalid or unsupported for ai-code-workflow@ai-code: archive`，
+在“市场源”面板移除该 `ai-code` 来源，重新添加上面的完整 URL，
+刷新市场后再打开插件详情或安装。
+
+选择 `ai-code`，选择 CodeVow 并安装、启用。macOS 自带 CLI 可使用：
 
 ```sh
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-agent-delegation@ai-code
 ```
 
 任一宿主安装后，都开启新会话。账号和所选模型仍由宿主管理。
 
 ## 下载包安装
 
-打开 [GitHub Releases](https://github.com/Zack-Zz/ai-code/releases)，选择对应
+打开 [GitHub Releases](https://github.com/Zack-Zz/ai-code/releases)，选择已发布
 插件的 Release，再选择宿主文件：`claude`、`codex` 或 `zcode`。
+CodeVow 已有正式版 `1.0.3` Release；只下载目标插件实际存在的公开 Release，
 版本以该 Release 显示的版本为准。
 
 | 下载文件 | 适用方式 |
@@ -90,7 +125,7 @@ Release 套件中，本地市场包位于 `downloads/`，纯插件包位于 `ins
 
 ```sh
 claude plugin install ai-code-workflow@ai-code-local
-codex plugin add ai-agent-delegation@ai-code-local
+codex plugin add ai-code-workflow@ai-code-local
 ```
 
 `-plugin.zip` 用于市场分发，手动本地安装使用带市场的下载包。保留已注册
@@ -109,6 +144,7 @@ codex plugin add ai-agent-delegation@ai-code-local
 | 插件或功能 | 要求 |
 |---|---|
 | 两个插件 | 支持原生插件的宿主、宿主账号和所选模型 |
+| Claude Code 正式市场安装 | 支持 `archive` 来源的 Claude Code **2.1.224+** |
 | CodeVow Markdown 技能 | 无需额外 Node.js 或 Python |
 | CodeVow 可选工具 | Python 3.11+；文件暂存需要支持 POSIX 文件操作的平台 |
 | Agent Delegation | Python 3，以及单独配置的 `agent-bridge/v1` CLI |
