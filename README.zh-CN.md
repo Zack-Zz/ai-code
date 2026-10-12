@@ -15,9 +15,6 @@ ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 Z
 | **CodeVow** | 规划改动、测试驱动开发、排查问题、审查代码与验证结果 | [CodeVow](plugins/ai-code-workflow/README.zh-CN.md) |
 | **Agent Delegation** | 将任务交给独立的 Claude Code、Codex 或 ZCode 会话，并收回结果；需要 Agent Bridge | [Agent Delegation](plugins/ai-agent-delegation/README.zh-CN.md) |
 
-Agent Bridge 由 [ai-mcp](https://github.com/Zack-Zz/ai-mcp) 提供，负责连接编码
-助手和管理任务。ai-code 维护插件及其使用规则。
-
 | 目录或文件 | 内容 |
 |---|---|
 | `plugins/` | 插件源码、使用说明、配置、适配与测试 |
@@ -44,8 +41,8 @@ Agent Bridge 由 [ai-mcp](https://github.com/Zack-Zz/ai-mcp) 提供，负责连�
 从[开发指南](CONTRIBUTING.zh-CN.md)开始：准备环境、修改现有插件、运行测试、
 构建安装包和在本地试用。
 
-新增插件请继续阅读[插件作者指南](docs/plugin-authoring.md)。项目结构见
-[总体架构](docs/architecture.md)，发行维护见[维护者发布指南](docs/publishing.md)。
+新增插件请继续阅读[插件作者指南](docs/plugin-authoring.zh-CN.md)。项目结构见
+[总体架构](docs/architecture.zh-CN.md)，发行维护见[维护者发布指南](docs/publishing.zh-CN.md)。
 
 ## 常见问题与其他说明
 
@@ -58,7 +55,7 @@ Agent Delegation 负责你明确要求的独立会话任务。
 
 **如何更新或报告问题？** 更新步骤见安装指南；问题和建议请提交到
 [GitHub Issues](https://github.com/Zack-Zz/ai-code/issues)，注明所用插件、编码助手
-及复现步骤。[文档导航](docs/README.md)汇总当前指南和参考资料。
+及复现步骤。[文档导航](docs/README.zh-CN.md)汇总当前指南和参考资料。
 
 ## 许可证与来源
 

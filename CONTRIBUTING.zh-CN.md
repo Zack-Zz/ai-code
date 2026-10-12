@@ -94,15 +94,15 @@ python3 tooling/plugin_tool.py marketplace sync --output /tmp/ai-code-dev-market
 
 ## 新增插件
 
-按[插件作者指南](docs/plugin-authoring.md)建立目录、声明资源、提供宿主适配，
+按[插件作者指南](docs/plugin-authoring.zh-CN.md)建立目录、声明资源、提供宿主适配，
 登记到 `catalog.json` 并接入插件测试。每个插件独立维护功能、版本和资源，
 公共工具负责注册、构建与包检查。
 
 ## 文档与交付
 
 用户 README 说明当前功能、安装和使用。开发步骤放在开发指南，发布前检查
-放在[维护者发布指南](docs/publishing.md)，验收数据放在[证据契约](docs/release-evidence.md)。
-当前指南使用现行接口；带日期的设计与验证报告保留在[参考资料](docs/README.md#设计与历史资料)。
+放在[维护者发布指南](docs/publishing.zh-CN.md)，验收数据放在[证据契约](docs/release-evidence.zh-CN.md)。
+当前指南使用现行接口；带日期的设计与验证报告保留在[参考资料](docs/README.zh-CN.md#设计与历史资料)。
 
 提交改动时包含相关源码、测试和文档，说明实际运行的检查及结果。发布、市场
 更新和用户安装是各自独立的操作，按维护指南处理。

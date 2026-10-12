@@ -1,113 +1,127 @@
-# ai-code 架构与责任边界
+# ai-code architecture and responsibilities
 
-ai-code 承载独立的 AI 编码插件。公共层负责注册、校验、构建、包检查和分发，
-各插件负责自己的功能、配置和行为规则。开发入口见[开发指南](../CONTRIBUTING.zh-CN.md)。
+English | [简体中文](architecture.zh-CN.md)
 
-## 仓库结构
+ai-code hosts independent AI coding plugins. Shared tooling handles registration,
+validation, builds, package checks and distribution. Each plugin owns its features,
+configuration and behavior rules. Start with the [development guide](../CONTRIBUTING.md).
+
+## Repository structure
 
 ```text
 ai-code/
-  catalog.json                    插件目录注册
-  distribution.json               main 市场与宿主运输方式
+  catalog.json                    Registered plugin directories
+  distribution.json               Main marketplace and host transports
   plugins/
     ai-code-workflow/             CodeVow
     ai-agent-delegation/          Agent Delegation
-  tooling/plugin_tool.py          公共 CLI
-  tooling/plugin_tools/           通用校验、构建、检查与发行
-  tests/                          公共测试和插件测试汇总
-  docs/                           用户、开发与维护文档
-  published/                      正式记录、市场回执与 Codex 安装内容
-  .github/workflows/              CI、Release 与市场同步
+  tooling/plugin_tool.py          Shared CLI
+  tooling/plugin_tools/           Validation, builds, checks and releases
+  tests/                          Shared tests and the plugin test runner
+  docs/                           User, development and maintenance guides
+  published/                      Release records, receipts and Codex installation content
+  .github/workflows/              CI, releases and marketplace synchronization
 ```
 
-构建输出放在显式指定的空临时目录；`dist/` 被 Git 忽略，不作为源码维护。
+Build output goes to an explicitly selected empty temporary directory. `dist/`
+is ignored by Git and is not maintained as source.
 
-## 公共层与插件
+## Shared tooling and plugins
 
-| 组成 | 维护内容 |
+| Component | Owns |
 |---|---|
-| `catalog.json` | 插件目录的相对路径，不复制版本和资源 |
-| 插件 `product.json` | 插件 ID、名称、版本、宿主、署名和资源白名单 |
-| 插件目录 | 技能、配置、辅助工具、宿主适配、说明和行为测试 |
-| 公共工具 | 从可信源码生成原生清单、安装包、市场、ZIP 和哈希 |
-| 根 `npm test` | 独立运行公共工具和全部已注册插件的测试组 |
+| `catalog.json` | Relative plugin directory paths, without copied versions or resources |
+| Plugin `product.json` | Plugin ID, name, version, hosts, attribution and resource whitelist |
+| Plugin directory | Skills, configuration, helper tools, host adapters, guides and behavior tests |
+| Shared tooling | Native manifests, packages, marketplaces, ZIPs and hashes generated from trusted source |
+| Root `npm test` | Independent test groups for shared tooling and every registered plugin |
 
-根 `package.json` 是 private 维护工具配置，不提供插件发行版本。未注册插件
-不进入公共构建；入包文件必须位于插件自己的显式资源白名单中。
+The root `package.json` configures private maintenance tooling, rather than a
+plugin release version. Unregistered plugins are excluded from shared builds.
+Packaged files must belong to the plugin's explicit resource whitelist.
 
-同一插件的共同资源在不同宿主包中保持同哈希，宿主适配和生成资源单独声明。
-一个插件的规则不约束其他插件。公共层不要求所有插件拥有 CodeVow 的六技能、
-Reviewer、策略或 `.ai-workflow` 任务记录。
+Common resources have matching hashes across the same plugin's host packages;
+host adapters and generated resources are declared separately. One plugin's rules
+do not govern another. Shared tooling does not require every plugin to adopt
+CodeVow's six skills, reviewer, policies or `.ai-workflow` task records.
 
-## 市场与发行
+## Marketplace and releases
 
-源码和公开市场都使用 `Zack-Zz/ai-code` 的 `main`，市场名为 `ai-code-preview`。
-同一插件 ID 的市场入口指向最新成功同步的正式版本。
+Source and the public marketplace use `Zack-Zz/ai-code` at `main`. The marketplace
+name is `ai-code-preview`. Each plugin ID points to its latest successfully
+synchronized stable release.
 
-| 输入或输出 | 职责 |
+| Input or output | Purpose |
 |---|---|
-| `product.json` | 当前开发源码的版本和资源 |
-| `published/index.json` | 已同步正式版本及记录引用 |
-| `published/releases/ID/VERSION.json` | 正式发行、冻结源码和制品记录 |
-| `published/marketplaces.lock.json` | 根公开清单的受管路径与哈希 |
-| `published/codex/ID/VERSION/` | Codex 安装所需内容 |
+| `product.json` | Current development version and resources |
+| `published/index.json` | Synchronized stable versions and record references |
+| `published/releases/ID/VERSION.json` | Stable release, frozen source and artifact records |
+| `published/marketplaces.lock.json` | Managed public manifests and hashes |
+| `published/codex/ID/VERSION/` | Content required for Codex installation |
 
-开发版本与市场版本可以不同。`marketplace sync --output <空目录>` 生成开发
-市场；`marketplace check` 只读检查公开快照。工具不会把开发源码直接当成正式
-市场入口。版本使用 `X.Y.Z` 或 `X.Y.Z-preview.N`；预览版只公开为 GitHub
-Prerelease，正式版成功发布并同步后进入市场。
+Development and marketplace versions may differ. `marketplace sync --output <empty-directory>`
+generates a development marketplace; `marketplace check` reads the public snapshot.
+Development source is not used directly as a stable marketplace entry. Versions
+use `X.Y.Z` or `X.Y.Z-preview.N`. Previews are GitHub Prereleases; stable versions
+enter the marketplace after successful publication and synchronization.
 
-Claude Code 和 ZCode 从固定 Release 附件安装。Codex 使用受管安装目录并固定
-实际分发提交。市场部署先准备 Codex 安装目录，再更新发行记录、当前指针、
-根清单和回执；路径、字节或基础提交发生变化时停止部署。
+Claude Code and ZCode install from fixed Release assets. Codex uses managed
+installation content pinned to an actual distribution commit. Marketplace deployment
+first prepares the Codex installation directory, then updates release records,
+current pointers, root manifests and receipts. Changes to paths, bytes or the
+base commit stop deployment.
 
-发行流程由 main 的可信工具读取冻结源码。Prepare 只读检查，Publish 经
-`plugin-release` 环境审核后上传、回读并公开附件；正式成功后显式调用市场
-同步。同步计划只读，部署经 `plugin-marketplace` 审核后写入。具体操作见
-[发布指南](publishing.md)，数据要求见[证据契约](release-evidence.md)。
+Release jobs use trusted tooling from main to read frozen source. Prepare performs
+read-only checks. Publish uploads, reads back and publishes assets after approval
+in `plugin-release`. Stable publication explicitly invokes marketplace synchronization.
+Planning is read-only; deployment writes after approval in `plugin-marketplace`.
+See the [publishing guide](publishing.md) and [evidence contract](release-evidence.md).
 
-## 宿主与执行引擎
+## Plugin hosts and execution engines
 
-宿主是加载插件的编码助手；执行引擎是 Agent Bridge 启动或续接的独立会话。
-两者使用不同的标识集合：
+A host is the coding assistant that loads a plugin. An execution engine is an
+independent session started or resumed by Agent Bridge. Their identifiers differ:
 
-| 插件宿主 ID | 编码助手 | Bridge 引擎 ID |
+| Plugin host ID | Coding assistant | Bridge engine ID |
 |---|---|---|
 | `claude` | Claude Code | `claude-code` |
 | `codex` | Codex | `codex` |
 | `zcode` | ZCode | `zcode` |
 
-例如，在 Codex 中使用派发插件，把任务交给 Claude Code，宿主与目标引擎不同。
-同工具派发需要用户明确要求独立会话。
+For example, loading Agent Delegation in Codex and handing a task to Claude Code
+uses different host and target engines. A same-tool handoff requires an explicit
+request for an independent session.
 
-原生包和市场路径由[渲染模块](../tooling/plugin_tools/rendering.py)维护。
-当前 Codex 发行检查使用 skills-only profile；增加新的组件类型时，应独立
-设计加载、权限和渠道要求。
+The [rendering module](../tooling/plugin_tools/rendering.py) owns native package
+and marketplace paths. Current Codex release checks use a skills-only profile.
+New component types need a separate design for loading, permissions and channel requirements.
 
-## ai-code 与 ai-mcp
+## Relationship with ai-mcp
 
-[ai-mcp](https://github.com/Zack-Zz/ai-mcp) 的 `@ai-mcp/agent-bridge` 负责独立
-会话、任务恢复、进程控制和产物读取。ai-code 的 `ai-agent-delegation` 提供
-派发技能、交接规范和调用外置 Bridge 的薄客户端。
+The `@ai-mcp/agent-bridge` module in [ai-mcp](https://github.com/Zack-Zz/ai-mcp)
+manages independent sessions, task recovery, process control and artifact access.
+ai-code's `ai-agent-delegation` plugin supplies handoff skills, contracts and a
+thin client for the external Bridge.
 
 ```text
-用户明确指定任务和目标工具
-  → Agent Delegation 整理交接
+The user explicitly names the task and target tool
+  → Agent Delegation prepares the handoff
   → agent-bridge/v1 CLI
-  → Agent Bridge 管理任务和目标独立会话
-  → 返回状态、改动与验证结果
-  → 发起会话按原任务要求核对结果
+  → Agent Bridge manages the task and independent target session
+  → Status, changes and verification results return
+  → The originating session checks results against the original request
 ```
 
-| 责任 | ai-code | ai-mcp |
+| Responsibility | ai-code | ai-mcp |
 |---|---|---|
-| 派发入口 | 明确用户意图、目标、范围和任务要求 | 检查调用者及执行权限 |
-| 调用与结果 | 使用 Bridge 契约，展示状态和产物 | 提供 CLI/API、引擎发现、任务与产物操作 |
-| 执行与恢复 | 按准确任务 ID 续接和回收结果 | 管理会话、进程、状态、恢复与取消 |
-| 资源 | 插件技能、薄客户端、适配和安装包 | 引擎驱动、运行时与受控配置 |
+| Handoff entry | Establish user intent, target, scope and task requirements | Check caller identity and execution permissions |
+| Calls and results | Consume the Bridge contract and present status and artifacts | Provide CLI/API, engine discovery, task and artifact operations |
+| Execution and recovery | Continue and collect results using exact task IDs | Manage sessions, processes, state, recovery and cancellation |
+| Resources | Plugin skills, thin client, adapters and packages | Engine drivers, runtime and controlled configuration |
 
-插件不复制引擎驱动、凭据或本地任务服务。所用模型和账号由目标工具管理。
-派发功能只在用户明确请求时使用，普通开发及原生子代理保持原有工作方式。
+The plugin does not duplicate engine drivers, credentials or the local task service.
+The target tool manages its own model and account. Handoffs run only on an explicit
+user request; ordinary development and native subagents keep their usual behavior.
 
-运行时用法见[Agent Bridge](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md)，
-插件用法见[Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md)。
+For runtime setup, see [Agent Bridge](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md).
+For plugin usage, see [Agent Delegation](../plugins/ai-agent-delegation/README.md).

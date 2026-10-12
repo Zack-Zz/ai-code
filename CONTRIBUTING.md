@@ -112,7 +112,7 @@ belong in this guide. Pre-publication checks belong in the
 [maintainer publishing guide](docs/publishing.md), with data requirements in the
 [evidence contract](docs/release-evidence.md). Current guides use the current
 interfaces. Dated design and verification records remain in
-[reference material](docs/README.md#设计与历史资料).
+[reference material](docs/README.md#design-and-historical-material).
 
 Include relevant source, tests and documentation when submitting a change, and
 report the checks you ran. Publication, marketplace updates and user installation

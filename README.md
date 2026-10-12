@@ -17,9 +17,6 @@ features and configuration, with shared tooling for packaging and distribution.
 | **CodeVow** | Plan changes, develop with TDD, debug problems, review code and verify results | [CodeVow](plugins/ai-code-workflow/README.md) |
 | **Agent Delegation** | Hand tasks to independent Claude Code, Codex or ZCode sessions and bring results back; requires Agent Bridge | [Agent Delegation](plugins/ai-agent-delegation/README.md) |
 
-Agent Bridge lives in [ai-mcp](https://github.com/Zack-Zz/ai-mcp), where it connects
-coding assistants and manages tasks. ai-code owns the plugins and their usage rules.
-
 | Path | Contents |
 |---|---|
 | `plugins/` | Plugin source, usage guides, configuration, adapters and tests |

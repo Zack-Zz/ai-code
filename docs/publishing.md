@@ -1,31 +1,40 @@
-# ai-code 维护者发布指南
+# ai-code Maintainer Publishing Guide
 
-本指南说明当前发行工具和工作流。用户安装见[安装指南](installation.zh-CN.md)，
-源码开发见[开发指南](../CONTRIBUTING.zh-CN.md)。发布前检查与验收记录在维护
-文档中管理，用户 README 只说明当前功能、安装和使用。
+English | [简体中文](publishing.zh-CN.md)
 
-## 发行输入与版本
+This guide describes the current release tools and workflows. For user
+installation, see the [installation guide](installation.md); for source
+development, see the [development guide](../CONTRIBUTING.md). Manage pre-release
+checks and acceptance records in maintainer documents. The user README describes
+only current features, installation, and usage.
 
-插件 `product.json` 是身份、版本、宿主、署名和公开资源白名单的唯一来源。
-`release.json` 声明说明文件与各宿主验收路径，不复制版本。根 Node 包为 private
-维护工具，不执行 npm publish。
+## Release inputs and versions
 
-版本仅使用 `X.Y.Z` 或 `X.Y.Z-preview.N`，数字无前导零，不接受其他后缀或
-build metadata。工具按数字比较版本，拒绝降级和同版本不同字节。
-规范源码标签为 `ID/vVERSION`。
+A plugin's `product.json` is the sole source for identity, version, hosts,
+attribution, and the public resource allowlist. `release.json` declares notes and
+host acceptance paths without duplicating the version. The root Node package is
+private maintenance tooling and is not published with npm publish.
 
-| 版本 | 本地模式 | GitHub Prerelease | main 市场 |
+Versions use only `X.Y.Z` or `X.Y.Z-preview.N`. Numbers must not have leading zeros;
+other suffixes and build metadata are rejected. Tooling compares versions
+numerically and rejects downgrades or different bytes for the same version.
+The canonical source tag is `ID/vVERSION`.
+
+| Version | Local mode | GitHub Prerelease | main marketplace |
 |---|---|---|---|
-| `X.Y.Z-preview.N` | draft | true | 不更新 |
-| `X.Y.Z` | stable | false | 正式成功后同步 |
+| `X.Y.Z-preview.N` | draft | true | No update |
+| `X.Y.Z` | stable | false | Synchronize after successful stable publication |
 
-GitHub Draft 表示尚未公开，与本地 `mode=draft/stable` 分开。发行种类由版本
-派生。Git 提交、标签、公开发行和市场部署分别需要本次明确授权。
+GitHub Draft means the release is not yet public and is separate from local
+`mode=draft/stable`. The release kind is derived from the version. Git commits,
+tags, public releases, and marketplace deployments each require explicit
+authorization for the current change.
 
-## 本地检查与制品准备
+## Local checks and artifact preparation
 
-准备 Node.js 22+、Python 3.11+ 和支持 POSIX 文件操作的环境。命令从仓库根
-执行，输出目录必须不存在或为空，建议放在仓库外。
+Prepare Node.js 22+, Python 3.11+, and an environment that supports POSIX file
+operations. Run commands from the repository root. Output directories must be
+absent or empty; placing them outside the repository is recommended.
 
 ```sh
 npm ci --no-audit --no-fund
@@ -38,93 +47,107 @@ python3 tooling/plugin_tool.py release prepare --plugin ai-code-workflow --mode 
 python3 tooling/plugin_tool.py release verify --plugin ai-code-workflow --path /tmp/codevow-release
 ```
 
-`draft` 用于本地准备；`stable` 要求干净 Git、规范标签与全部声明宿主的字节
-绑定验收。查看报告的 `publication_ready`、`pending_acceptance` 和
-`limitations`。本地命令不安装插件、不上传制品，也不修改 Git。
+`draft` is used for local preparation. `stable` requires clean Git, a canonical
+tag, and byte-bound acceptance for all declared hosts. Review the report's
+`publication_ready`, `pending_acceptance`, and `limitations`. Local commands do
+not install plugins, upload artifacts, or modify Git.
 
-`verify` 从可信源码独立重建资源和 ZIP 闭包。若要核对版本推进，可使用
-`--previous /path/to/verified-bundle/release.json`；参考套件仍须经过完整字节
-校验，同版本不能改变内容。
+`verify` independently rebuilds resources and the ZIP closure from trusted
+source. To check version progression, use
+`--previous /path/to/verified-bundle/release.json`. The reference bundle must
+still pass complete byte verification; content cannot change for the same
+version.
 
-## 制品与开发市场
+## Artifacts and the development marketplace
 
-当前 release manifest 使用 schema 2。不同产物的用途如下：
+The current release manifest uses schema 2. Outputs serve these purposes:
 
-| 产物 | 用途 |
+| Artifact | Purpose |
 |---|---|
-| `packages/` | 宿主安装目录、插件 ZIP、本地市场和索引 |
-| `installers/ID-VERSION-HOST-plugin.zip` | 完整单插件原生包，不带市场 |
-| `downloads/ID-VERSION-HOST.zip` | 带本地市场的手动下载包 |
-| `submissions/openai/ID-VERSION.zip` | skills-only 投稿包 |
-| `submissions/claude/`、`submissions/zcode/` | 渠道源码套件与登记项 |
-| `release.json`、`SHA256SUMS`、`release-notes.md` | 发行记录、文件闭包、校验值和说明 |
+| `packages/` | Host installation directories, plugin ZIPs, local marketplaces, and indexes |
+| `installers/ID-VERSION-HOST-plugin.zip` | Complete single-plugin native package without a marketplace |
+| `downloads/ID-VERSION-HOST.zip` | Manual download package with a local marketplace |
+| `submissions/openai/ID-VERSION.zip` | skills-only submission package |
+| `submissions/claude/`, `submissions/zcode/` | Channel source bundles and registration entries |
+| `release.json`, `SHA256SUMS`, `release-notes.md` | Release record, file closure, checksums, and notes |
 
-开发市场只生成到显式空输出目录：
+Generate development marketplaces only into explicit empty output directories:
 
 ```sh
 python3 tooling/plugin_tool.py marketplace sync --output /tmp/ai-code-development
 ```
 
-各宿主目录的市场名为 `ai-code-local`。试用步骤见开发指南。
-`dist/` 是被忽略的临时输出，不提交；公开 ZIP 保存为 Release 附件。
+The marketplace name in each host directory is `ai-code-local`. See the
+development guide for trial steps. `dist/` is ignored temporary output and must
+not be committed. Public ZIPs are stored as Release attachments.
 
-## main 市场记录
+## main marketplace records
 
-`distribution.json` 维护 main、市场名 `ai-code-preview`、latest-stable 策略和
-宿主运输方式。同一插件 ID 只有一个当前正式入口。
+`distribution.json` maintains main, the marketplace name `ai-code-preview`, the
+latest-stable policy, and host transport methods. Each plugin ID has only one
+current stable entry.
 
-| 路径 | 内容 |
+| Path | Contents |
 |---|---|
-| `.agents/plugins/marketplace.json` | Codex 入口 |
-| `.claude-plugin/marketplace.json` | Claude Code 入口 |
-| `marketplace.json` | ZCode 入口 |
-| `published/index.json` | 已同步的正式版本与记录引用 |
-| `published/releases/ID/VERSION.json` | 不可变正式记录与冻结源码 |
-| `published/marketplaces.lock.json` | 受管清单及哈希回执 |
-| `published/codex/ID/VERSION/` | Codex 原生安装内容 |
+| `.agents/plugins/marketplace.json` | Codex entry point |
+| `.claude-plugin/marketplace.json` | Claude Code entry point |
+| `marketplace.json` | ZCode entry point |
+| `published/index.json` | Synchronized stable versions and record references |
+| `published/releases/ID/VERSION.json` | Immutable stable record and frozen source |
+| `published/marketplaces.lock.json` | Managed manifests and hash receipts |
+| `published/codex/ID/VERSION/` | Codex native installation contents |
 
-Claude Code 和 ZCode 使用固定 Release 附件；Codex 入口固定实际分发提交。
-`product.json` 维护开发版本，`published/` 维护市场版本。
+Claude Code and ZCode use fixed Release attachments. The Codex entry fixes the
+actual distribution commit. `product.json` maintains the development version;
+`published/` maintains the marketplace version.
 
-公开快照检查为只读操作：
+Public snapshot checking is read-only:
 
 ```sh
 python3 tooling/plugin_tool.py marketplace check --root .
 ```
 
-空市场不使用预览版替代正式入口。公开清单不手工编辑，正式发行通过下面的
-市场计划与部署流程更新。
+An empty marketplace does not substitute a preview for a stable entry. Do not
+edit public manifests manually. Stable releases update them through the
+marketplace planning and deployment process below.
 
-## 宿主验收与公开摘要
+## Host acceptance and the public summary
 
-对插件声明的每个宿主执行真实安装和任务场景，核对版本、加载内容、授权边界
-和结果，再记录证据。格式见[发行证据契约](release-evidence.md)。
+For each host declared by the plugin, perform real installation and task
+scenarios, verify the version, loaded contents, authorization boundaries, and
+results, then record evidence. See the
+[release evidence contract](release-evidence.md) for the format.
 
-在能读取私有材料的本地完成验收后，执行：
+After completing acceptance locally where private materials are readable, run:
 
 ```sh
 python3 tooling/plugin_tool.py release acceptance-export --plugin ai-code-workflow
 ```
 
-工具生成 `release/acceptance-proof.json`，只导出经核验的哈希声明。维护者审核
-后将摘要与最终公开源码冻结在规范标签中，原始材料留在私有路径。Actions
-显式使用 committed 验收，不读取或公开私有正文。摘要是事实声明，不产生
-发布授权，也不代替真实宿主测试。
+Tooling generates `release/acceptance-proof.json`, exporting only verified hash
+declarations. After maintainer review, freeze the summary with the final public
+source in the canonical tag, keeping original materials in private paths.
+Actions explicitly uses committed acceptance and neither reads nor publishes
+private bodies. The summary is a factual declaration; it grants no publication
+authorization and does not replace real host tests.
 
-## Prepare、Publish 与市场同步
+## Prepare, Publish, and marketplace synchronization
 
-[Release plugin](../.github/workflows/release.yml) 从 main 的手工入口接收
-`plugin`、已有 `source_tag` 和 `operation=prepare|publish`。
+[Release plugin](../.github/workflows/release.yml) accepts `plugin`, an existing
+`source_tag`, and `operation=prepare|publish` through its manual entry on main.
 
-1. Prepare 使用 main 的可信管理工具读取冻结标签，核验标签格式与 main 可达性，执行测试、静态检查、制品准备与独立复验，保存 Actions artifact。
-2. Publish 在 `plugin-release` 环境审核后创建 Draft、上传完整附件、逐件回读并核对冻结标签，再公开为对应种类的 Release。已有同版本 Release 不覆盖，流程不创建标签。
-3. 正式版公开成功后显式调用 [Sync plugin marketplace](../.github/workflows/marketplace.yml)。预览版到 Release 为止。
+1. Prepare uses trusted management tooling from main to read the frozen tag, verify its format and reachability from main, run tests and static checks, prepare artifacts, independently reverify them, and save an Actions artifact.
+2. After approval in the `plugin-release` environment, Publish creates a Draft, uploads all attachments, reads each back and verifies the frozen tag, then publishes the corresponding release kind. It does not overwrite an existing Release of the same version or create tags.
+3. After successful stable publication, explicitly invoke [Sync plugin marketplace](../.github/workflows/marketplace.yml). Previews stop at the Release.
 
-源码标签的公开输入必须与 Git blob 字节一致；Actions artifact 保留原生隐藏
-目录。公开后继续回读状态，无法确认时报告 uncertain，不自动重试或删除。
+Public inputs at the source tag must match Git blob bytes. Actions artifacts
+preserve native hidden directories. Continue reading back the state after
+publication. If it cannot be confirmed, report uncertain; do not automatically
+retry or delete it.
 
-市场同步的 plan 只读；deploy 经 `plugin-marketplace` 环境审核，并要求实际
-已审阅的计划哈希和 main 基础 SHA。人工执行示例：
+Marketplace synchronization plan is read-only. deploy requires approval in the
+`plugin-marketplace` environment, the hash of the actually reviewed plan, and the
+main base SHA. Manual execution example:
 
 ```sh
 python3 /path/to/trusted-main/.github/scripts/deploy_marketplace.py \
@@ -133,7 +156,8 @@ python3 /path/to/trusted-main/.github/scripts/deploy_marketplace.py \
   --action plan --output /tmp/remote-market-plan.json
 ```
 
-审阅 Release、源码、附件哈希、路径变更和 main 基准；授权后按同一输入部署：
+Review the Release, source, attachment hashes, path changes, and main baseline.
+After authorization, deploy with the same inputs:
 
 ```sh
 python3 /path/to/trusted-main/.github/scripts/deploy_marketplace.py \
@@ -143,10 +167,15 @@ python3 /path/to/trusted-main/.github/scripts/deploy_marketplace.py \
   --expected-market-commit "$REVIEWED_MAIN_SHA" --output /tmp/deploy-result.json
 ```
 
-上述变量来自选定插件、已公开正式标签和实际审阅结果，不使用占位值执行。
-部署器重验 Release、标签、全部附件和 stable 门禁。Codex 安装目录与市场
-记录分阶段提交，只有市场记录回读一致才报告同步完成。基础提交或字节变化
-时停止；使用普通 fast-forward，不 force push。
+These variables come from the selected plugin, its published stable tag, and the
+actual review results; do not execute using placeholder values. The deployer
+reverifies the Release, tag, all attachments, and stable gates. Codex installation
+contents and marketplace records are committed in stages. Synchronization is
+reported complete only when marketplace records read back consistently. Stop if
+the base commit or bytes change. Use ordinary fast-forward updates, never force
+push.
 
-Release 已公开而市场更新失败时，分别报告两个结果，并保留当前可用市场入口。
-官方目录投稿属于独立人工渠道，生成的 submission 套件不代表官方收录。
+If the Release is public but the marketplace update fails, report both results
+separately and preserve the current usable marketplace entry. Submission to an
+official directory is a separate manual channel; generated submission bundles do
+not mean official inclusion.

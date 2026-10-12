@@ -1,16 +1,20 @@
-# 接入一个 AI 插件
+# Add an AI Plugin
 
-本指南适用于在 ai-code 仓库加入独立的 AI 相关插件。先定义插件用途、最小
-内容和实际目标宿主，再注册目录。已有 workflow 只是一个插件实例；新插件
-不必包含它的策略、任务记录、Reviewer 或六份技能。
+English | [简体中文](plugin-authoring.zh-CN.md)
 
-环境准备、修改现有插件和本地试用先看[开发指南](../CONTRIBUTING.zh-CN.md)。
-本指南聚焦新增插件。所有命令在仓库根运行，维护规则见 [AGENTS.md](../AGENTS.md)，
-发行操作见[发布指南](publishing.md)。
+This guide covers adding an independent AI-related plugin to the ai-code
+repository. Define the plugin's purpose, minimum contents, and actual target hosts
+before registering its directory. The existing workflow is one plugin instance;
+a new plugin does not need its policies, task records, Reviewer, or six skills.
 
-## 1. 建立独立源码目录
+For environment setup, changes to existing plugins, and local trials, start with
+the [development guide](../CONTRIBUTING.md). This guide focuses on adding plugins.
+Run all commands from the repository root. See [AGENTS.md](../AGENTS.md) for
+maintenance rules and the [publishing guide](publishing.md) for release operations.
 
-一个只有单份技能、面向 Codex 的最小例子：
+## 1. Create an independent source directory
+
+A minimal Codex plugin with one skill might look like this:
 
 ```text
 plugins/ai-example/
@@ -24,14 +28,24 @@ plugins/ai-example/
   tests/
 ```
 
-`ai-example` 仅为指南占位符，不是已提供的正式插件。实际 ID 使用小写
-kebab-case，建议目录名与 ID 一致。每个插件自有版本、许可证与说明，不将兄弟
-插件的相对路径列入资源。README 面向使用者说明用途、安装方式、使用步骤和必要依赖。
-发布前流程、宿主验收与开发测试记录放在维护文档中，不写入用户 README。
+`ai-example` is a placeholder in this guide, not an available production plugin.
+Use lowercase kebab-case for the actual ID; matching the directory name to the ID
+is recommended. Each plugin owns its version, license, and documentation. Do not
+list relative paths into sibling plugins as resources. The user README explains
+the purpose, installation, usage, and required dependencies. Keep pre-release
+procedures, host acceptance, and development test records in maintainer documents,
+not in the user README.
 
-## 2. 声明身份、宿主和资源
+Documentation for external readers, including READMEs, installation, usage and
+configuration guides, must be available in English and Chinese. English is the
+default; place reciprocal language links at the top and keep links between
+bilingual guides in the selected language. Design, implementation, verification
+records and internal maintenance material may remain Chinese-only. Existing
+translations can be retained.
 
-`product.json`：
+## 2. Declare identity, hosts, and resources
+
+`product.json`:
 
 ```json
 {
@@ -50,39 +64,48 @@ kebab-case，建议目录名与 ID 一致。每个插件自有版本、许可证
 }
 ```
 
-身份、版本和白名单只写在该清单。不要在 catalog、根 package.json 或市场
-中维护第二份开发版本。新的公开版本仅使用 `X.Y.Z` 或 `X.Y.Z-preview.N`，
-数字禁止前导零，不接受其他后缀或 build metadata；preview 序号按数字比较，
-同核心正式版在所有 preview 之后。发行种类由版本派生。
+Declare identity, version, and the allowlist only in this manifest. Do not maintain
+a second development version in the catalog, root package.json, or marketplace.
+New public versions use only `X.Y.Z` or `X.Y.Z-preview.N`. Numbers must not have
+leading zeros; other suffixes and build metadata are rejected. Preview sequence
+numbers are compared numerically, and a stable version follows all previews with
+the same core version. The release kind is derived from the version.
 
-`hosts` 必填且非空，当前接受 `claude`、`codex`、`zcode`；每个声明
-宿主都必须有真实 `adapters/<host>/plugin.json`。
+`hosts` is required and must be nonempty. The supported values are currently
+`claude`, `codex`, and `zcode`. Every declared host must have an actual
+`adapters/<host>/plugin.json`.
 
-声明的技能自动贡献其 `skills/<name>/SKILL.md`。技能引用的参考文档、脚本
-和额外资源需登记到 resources。例如：
+Declared skills automatically contribute their `skills/<name>/SKILL.md`. Register
+reference documents, scripts, and additional resources used by skills in
+resources. For example:
 
 ```json
 {"source": "skills/example/references", "target": "skills/example/references", "include": ["guide.md"]}
 ```
 
-source 是文件时 include 必须为 `[]`；source 是目录时 include 必须逐个列出
-相对文件名。不要使用通配符或自动递归打包。文件必须真实存在；拒绝绝对
-路径、`..`、符号链接、缓存文件和重复目标。包内相对 Markdown 引用必须在
-白名单闭包中可以解析。
+When source is a file, include must be `[]`. When source is a directory, include
+must list each relative filename explicitly. Do not use wildcards or automatic
+recursive packaging. Files must exist. Absolute paths, `..`, symbolic links,
+cache files, and duplicate targets are rejected. Relative Markdown references in
+the package must resolve within the allowlisted resource closure.
 
-`core_skills`、`shared_skills` 可省略或为空；有值时互不重叠，元数据 name
-与技能目录名一致。`profiles` 与 `generated_agents` 也可省略或为空：只有
-需要 profile 标签或受控 Agent 文本合成的插件才声明。profiles 只是唯一名称列表，
-策略资源和实际行为由该插件自行校验，公共层不强制 policies 文件。生成 Agent 每项为
-`host/template/body/target`，当前接受已声明的 Claude Code / ZCode 宿主及 agents/*.md 目标，
-只做数据化正文合成，不执行代码 hook。
+`core_skills` and `shared_skills` may be omitted or empty. When populated, they
+must not overlap, and the metadata name must match the skill directory name.
+`profiles` and `generated_agents` may also be omitted or empty: declare them only
+when the plugin needs profile labels or controlled Agent text composition.
+profiles is only a list of unique names. Each plugin validates its policy
+resources and actual behavior; the shared layer does not require policies files.
+Each generated Agent entry contains `host/template/body/target`. Currently,
+declared Claude Code / ZCode hosts and agents/*.md targets are accepted. Generation
+only composes text from data and does not execute code hooks.
 
-纯资源能被校验和打包，不能证明某个运行能力已可用。新的宿主组件形态必须
-先明确原生清单、启动/权限行为及真实会话验收，再扩展支持。
+Validation and packaging of resources do not prove that a runtime capability is
+available. Before supporting a new host component type, establish its native
+manifest, startup and permission behavior, and acceptance in a real session.
 
-## 3. 提供宿主适配
+## 3. Provide host adapters
 
-技能 frontmatter 使用单行 name、description 和可选 origin：
+Skill frontmatter uses single-line name, description, and optional origin fields:
 
 ```markdown
 ---
@@ -95,7 +118,7 @@ description: Explain the concrete AI task this skill handles.
 Describe the task, inputs, actions and evidence expected from the assistant.
 ```
 
-`adapters/codex/plugin.json` 最小模板可为：
+A minimal `adapters/codex/plugin.json` template can be:
 
 ```json
 {
@@ -104,11 +127,14 @@ Describe the task, inputs, actions and evidence expected from the assistant.
 }
 ```
 
-公共构建从 product.json 注入 name/version，不在模板维护第二份发行版本。
-更完整的原生界面可参考已有插件，但宿主特有清单要符合其真实能力，不将
-未知字段当作已支持特性。该最小模板通过仓库结构校验不等于真实宿主已验收。
+The shared build injects name/version from product.json. Do not maintain a second
+release version in the template. Existing plugins can serve as references for
+more complete native interfaces, but host-specific manifests must reflect actual
+capabilities. Do not treat unknown fields as supported features. Passing the
+repository's structural validation with this minimal template does not mean the
+plugin has passed acceptance in a real host.
 
-对上例的 Codex 技能，提供 `adapters/codex/interfaces.json`：
+For the Codex skill above, provide `adapters/codex/interfaces.json`:
 
 ```json
 {
@@ -125,48 +151,58 @@ Describe the task, inputs, actions and evidence expected from the assistant.
 }
 ```
 
-技能集合必须与该插件清单一致；公共构建生成各自
-`skills/<name>/agents/openai.yaml`，不在源码技能目录维护第二份界面元数据。
-无技能插件不要求这份技能界面文件。声明 ZCode 时提供其原生 plugin.json；
-若需要 Agent，显式登记生成元数据并编写插件自己的行为检查。
+The skill set must match the plugin manifest. The shared build generates each
+`skills/<name>/agents/openai.yaml`; do not maintain another copy of interface
+metadata in the source skill directory. Plugins without skills do not need this
+skill interface file. When declaring ZCode, provide its native plugin.json. If
+Agents are needed, explicitly register their generation metadata and write the
+plugin's own behavior checks.
 
-声明 Claude Code 时提供 `adapters/claude/plugin.json`，构建输出
-`.claude-plugin/plugin.json`。`displayName` 从 product 派生，namespace ID
-保持稳定。可选 `publisher` 只含公开 `name`、HTTPS `url` 和 `email`；工具
-统一生成 native author 与 Codex developerName，不在适配模板复制署名。
+When declaring Claude Code, provide `adapters/claude/plugin.json`; the build emits
+`.claude-plugin/plugin.json`. `displayName` is derived from product, and the
+namespace ID stays stable. Optional `publisher` contains only public `name`, an
+HTTPS `url`, and `email`. Tooling generates native author and Codex developerName
+consistently; do not duplicate attribution in adapter templates.
 
-开发市场由工具统一生成，不需要新插件提供 marketplace 模板。公开 main
-市场从已核验正式发行记录生成，不从当前开发清单直接同步。workflow
-保留的旧模板只供自己的专属 build 使用。
+Tooling generates the development marketplace centrally. New plugins do not need
+marketplace templates. The public main marketplace is generated from verified
+stable release records, not directly synchronized from current development
+manifests. Old templates retained by workflow are only for its dedicated build.
 
-## 4. 注册目录并接入测试
+## 4. Register the directory and integrate tests
 
-在根 `catalog.json` 的 plugins 数组中添加：
+Add this entry to the plugins array in the root `catalog.json`:
 
 ```json
 {"path": "plugins/ai-example"}
 ```
 
-注册表只存路径，拒绝未知字段、重复目录、重复 ID 和逃逸路径。目录存在但
-未登记不会被自动构建。
+The registry stores only paths. Unknown fields, duplicate directories, duplicate
+IDs, and paths that escape the repository are rejected. A directory that exists
+but is not registered is not built automatically.
 
-为插件真实行为编写有意义的失败测试，执行 RED 后再实现 GREEN。统一门禁
-按 catalog 为每个正式插件发现以下受控入口，至少必须存在一个：
+Write meaningful failing tests for the plugin's actual behavior. Run RED before
+implementing GREEN. For each production plugin, the unified gate discovers the
+following controlled entry points through the catalog; at least one must exist:
 
-- `tests/skills/run-skills.js`：Node 技能/资源契约组。
-- `tests/run_python_tests.py`：插件自己的 Python 测试汇总。
+- `tests/skills/run-skills.js`: the Node skill/resource contract group.
+- `tests/run_python_tests.py`: the plugin's own Python test aggregator.
 
-每个入口独立子进程运行，自身须拒绝空测试组并将失败、启动错误或 signal
-传为非零。新插件若没有任一入口，统一门禁判失败；确认 `npm test` 实际
-执行新组。公共 `tests/run_python_tests.py` 只运行仓库通用工具测试，插件
-Python 入口独立运行以避免同名 tests 包冲突。不要新增任意命令 hook。
-不能用空组、仅有文件存在断言或重复实现的测试代替行为检查。文档和资源
-修改根据影响做校验，无需机械增加测试。
+Each entry point runs in its own subprocess. It must reject empty test groups and
+propagate failures, startup errors, or signals as a nonzero exit status. The
+unified gate fails if a new plugin has neither entry point. Confirm that
+`npm test` actually executes the new group. The shared
+`tests/run_python_tests.py` runs only repository-wide tooling tests; plugin Python
+entry points run independently to avoid collisions between tests packages with
+the same name. Do not add arbitrary command hooks. Empty groups, assertions that
+only check file existence, and tests that duplicate the implementation cannot
+replace behavior checks. Validate document and resource changes according to
+their impact; do not add tests mechanically.
 
-新增公共工具行为时，同样先给有效 RED；用最小 fixture 验证通用规则，
-不把测试样例登记成正式插件。
+New shared tooling behavior also requires a valid RED first. Use minimal fixtures
+to verify shared rules; do not register test fixtures as production plugins.
 
-## 5. 校验、构建和检查
+## 5. Validate, build, and check
 
 ```sh
 python3 tooling/plugin_tool.py list
@@ -178,53 +214,76 @@ python3 tooling/plugin_tool.py package check \
 npm run lint
 ```
 
-`/tmp/ai-example-packages` 必须不存在或为空；重复验证使用新的空目录。`--all` 可校验
-或构建全部登记插件。`--host all` 按各插件 hosts 生成对应产物。
+`/tmp/ai-example-packages` must be absent or empty. Use a fresh empty directory
+when repeating validation. `--all` validates or builds every registered plugin.
+`--host all` generates outputs for each plugin's declared hosts.
 
-包检查使用可信仓库 `--root` 独立重建预期资源闭包，重算实际文件哈希并
-核对原生清单和市场 source。不要调用尚未验证的包自己的 Python 文件作为
-初始验证器。`ok` 不表示作者身份已认证，也不表示宿主实际执行了组件。
+Package checking independently rebuilds the expected resource closure from the
+trusted repository specified by `--root`, recalculates actual file hashes, and
+checks native manifests and marketplace source. Do not use an unverified
+package's own Python files as the initial validator. `ok` does not mean the
+author's identity is certified or the host has actually executed its components.
 
-公共包检查拒绝全部未登记文件，包括可以被 Python 执行的 `.pyc` 缓存。
-先验证发行包，再运行包内代码；需要保持产物可复验时使用 Python `-B`
-或 `PYTHONDONTWRITEBYTECODE=1`。采集注册插件的输入及复查时始终从仓库根遍历目录，
-不把插件子目录重新作为允许跟随父目录链接的信任根。
+Shared package checks reject all unregistered files, including `.pyc` cache files
+that Python can execute. Verify the release package before running code inside
+it. To keep outputs reproducibly verifiable, use Python `-B` or
+`PYTHONDONTWRITEBYTECODE=1`. Always traverse from the repository root when
+collecting and rechecking registered plugin inputs. Do not treat a plugin
+subdirectory as a new trust root that permits following links in parent
+directories.
 
-构建输出 `<output>/index.json` 使用 schema_version 2，按 plugins/ID/hosts/HOST 记录
-各包路径和哈希，按 hosts/HOST 记录聚合市场。插件自己的 artifact 保持自身
-身份和来源。修改一个插件时核对兄弟插件内容和哈希不受影响。
+The build output `<output>/index.json` uses schema_version 2. It records each
+package's path and hash under plugins/ID/hosts/HOST and aggregate marketplaces
+under hosts/HOST. Each plugin's artifact retains its own identity and provenance.
+When changing one plugin, verify that sibling plugin contents and hashes are
+unaffected.
 
-开发市场使用显式空输出目录，注册对应的 `<output>/<host>`：
+Use an explicit empty output directory for the development marketplace and
+register the corresponding `<output>/<host>`:
 
 ```sh
 python3 tooling/plugin_tool.py marketplace sync --output /tmp/ai-example-development
 python3 tooling/plugin_tool.py marketplace check --root .
 ```
 
-sync 在临时目录生成注册源码的三端开发市场；check 只读核验公开快照的
-冻结源码 S、安装内容与固定 Codex 分发提交 D，不要求正式版本等于当前
-开发版本。`dist/` 是被忽略的临时构建输出，不得提交或推送；CI 拒绝跟踪
-该目录，公开制品保存为 Release 附件。
+sync generates development marketplaces for registered source plugins across the
+three hosts in a temporary directory. check performs read-only verification of
+the public snapshot's frozen source S, installation contents, and fixed Codex
+distribution commit D. The stable version need not equal the current development
+version. `dist/` is ignored temporary build output and must not be committed or
+pushed. CI rejects tracked files in that directory. Public artifacts are stored
+as Release attachments.
 
-需要发行准备时增加插件 `release.json` 和可移植双语说明，见
-[发布指南](publishing.md) 与[验收契约](release-evidence.md)。这些输入属于
-发布机制；仅构建资源包的插件无需被强制套用当前 skills-only 上架 profile。
+For release preparation, add the plugin's `release.json` and portable bilingual
+documentation. See the [publishing guide](publishing.md) and
+[acceptance contract](release-evidence.md). These inputs belong to the release
+mechanism. A plugin that only builds resource packages does not have to adopt the
+current skills-only submission profile.
 
-## 6. 交付与原生验收
+## 6. Delivery and native acceptance
 
-每个宿主目录有名为 `ai-code-local` 的聚合市场；各插件 ZIP 只包含自身包和
-单插件市场。解压到稳定目录后按宿主原生方式注册，见现有
-[用户安装指南](installation.zh-CN.md#下载包安装)中的本地市场步骤。
-原生命令与版本支持仍需对应插件实际验证。
+Each host directory has an aggregate marketplace named `ai-code-local`. Each
+plugin ZIP contains only its own package and a single-plugin marketplace. Extract
+it to a stable directory and register it through the host's native method. See
+the local marketplace steps under
+[downloaded package installation](installation.md#downloaded-package-installation)
+in the existing user installation guide. Native commands and version support
+still require actual verification for the relevant plugin.
 
-catalog 登记和开发试用不等于正式发行。新预览版只进入 GitHub Prerelease；
-正式版本通过全部声明宿主的 stable 验收、公开并成功同步后才进入 main
-单市场。同一 ID 只有一个当前入口，没有正式版的插件暂不出现在公开市场。
-`published/index.json` 与正式记录描述已上线版本，不是第二份开发版本来源。
+Catalog registration and development trials do not constitute a production
+release. New previews appear only as GitHub Prereleases. A stable version enters
+the single main marketplace only after passing stable acceptance for all declared
+hosts, being published, and completing synchronization. Each ID has only one
+current entry. Plugins without a stable release do not yet appear in the public
+marketplace. `published/index.json` and stable records describe deployed versions;
+they are not a second source for development versions.
 
-插件支持说明要分别报告源校验、脚本测试、包检查、原生加载和实际行为。
-记录宿主版本、模型、包哈希及会话证据；尚未验收写 `unverified`。为 MCP
-增加普通资源文件不代表配置发现、认证、server 启动或工具调用已经支持。
+Plugin support statements must report source validation, script tests, package
+checks, native loading, and actual behavior separately. Record the host version,
+model, package hash, and session evidence; use `unverified` until acceptance is
+complete. Adding ordinary resource files for MCP does not imply support for
+configuration discovery, authentication, server startup, or tool invocation.
 
-交付时保留未提交改动，给出摘要、diff、验证结果和剩余限制，等待用户
-Review。commit、push、tag、merge、PR、安装与发布仍遵守独立授权边界。
+Leave changes uncommitted on delivery. Provide a summary, diff, validation
+results, and remaining limitations for user Review. Commit, push, tag, merge, PR,
+installation, and publication retain their separate authorization boundaries.

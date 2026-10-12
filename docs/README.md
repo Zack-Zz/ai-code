@@ -1,31 +1,35 @@
-# ai-code 文档导航
+# ai-code documentation
 
-按阅读目的选择当前指南。带日期的设计与验证记录放在末尾的参考资料中。
+English | [简体中文](README.zh-CN.md)
 
-## 使用插件
+Choose a current guide by what you want to do. Dated design and verification
+records appear in the reference section at the end.
 
-- [安装指南](installation.zh-CN.md) / [English](installation.md)：各编码助手的市场安装、下载包安装、更新和卸载。
-- [CodeVow](../plugins/ai-code-workflow/README.zh-CN.md) / [English](../plugins/ai-code-workflow/README.md)：功能、示例和配置。
-- [CodeVow 详细用法](../plugins/ai-code-workflow/docs/usage.zh-CN.md) / [English](../plugins/ai-code-workflow/docs/usage.md)：配置、任务记录和可选文件工具。
-- [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md) / [English](../plugins/ai-agent-delegation/README.md)：依赖准备、派发、续接和取消。
-- [Agent Bridge 使用与配置](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置)：外置运行时的准备入口。
+## Use plugins
 
-## 开发插件
+- [Installation](installation.md): marketplace and downloaded-package installation, updates and removal for each coding assistant.
+- [CodeVow](../plugins/ai-code-workflow/README.md): features, examples and configuration.
+- [Detailed CodeVow usage](../plugins/ai-code-workflow/docs/usage.md): configuration, task records and optional file tools.
+- [Agent Delegation](../plugins/ai-agent-delegation/README.md): requirements, handoffs, continuation and cancellation.
+- [Agent Bridge setup](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置): preparation of the external runtime.
 
-- [开发指南](../CONTRIBUTING.zh-CN.md) / [English](../CONTRIBUTING.md)：环境、修改现有插件、测试、构建和本地试用。
-- [插件作者指南](plugin-authoring.md)：新增插件的身份、资源、适配、注册和测试要求。
-- [总体架构](architecture.md)：仓库结构、公共工具、插件及 ai-mcp 的责任边界。
+## Develop plugins
 
-## 维护发行
+- [Development guide](../CONTRIBUTING.md): environment, existing plugins, tests, builds and local trials.
+- [Plugin authoring](plugin-authoring.md): identity, resources, adapters, registration and tests for a new plugin.
+- [Architecture](architecture.md): repository structure and the responsibilities of shared tooling, plugins and the external runtime.
 
-- [发布指南](publishing.md)：发行准备、宿主验收、GitHub Release 和市场更新。
-- [发行证据契约](release-evidence.md)：验收材料、公开摘要与 CI 的数据要求。
+## Maintain releases
 
-## 设计与历史资料
+- [Publishing guide](publishing.md): preparation, host acceptance, GitHub Releases and marketplace updates.
+- [Release evidence contract](release-evidence.md): acceptance materials, public digests and CI data requirements.
 
-- [设计方案](design/)：按日期保存的规格与设计决定。
-- [开发与验证记录](reviews/)：对应日期、源码和环境的检查记录。
-- [CodeVow 设计](../plugins/ai-code-workflow/docs/design/)与[验证记录](../plugins/ai-code-workflow/docs/reviews/)：插件内部设计及测试背景。
-- [迁移来源](../plugins/ai-code-workflow/docs/migration.md)与[历史资料](../plugins/ai-code-workflow/docs/bel-history/README.md)：来源、许可证和早期记录。
+## Design and historical material
 
-日常安装和开发使用上方当前指南。历史资料保留原日期和命令，仅用于追溯。
+- [Designs](design/): dated specifications and design decisions.
+- [Development and verification records](reviews/): checks tied to their dates, source and environments.
+- [CodeVow designs](../plugins/ai-code-workflow/docs/design/) and [verification records](../plugins/ai-code-workflow/docs/reviews/): internal design and test context.
+- [Migration origins](../plugins/ai-code-workflow/docs/migration.md) and [historical material](../plugins/ai-code-workflow/docs/bel-history/README.md): provenance, licenses and early records.
+
+Use the current guides above for everyday installation and development.
+Historical material retains its original dates and commands for reference.
