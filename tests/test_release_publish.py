@@ -1,6 +1,7 @@
 """Real local bundles and a fake GitHub API with HTTP attachment readback."""
 
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import io as streams
 import importlib.util
 import json
 from pathlib import Path
@@ -47,6 +48,8 @@ class FakeGitHub:
         self.fail_lookup = False
         self.name = None
         self.body = None
+        self.draft_tag_404 = True
+        self.listing_ids = [73]
         owner = self
         class Handler(BaseHTTPRequestHandler):
             def do_GET(self):
@@ -101,6 +104,9 @@ class FakeGitHub:
         if '--paginate' in args:
             if self.fail_lookup:
                 return result(code=1, error='network unavailable')
+            if args[args.index('--jq') + 1] == '.[] | [.id, .tag_name] | @tsv':
+                return result(''.join(f'{identity}\t{self.tag}\n' for identity in self.listing_ids)
+                              if self.existing or self.created else '')
             return result(self.tag + '\n' if self.existing or self.created else '')
         endpoint = args[2]
         if endpoint.endswith('/git/refs'):
@@ -125,7 +131,9 @@ class FakeGitHub:
             if self.move_tag_on_download:
                 self.revision = 'b' * 40
             return result(raw)
-        if '/releases/tags/' in endpoint:
+        if '/releases/tags/' in endpoint or endpoint.endswith('/releases/73'):
+            if '/releases/tags/' in endpoint and self.draft_tag_404 and not self.public:
+                return result(code=1, error='gh: Not Found (HTTP 404)')
             if self.public and self.fail_after_edit:
                 return result(code=1)
             assets = [{'id': identity, 'name': self.names[identity], 'size': len(raw), 'state': 'uploaded'}
@@ -238,6 +246,37 @@ class ReleasePublishTests(unittest.TestCase):
         record = json.loads((self.bundle / 'release.json').read_text())
         self.assertEqual(record['readiness']['accepted_hosts'], [])
         self.assertEqual(record['readiness']['pending_acceptance'], ['claude', 'codex', 'zcode'])
+
+    def test_first_draft_is_read_by_id_when_tag_endpoint_only_serves_public_releases(self):
+        self.fixture('1.0.3')
+        self.github.draft_tag_404 = True
+        report = self.call()
+        self.assertTrue(report['ok'], report)
+        self.assertTrue(report['published'])
+        self.assertEqual(report['release_id'], 73)
+        self.assertTrue(any(args[1:3] == ['api', 'repos/example/ai-code/releases/73']
+                            for args in self.github.calls))
+
+    def test_retry_existing_complete_draft_reuses_its_id_after_tag_lookup_would_404(self):
+        self.fixture('1.0.3')
+        publish.drafts.create_draft(self.root, 'ai-one', self.bundle, 'example/ai-code', run=self.github.run)
+        self.github.draft_tag_404 = True
+        report = self.call()
+        self.assertTrue(report['ok'], report)
+        self.assertTrue(report['reused'])
+        self.assertTrue(report['published'])
+        self.assertEqual(sum(args[1:3] == ['release', 'create'] for args in self.github.calls), 1)
+
+    def test_ambiguous_same_tag_release_ids_fail_before_publication(self):
+        self.fixture('1.0.3')
+        publish.drafts.create_draft(self.root, 'ai-one', self.bundle, 'example/ai-code', run=self.github.run)
+        self.github.listing_ids = [73, 74]
+        before = len(self.github.calls)
+        report = self.call()
+        self.assertFalse(report['ok'], report)
+        self.assertIn('ambiguous', report['error'])
+        self.assertFalse(any(args[1:3] in (['release', 'create'], ['release', 'edit'])
+                             for args in self.github.calls[before:]))
 
     def test_corrupt_same_length_asset_is_never_published(self):
         self.fixture()
@@ -510,6 +549,32 @@ class ReleasePublishTests(unittest.TestCase):
             self.assertEqual(publish.main(), 0)
         self.assertIsNone(called.call_args.kwargs['draft_result'])
         self.assertTrue(called.call_args.kwargs['ensure_tag'])
+
+    def test_cli_failure_receipt_is_visible_on_stderr_when_stdout_is_redirected(self):
+        arguments = [str(SCRIPT), '--root', str(self.root), '--plugin', 'ai-one', '--source-tag',
+                     'ai-one/v1.0.3', '--bundle', str(self.bundle), '--repository', 'example/ai-code']
+        receipt = {'ok': False, 'draft': True, 'error': 'GitHub command failed (HTTP 404)'}
+        stdout, stderr = streams.StringIO(), streams.StringIO()
+        with mock.patch.object(publish.sys, 'argv', arguments), \
+                mock.patch.object(publish, 'publish_release', return_value=receipt), \
+                mock.patch.object(publish.sys, 'stdout', stdout), \
+                mock.patch.object(publish.sys, 'stderr', stderr):
+            self.assertEqual(publish.main(), 1)
+        self.assertEqual(json.loads(stdout.getvalue()), receipt)
+        self.assertIn('HTTP 404', stderr.getvalue())
+        self.assertEqual(json.loads(stderr.getvalue()), receipt)
+
+    def test_cli_success_keeps_machine_receipt_on_stdout_without_error_log(self):
+        arguments = [str(SCRIPT), '--root', str(self.root), '--plugin', 'ai-one', '--source-tag',
+                     'ai-one/v1.0.3', '--bundle', str(self.bundle), '--repository', 'example/ai-code']
+        stdout, stderr = streams.StringIO(), streams.StringIO()
+        with mock.patch.object(publish.sys, 'argv', arguments), \
+                mock.patch.object(publish, 'publish_release', return_value={'ok': True}), \
+                mock.patch.object(publish.sys, 'stdout', stdout), \
+                mock.patch.object(publish.sys, 'stderr', stderr):
+            self.assertEqual(publish.main(), 0)
+        self.assertEqual(json.loads(stdout.getvalue()), {'ok': True})
+        self.assertEqual(stderr.getvalue(), '')
 
     def test_remote_tag_move_after_draft_upload_prevents_publication(self):
         self.fixture()

@@ -14,6 +14,26 @@ import create_release_draft as drafts
 LIMIT = 256 * 1024 * 1024
 
 
+def _release_id(gh, repository, tag):
+    # GitHub's tag endpoint serves published releases only. The authenticated
+    # list includes drafts; resolve an unambiguous ID and read that resource.
+    listing = gh("api", "--paginate", f"repos/{repository}/releases",
+                 "--jq", ".[] | [.id, .tag_name] | @tsv")
+    matches = []
+    for line in listing.splitlines():
+        fields = line.split("\t")
+        if len(fields) != 2:
+            raise ValueError("invalid release identity listing")
+        identity, listed_tag = fields
+        if listed_tag == tag:
+            if not drafts.re.fullmatch(r"[1-9][0-9]*", identity):
+                raise ValueError("invalid matching Release ID")
+            matches.append(int(identity))
+    if len(matches) > 1:
+        raise ValueError("ambiguous releases for the selected version tag")
+    return matches[0] if matches else None
+
+
 def _ensure_remote_tag(gh, repository, tag, revision, before_create=None):
     try:
         reference = json.loads(gh("api", f"repos/{repository}/git/ref/tags/{quote(tag, safe='')}"))["object"]
@@ -92,8 +112,8 @@ def publish_release(root, plugin_id, source_tag, bundle, repository, run=None, d
 
             def read_release(public=None):
                 nonlocal observed_public
-                release = json.loads(gh("api", f"repos/{repository}/releases/tags/{quote(tag, safe='')}"))
-                if type(release.get("id")) is not int or release["id"] <= 0 or release.get("tag_name") != tag or \
+                release = json.loads(gh("api", f"repos/{repository}/releases/{release_id}"))
+                if type(release.get("id")) is not int or release["id"] != release_id or release.get("tag_name") != tag or \
                         type(release.get("draft")) is not bool:
                     raise ValueError("remote Release identity or draft state differs from its version")
                 # These fields establish observed remote state even when the
@@ -124,8 +144,8 @@ def publish_release(root, plugin_id, source_tag, bundle, repository, run=None, d
                         raise ValueError("uploaded release asset bytes differ from the verified bundle: " + asset["name"])
                 return release
 
-            releases = gh("api", "--paginate", f"repos/{repository}/releases", "--jq", ".[].tag_name")
-            existing = tag in releases.splitlines()
+            release_id = _release_id(gh, repository, tag)
+            existing = release_id is not None
             if draft_result is not None and not existing:
                 raise ValueError("the receipted Draft is missing; refusing recreation")
             if existing:
@@ -149,6 +169,9 @@ def publish_release(root, plugin_id, source_tag, bundle, repository, run=None, d
                 result["reused"] = False
                 if not result.get("ok"):
                     return result
+                release_id = _release_id(gh, repository, tag)
+                if release_id is None:
+                    raise ValueError("created Draft is missing from the authenticated release listing")
                 before = read_release(public=False)
             recheck_source()
             drafts._bind_remote(gh, repository, tag, verified["source_revision"])
@@ -201,6 +224,10 @@ def main():
     except (drafts.io.ToolError, OSError, ValueError, TypeError, KeyError, AttributeError, subprocess.SubprocessError) as exc:
         result = {"ok": False, "error": str(exc)}
     print(json.dumps(result, indent=2))
+    if not result["ok"]:
+        # Actions retains stdout as the receipt artifact. Also expose the safe
+        # failure receipt in its logs without changing the workflow or exit code.
+        print(json.dumps(result, indent=2), file=sys.stderr)
     return 0 if result["ok"] else 1
 
 
