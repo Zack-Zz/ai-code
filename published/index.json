@@ -1,4 +1,17 @@
 {
-  "plugins": {},
+  "plugins": {
+    "ai-code-workflow": {
+      "codex_revision": "04a52fbaa25c4e1779c57aff5a80f409be6496c3",
+      "installers": {
+        "claude": "9683ee111f144e56a021afe7fe18064f117e3d63e5b850282f4ba9638d90ed07",
+        "codex": "c009834fc90d3cddb68c2dc6aec79d6b266d8a30d7f71d6c642bf068b190939a",
+        "zcode": "88c48ee73a662df0781f1a0d193e6c1f1221bc40f8462213f50fb842faa1df85"
+      },
+      "release_id": 410477577,
+      "source_revision": "91dec3a64731f8de2fb68e49bce9f4228289bbbd",
+      "source_tree_hash": "daae29eac5cb65c141b1c97ef675d50741446f8b35dbe9037a7505f238accd60",
+      "version": "1.0.3"
+    }
+  },
   "schema_version": 2
 }

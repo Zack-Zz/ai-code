@@ -1,4 +1,20 @@
 {
   "name": "ai-code",
-  "plugins": []
+  "plugins": [
+    {
+      "category": "developer-tools",
+      "name": "ai-code-workflow",
+      "policy": {
+        "authentication": "ON_INSTALL",
+        "installation": "AVAILABLE"
+      },
+      "source": {
+        "path": "./published/codex/ai-code-workflow/1.0.3",
+        "sha": "04a52fbaa25c4e1779c57aff5a80f409be6496c3",
+        "source": "git-subdir",
+        "url": "https://github.com/Zack-Zz/ai-code.git"
+      },
+      "version": "1.0.3"
+    }
+  ]
 }
