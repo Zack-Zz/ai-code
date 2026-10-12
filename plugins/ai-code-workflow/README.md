@@ -41,14 +41,28 @@ direct skill invocation, authorization checks and actual host verification.
 | `verification` | Check the final code state and report actual verification |
 | `review-results` | Present conclusions with clear impact and clickable evidence |
 
-Read-only questions stay read-only. The default `collaborative` mode confirms
-the development plan before implementation and does not re-ask an already
-confirmed scope. `continuous` mode keeps work moving within the scope you have
-explicitly authorized.
+## Choose a collaboration mode
 
-Both modes preserve existing edits. Commit, push, tag, merge, PR creation,
-installation and external publication each need your explicit authorization.
-A mode switch or task record does not grant it.
+Choose whether you want to confirm the proposed plan before the assistant starts
+editing:
+
+| Mode | How work starts | Choose it when |
+|---|---|---|
+| `collaborative` — collaborative mode (default) | The assistant investigates, explains the proposed change and waits for you to confirm the plan before editing. | You want to review the approach before implementation. |
+| `continuous` — continuous mode | After you ask it to implement a task, the assistant explains a short plan and proceeds within the scope you authorized. | The goal and scope are clear, and you want the assistant to carry the task through. |
+
+Once implementation starts, both modes continue through coding, testing and
+review without asking you to approve every ordinary step. Previously confirmed
+plans are reused. If the scope or a key decision changes materially, the assistant
+asks you to confirm the affected part.
+
+Both modes keep the same testing, review and verification requirements and
+preserve your existing edits. Requests only for explanation or investigation
+stay read-only; follow-up questions during an authorized task do not cancel
+work you have already permitted.
+Commit, push, tag, merge, PR creation, installation and external publication
+still need your explicit instructions; a mode switch or task record does not
+grant permission.
 
 ## Project configuration
 
@@ -63,8 +77,8 @@ Create `.ai-workflow/policy.json` in your project to set preferences:
 }
 ```
 
-Defaults come from [collaborative](policies/collaborative.json) or
-[continuous](policies/continuous.json). Project settings override the defaults;
+The default mode is `collaborative`. Set `mode` to `continuous` to use the
+continuous mode described above. Project settings override the packaged defaults;
 explicit conversation options take precedence. The
 [usage guide](docs/usage.md) covers all settings, policy inspection, optional
 task records and project file staging.

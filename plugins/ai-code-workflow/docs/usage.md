@@ -6,6 +6,42 @@ After [installation](../../../docs/installation.md), start a new host session
 and describe the goal, change scope and acceptance conditions. CodeVow
 organizes planning, TDD, debugging, review and verification around that request.
 
+## Choose a collaboration mode
+
+The mode controls whether the assistant waits for you to confirm its proposed
+plan before editing. Choose the working style you prefer:
+
+| Mode | How work starts | Choose it when |
+|---|---|---|
+| `collaborative` — collaborative mode (default) | The assistant investigates, explains the proposed change and waits for you to confirm the plan before editing. | You want to review the approach before implementation. |
+| `continuous` — continuous mode | After you ask it to implement a task, the assistant explains a short plan and proceeds within the scope you authorized. | The goal and scope are clear, and you want the assistant to carry the task through. |
+
+For example, you ask: "Fix the login timeout, change only the authentication
+module, and run its tests."
+
+- In `collaborative`, the assistant investigates and proposes a fix, then waits
+  for your confirmation before editing.
+- In `continuous`, it investigates, explains a short plan, and carries out the
+  fix and tests within the scope you specified.
+
+Once implementation starts, both modes continue through coding, testing and
+review without asking you to approve every ordinary step. Previously confirmed
+plans are reused. If the scope or a key decision changes materially, the assistant
+asks you to confirm the affected part.
+
+Both modes keep the same testing, review and verification requirements and
+preserve your existing edits. Requests only for explanation or investigation
+stay read-only; follow-up questions during an authorized task do not cancel
+work you have already permitted.
+Commit, push, tag, merge, PR creation, installation and external publication
+still need your explicit instructions; a mode switch or task record does not
+grant permission.
+
+Choose your default in [project policy](#project-policy), or tell the assistant
+which mode to use for the current task. Selecting `continuous` alone does not
+ask the assistant to implement anything; also describe the task and the changes
+you want it to make.
+
 ## Connect the project entry
 
 Skill descriptions help the host select CodeVow skills. Installation and those
@@ -54,8 +90,8 @@ remain read-only rather than claim CodeVow is active.
   writing tests, diagnostic files or repairs. A follow-up question during
   authorized development does not revoke that authorization; explicit stop
   requests and scope limits still apply.
-- For development, it explains the proposed changes with a proportionate plan
-  and waits for applicable scope confirmation under `collaborative`.
+- For development, it follows the [selected mode](#choose-a-collaboration-mode)
+  to explain the plan and start implementation.
 - Behavior changes start with a meaningful failing test, followed by the
   implementation and refactoring under the passing baseline.
 - Debugging uses hypotheses and small experiments to locate the cause.
@@ -63,14 +99,6 @@ remain read-only rather than claim CodeVow is active.
   critical risk or when the configured review level is `all`.
 - Delivery reports the final code state, actual checks, findings and remaining
   work. Changed code needs fresh verification.
-
-The default `collaborative` mode implements after applicable confirmation of
-the proposed changes; existing confirmation covering that scope is reused.
-`continuous` keeps moving within an already authorized scope and grants no new
-authorization. Both preserve existing edits and keep Git operations,
-installation and external publication
-subject to your explicit authorization. A policy file or task record does not
-grant permission.
 
 ## Project policy
 
@@ -89,7 +117,7 @@ Save preferences in `<project>/.ai-workflow/policy.json`:
 
 | Field | Values and effect |
 |---|---|
-| `mode` | `collaborative` or `continuous`; controls collaboration pacing |
+| `mode` | `collaborative` (confirm the plan before editing, default) or `continuous` (proceed within the task scope you authorized); see [mode selection](#choose-a-collaboration-mode) |
 | `review_level` | `critical` or `all`; determines when independent review is attempted |
 | `max_parallel_tasks` | Integer from 1 to 8; caps concurrent subtasks |
 | `response_language` | `auto` or a language tag such as `en` or `zh-CN` |
