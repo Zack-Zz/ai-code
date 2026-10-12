@@ -1,0 +1,7 @@
+interface:
+  display_name: "Debugging"
+  short_description: "Diagnose from evidence; report before unauthorized repair"
+  brand_color: "#D97706"
+  default_prompt: "Use $debugging with workflow's request and authorization context to investigate and report this symptom, repairing only within an applicable grant."
+policy:
+  allow_implicit_invocation: true
