@@ -1,127 +1,80 @@
 # CodeVow — AI Coding Workflow
 
-CodeVow helps an AI coding assistant plan with you, use TDD, diagnose from
-evidence, review risks and verify the final code state. Its plugin ID is
-`ai-code-workflow`. This package is a self-hosted preview candidate; the generated
-manifest and release record supply its version and hashes.
+English | [简体中文](README_CN.md)
 
-[简体中文](README_CN.md)
+CodeVow helps your AI coding assistant turn a request into a planned, tested
+and reviewed change. It brings plan-first collaboration, TDD, evidence-driven
+debugging and final-state verification to Claude Code, Codex and ZCode.
+The plugin ID is `ai-code-workflow`.
 
-## What the package contains
+## Install and start
 
-Six Markdown skills: `workflow`, `tdd`, `debugging`, `review`, `verification`
-and `review-results`. Two policies, `collaborative` and `continuous`, govern
-collaboration pacing. Optional local Python tools resolve policy, keep
-workspace-bound task/evidence records and stage owned files with receipts.
-Claude Code and ZCode packages include a reviewer with `model: inherit`,
-`Read/Grep/Glob` tools and `maxTurns: 12`, composed from the same reviewer
-contract. Codex supplies the six native skill interface files.
+Follow the [installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md) to register the marketplace,
+choose CodeVow, and install and enable it. Available plugins are listed in the
+marketplace. The guide also covers Release downloads, updates and uninstalling.
 
-Claude Code, Codex and ZCode package layouts are provided. **Every native host
-acceptance is unverified**: packaging, hashes and script tests do not prove
-skill discovery, automatic invocation, policy loading or reviewer enforcement.
-Use a fresh, explicitly authorized host session to verify those behaviors.
+Start a new session and describe your goal, scope and acceptance conditions:
 
-Task host-run evidence accepts all three targets. In the source repository,
-A23/A24 exercise each selected package's file staging and recovery tools, and
-A25 checks all declared host packages and common resource hashes. These are
-deterministic tool/package checks; they do not install into a host or run a
-model. The evaluation scripts themselves are source-only developer tools.
+> Add a bulk discount tier. Keep existing pricing behavior unchanged and
+> test the boundaries. Show me the plan before implementation.
 
-## Dependencies, network and writes
+You can also ask for a focused investigation or review:
 
-Use your own host installation, account and selected model. Native Markdown
-skills need no Node.js or Python runtime. Optional management commands require
-Python 3.11+ and the standard library, on a platform with POSIX directory-handle
-and no-follow file primitives for controlled reads/writes. Support outside the
-validated development environment remains unverified. The package includes no external Python
-or Node dependency, MCP server, background service or model router.
+> Diagnose the intermittent timeout from logs and code before changing anything.
+>
+> Review this diff for authorization and data consistency risks.
 
-The Python tool makes no network/model calls and performs no Git mutations.
-The host may use its normal model service and may download/update plugin
-content during native installation; this remains subject to your host settings.
-Native installation writes host-managed plugin/configuration locations.
-CodeVow's explicit `task ... --apply` writes only the selected workspace's
-`.ai-workflow/tasks/`; `files apply` writes owned files under
-`.ai-workflow/staged/ai-code-workflow/` plus receipts/backups. A task record,
-mode change or approved marker never grants user authorization.
+## How it works
 
-## Install through the native host
+| Skill | What it helps with |
+|---|---|
+| `workflow` | Clarify the request, agree on a proportionate plan and organize the work |
+| `tdd` | Start behavior changes with a meaningful failing test, then implement and refactor |
+| `debugging` | Use hypotheses and small experiments to identify the cause |
+| `review` | Review affected risks, verify findings and attempt independent review when required |
+| `verification` | Check the final code state and report actual verification |
+| `review-results` | Present conclusions with clear impact and clickable evidence |
 
-The 1.0.2 candidate separates native installers from manual download packages.
-A schema 2 release bundle contains `installers/ID-VERSION-HOST-plugin.zip`,
-with one plugin root and its complete native package, including `artifact.json`.
-It contains no local marketplace. The manual `downloads/ID-VERSION-HOST.zip`
-still includes a marketplace; submission ZIPs remain separate source kits.
+Read-only questions stay read-only. The default `collaborative` mode confirms
+the development plan before implementation and does not re-ask an already
+confirmed scope. `continuous` mode keeps work moving within the scope you have
+explicitly authorized.
 
-The planned GitHub preview market is `ai-code-preview` on
-`codex/marketplace-preview`; stable is `ai-code-stable` on `codex/marketplace`.
-Claude uses a fixed Release archive URL/hash, ZCode uses a ZIP URL/hash/path,
-and Codex uses a version directory pinned to a distribution commit.
-Publication and reviewed market deployment are separate steps. These notes do
-not claim that either channel is remotely published or that native transport
-and upgrades have passed acceptance. Existing `dist/` and `ai-code-local`
-entry points remain during migration; use the source repository's publishing
-guide for the current channel status.
+Both modes preserve existing edits. Commit, push, tag, merge, PR creation,
+installation and external publication each need your explicit authorization.
+A mode switch or task record does not grant it.
 
-For manual testing, download the local-market candidate for your host and unzip it to a stable directory.
-The host marketplace root is the directory containing the native market file,
-not the `ai-code-workflow` package directory. Default generated market name:
-`ai-code-local`; use the actual declared name if you received a different source kit.
+## Project configuration
 
-For Claude Code, the marketplace file is `.claude-plugin/marketplace.json`:
+Create `.ai-workflow/policy.json` in your project to set preferences:
 
-```sh
-claude plugin marketplace add /path/to/extracted/claude
-claude plugin install ai-code-workflow@ai-code-local
+```json
+{
+  "schema_version": 1,
+  "mode": "collaborative",
+  "response_language": "en",
+  "verification_notes": ["Run the relevant tests before delivery"]
+}
 ```
 
-For Codex, the marketplace file is `.agents/plugins/marketplace.json`:
+Defaults come from [collaborative](policies/collaborative.json) or
+[continuous](policies/continuous.json). Project settings override the defaults;
+explicit conversation options take precedence. The
+[usage guide](https://github.com/Zack-Zz/ai-code/blob/main/plugins/ai-code-workflow/docs/usage.md) covers all settings, policy inspection, optional
+task records and project file staging.
 
-```sh
-codex plugin marketplace add /path/to/extracted/codex
-```
+The plugin uses your host, account and selected model. Markdown skills need
+no additional Node.js or Python. Optional tools need Python 3.11+; file staging
+needs a platform supporting POSIX file operations. The Python tool makes no
+network or model calls and performs no Git operations.
 
-Restart the supported desktop client, select the `ai-code-local` source in
-the Plugins Directory, and install CodeVow. Check your actual Codex version's
-`plugin --help`; CLI availability varies. For ZCode, register the extracted `marketplace.json` through its native
-marketplace UI and install `ai-code-workflow`. No automatic installer runs from
-this package. Installation/enablement alone is not runtime acceptance.
+## More help and license
 
-Start a new session, confirm discovery and the installed package hash, then
-try a small authorized development task. Confirm that planning, real RED/GREEN,
-review and final-state verification actually occur before relying on the workflow.
+- [Installation, updates and uninstalling](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md)
+- [Usage and advanced tools](https://github.com/Zack-Zz/ai-code/blob/main/plugins/ai-code-workflow/docs/usage.md)
+- [Workflow rules](skills/workflow/SKILL.md) and [policy schema](schemas/policy.schema.json)
 
-## Optional commands from the package root
-
-```sh
-python3 tools/workflow_tool.py policy resolve --plugin-root . --workspace /path/to/project
-python3 tools/workflow_tool.py task create --workspace /path/to/project --id demo --input templates/task.json
-python3 tools/workflow_tool.py task check --workspace /path/to/project --id demo
-```
-
-Task creation is a preview unless `--apply` is explicitly added. For optional
-file staging, first write and inspect a plan:
-
-```sh
-python3 tools/workflow_tool.py files plan --package . --target /path/to/project --action stage --out /tmp/codevow-plan.json
-python3 tools/workflow_tool.py files apply --plan /tmp/codevow-plan.json --expected-plan-hash <actual-plan-hash>
-```
-
-File updates and removals reject user-edited/unowned content. Interrupted
-operations retain recovery material. Staging is separate from host installation.
-Verify a downloaded package using trusted repository tooling before executing
-its Python code; the examined package must not serve as its own initial verifier.
-
-## Source, license and limitations
-
-Source: [Zack-Zz/ai-code](https://github.com/Zack-Zz/ai-code), plugin directory
-`plugins/ai-code-workflow/`. Publisher metadata is a maintainer declaration,
-not a verified identity or endorsement. Public release/promotion requires
-separate approval and real acceptance for each claimed host.
-
-MIT; see [LICENSE](LICENSE), [NOTICE](NOTICE) and the preserved
+MIT — see [LICENSE](LICENSE), [NOTICE](NOTICE) and the preserved
 [backend-engineering-lite license](LICENSES/backend-engineering-lite.txt).
-Historical workflow evidence and the support matrix remain in the source
-repository, with their original dates. This candidate adds no claims of native
-host acceptance and no automated trading, deployment or Git-publishing capability.
+CodeVow's workflows evolved from backend-engineering-lite in this repository;
+the repository's early history derives from Affaan Mustafa's ai-code.

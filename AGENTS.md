@@ -25,6 +25,8 @@
 ## 维护规则
 
 - 修改目标插件前读取其 `AGENTS.md`；workflow 的行为规则只约束该插件。
+- 用户 README 说明当前项目、安装与用法；开发与发布流程各自进入专门指南。
+  当前操作文档只说明最新接口，不加入旧版本兼容步骤；带日期的历史报告保留原记录。
 - 行为变更走 TDD：先写有意义的失败测试，环境错误不算有效 RED；再最小
   实现、跑绿、按需重构。新增行为性保护逻辑同样先写失败测试。
 - `catalog.json` 不复制插件 ID、版本或资源；根 private `package.json`
@@ -36,7 +38,7 @@
 - 同一插件的共同资源在不同宿主包中保持同哈希；适配及生成资源单独声明。
 - 新公开版本只接受 `X.Y.Z` 或 `X.Y.Z-preview.N`，数字无前导零；统一按
   数字比较 preview 序号，同核心正式版在其后。发行种类从版本派生，不能
-  自由组合 mode/prerelease。历史 numeric Prerelease 保留原记录和字节。
+  自由组合 mode/prerelease。
 - 源码与公开市场统一使用 main，每个插件 ID 只有一个当前正式入口；
   preview 只公开 Release，不更新市场。没有正式版的插件不回退到 preview。
   `product.json` 是开发权威，`published/` 是已上线来源，允许版本不同。
@@ -74,8 +76,7 @@
   摘要是维护者事实声明，不是平台认证或发布授权，不可手写以绕过验收。
 - `marketplace sync --output <空目录>` 仅生成临时开发市场；
   `marketplace check` 只读核验公开快照、冻结源码 S 与固定分发提交 D。
-  `marketplace initialize --migrate` 仅在旧根清单精确匹配 ownership 回执时
-  迁为空正式快照，拒绝未知内容、人工编辑及链接。
+  不手工修改公开清单，正式市场更新通过受审核的计划与部署流程执行。
 - Release 的 Prepare 与测试只读；Publish 经 main 的 plugin-release 审核，
   正式成功后显式调用 Sync。市场 plan 只读，deploy 经 plugin-marketplace
   审核后按已审阅哈希及 main 基础 SHA 写入，不接受 absent 或 force push。

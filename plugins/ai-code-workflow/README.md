@@ -2,132 +2,79 @@
 
 English | [简体中文](README.zh-CN.md)
 
-CodeVow is a public, host-portable engineering workflow for AI coding assistants:
-**plan first, test-first, evidence-driven debugging, risk-focused review, and
-verification bound to the final code state.** Package targets are Claude Code,
-Codex and ZCode; native host acceptance remains unverified for all three.
+CodeVow helps your AI coding assistant turn a request into a planned, tested
+and reviewed change. It brings plan-first collaboration, TDD, evidence-driven
+debugging and final-state verification to Claude Code, Codex and ZCode.
+The plugin ID is `ai-code-workflow`.
 
-One source generates all three host packages. The package ships six skills —
-`workflow`, `tdd`, `debugging`, `review`, `verification`, and the shared
-review-presentation contract `review-results` — plus two collaboration
-policies (`collaborative` default, `continuous` pacing-only), task/evidence
-record tooling, and receipted file staging. It contains no agent runtime, no
-MCP scheduling, no background services, no model routing and no mandatory
-multi-role pipeline.
+## Install and start
 
-**Historical verification baseline (2026-10-03): unpublished candidate bundles 2.0.0; implemented_with_acceptance_blocked.** Implemented
-and deterministically tested; all seven measured core modules exceed 80% statement coverage.
-real-host acceptance is blocked on the authoring machine and honestly marked
-`unverified` — see [docs/support-matrix.md](docs/support-matrix.md) and
-[evals/blocked-env-2026-10-02.md](evals/blocked-env-2026-10-02.md). Not yet
-host-verified anywhere; do not cite it as such.
+Follow the [installation guide](../../docs/installation.md) to register the marketplace,
+choose CodeVow, and install and enable it. Available plugins are listed in the
+marketplace. The guide also covers Release downloads, updates and uninstalling.
 
-The display name changed from AI Code Workflow to CodeVow on 2026-10-07.
-The plugin ID remains `ai-code-workflow`. Its initial CodeVow version is
-`1.0.0`; the earlier `2.0.0` number belonged to the pre-installation candidate.
-Earlier design and verification records retain their original names and
-dates; the version reset adds no host-acceptance evidence.
+Start a new session and describe your goal, scope and acceptance conditions:
 
-This directory is one plugin in the [ai-code collection](../../README.md).
-Paths below are relative to this plugin directory unless a command explicitly
-says to run from the repository root. Shared packaging and new-plugin guidance
-are in [the authoring guide](../../docs/plugin-authoring.md).
+> Add a bulk discount tier. Keep existing pricing behavior unchanged and
+> test the boundaries. Show me the plan before implementation.
 
-## Current candidate metadata
+You can also ask for a focused investigation or review:
 
-The publisher declaration is maintained in `product.json`; it is not an
-identity certification. The package includes a PNG listing icon, an SVG alternative and
-portable English/Chinese README files. `release.json` selects release notes,
-package guides and acceptance evidence; all three evidence slots are currently
-`null`. Draft packaging must remain distinct from stable promotion.
+> Diagnose the intermittent timeout from logs and code before changing anything.
+>
+> Review this diff for authorization and data consistency risks.
 
-Claude Code and ZCode reviewers use the same shared contract, with native
-read-only tool declarations, inherited model selection and twelve turns.
-Their actual enforcement is unverified. In the current `1.0.2` candidate,
-A23/A24 prepare packages for every declared host and exercise the selected
-package's owned-file tools; A25 checks all declared packages and their shared
-resources. These deterministic checks do not establish native installation,
-skill behavior or reviewer enforcement. Historical Codex/ZCode results retain
-their original scope.
+## How it works
 
-The 1.0.2 preview adds schema 2 release installers and reviewed GitHub market
-plans. Each native installer contains one complete plugin root including
-`artifact.json`; local-market downloads and submission kits stay separate.
-Release publication, marketplace deployment and actual native transport or
-upgrade acceptance are separate states. Existing `dist/` and `ai-code-local`
-remain during migration; no remote publication or host acceptance is claimed.
+| Skill | What it helps with |
+|---|---|
+| `workflow` | Clarify the request, agree on a proportionate plan and organize the work |
+| `tdd` | Start behavior changes with a meaningful failing test, then implement and refactor |
+| `debugging` | Use hypotheses and small experiments to identify the cause |
+| `review` | Review affected risks, verify findings and attempt independent review when required |
+| `verification` | Check the final code state and report actual verification |
+| `review-results` | Present conclusions with clear impact and clickable evidence |
 
-## What it gives you
+Read-only questions stay read-only. The default `collaborative` mode confirms
+the development plan before implementation and does not re-ask an already
+confirmed scope. `continuous` mode keeps work moving within the scope you have
+explicitly authorized.
 
-- **Plan-first collaboration** — every development task (QUICK and urgent
-  included) gets a proportionate plan and waits for your confirmation;
-  already-authorized scopes are not re-asked. Continuous mode only changes
-  pacing inside an authorized scope — a mode switch never grants anything.
-- **Real TDD discipline** — valid RED (environment failures never count),
-  minimal GREEN, refactor under a preserved baseline.
-- **Evidence-driven debugging** — explicit hypotheses and minimal
-  distinguishing experiments; guessing stops after two evidence-free tries.
-- **Honest review** — affected dimensions only, independent read-only
-  reviewer attempted for critical risk, findings verified by the main agent,
-  output presented through the review-results decision-first contract.
-- **Verification that doesn't rot** — claims bind to the final code state;
-  changed code invalidates stale passes; unresolved critical/high defects
-  keep the task incomplete.
-- **Audit trail without permission leakage** — optional task/evidence
-  records with CAS updates and content-hash invalidation; records never
-  generate authorization.
+Both modes preserve existing edits. Commit, push, tag, merge, PR creation,
+installation and external publication each need your explicit authorization.
+A mode switch or task record does not grant it.
 
-## Quick start
+## Project configuration
 
-Self-hosted preview; real host acceptance is still unverified. Run from the ai-code repository root:
+Create `.ai-workflow/policy.json` in your project to set preferences:
 
-```sh
-npm test
-python3 tooling/plugin_tool.py validate --plugin ai-code-workflow
-python3 tooling/plugin_tool.py build --plugin ai-code-workflow --host all --output dist-check
-python3 tooling/plugin_tool.py package check \
-  --path dist-check/zcode/ai-code-workflow --host zcode --root .
+```json
+{
+  "schema_version": 1,
+  "mode": "collaborative",
+  "response_language": "en",
+  "verification_notes": ["Run the relevant tests before delivery"]
+}
 ```
 
-Install a built package into Claude Code/Codex/ZCode: [docs/installation.md](docs/installation.md).
-Day-to-day usage and policies: [docs/usage.md](docs/usage.md).
-Self-hosted distribution: [publishing preparation](../../docs/publishing.md).
-The source-specific tool remains `plugins/ai-code-workflow/scripts/workflow_tool.py`
-from the repository root; its installed entry remains `tools/workflow_tool.py`.
-Policy/task/files behavior belongs to this plugin. Its ID and candidate version
-are `ai-code-workflow` and `1.0.2`.
+Defaults come from [collaborative](policies/collaborative.json) or
+[continuous](policies/continuous.json). Project settings override the defaults;
+explicit conversation options take precedence. The
+[usage guide](docs/usage.md) covers all settings, policy inspection, optional
+task records and project file staging.
 
-## Plugin directory map
+The plugin uses your host, account and selected model. Markdown skills need
+no additional Node.js or Python. Optional tools need Python 3.11+; file staging
+needs a platform supporting POSIX file operations. The Python tool makes no
+network or model calls and performs no Git operations.
 
-| Path | Purpose |
-|---|---|
-| `skills/`, `policies/`, `product.json` | The plugin source and its identity/whitelist |
-| `scripts/workflow_tool.py`, `scripts/workflow/` | Management tools (validate/policy/task/build/package/files), Python 3.11+ stdlib only |
-| `adapters/claude/`, `adapters/codex/`, `adapters/zcode/` | Native host manifests, market templates, reviewer declarations and interface metadata |
-| `assets/`, `release/`, `release.json` | PNG and SVG branding, portable package guides, draft notes and acceptance slots |
-| `schemas/`, `templates/` | Fixed data-contract documents and task/evidence input templates |
-| `evals/` | A01–A25 acceptance cases, one-shot fixtures, prepare/collect/grade tooling |
-| `../../dist/` | Generated host distributions at the repository root (rebuildable) |
-| `docs/` | Design docs, usage, installation, migration, support matrix, coverage |
-| `tests/` | Plugin Node contract checks and Python unit/integration tests; the unified gate lives at `../../tests/run-suite.js` |
+## More help and license
 
-## Verification & development
+- [Installation, updates and uninstalling](../../docs/installation.md)
+- [Usage and advanced tools](docs/usage.md)
+- [Workflow rules](skills/workflow/SKILL.md) and [policy schema](schemas/policy.schema.json)
 
-- Unified gate: `npm test` (`tests/run-suite.js`) — every group runs even if
-  an earlier one fails; verdicts come only from process exit statuses (no
-  output parsing); empty test sets fail.
-- Workflow Python tests, from the repository root: `python3 plugins/ai-code-workflow/tests/run_python_tests.py`.
-- Shared tooling Python tests: `python3 tests/run_python_tests.py`.
-- Plugin skill contracts, from the repository root: `node plugins/ai-code-workflow/tests/skills/run-skills.js`.
-- Lint: `npm run lint` (eslint + markdownlint; needs `npm install`).
-- Coverage method and numbers: [docs/coverage.md](docs/coverage.md).
-- Migrating from backend-engineering-lite: [docs/migration.md](docs/migration.md).
-
-## License & provenance
-
-MIT — see [LICENSE](LICENSE) and [NOTICE](NOTICE). This repository's early
-history derives from Affaan Mustafa's ai-code (MIT); the v1 workflows migrate
-from backend-engineering-lite (also in-repo history), whose license is
-preserved in [LICENSES/backend-engineering-lite.txt](LICENSES/backend-engineering-lite.txt)
-and in every package. BEL's README credited obra/Superpowers as the
-inspiration for its evidence-driven workflow ideas; no source was copied.
+MIT — see [LICENSE](LICENSE), [NOTICE](NOTICE) and the preserved
+[backend-engineering-lite license](LICENSES/backend-engineering-lite.txt).
+CodeVow's workflows evolved from backend-engineering-lite in this repository;
+the repository's early history derives from Affaan Mustafa's ai-code.

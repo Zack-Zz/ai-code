@@ -1,7 +1,7 @@
 # CodeVow — Agent Instructions
 
 本目录是 ai-code 多插件仓库中的 **AI 工作流插件**：CodeVow（插件 ID
-`ai-code-workflow`）。当前候选目标为 Claude Code、Codex 与 ZCode，真实宿主状态均为 unverified。
+`ai-code-workflow`）。声明宿主为 Claude Code、Codex 与 ZCode，发行支持以实际宿主证据为准。
 本目录维护工作流素材与专属管理工具，公共发行工具在仓库根 `tooling/`。
 同时遵守 [仓库规则](../../AGENTS.md)。下列源码路径均相对本插件目录。
 
@@ -17,7 +17,7 @@
 | `assets/`、`release/`、`release.json` | PNG 发布图标与 SVG 备用标识、可移植包说明、草稿备注和逐宿主验收证据槽 |
 | `schemas/`、`templates/` | 固定数据契约文档、任务/证据输入模板 |
 | `evals/` | A01–A25 验收场景、fixture 与 prepare/collect/grade |
-| `../../dist/` | 仓库根的可复现宿主发行目录（可删除重建） |
+| 显式临时输出目录 | 本地可复现构建产物；`dist/` 被忽略，不提交 |
 | `docs/design/` | 本轮开发的设计文档（任务设计/实现规格/数据契约/验收矩阵） |
 
 ## 维护规则
@@ -48,7 +48,7 @@
   `python3 tooling/plugin_tool.py build --plugin ai-code-workflow --host all --output <空目录>`；
   `python3 tooling/plugin_tool.py package check --path <包> --host <端> --root .`。
 - 工作流专属工具从仓库根调用 `python3 plugins/ai-code-workflow/scripts/workflow_tool.py`；
-  其原有 validate/build/package、policy/task/files 命令保留，源码 `--root` 指向本插件目录。
+  当前 validate/build/package、policy/task/files 命令的源码 `--root` 指向本插件目录。
   随包入口仍为 `python3 tools/workflow_tool.py`。
 - 静态检查：`npm run lint`（需本地 node_modules）。
 - 区分静态检查、脚本测试与真实宿主行为：宿主内实际加载与遵循需真实会话

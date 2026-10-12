@@ -1,89 +1,151 @@
 # Using CodeVow
 
-CodeVow is a set of six skills — `workflow`, `tdd`, `debugging`,
-`review`, `verification`, plus the shared presentation contract
-`review-results` — that organize how your coding assistant works with you.
-Packages target Claude Code, Codex and ZCode; native behavior remains
-unverified for each. Claude Code and ZCode reviewer declarations use the same
-contract, inherited models and read-only tool lists; this is configuration
-evidence until a real session confirms enforcement.
+English | [简体中文](usage.zh-CN.md)
 
-Default collaboration mode: **plan first, implement after your confirmation**.
+After [installation](../../../docs/installation.md), start a new host session
+and describe the goal, change scope and acceptance conditions. CodeVow
+organizes planning, TDD, debugging, review and verification around that request.
 
-This is the workflow plugin within [ai-code](../../../README.md). Its source
-entry from the repository root is
-`plugins/ai-code-workflow/scripts/workflow_tool.py`; installed examples below
-run from the package root using `tools/workflow_tool.py`. Collection-level
-list/validate/build/check commands are at `tooling/plugin_tool.py` in the
-trusted repository, as described in [the authoring guide](../../../docs/plugin-authoring.md).
+## Daily workflow
 
-## The five abilities
+- For explanations or investigations, the assistant reads the relevant evidence
+  and answers without starting an implementation.
+- For development, it proposes a proportionate plan and confirms the scope.
+- Behavior changes start with a meaningful failing test, followed by the
+  implementation and refactoring under the passing baseline.
+- Debugging uses hypotheses and small experiments to locate the cause.
+- Review focuses on affected risks; an independent review is attempted for
+  critical risk or when the configured review level is `all`.
+- Delivery reports the final code state, actual checks, findings and remaining
+  work. Changed code needs fresh verification.
 
-| Skill | What it does | You say things like |
-|---|---|---|
-| workflow | Classifies your request (read-only vs development), forms a proportionate plan, tracks authorization and organizes the rest | "Add a bulk discount tier" |
-| tdd | Drives behavior changes test-first: valid RED, minimal GREEN, refactor under a preserved baseline | (loaded automatically for development tasks) |
-| debugging | Evidence-driven diagnosis: explicit hypotheses, minimal distinguishing experiments, no guess-editing loops | "This intermittently returns unknown — diagnose, don't shotgun-fix" |
-| review | Risk-focused review of the final diff; attempts an independent read-only reviewer for critical risk; findings verified by the main agent | "Review this diff; treat it as high risk" |
-| verification | Binds completion claims to the final code state with explicit verification levels and stale-evidence rules | (loaded before every delivery) |
+The default `collaborative` mode implements after plan confirmation.
+`continuous` keeps moving within an already authorized scope. Both preserve
+existing edits and keep Git operations, installation and external publication
+subject to your explicit authorization. A policy file or task record does not
+grant permission.
 
-`review-results` is not invoked by name: the review output is presented
-through it (decision first, business flow, abnormal node, clickable evidence).
+## Project policy
 
-## Collaboration modes
+Save preferences in `<project>/.ai-workflow/policy.json`:
 
-- `collaborative` (default): development tasks get a plan proportionate to
-  their size — QUICK and urgent fixes get a short plan, not none — and
-  implementation starts after an applicable confirmation. Ordinary details
-  are not re-asked once confirmed.
-- `continuous`: same contracts, but inside a scope you have already
-  explicitly authorized the agent keeps going without per-step
-  re-confirmation. **Selecting continuous never creates authorization**; Git
-  writes, installs and external publication always need their own explicit
-  go-ahead, in both modes.
+```json
+{
+  "schema_version": 1,
+  "mode": "collaborative",
+  "review_level": "critical",
+  "max_parallel_tasks": 2,
+  "response_language": "en",
+  "verification_notes": ["Run the relevant tests before delivery"]
+}
+```
 
-## Policies
+| Field | Values and effect |
+|---|---|
+| `mode` | `collaborative` or `continuous`; controls collaboration pacing |
+| `review_level` | `critical` or `all`; determines when independent review is attempted |
+| `max_parallel_tasks` | Integer from 1 to 8; caps concurrent subtasks |
+| `response_language` | `auto` or a language tag such as `en` or `zh-CN` |
+| `verification_notes` | Up to 16 short project verification requirements |
 
-Two profiles ship with the package (`policies/collaborative.json`,
-`policies/continuous.json`) with fields `review_level` (critical|all),
-`max_parallel_tasks` (1–8), `response_language` (auto or a language tag),
-`verification_notes` (up to 16 short project requirements). A workspace may
-override fields via `.ai-workflow/policy.json` (`schema_version: 1`, subset of
-fields); your explicit in-conversation options win over the file.
+`schema_version` must be `1`; the other fields may be omitted. Resolution order
+is the selected packaged profile, then project settings, then explicit options
+you provide for the current conversation. Invalid files or unknown fields
+produce an error; correct the configuration before continuing dependent work.
+See the [policy schema](../schemas/policy.schema.json).
 
-Resolve what is in effect (read-only, no side effects):
+## Inspect configuration
+
+All commands below run from the installed CodeVow package root. Replace
+`/path/to/project` with your actual workspace. The optional tools require
+Python 3.11+; the Markdown skills themselves need no Python.
 
 ```sh
 python3 tools/workflow_tool.py policy resolve \
-  --plugin-root /path/to/ai-code-workflow --workspace /path/to/your/project
-# add --mode continuous --review-level all --max-parallel-tasks 3 \
-#   --response-language zh-CN --verification-note "run full suite"
+  --plugin-root . --workspace /path/to/project
 ```
 
-The output records the effective policy, a per-field source, warnings and a
-content hash.
-
-## Task records (optional, for long or hand-off tasks)
+The result includes effective values, each value's source and a policy hash.
+You can provide explicit options for the current task:
 
 ```sh
-# start a record (preview first; add --apply to write)
-python3 tools/workflow_tool.py task create --workspace . --id my-task \
-  --input task-input.json            # schema: templates/task.json
-python3 tools/workflow_tool.py task update --workspace . --id my-task \
-  --expected-revision 1 --input update.json --apply
-python3 tools/workflow_tool.py task check --workspace . --id my-task
+python3 tools/workflow_tool.py policy resolve \
+  --plugin-root . --workspace /path/to/project \
+  --mode continuous --review-level all --response-language en \
+  --verification-note "Run the relevant tests before delivery"
 ```
 
-Records live in `<workspace>/.ai-workflow/tasks/<id>/`. They are an audit
-index: nothing in them grants permissions, and `task check` reports when
-evidence has gone stale (edited evidence, changed files, drifted workspace)
-instead of silently trusting old passes. Exit codes: 0 ok, 1 validation/run
-failure, 2 arguments/data, 3 conflict/lock, 4 identity/evidence invalid,
-5 host environment unavailable.
+Resolution is read-only. It does not save settings or authorize implementation.
+Use `python3 tools/workflow_tool.py policy resolve --help` for all options.
 
-## What the tools never do
+## Optional task and evidence records
 
-No Git mutations, no model calls, no project command execution, no background
-services, no writes to your global config. Staging files into a project is an
-explicit, receipted operation (see [installation](installation.md)) that refuses to
-overwrite your edits and never takes over files it does not own.
+For long-running work or handoff, copy and adapt the [task input
+template](../templates/task.json). Use the actual plan, protected paths and
+references to your authorization; the tool records them without proving or
+granting permission.
+
+Preview creation first:
+
+```sh
+python3 tools/workflow_tool.py task create \
+  --workspace /path/to/project --id my-task --input /path/to/task-input.json
+```
+
+Add `--apply` to that command to save the record. Records live in
+`<project>/.ai-workflow/tasks/<id>/`. To check the record and its evidence:
+
+```sh
+python3 tools/workflow_tool.py task check --workspace /path/to/project --id my-task
+```
+
+Updates use the current `record_revision` from `task.json`, and an input file
+following the [task schema](../schemas/task.schema.json):
+
+```sh
+python3 tools/workflow_tool.py task update \
+  --workspace /path/to/project --id my-task \
+  --expected-revision <current-revision> --input /path/to/update.json
+```
+
+Replace `<current-revision>` with the actual integer. Update is also a preview
+unless you add `--apply`; a revision conflict requires reading the current
+record before trying again. The [evidence template](../templates/evidence.json)
+describes evidence inputs. `task check` detects changed evidence, files or
+workspace identity rather than treating an earlier pass as current.
+
+## Optional project file staging
+
+Staging creates a workspace-local plugin copy. Native installation does not
+require it. File staging needs a platform supporting POSIX file operations.
+
+Generate a plan:
+
+```sh
+python3 tools/workflow_tool.py files plan \
+  --package . --target /path/to/project --action stage --out /tmp/codevow-plan.json
+```
+
+This writes only the plan file. Read the plan and the reported `plan_hash`,
+then apply the operation you have approved:
+
+```sh
+python3 tools/workflow_tool.py files apply \
+  --plan /tmp/codevow-plan.json --expected-plan-hash <plan-hash>
+```
+
+Replace `<plan-hash>` with the reported hash. Copies go to
+`<project>/.ai-workflow/staged/ai-code-workflow/`; ownership is recorded in
+`<project>/.ai-workflow/receipts/ai-code-workflow.json`.
+Use `files plan --action update` with the new package to update the copy.
+Use `files plan --target /path/to/project --action remove --out /tmp/codevow-plan.json`
+to plan removal, then inspect and apply that plan.
+
+Updates and removals refuse to overwrite or delete files you have edited.
+Interrupted operations preserve recovery material. Avoid concurrent edits
+during apply and inspect any reported conflicts. Staging does not register a
+plugin with the host; updating the host plugin does not update staged files.
+
+The tools make no network or model calls, execute no project commands and
+perform no Git operations. Use `python3 tools/workflow_tool.py --help` for
+the command index.

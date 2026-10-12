@@ -1,23 +1,56 @@
-# Agent Delegation 源码
+# Agent Delegation
 
-独立插件 `ai-agent-delegation` 的首版候选，版本与资源闭包只由 product.json
-维护。提供明确派发单技能、三宿主适配和外置 Bridge 薄客户端。插件不复制
-运行时、驱动、任务状态或 CodeVow 流程。
+English | [简体中文](README.zh-CN.md)
 
-产品说明见 [中文发行 README](release/README_CN.md)、
-[支持矩阵](docs/support-matrix.md)和[宿主验收方案](docs/host-evaluation.md)。
-release README 的相对链接以发行包根目录为基准。宿主支持当前均 unverified。
+Hand a task to an independent Claude Code, Codex or ZCode session and bring its
+changes and results back to your current conversation. Use it when you want
+another coding assistant to implement a feature, review code or continue an
+existing task. The plugin ID is `ai-agent-delegation`.
 
-在仓库根运行插件本地测试：
+## Install and prepare
 
-```sh
-PYTHONDONTWRITEBYTECODE=1 python3 plugins/ai-agent-delegation/tests/run_python_tests.py
-```
+Follow the [installation guide](../../docs/installation.md) to install and enable the
+plugin in your host. Available plugins are listed in the marketplace.
 
-根 catalog 登记后，公共入口 validate/build/package check、npm test 由公共层
-统一处理。此插件无独立 build/runtime/安装器。发布 acceptance 当前全部
-为 null，待真实源/包绑定验收；测试通过不自动授权 Git、安装或发布。
+You need Python 3 and a separately configured `agent-bridge/v1` CLI.
+Agent Bridge connects the coding assistants and keeps task state; it requires
+Node.js 22.16+ and separately installed, authenticated target tools.
+Follow [Bridge setup and configuration](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置)
+to register the project, tools and caller session.
 
-当前功能源码已覆盖明确派发、同工具独立会话、交接、回执和结果回收。
-ZCode 的公开 CLI 适配由 Bridge 提供；当前 standalone 与桌面账户入口
-差异属于原生能力限制，不在本插件内复制认证、伪造授权或切换模型。
+The plugin's client uses these settings from the host's environment:
+
+| Setting | Purpose |
+|---|---|
+| `AGENT_BRIDGE_BIN` | Single executable path when `agent-bridge` is outside `PATH` |
+| `AGENT_BRIDGE_CONFIG` | Path to the private Bridge configuration |
+| `AGENT_BRIDGE_CALLER_REF` | Existing registered caller identity bound to the originating session |
+
+Use your configured caller reference. The plugin does not install Bridge,
+register identities or change your host's global settings.
+
+## Usage
+
+Start a new session and name the target tool, task and permitted scope:
+
+- “Ask Claude Code to implement this feature. Only change the login module and run its tests.”
+- “Ask ZCode to review this diff without editing files.”
+- “Have another independent Codex session fix this problem and bring back the results.”
+
+The assistant checks the selected tool, prepares the handoff, starts the task,
+and returns its status, changed files and verification results. You can ask it
+to continue the same task with a follow-up, or cancel it.
+
+If the selected tool is unavailable, the assistant explains why and lets you
+choose an alternative. Ordinary development and native subagents keep their
+usual behavior. A handoff covers the work you requested; commit, push, tag,
+merge, PR creation, installation, publication and messages to others require
+separate authorization. Task records and receipts do not grant it.
+
+## More help and license
+
+- [Installation, updates and uninstalling](../../docs/installation.md)
+- [Agent Bridge setup](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置)
+- Advanced: [delegation skill](skills/agent-delegation/SKILL.md), [Bridge client commands](skills/agent-delegation/references/bridge-client.md) and [handoff contract](skills/agent-delegation/references/handoff-contract.md)
+
+[MIT](LICENSE). Maintained by Zack-Zz.

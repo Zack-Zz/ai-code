@@ -4,9 +4,9 @@
 内容和实际目标宿主，再注册目录。已有 workflow 只是一个插件实例；新插件
 不必包含它的策略、任务记录、Reviewer 或六份技能。
 
-所有命令在仓库根运行。维护规则见 [AGENTS.md](../AGENTS.md)，公共字段和
-发行规则见 [发布指南](publishing.md)；目录迁移背景保留在
-[多插件规格](design/2026-10-07-multi-plugin-design.md)。
+环境准备、修改现有插件和本地试用先看[开发指南](../CONTRIBUTING.zh-CN.md)。
+本指南聚焦新增插件。所有命令在仓库根运行，维护规则见 [AGENTS.md](../AGENTS.md)，
+发行操作见[发布指南](publishing.md)。
 
 ## 1. 建立独立源码目录
 
@@ -26,7 +26,8 @@ plugins/ai-example/
 
 `ai-example` 仅为指南占位符，不是已提供的正式插件。实际 ID 使用小写
 kebab-case，建议目录名与 ID 一致。每个插件自有版本、许可证与说明，不将兄弟
-插件的相对路径列入资源。README 要说明用途、依赖、支持状态和验证边界。
+插件的相对路径列入资源。README 面向使用者说明用途、安装方式、使用步骤和必要依赖。
+发布前流程、宿主验收与开发测试记录放在维护文档中，不写入用户 README。
 
 ## 2. 声明身份、宿主和资源
 
@@ -52,8 +53,7 @@ kebab-case，建议目录名与 ID 一致。每个插件自有版本、许可证
 身份、版本和白名单只写在该清单。不要在 catalog、根 package.json 或市场
 中维护第二份开发版本。新的公开版本仅使用 `X.Y.Z` 或 `X.Y.Z-preview.N`，
 数字禁止前导零，不接受其他后缀或 build metadata；preview 序号按数字比较，
-同核心正式版在所有 preview 之后。历史 numeric Prerelease 保留原状态，
-不能改标志成为新正式版。
+同核心正式版在所有 preview 之后。发行种类由版本派生。
 
 `hosts` 必填且非空，当前接受 `claude`、`codex`、`zcode`；每个声明
 宿主都必须有真实 `adapters/<host>/plugin.json`。
@@ -186,9 +186,8 @@ npm run lint
 初始验证器。`ok` 不表示作者身份已认证，也不表示宿主实际执行了组件。
 
 公共包检查拒绝全部未登记文件，包括可以被 Python 执行的 `.pyc` 缓存。
-先验证原始发行包，再运行包内代码；需要保持产物可复验时使用 Python `-B`
-或 `PYTHONDONTWRITEBYTECODE=1`。workflow 专属检查器的历史缓存分类不能
-替代公共可信源码检查。采集注册插件的输入及复查时始终从仓库根遍历目录，
+先验证发行包，再运行包内代码；需要保持产物可复验时使用 Python `-B`
+或 `PYTHONDONTWRITEBYTECODE=1`。采集注册插件的输入及复查时始终从仓库根遍历目录，
 不把插件子目录重新作为允许跟随父目录链接的信任根。
 
 构建输出 `<output>/index.json` 使用 schema_version 2，按 plugins/ID/hosts/HOST 记录
@@ -215,7 +214,7 @@ sync 在临时目录生成注册源码的三端开发市场；check 只读核验
 
 每个宿主目录有名为 `ai-code-local` 的聚合市场；各插件 ZIP 只包含自身包和
 单插件市场。解压到稳定目录后按宿主原生方式注册，见现有
-[安装说明](../plugins/ai-code-workflow/docs/installation.md) 中的市场路径约定。
+[用户安装指南](installation.zh-CN.md#下载包安装)中的本地市场步骤。
 原生命令与版本支持仍需对应插件实际验证。
 
 catalog 登记和开发试用不等于正式发行。新预览版只进入 GitHub Prerelease；
