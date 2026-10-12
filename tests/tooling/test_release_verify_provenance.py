@@ -9,6 +9,7 @@ from plugin_tools import io
 from plugin_tools.release import check_release, prepare_release, verify_release
 from plugin_tools.release import core, layout, metadata
 from tests.tooling import test_release_source_git as git_fixtures
+from tests.tooling.test_release import refresh_record
 
 
 class VerifyProvenanceTests(unittest.TestCase):
@@ -127,3 +128,42 @@ class VerifyProvenanceTests(unittest.TestCase):
         self.assertFalse(verified["ok"], verified)
         self.assertFalse(verified["publication_ready"], verified)
         self.assertTrue(any("clean working tree" in item for item in verified["blockers"]), verified)
+
+    def test_tagged_pending_draft_keeps_historical_readiness_and_bytes(self):
+        self.fixture.commit()
+        recorded = self.prepare()
+        self.assertFalse(recorded["readiness"]["publication_ready"])
+        self.assertEqual(recorded["readiness"]["accepted_hosts"], [])
+        original = {path.relative_to(self.bundle): path.read_bytes()
+                    for path in self.bundle.rglob("*") if path.is_file()}
+        verified = verify_release(self.root, self.case.spec(), self.bundle)
+        self.assertTrue(verified["ok"], verified)
+        self.assertFalse(verified["publication_ready"], verified)
+        self.assertEqual(verified["bundle_readiness"], recorded["readiness"])
+        self.assertEqual({path.relative_to(self.bundle): path.read_bytes()
+                          for path in self.bundle.rglob("*") if path.is_file()}, original)
+
+    def test_pending_stable_bundle_cannot_forge_accepted_hosts_even_when_resealed(self):
+        self.fixture.commit()
+        prepared = prepare_release(self.root, self.case.spec(), self.bundle, mode="stable")
+        self.assertTrue(prepared["ok"], prepared)
+        path = self.bundle / "release.json"
+        record = json.loads(path.read_text())
+        record["readiness"]["accepted_hosts"] = ["claude", "codex", "zcode"]
+        record["readiness"]["pending_acceptance"] = []
+        path.write_bytes(io.dump_json(record))
+        refresh_record(self.bundle)
+        verified = verify_release(self.root, self.case.spec(), self.bundle, mode="stable")
+        self.assertFalse(verified["ok"], verified)
+        self.assertTrue(any("bytes differ" in item for item in verified["blockers"]), verified)
+
+    def test_pending_stable_bundle_cannot_hide_installer_tampering_by_resealing(self):
+        self.fixture.commit()
+        prepared = prepare_release(self.root, self.case.spec(), self.bundle, mode="stable")
+        self.assertTrue(prepared["ok"], prepared)
+        installer = self.bundle / "installers/ai-one-1.0.0-codex-plugin.zip"
+        installer.write_bytes(installer.read_bytes() + b"tampered installer bytes")
+        refresh_record(self.bundle)
+        verified = verify_release(self.root, self.case.spec(), self.bundle, mode="stable")
+        self.assertFalse(verified["ok"], verified)
+        self.assertTrue(any("bytes differ" in item for item in verified["blockers"]), verified)

@@ -25,6 +25,10 @@ python3 tooling/plugin_tool.py list
 开发前阅读根 [AGENTS.md](AGENTS.md) 和目标插件的 `AGENTS.md`。插件版本、
 宿主和入包资源以目标插件的 `product.json` 为准，根 `package.json` 用于维护工具。
 
+由 AI 协助制作插件、验证、准备版本或处理发布时，可使用项目技能
+[$ai-code-plugin-release](.agents/skills/ai-code-plugin-release/SKILL.md)，
+按当前任务读取对应的制作、发布与证据指南。
+
 ## 修改现有插件
 
 先定位目标插件，再修改对应的功能与测试：

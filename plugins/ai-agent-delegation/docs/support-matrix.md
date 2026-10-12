@@ -25,8 +25,8 @@ Agent Delegation 首版候选提供单技能、三宿主元数据与外置 Bridg
 
 release acceptance 当前三个宿主均为 null（整包必需场景尚未全部验收）。已有
 部分真实 Claude/Codex 场景不推广为整包支持；源码或包变化后重新绑定证据。
-候选草案可准备，
-stable 仍受干净 Git、规范标签与全部宿主字节绑定验收门禁约束。包清单、
+候选草案可准备；stable 技术发布仍须通过干净 Git、规范标签、源码与包字节
+核验。真实宿主验收独立报告，尚未验收保持 unverified，不阻断技术发布。包清单、
 Agent 输出及“approved”状态均不构成 Git、安装或发布授权。
 
 Bridge 提供的 API 已实现，不代表每个原生安装都可用。当前 ZCode 0.16.9

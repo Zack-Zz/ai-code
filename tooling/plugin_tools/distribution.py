@@ -200,8 +200,6 @@ def _record(record, channel, repository, *, staged=False):
             raise DataError("invalid record host acceptance inventory")
     if set(readiness["pending_acceptance"]) & set(readiness["accepted_hosts"]) or set(readiness["pending_acceptance"] + readiness["accepted_hosts"]) != set(hosts):
         raise DataError("record acceptance must partition all declared hosts")
-    if channel == "stable" and (readiness["pending_acceptance"] or set(readiness["accepted_hosts"]) != set(hosts)):
-        raise DataError("stable record requires accepted evidence for every declared host")
     if not isinstance(readiness["limitations"], list) or not all(isinstance(item, str) for item in readiness["limitations"]):
         raise DataError("invalid readiness limitations")
     if not isinstance(readiness["package_content_hashes"], dict) or set(readiness["package_content_hashes"]) != set(hosts):
@@ -382,7 +380,7 @@ def plan_distribution(root, spec, bundle, release_info, channel, market_files=No
         raise DataError("distribution requires a clean correctly tagged source matching the bundle")
     source_git.validate_head_inputs(root, spec, metadata.capture_release(spec, committed_acceptance=True), provenance["source_revision"])
     if channel == "stable" and not report["publication_ready"]:
-        raise DataError("stable distribution requires every declared host's byte-bound acceptance")
+        raise DataError("stable distribution requires technical publication readiness")
     _object(release_info, {"id", "tag_name", "draft", "prerelease", "html_url", "assets"}, "public Release info")
     if type(release_info["id"]) is not int or release_info["id"] <= 0 or release_info["tag_name"] != canonical or release_info["draft"] is not False or type(release_info["prerelease"]) is not bool or release_info["prerelease"] != channel_config["prerelease"]:
         raise DataError("public Release ID/tag/visibility/channel differs")

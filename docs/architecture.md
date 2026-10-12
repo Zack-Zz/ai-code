@@ -80,10 +80,13 @@ first prepares the Codex installation directory, then updates release records,
 current pointers, root manifests and receipts. Changes to paths, bytes or the
 base commit stop deployment.
 
-Release jobs use trusted tooling from main to read frozen source. Prepare performs
-read-only checks. Publish uploads, reads back and publishes assets after approval
-in `plugin-release`. Stable publication explicitly invokes marketplace synchronization.
+The single manual build/publish entry uses trusted tooling from main to freeze
+the committed plugin version and derive its canonical tag. Build performs remote
+read-only checks and exports native installers. Publish creates or reuses the
+immutable tag, uploads, reads back and publishes assets through `plugin-release`.
+Stable publication automatically invokes marketplace synchronization.
 Planning is read-only; deployment writes after approval in `plugin-marketplace`.
+Host acceptance is an independent factual status, not a technical publication gate.
 See the [publishing guide](publishing.md) and [evidence contract](release-evidence.md).
 
 ## Plugin hosts and execution engines

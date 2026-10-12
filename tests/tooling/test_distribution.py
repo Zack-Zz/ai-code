@@ -175,8 +175,8 @@ class HostedMarketTests(unittest.TestCase):
 
     def test_stable_rejects_unverified_bundle(self):
         with mock.patch.object(distribution, "verify_release", return_value={"ok": False,
-                "blockers": ["all declared hosts require byte-bound acceptance"]}):
-            with self.assertRaisesRegex(io.DataError, "acceptance"):
+                "blockers": ["source bytes differ from frozen tagged source"]}):
+            with self.assertRaisesRegex(io.DataError, "frozen tagged source"):
                 self.plan()
 
     def test_preview_never_enters_the_default_market(self):
@@ -185,14 +185,67 @@ class HostedMarketTests(unittest.TestCase):
             distribution.plan_distribution(self.root, self.case.spec(), self.case.output,
                 self.release_info, "preview", base_commit="b" * 40)
 
-    def test_old_stable_record_cannot_claim_ready_with_pending_hosts(self):
+    def test_stable_record_can_be_technically_ready_with_pending_hosts(self):
         record = self.plan()['record']
         record.update(channel='stable', mode='stable', codex_revision='d' * 40)
         record['readiness']['publication_ready'] = True
         record['readiness']['pending_acceptance'] = ['codex']
         record['readiness']['accepted_hosts'] = ['claude', 'zcode']
-        with self.assertRaises(io.DataError):
-            distribution._record(record, 'stable', record['repository'])
+        distribution._record(record, 'stable', record['repository'])
+        self.assertEqual(record['readiness']['pending_acceptance'], ['codex'])
+        self.assertEqual(record['readiness']['accepted_hosts'], ['claude', 'zcode'])
+
+    def test_all_null_stable_release_can_update_market_with_truthful_pending_hosts(self):
+        config = json.loads((self.case.plugin / "release.json").read_text())
+        config["acceptance"] = {host: None for host in self.case.spec().hosts}
+        release_fixtures.write_json(self.case.plugin / "release.json", config)
+        self.git("add", "-A")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "--no-verify", "-qm", "untested host release fixture")
+        self.git("tag", "-f", "ai-one/v1.0.0")
+        shutil.rmtree(self.case.output)
+        report = prepare_release(self.root, self.case.spec(), self.case.output, mode="stable",
+                                 committed_acceptance=True)
+        self.assertTrue(report["ok"], report)
+        self.release_info = self.info(self.case.spec(), self.case.output)
+        plan = self.plan()
+        self.assertEqual(plan["status"], "plan_ready")
+        self.assertTrue(plan["record"]["readiness"]["publication_ready"])
+        self.assertEqual(plan["record"]["readiness"]["accepted_hosts"], [])
+        self.assertEqual(plan["record"]["readiness"]["pending_acceptance"], ["claude", "codex", "zcode"])
+        final = distribution.finalize_files(plan, "d" * 40)
+        record = json.loads(final["published/releases/ai-one/1.0.0.json"])
+        self.assertEqual(record["readiness"], plan["record"]["readiness"])
+        retry = self.plan(market_files=final, base_commit="c" * 40)
+        self.assertEqual(retry["status"], "already_deployed")
+        self.assertEqual(distribution.finalize_files(retry, "d" * 40), final)
+        # Later real evidence stays truthful, but cannot replace the immutable
+        # public record or installers for this already published version.
+        self.case.accept(hosts=["claude"])
+        self.git("add", "-A")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "--no-verify", "-qm", "later actual host evidence fixture")
+        self.git("tag", "-f", "ai-one/v1.0.0")
+        shutil.rmtree(self.case.output)
+        report = prepare_release(self.root, self.case.spec(), self.case.output, mode="stable",
+                                 committed_acceptance=True)
+        self.assertTrue(report["ok"], report)
+        self.assertTrue(report["publication_ready"], report)
+        self.assertEqual(report["readiness"]["accepted_hosts"], ["claude"])
+        self.assertEqual(report["pending_acceptance"], ["codex", "zcode"])
+        self.release_info = self.info(self.case.spec(), self.case.output)
+        with self.assertRaisesRegex(io.DataError, "same-version public record/installer bytes differ"):
+            self.plan(market_files=final, base_commit="c" * 40)
+
+    def test_record_host_inventory_still_partitions_hosts_and_requires_package_hashes(self):
+        for field, value in (("accepted_hosts", ["claude", "zcode"]),
+                             ("pending_acceptance", ["codex"]),
+                             ("package_content_hashes", {}),
+                             ("publication_ready", False)):
+            record = self.plan()["record"]
+            record["readiness"][field] = value
+            with self.subTest(field=field), self.assertRaises(io.DataError):
+                distribution._record(record, "stable", record["repository"], staged=True)
 
     def test_identical_deployment_is_readonly_and_user_edits_are_rejected(self):
         final = distribution.finalize_files(self.plan(), "d" * 40)

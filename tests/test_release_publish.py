@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import threading
 import unittest
+from unittest import mock
 from urllib.request import urlopen
 import zipfile
 
@@ -40,6 +41,12 @@ class FakeGitHub:
         self.move_tag_on_download = False
         self.fail_edit = False
         self.fail_after_edit = False
+        self.tag_missing = False
+        self.ref_error = None
+        self.fail_ref_create = False
+        self.fail_lookup = False
+        self.name = None
+        self.body = None
         owner = self
         class Handler(BaseHTTPRequestHandler):
             def do_GET(self):
@@ -63,16 +70,18 @@ class FakeGitHub:
     def run(self, args, **options):
         self.calls.append(args)
         binary = not options.get('text', True)
-        def result(payload='', code=0):
+        def result(payload='', code=0, error=''):
             if binary and isinstance(payload, str):
                 payload = payload.encode()
-            return subprocess.CompletedProcess(args, code, payload, b'' if binary else '')
+            return subprocess.CompletedProcess(args, code, payload, error.encode() if binary else error)
         if args[1:3] == ['release', 'create']:
             if self.created or self.existing:
                 return result(code=1)
             self.created = True
             self.tag = args[3]
             self.preview = '--prerelease' in args
+            self.name = args[args.index('--title') + 1]
+            self.body = Path(args[args.index('--notes-file') + 1]).read_bytes().decode('utf-8')
             for identity, arg in enumerate(args[4:args.index('--repo')], 1):
                 path = Path(arg)
                 self.assets[identity] = path.read_bytes()
@@ -90,9 +99,24 @@ class FakeGitHub:
             self.public = True
             return result()
         if '--paginate' in args:
-            return result('ai-one/v1.0.4-preview.2\n' if self.existing else '')
+            if self.fail_lookup:
+                return result(code=1, error='network unavailable')
+            return result(self.tag + '\n' if self.existing or self.created else '')
         endpoint = args[2]
+        if endpoint.endswith('/git/refs'):
+            assert '--method' in args and args[args.index('--method') + 1] == 'POST'
+            assert '-f' in args and 'ref=refs/tags/' + self.tag in args
+            assert 'sha=' + self.revision in args
+            assert self.tag_missing
+            if self.fail_ref_create:
+                return result(code=1, error='gh: Resource not accessible (HTTP 403)')
+            self.tag_missing = False
+            return result(json.dumps({'object': {'type': 'commit', 'sha': self.revision}}))
         if '/git/ref/tags/' in endpoint:
+            if self.ref_error:
+                return result(code=1, error=self.ref_error)
+            if self.tag_missing:
+                return result(json.dumps({'message': 'Not Found'}), code=1, error='gh: Not Found (HTTP 404)')
             return result(json.dumps({'object': {'type': 'commit', 'sha': self.revision}}))
         if '/releases/assets/' in endpoint:
             identity = int(endpoint.rsplit('/', 1)[1])
@@ -109,7 +133,8 @@ class FakeGitHub:
             if self.missing:
                 assets.pop()
             return result(json.dumps({'id': 73, 'tag_name': self.tag, 'draft': not self.public,
-                                      'prerelease': self.preview != self.wrong_kind, 'assets': assets}))
+                                      'prerelease': self.preview != self.wrong_kind, 'assets': assets,
+                                      'name': self.name, 'body': self.body}))
         raise AssertionError(args)
 
 
@@ -156,6 +181,8 @@ class ReleasePublishTests(unittest.TestCase):
         self.git('tag', self.tag)
         self.git('update-ref', 'refs/remotes/origin/main', self.revision)
         self.github = FakeGitHub(self.revision)
+        self.github.tag = self.tag
+        self.github.preview = 'preview' in version
         self.addCleanup(self.github.close)
         return prepare.prepare(self.root, 'ai-one', self.tag, self.bundle)
 
@@ -184,7 +211,7 @@ class ReleasePublishTests(unittest.TestCase):
         self.assertEqual(sum(args[1:3] == ['release', 'edit'] for args in self.github.calls), 1)
         self.assertTrue(any('/releases/assets/' in args[2] for args in self.github.calls if args[1] == 'api'))
 
-    def test_stable_requires_actual_byte_bound_fixture_acceptance_and_publishes_without_preview(self):
+    def test_stable_with_actual_byte_bound_fixture_acceptance_publishes_without_preview(self):
         prepared = self.fixture('1.0.4', accepted=True)
         self.assertEqual((prepared['kind'], prepared['mode']), ('stable', 'stable'))
         report = self.call()
@@ -203,11 +230,14 @@ class ReleasePublishTests(unittest.TestCase):
         self.assertEqual(sum(args[1:3] == ['release', 'create'] for args in self.github.calls), 1)
         self.assertEqual(sum(args[1:3] == ['release', 'edit'] for args in self.github.calls), 1)
 
-    def test_new_numeric_version_without_acceptance_cannot_prepare_or_contact_github(self):
-        with self.assertRaisesRegex(ValueError, 'stable'):
-            self.fixture('1.0.2')
-        self.assertEqual(self.github.calls, [])
-        self.assertFalse(self.bundle.exists())
+    def test_new_numeric_version_without_acceptance_publishes_truthful_host_report(self):
+        self.fixture('1.0.2')
+        report = self.call()
+        self.assertTrue(report['ok'], report)
+        self.assertFalse(report['prerelease'])
+        record = json.loads((self.bundle / 'release.json').read_text())
+        self.assertEqual(record['readiness']['accepted_hosts'], [])
+        self.assertEqual(record['readiness']['pending_acceptance'], ['claude', 'codex', 'zcode'])
 
     def test_corrupt_same_length_asset_is_never_published(self):
         self.fixture()
@@ -233,12 +263,253 @@ class ReleasePublishTests(unittest.TestCase):
         self.assertFalse(report['ok'], report)
         self.assertFalse(self.github.public)
 
-    def test_existing_same_version_is_never_overwritten(self):
+    def test_incomplete_existing_same_version_is_never_overwritten(self):
         self.fixture()
         self.github.existing = True
-        with self.assertRaisesRegex(ValueError, 'already exists'):
-            self.call()
+        report = self.call()
+        self.assertFalse(report['ok'], report)
         self.assertFalse(self.github.created)
+        self.assertFalse(self.github.public)
+
+    def test_complete_public_release_is_reused_after_full_byte_readback_without_writes(self):
+        self.fixture('1.0.2')
+        self.assertTrue(self.call()['ok'])
+        before = len(self.github.calls)
+        report = self.call()
+        self.assertTrue(report['ok'], report)
+        self.assertTrue(report['published'])
+        self.assertTrue(report['reused'])
+        self.assertEqual(report['release_id'], 73)
+        calls = self.github.calls[before:]
+        self.assertFalse(any(args[1:3] in (['release', 'create'], ['release', 'edit']) for args in calls))
+        self.assertTrue(any('/releases/assets/' in args[2] for args in calls if args[1] == 'api'))
+
+    def test_complete_existing_draft_is_reused_and_published_without_recreation(self):
+        self.fixture()
+        publish.drafts.create_draft(self.root, 'ai-one', self.bundle, 'example/ai-code', run=self.github.run)
+        report = self.call()
+        self.assertTrue(report['ok'], report)
+        self.assertTrue(report['reused'])
+        self.assertTrue(report['published'])
+        self.assertEqual(sum(args[1:3] == ['release', 'create'] for args in self.github.calls), 1)
+
+    def test_existing_draft_with_changed_body_or_name_is_never_repaired_or_published(self):
+        self.fixture()
+        publish.drafts.create_draft(self.root, 'ai-one', self.bundle, 'example/ai-code', run=self.github.run)
+        for field in ('body', 'name'):
+            original = getattr(self.github, field)
+            setattr(self.github, field, original + ' externally edited')
+            before = len(self.github.calls)
+            with self.subTest(field=field):
+                report = self.call()
+                self.assertFalse(report['ok'], report)
+                self.assertIn('title or body', report['error'])
+                self.assertFalse(self.github.public)
+                self.assertFalse(any(args[1:3] in (['release', 'create'], ['release', 'edit'])
+                                     for args in self.github.calls[before:]))
+            setattr(self.github, field, original)
+
+    def test_public_release_with_changed_body_or_name_cannot_be_reused(self):
+        self.fixture()
+        self.assertTrue(self.call()['ok'])
+        for field in ('body', 'name'):
+            original = getattr(self.github, field)
+            setattr(self.github, field, original + ' externally edited')
+            before = len(self.github.calls)
+            with self.subTest(field=field):
+                report = self.call()
+                self.assertFalse(report['ok'], report)
+                self.assertTrue(report['published'], report)
+                self.assertFalse(report['publication_verified'], report)
+                self.assertIn('title or body', report['error'])
+                self.assertFalse(any(args[1:3] in (['release', 'create'], ['release', 'edit'])
+                                     for args in self.github.calls[before:]))
+                self.assertTrue(self.github.public)
+            setattr(self.github, field, original)
+
+    def test_existing_public_release_with_wrong_remote_tag_retains_known_public_state(self):
+        self.fixture()
+        self.assertTrue(self.call()['ok'])
+        self.github.revision = 'b' * 40
+        before = len(self.github.calls)
+        report = self.call()
+        self.assertFalse(report['ok'], report)
+        self.assertTrue(report['published'], report)
+        self.assertFalse(report['draft'], report)
+        self.assertFalse(report['publication_verified'], report)
+        self.assertIn('source commit', report['error'])
+        self.assertTrue(self.github.public)
+        self.assertFalse(any(args[1:3] in (['release', 'create'], ['release', 'edit'])
+                             for args in self.github.calls[before:]))
+
+    def test_page_body_change_after_publication_reports_uncertain_outcome(self):
+        self.fixture()
+        original = self.github.run
+        def change_after_edit(args, **options):
+            result = original(args, **options)
+            if args[1:3] == ['release', 'edit']:
+                self.github.body += ' external change after publishing'
+            return result
+        report = publish.publish_release(self.root, 'ai-one', self.tag, self.bundle,
+            'example/ai-code', run=change_after_edit)
+        self.assertFalse(report['ok'], report)
+        self.assertIsNone(report['published'])
+        self.assertIn('uncertain', report['publication_outcome'])
+        self.assertIn('title or body', report['error'])
+        self.assertTrue(self.github.public)
+        self.assertEqual(sum(args[1:3] == ['release', 'edit'] for args in self.github.calls), 1)
+
+    def test_first_uploaded_draft_with_changed_page_body_is_not_published(self):
+        self.fixture()
+        original = self.github.run
+        def change_after_create(args, **options):
+            result = original(args, **options)
+            if args[1:3] == ['release', 'create']:
+                self.github.body = self.github.body.rstrip('\n')
+            return result
+        report = publish.publish_release(self.root, 'ai-one', self.tag, self.bundle,
+            'example/ai-code', run=change_after_create)
+        self.assertFalse(report['ok'], report)
+        self.assertIn('title or body', report['error'])
+        self.assertFalse(self.github.public)
+
+    def test_corrupt_public_release_is_not_repaired_overwritten_or_republished(self):
+        self.fixture()
+        self.assertTrue(self.call()['ok'])
+        before = len(self.github.calls)
+        self.github.corrupt = True
+        report = self.call()
+        self.assertFalse(report['ok'], report)
+        self.assertTrue(report['published'], report)
+        self.assertFalse(report['publication_verified'], report)
+        self.assertIn('bytes differ', report['error'])
+        self.assertFalse(any(args[1:3] in (['release', 'create'], ['release', 'edit'])
+                             for args in self.github.calls[before:]))
+
+    def test_ensure_tag_creates_only_missing_exact_ref_after_local_verification(self):
+        self.fixture('1.0.2')
+        self.github.tag_missing = True
+        report = self.call(ensure_tag=True)
+        self.assertTrue(report['ok'], report)
+        self.assertTrue(report['published'])
+        self.assertFalse(report['reused'])
+        refs = [args for args in self.github.calls if args[1] == 'api' and args[2].endswith('/git/refs')]
+        self.assertEqual(len(refs), 1)
+        self.assertIn('ref=refs/tags/' + self.tag, refs[0])
+        self.assertIn('sha=' + self.revision, refs[0])
+        self.assertFalse(any('--force' in args for args in self.github.calls))
+
+    def test_missing_tag_is_never_created_without_explicit_ensure_tag(self):
+        self.fixture()
+        self.github.tag_missing = True
+        report = self.call()
+        self.assertFalse(report['ok'], report)
+        self.assertFalse(any(args[2].endswith('/git/refs') for args in self.github.calls if args[1] == 'api'))
+        self.assertFalse(self.github.created)
+
+    def test_ensure_tag_rejects_other_sha_and_does_not_replace_ref(self):
+        self.fixture()
+        self.github.revision = 'b' * 40
+        report = self.call(ensure_tag=True)
+        self.assertFalse(report['ok'], report)
+        self.assertIn('source commit', report['error'])
+        self.assertFalse(self.github.created)
+        self.assertFalse(any(args[2].endswith('/git/refs') for args in self.github.calls if args[1] == 'api'))
+
+    def test_tag_network_and_permission_failures_are_never_treated_as_missing(self):
+        self.fixture()
+        for error in ('network unavailable', 'gh: Forbidden (HTTP 403)', 'gh: Unauthorized (HTTP 401)'):
+            self.github.calls = []
+            self.github.ref_error = error
+            report = self.call(ensure_tag=True)
+            self.assertFalse(report['ok'], report)
+            self.assertFalse(self.github.created)
+            self.assertFalse(any(args[2].endswith('/git/refs') for args in self.github.calls if args[1] == 'api'))
+
+    def test_missing_annotated_tag_object_does_not_attempt_reference_creation(self):
+        calls = []
+        def gh(*args):
+            calls.append(args)
+            if '/git/ref/tags/' in args[1]:
+                return json.dumps({'object': {'type': 'tag', 'sha': 'a' * 40}})
+            if '/git/tags/' in args[1]:
+                raise publish.drafts.GitHubCommandError('gh: Not Found (HTTP 404)')
+            return '{}'
+        with self.assertRaises(publish.drafts.GitHubCommandError):
+            publish._ensure_remote_tag(gh, 'example/ai-code', 'ai-one/v1.0.0', 'b' * 40)
+        self.assertFalse(any(args[1].endswith('/git/refs') for args in calls))
+
+    def test_ensure_tag_write_failure_never_creates_release(self):
+        self.fixture()
+        self.github.tag_missing = True
+        self.github.fail_ref_create = True
+        report = self.call(ensure_tag=True)
+        self.assertFalse(report['ok'], report)
+        self.assertFalse(self.github.created)
+
+    def test_ensure_tag_local_tampering_prevents_any_network_call(self):
+        self.fixture()
+        self.github.tag_missing = True
+        (self.bundle / 'release-notes.md').write_text('untrusted release notes')
+        with self.assertRaises(ValueError):
+            self.call(ensure_tag=True)
+        self.assertEqual(self.github.calls, [])
+
+    def test_source_change_during_missing_tag_lookup_prevents_remote_tag_write(self):
+        self.fixture()
+        self.github.tag_missing = True
+        original = self.github.run
+        def change_source(args, **options):
+            result = original(args, **options)
+            if args[1] == 'api' and '/git/ref/tags/' in args[2]:
+                (self.plugin / 'release/NOTES.md').write_text('changed during remote discovery')
+            return result
+        report = publish.publish_release(self.root, 'ai-one', self.tag, self.bundle,
+            'example/ai-code', run=change_source, ensure_tag=True)
+        self.assertFalse(report['ok'], report)
+        self.assertFalse(any(args[2].endswith('/git/refs') for args in self.github.calls if args[1] == 'api'))
+        self.assertFalse(self.github.created)
+
+    def test_source_change_during_final_asset_readback_prevents_publication(self):
+        self.fixture()
+        original = self.github.run
+        downloads = 0
+        def change_source(args, **options):
+            nonlocal downloads
+            result = original(args, **options)
+            if args[1] == 'api' and '/releases/assets/' in args[2]:
+                downloads += 1
+                if downloads == len(self.github.assets) + 1:
+                    (self.plugin / 'release/NOTES.md').write_text('changed during final asset readback')
+            return result
+        report = publish.publish_release(self.root, 'ai-one', self.tag, self.bundle,
+            'example/ai-code', run=change_source)
+        self.assertFalse(report['ok'], report)
+        self.assertFalse(self.github.public)
+
+    def test_oversized_assets_fail_before_any_remote_tag_or_release_write(self):
+        self.fixture()
+        self.github.tag_missing = True
+        with mock.patch.object(publish, 'LIMIT', 1), self.assertRaises(ValueError):
+            self.call(ensure_tag=True)
+        self.assertEqual(self.github.calls, [])
+
+    def test_release_discovery_failure_cannot_create_or_publish_release(self):
+        self.fixture()
+        self.github.fail_lookup = True
+        report = self.call(ensure_tag=True)
+        self.assertFalse(report['ok'], report)
+        self.assertFalse(self.github.created)
+        self.assertFalse(self.github.public)
+
+    def test_cli_can_publish_without_draft_result_and_passes_ensure_tag(self):
+        arguments = [str(SCRIPT), '--root', str(self.root), '--plugin', 'ai-one', '--source-tag',
+                     'ai-one/v1.0.0', '--bundle', str(self.bundle), '--repository', 'example/ai-code', '--ensure-tag']
+        with mock.patch.object(publish.sys, 'argv', arguments), \
+                mock.patch.object(publish, 'publish_release', return_value={'ok': True}) as called:
+            self.assertEqual(publish.main(), 0)
+        self.assertIsNone(called.call_args.kwargs['draft_result'])
+        self.assertTrue(called.call_args.kwargs['ensure_tag'])
 
     def test_remote_tag_move_after_draft_upload_prevents_publication(self):
         self.fixture()

@@ -1,23 +1,20 @@
-name: Release plugin
+name: Build & publish plugins / 构建与发布插件
 
 on:
   workflow_dispatch:
     inputs:
       plugin:
-        description: Registered plugin ID
+        description: Plugin / 插件
         required: true
         default: ai-code-workflow
-        type: string
-      source_tag:
-        description: Existing frozen ID/vVERSION tag reachable from main
-        required: true
-        type: string
-      operation:
-        description: Prepare a bundle or publish after environment review
-        required: true
-        default: prepare
         type: choice
-        options: [prepare, publish]
+        options: [ai-code-workflow, ai-agent-delegation]
+      operation:
+        description: Build only / 仅构建；Publish + stable market / 发布并更新正式市场
+        required: true
+        default: build
+        type: choice
+        options: [build, publish]
 
 permissions:
   contents: read
@@ -39,6 +36,8 @@ jobs:
     outputs:
       revision: ${{ steps.prepare.outputs.revision }}
       kind: ${{ steps.prepare.outputs.kind }}
+      tag: ${{ steps.prepare.outputs.tag }}
+      version: ${{ steps.prepare.outputs.version }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -48,7 +47,7 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ inputs.source_tag }}
+          ref: ${{ github.sha }}
           path: source
           fetch-depth: 0
           persist-credentials: false
@@ -58,13 +57,14 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
-      - name: Verify canonical tag and main ancestry before executing source tests
+      - name: Freeze committed main version before executing source tests
+        id: freeze
         env:
           PLUGIN_ID: ${{ inputs.plugin }}
-          SOURCE_TAG: ${{ inputs.source_tag }}
+          DISPATCH_SHA: ${{ github.sha }}
         run: |
           git -C source fetch --no-tags origin main:refs/remotes/origin/main
-          python3 trusted/.github/scripts/prepare_release.py --root source --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --check-source-only
+          python3 trusted/.github/scripts/prepare_release.py --root source --plugin "$PLUGIN_ID" --from-main --revision "$DISPATCH_SHA" --check-source-only
       - name: Test and lint frozen source with read permissions
         working-directory: source
         run: |
@@ -79,10 +79,24 @@ jobs:
         id: prepare
         env:
           PLUGIN_ID: ${{ inputs.plugin }}
-          SOURCE_TAG: ${{ inputs.source_tag }}
+          SOURCE_TAG: ${{ steps.freeze.outputs.tag }}
         run: |
-          git -C source fetch --no-tags origin main:refs/remotes/origin/main
           python3 trusted/.github/scripts/prepare_release.py --root source --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --output "$RUNNER_TEMP/release-bundle"
+      - name: Show downloads and independent host verification status
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          record = json.loads((Path(os.environ['RUNNER_TEMP']) / 'release-bundle/release.json').read_text())
+          status = record['readiness']
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write(f"## {record['product_id']} {record['version']}\n\n")
+              summary.write('Download the artifact below; native installers are in `installers/`, development packages in `downloads/`. / 下载下方 artifact，原生安装包位于 `installers/`，开发包位于 `downloads/`。\n\n')
+              summary.write(f"Frozen source: `{record['source_revision']}`; tag: `{record['tag']}`\n\n")
+              summary.write('Host verification / 宿主实测（independent of publication）:\n\n')
+              summary.write('- verified: ' + (', '.join(status['accepted_hosts']) or 'none') + '\n')
+              summary.write('- unverified: ' + (', '.join(status['pending_acceptance']) or 'none') + '\n')
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: plugin-release-${{ github.run_id }}
@@ -119,20 +133,20 @@ jobs:
         with:
           name: plugin-release-${{ github.run_id }}
           path: ${{ runner.temp }}/release-bundle/
-      - name: Create verified Draft and upload every asset
+      - name: Rebind the frozen source in the isolated CI checkout
         env:
-          GH_TOKEN: ${{ github.token }}
           PLUGIN_ID: ${{ inputs.plugin }}
+          DISPATCH_SHA: ${{ needs.prepare.outputs.revision }}
         run: |
           git -C source fetch --no-tags origin main:refs/remotes/origin/main
-          python3 trusted/.github/scripts/create_release_draft.py --root source --plugin "$PLUGIN_ID" --bundle "$RUNNER_TEMP/release-bundle" --repository "$GITHUB_REPOSITORY" > "$RUNNER_TEMP/draft-result.json"
-      - name: Read back uploaded bytes and explicitly publish
+          python3 trusted/.github/scripts/prepare_release.py --root source --plugin "$PLUGIN_ID" --from-main --revision "$DISPATCH_SHA" --check-source-only
+      - name: Verify uploaded bytes and publish or reuse the immutable Release
         env:
           GH_TOKEN: ${{ github.token }}
           PLUGIN_ID: ${{ inputs.plugin }}
-          SOURCE_TAG: ${{ inputs.source_tag }}
+          SOURCE_TAG: ${{ needs.prepare.outputs.tag }}
         run: |
-          python3 trusted/.github/scripts/publish_release.py --root source --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --bundle "$RUNNER_TEMP/release-bundle" --repository "$GITHUB_REPOSITORY" --draft-result "$RUNNER_TEMP/draft-result.json" > "$RUNNER_TEMP/publish-result.json"
+          python3 trusted/.github/scripts/publish_release.py --root source --plugin "$PLUGIN_ID" --source-tag "$SOURCE_TAG" --bundle "$RUNNER_TEMP/release-bundle" --repository "$GITHUB_REPOSITORY" --ensure-tag > "$RUNNER_TEMP/publish-result.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: ${{ always() }}
         with:
@@ -149,5 +163,4 @@ jobs:
     uses: ./.github/workflows/marketplace.yml
     with:
       plugin: ${{ inputs.plugin }}
-      source_tag: ${{ inputs.source_tag }}
-      action: deploy
+      source_tag: ${{ needs.prepare.outputs.tag }}

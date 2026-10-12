@@ -27,6 +27,10 @@ Read the root [AGENTS.md](AGENTS.md) and the target plugin's `AGENTS.md` first.
 The plugin's `product.json` owns its version, hosts and packaged resources;
 the root `package.json` is maintenance tooling.
 
+For AI-assisted plugin creation, validation, version preparation and release work,
+use the project skill [$ai-code-plugin-release](.agents/skills/ai-code-plugin-release/SKILL.md).
+It reads the relevant authoring, publishing and evidence guides for the current task.
+
 ## Change an existing plugin
 
 Locate the plugin and update its features and tests:

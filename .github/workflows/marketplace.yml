@@ -1,4 +1,4 @@
-name: Sync plugin marketplace
+name: Internal marketplace sync / 内部市场同步
 
 on:
   workflow_call:
@@ -9,43 +9,6 @@ on:
       source_tag:
         type: string
         required: true
-      action:
-        type: string
-        default: deploy
-      use_generated_plan:
-        type: boolean
-        default: true
-      expected_plan_hash:
-        type: string
-        default: ''
-      expected_market_commit:
-        type: string
-        default: ''
-  workflow_dispatch:
-    inputs:
-      plugin:
-        description: One registered plugin ID
-        type: string
-        required: true
-        default: ai-code-workflow
-      source_tag:
-        description: Existing public Release tag (ID/vVERSION)
-        type: string
-        required: true
-      action:
-        description: Plan first, then deploy the reviewed hash
-        type: choice
-        options: [plan, deploy]
-        default: plan
-        required: true
-      expected_plan_hash:
-        description: Required for deploy, from a reviewed plan run
-        type: string
-        required: false
-      expected_market_commit:
-        description: Required for deploy, reviewed main base SHA
-        type: string
-        required: false
 
 permissions:
   contents: read
@@ -112,7 +75,7 @@ jobs:
                   output.write(f'{key}={plan[key]}\n')
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
               summary.write('Review the full plan artifact before deployment.\n\n')
-              for key in ('product_id', 'version', 'channel', 'branch', 'base_commit', 'source_revision', 'plan_hash'):
+              for key in ('status', 'product_id', 'version', 'channel', 'branch', 'base_commit', 'source_revision', 'plan_hash'):
                   summary.write(f'- {key}: `{plan[key]}`\n')
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -123,7 +86,7 @@ jobs:
           retention-days: 30
 
   deploy:
-    if: ${{ inputs.action == 'deploy' && needs.plan.outputs.status == 'plan_ready' && github.ref == 'refs/heads/main' }}
+    if: ${{ needs.plan.outputs.status == 'plan_ready' && github.ref == 'refs/heads/main' }}
     needs: plan
     environment: plugin-marketplace
     permissions:
@@ -151,8 +114,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PLUGIN_ID: ${{ inputs.plugin }}
           SOURCE_TAG: ${{ inputs.source_tag }}
-          REVIEWED_HASH: ${{ inputs.use_generated_plan && needs.plan.outputs.plan_hash || inputs.expected_plan_hash }}
-          REVIEWED_COMMIT: ${{ inputs.use_generated_plan && needs.plan.outputs.base_commit || inputs.expected_market_commit }}
+          REVIEWED_HASH: ${{ needs.plan.outputs.plan_hash }}
+          REVIEWED_COMMIT: ${{ needs.plan.outputs.base_commit }}
         run: |
           git -C source fetch --no-tags origin main:refs/remotes/origin/main
           python3 - <<'PY'

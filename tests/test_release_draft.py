@@ -100,12 +100,21 @@ class DraftTests(unittest.TestCase):
         created = next(args for args in self.calls if args[1:3] == ["release", "create"])
         self.assertNotIn('--prerelease', created)
 
-    def test_new_numeric_release_without_stable_acceptance_cannot_create_prerelease(self):
+    def test_new_numeric_release_requires_stable_technical_readiness(self):
         report = dict(self.report, mode="draft", publication_ready=False)
         with mock.patch.object(draft, "verify_release", return_value=report):
             with self.assertRaisesRegex(ValueError, "stable"):
                 self.call()
         self.assertEqual(self.calls, [])
+
+    def test_github_transport_errors_have_no_missing_ref_status(self):
+        for error, status in (("network unavailable", None), ("permission denied", None),
+                              ("gh: Forbidden (HTTP 403)", 403), ("gh: Not Found (HTTP 404)", 404)):
+            def run(*args, **options):
+                return subprocess.CompletedProcess(args, 1, "", error)
+            with self.subTest(error=error), self.assertRaises(draft.GitHubCommandError) as failure:
+                draft.github_command(run, self.root, "api", "repos/example/ai-code/git/ref/tags/ai-one")
+            self.assertEqual(failure.exception.status, status)
 
     def test_draft_uploads_installers_and_the_bundle_sha256sums(self):
         with mock.patch.object(draft, "verify_release", return_value=self.report):

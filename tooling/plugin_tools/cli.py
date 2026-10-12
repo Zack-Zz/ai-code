@@ -45,6 +45,12 @@ def main(argv=None):
     release_check = release_commands.add_parser("check")
     release_prepare = release_commands.add_parser("prepare")
     release_verify = release_commands.add_parser("verify")
+    release_version = release_commands.add_parser("prepare-version", help="preview or apply local version and bilingual notes edits")
+    release_version.add_argument("--plugin", required=True)
+    release_version.add_argument("--version", required=True)
+    release_version.add_argument("--notes-file", required=True,
+                                 help="UTF-8 Markdown body with ### English and ### 中文 sections")
+    release_version.add_argument("--apply", action="store_true")
     release_acceptance = release_commands.add_parser("acceptance-export")
     release_acceptance.add_argument("--plugin", required=True)
     release_acceptance.add_argument("--replace", action="store_true")
@@ -74,7 +80,7 @@ def main(argv=None):
     distribution_check.add_argument("--expected-plan-hash")
     distribution_check.add_argument("--expected-market-commit")
     for command in (listing, validating, building, checking, syncing, market_check, market_initialize,
-                    release_check, release_prepare, release_verify, release_acceptance, distribution_plan, distribution_check):
+                    release_check, release_prepare, release_verify, release_version, release_acceptance, distribution_plan, distribution_check):
         command.add_argument("--root", default=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     try:
@@ -112,7 +118,10 @@ def main(argv=None):
         if args.command == "release":
             from .release import check_release, prepare_release, verify_release
             spec = select_plugins(specs, args.plugin)[0]
-            if args.release_command == "acceptance-export":
+            if args.release_command == "prepare-version":
+                from .release.preparation import prepare_version
+                result = prepare_version(args.root, spec, args.version, args.notes_file, apply=args.apply)
+            elif args.release_command == "acceptance-export":
                 from .release.acceptance import export_acceptance
                 result = export_acceptance(spec, replace=args.replace)
             elif args.release_command == "check":

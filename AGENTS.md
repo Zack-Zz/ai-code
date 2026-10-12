@@ -18,9 +18,20 @@
 | `tests/` | 公共工具测试、插件测试汇总与统一门禁 |
 | `docs/plugin-authoring.md` | 最小接入要求与验证边界 |
 | `docs/publishing.md`、`docs/release-evidence.md` | 发布机制、渠道和证据契约 |
+| `.agents/skills/ai-code-plugin-release/` | 本项目插件制作、验证与发布技能，不进入插件发行包 |
 | `docs/design/2026-10-07-multi-plugin-design.md` | 多插件改造规格与执行顺序 |
 | `published/` | 正式发行记录、当前指针、所有权回执与固定 Codex 安装内容 |
 | `dist/` | 被忽略的本地/CI 临时构建输出，不进入 Git 跟踪 |
+
+## 项目技能入口
+
+- 在本仓库新增或维护插件、准备版本与发布说明、验证发行包，或处理构建/
+  发布任务时，先读取
+  [ai-code-plugin-release](.agents/skills/ai-code-plugin-release/SKILL.md)，
+  再按当前任务读取其中链接的制作、发布或证据指南。
+- 即使宿主没有自动发现项目技能，也按该入口读取；普通业务编码和插件用户
+  的安装/使用问题不触发此维护流程。技能保留当前任务的用户授权，不把咨询、
+  commit/push、实际发布或安装相互推导为授权。
 
 ## 维护规则
 
@@ -73,19 +84,31 @@
   文档。静态检查为 `npm run lint`，需本地 node_modules。
 - 区分静态校验、脚本测试、包完整性与真实宿主行为。原生加载、自动调用、
   运行工具或 MCP 的支持必须有实际宿主证据，不从清单或目录布局推导。
-- `release check/prepare/verify` 区分 draft 与 stable；stable 必须通过干净
-  Git、规范标签和全部声明宿主的字节绑定验收。GitHub Draft 是公开状态，
-  不等于本地验收 mode；新发行公开前须回读完整附件并复核冻结源码标签。
-- 默认本地验收读取实际私有材料；`release acceptance-export` 全部核验后
-  只导出哈希声明，维护者审核并随源码标签冻结。Actions 显式使用 committed
-  验收，重验摘要 HEAD 字节、公开输入与所有包哈希，不读取或公开私有正文。
-  摘要是维护者事实声明，不是平台认证或发布授权，不可手写以绕过验收。
+- `release prepare-version` 是 AI 本地辅助：用户给版本与改动说明，AI 起草
+  中英正文并先预览、再应用版本与说明变更；旧证据失效时明确列出引用重置
+  与有效生成摘要移除，保留私有材料和发布历史。不自动执行 Git、构建、发布
+  或安装；完成后等待用户 Review 与针对本次 commit/push 的明确授权。
+- `release check/prepare/verify` 区分 draft 与 stable；stable 技术就绪要求
+  干净 Git、规范标签、有效公开输入与独立包校验，真实宿主验收独立报告。
+  null/pending 不阻断技术发布，不能据此声称宿主通过。GitHub Draft 是公开
+  状态，不等于本地验收 mode；公开前后须回读完整附件并复核冻结源码标签。
+- 已提供的本地验收记录须读取实际私有材料并严格核验；可选的
+  `release acceptance-export` 仍要求全部宿主真实验收，通过后只导出哈希
+  声明，维护者审核并随源码标签冻结。Actions 显式使用 committed 模式；
+  有摘要时重验 HEAD 字节、公开输入与所有包哈希，没有摘要与证据引用时
+  保持 pending。不读取或公开私有正文，不因坏摘要回退或忽略。摘要是维护者
+  事实声明，不是平台认证或发布授权，不可手写以绕过验收。
 - `marketplace sync --output <空目录>` 仅生成临时开发市场；
   `marketplace check` 只读核验公开快照、冻结源码 S 与固定分发提交 D。
   不手工修改公开清单，正式市场更新通过受审核的计划与部署流程执行。
-- Release 的 Prepare 与测试只读；Publish 经 main 的 plugin-release 审核，
-  正式成功后显式调用 Sync。市场 plan 只读，deploy 经 plugin-marketplace
-  审核后按已审阅哈希及 main 基础 SHA 写入，不接受 absent 或 force push。
+- 唯一手动发行入口为 main 的 Build & publish plugins / 构建与发布插件，
+  只选择 plugin 与 operation=build|publish，版本和说明读取 product/release
+  源码，规范标签自动派生。build 完整构建与复验，不远端写入；publish 经
+  plugin-release 环境创建或复用不可变标签、回读附件并公开 Release，正式版
+  自动调用内部市场工作流，preview 只公开 Release。市场 plan 只读，deploy
+  经 plugin-marketplace 环境按本次生成的计划哈希及 main 基础 SHA 写入；
+  环境若配置审核人，运行暂停等待批准，不接受 absent 或 force push。
+  同版本不同公开字节拒绝；市场失败可按相同未变版本重跑 publish 继续同步。
   本地工作流验证不等于远端执行、环境权限或真实宿主升级通过。
 
 ## 授权边界

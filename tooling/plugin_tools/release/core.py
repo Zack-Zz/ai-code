@@ -36,9 +36,10 @@ def _report(spec, mode, capture=None, provenance=None, blockers=()):
             blockers.append("stable release requires a clean working tree")
         if provenance["tag"] is None:
             blockers.append("stable release requires its identity/version tag at HEAD")
-        if pending:
-            blockers.append("stable release requires accepted byte-bound evidence for every host")
-    ready = not blockers and not pending and provenance["source_revision"] is not None and \
+    # Stable publication readiness describes technical provenance and payload
+    # checks. Host acceptance is reported independently and never inferred.
+    # Keep draft readiness unchanged so existing preview bundles retain bytes.
+    ready = not blockers and (mode == "stable" or not pending) and provenance["source_revision"] is not None and \
         not provenance["working_tree_dirty"] and provenance["tag"] is not None
     readiness = {"publication_ready": ready, "pending_acceptance": pending,
         "accepted_hosts": sorted(capture.accepted if capture is not None else []),
@@ -62,7 +63,7 @@ def _context(root, spec, mode, previous=None, tag=None, *, committed_acceptance=
     integrity.compare_previous(spec, capture, previous)
     provenance = metadata.git_provenance(root, spec.product_id, spec.version, tag)
     if (provenance["source_revision"] is not None and not provenance["working_tree_dirty"] and
-            provenance["tag"] is not None and not capture.pending):
+            provenance["tag"] is not None):
         source_git.validate_head_inputs(root, spec, capture, provenance["source_revision"])
     return capture, provenance, _report(spec, mode, capture, provenance)
 

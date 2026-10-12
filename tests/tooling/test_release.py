@@ -112,11 +112,14 @@ class ReleaseTests(unittest.TestCase):
         bytes_at = lambda root: {p.relative_to(root).as_posix(): p.read_bytes() for p in root.rglob("*") if p.is_file()}
         self.assertEqual(bytes_at(self.output), bytes_at(second))
 
-    def test_stable_cannot_use_missing_acceptance_or_absent_git_tag(self):
+    def test_stable_requires_git_source_and_identity_tag(self):
         report = check_release(self.root, self.spec(), mode="stable")
         self.assertFalse(report["ok"], report)
         self.assertFalse(report["publication_ready"])
         self.assertTrue(report["blockers"])
+        self.assertEqual(report["pending_acceptance"], sorted(HOSTS))
+        self.assertTrue(any("Git source revision" in item for item in report["blockers"]), report)
+        self.assertTrue(any("identity/version tag" in item for item in report["blockers"]), report)
         result = prepare_release(self.root, self.spec(), self.output, mode="stable")
         self.assertFalse(result["ok"])
         self.assertFalse(self.output.exists())

@@ -71,9 +71,11 @@ Claude Code 和 ZCode 从固定 Release 附件安装。Codex 使用受管安装�
 实际分发提交。市场部署先准备 Codex 安装目录，再更新发行记录、当前指针、
 根清单和回执；路径、字节或基础提交发生变化时停止部署。
 
-发行流程由 main 的可信工具读取冻结源码。Prepare 只读检查，Publish 经
-`plugin-release` 环境审核后上传、回读并公开附件；正式成功后显式调用市场
-同步。同步计划只读，部署经 `plugin-marketplace` 审核后写入。具体操作见
+唯一手动构建/发布入口由 main 的可信工具冻结已提交的插件版本，自动派生规范
+标签。build 对远端只读并导出原生安装包；publish 经 `plugin-release` 环境
+创建或复用不可变标签，上传、回读并公开附件；正式成功后自动调用市场同步。
+同步计划只读，部署经 `plugin-marketplace` 审核后写入。宿主验收是独立的事实
+状态，不作为技术发布门禁。具体操作见
 [发布指南](publishing.zh-CN.md)，数据要求见[证据契约](release-evidence.zh-CN.md)。
 
 ## 宿主与执行引擎

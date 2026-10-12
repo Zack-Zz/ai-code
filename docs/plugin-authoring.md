@@ -272,8 +272,9 @@ still require actual verification for the relevant plugin.
 
 Catalog registration and development trials do not constitute a production
 release. New previews appear only as GitHub Prereleases. A stable version enters
-the single main marketplace only after passing stable acceptance for all declared
-hosts, being published, and completing synchronization. Each ID has only one
+the single main marketplace after passing source/package checks, being published,
+and completing synchronization. Real host acceptance is reported independently;
+pending hosts remain `unverified` and do not block technical publication. Each ID has only one
 current entry. Plugins without a stable release do not yet appear in the public
 marketplace. `published/index.json` and stable records describe deployed versions;
 they are not a second source for development versions.

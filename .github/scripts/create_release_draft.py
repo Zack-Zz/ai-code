@@ -26,7 +26,7 @@ def release_policy(spec, report):
     kind = release_kind(spec.version)
     mode = "draft" if kind == "preview" else "stable"
     if report.get("mode") != mode or (kind == "stable" and report.get("publication_ready") is not True):
-        raise ValueError(f"new {kind} release requires {mode} verification and stable host acceptance where applicable")
+        raise ValueError(f"new {kind} release requires {mode} verification and technical publication readiness where applicable")
     return kind
 
 
@@ -61,6 +61,10 @@ def _current_source(root, spec, report, tag):
 
 def _remote_commit(gh, repository, tag):
     reference = json.loads(gh("api", f"repos/{repository}/git/ref/tags/{quote(tag, safe='')}"))["object"]
+    return _resolve_remote_commit(gh, repository, reference)
+
+
+def _resolve_remote_commit(gh, repository, reference):
     seen = set()
     while reference.get("type") == "tag":
         sha = reference.get("sha", "")
@@ -76,6 +80,25 @@ def _remote_commit(gh, repository, tag):
 def _bind_remote(gh, repository, tag, revision):
     if _remote_commit(gh, repository, tag) != revision:
         raise ValueError("remote release tag does not match the reviewed source commit")
+
+
+class GitHubCommandError(ValueError):
+    """Distinguish an explicit HTTP status from transport or CLI failures."""
+
+    def __init__(self, stderr):
+        if isinstance(stderr, bytes):
+            stderr = stderr.decode("utf-8", errors="replace")
+        status = re.search(r"\(HTTP ([0-9]{3})\)$", (stderr or "").strip())
+        self.status = int(status[1]) if status else None
+        super().__init__("GitHub command failed; no retry or overwrite attempted" +
+                         (f" (HTTP {self.status})" if self.status else ""))
+
+
+def github_command(run, root, *arguments, binary=False):
+    result = run(["gh", *arguments], cwd=root, capture_output=True, text=not binary, timeout=60)
+    if result.returncode != 0:
+        raise GitHubCommandError(result.stderr)
+    return result.stdout
 
 
 def bind_repository(specs, repository):
@@ -97,10 +120,7 @@ def create_draft(root, plugin_id, bundle, repository, run=None):
     run = subprocess.run if run is None else run
 
     def gh(*arguments):
-        result = run(["gh", *arguments], cwd=root, capture_output=True, text=True, timeout=60)
-        if result.returncode != 0:
-            raise ValueError("GitHub command failed; no retry or overwrite attempted: " + result.stderr.strip())
-        return result.stdout
+        return github_command(run, root, *arguments)
 
     # Capture into a private upload tree; verify the captured bytes against source.
     # This also preserves native hidden files independently of Actions' defaults.

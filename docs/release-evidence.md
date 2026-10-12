@@ -2,11 +2,14 @@
 
 English | [简体中文](release-evidence.zh-CN.md)
 
-This maintainer guide describes the acceptance data format used by the current
-release tools. Recorded status comes from actual host verification. Use accepted
-only after real scenarios have completed and a maintainer has checked the
-materials. For installation and usage, see the
-[user guide](installation.md).
+Technical publication and real host acceptance are separate results. A stable
+Release and marketplace update may proceed with host slots still `null` or
+pending. Script tests, package hashes, and successful publication do not establish
+native installation, skill invocation, or runtime behavior. Use `accepted` only
+after real scenarios have completed and a maintainer has checked their materials.
+This guide preserves the optional strict evidence format and exporter. Ordinary
+publication does not require maintainers to handwrite acceptance JSON. See the
+[user guide](installation.md) and [publishing guide](publishing.md).
 
 ## Release configuration
 
@@ -72,73 +75,73 @@ original materials or acceptance JSON into release artifacts. Humans must still
 check the public allowlist and document contents; tooling does not identify
 sensitive information in arbitrary text fragments.
 
-## Actual acceptance and CI
+## Independent host verification
 
-Check Claude Code's fixed archive URL/SHA256, ZCode's ZIP URL/SHA256/path, and the
-installation directory in Codex's fixed distribution commit separately. Record
-marketplace registration, discovery, initial installation, updates, actual loaded
-contents, and rejection of incorrect hashes. State conclusions only for what was
-actually verified.
+Report source checks, package integrity, Release publication, marketplace
+synchronization, and host runtime verification separately. A technically ready
+stable report may have `publication_ready=true` and nonempty
+`pending_acceptance` together. List `accepted_hosts`, pending hosts, and
+`limitations` without turning pending into an acceptance pass.
 
-Keep separate evidence for Release publication, marketplace deployment, and
-runtime behavior. A plan hash, record file, GitHub prerelease, or accepted marker
-does not authorize Git operations, Publish, or deployment.
+Check Claude Code's fixed archive URL/SHA256, ZCode's ZIP URL/SHA256/path, and
+Codex's installation directory at the fixed distribution commit separately.
+Record marketplace registration, discovery, initial installation, updates,
+actual loaded contents, and rejection of incorrect hashes. Then verify skill
+invocation, authorization boundaries, Reviewer behavior where applicable, and
+packaged tools. State only the level actually reached; native loading alone
+does not establish every behavior. Each host claimed as accepted needs its own
+actual record. Post-publication host results can remain independent verification
+reports bound to the tested version and bytes; they do not require changing an
+immutable Release or its frozen source.
 
-For each host, separately verify the native manifest, marketplace discovery,
-installation and loading, skill invocation, workflow authorization boundaries,
-Reviewer behavior, and the availability of packaged tools. Record the level of
-verification reached and unfinished items. Script tests cannot prove that a host
-actually follows Markdown. Native loading alone cannot justify marking all
-behavior as accepted. Each declared host needs its own actual record.
+Null slots require no private files. When an evidence path is supplied, ordinary
+local `release check/prepare/verify` reads the actual JSON and original materials
+and checks their bindings strictly. Invalid, stale, or missing configured evidence
+is an error, not an acceptance pass. A clean CI checkout can explicitly use
+`--committed-acceptance` to verify a reviewed public summary without private
+bodies. Actions uses this mode. With no summary and no evidence references, hosts
+remain pending and technical publication can proceed. The tools do not switch
+modes from environment variables or silently ignore broken supplied records.
 
-By default, local `release check/prepare/verify` still requires readable
-acceptance JSON and original materials, checking actual bytes item by item. A
-clean GitHub checkout uses the hash declaration reviewed by the maintainer and
-frozen with the source. It does not select an acceptance mode automatically from
-environment variables or missing files.
+## Optional strict acceptance export
 
-After completing acceptance for all hosts, run this in the local source tree
-that retains the private files:
+If all declared hosts have completed byte-bound acceptance, run in a local source
+tree that retains the private records and logs:
 
-```bash
+```sh
 python3 tooling/plugin_tool.py release acceptance-export --plugin ai-code-workflow
 ```
 
-The command reads all acceptance records and logs under the existing strict
-rules. It rejects export if any host is pending, a file is missing, or a hash does
-not match. Its output is fixed at the plugin's `release/acceptance-proof.json`.
-It contains only identity, version, source hash, all host package hashes, exact
-public input hashes, and canonical paths and SHA256 values for acceptance files
-and logs. It contains no summary, logs, or acceptance JSON bodies. Export and CI
-reading share a 1 MiB limit. If an existing summary would change, review it first
-and then explicitly use `--replace`. Identical exports are idempotent.
+The exporter reads and verifies every record and actual log. Any pending host,
+missing file, or hash mismatch prevents export. It writes only the plugin's
+`release/acceptance-proof.json`, containing identity, version, source hash, all
+host package hashes, exact public input hashes, and canonical paths and SHA256
+values for evidence and logs. It contains no summary, log, or acceptance JSON
+bodies. Export and committed reading share a 1 MiB limit. Identical exports are
+idempotent; changed existing summaries require review and explicit `--replace`.
+Do not handwrite a summary to substitute for real tests.
 
-After reviewing the summary, commit it together with the final public inputs and
-create the canonical tag. Keep original materials in ignored `private/` paths
-within the plugin. The summary does not contain the final commit SHA, avoiding a
-self-reference between a file and its containing commit. Actions separately
-confirms that the summary bytes equal the Git blob at the tagged HEAD, requires
-clean source and a canonical tag, and recalculates all public input and package
-hashes. Changes to source, documentation, configuration, or package bytes require
-acceptance and export to run again; the old summary cannot be reused.
+Review the summary and freeze it with final public source in the canonical
+`ID/vVERSION` tag as part of an authorized publication. Keep original materials
+in ignored private paths inside the plugin. The summary omits its containing
+commit SHA to avoid self-reference. Committed verification requires clean source,
+the canonical tag, summary bytes equal to the HEAD Git blob, and recomputed public
+input and package hashes. A present or HEAD-recorded summary cannot fall back to
+private mode because it is corrupt, removed, uncommitted, or stale. Both modes
+produce the same complete artifact bytes for the same frozen source.
 
-Actions Prepare, Draft, Publish, and marketplace planning/deployment explicitly
-use `committed_acceptance`. To reproduce that mode locally, pass
-`--committed-acceptance`. Ordinary local commands continue checking actual
-private files. A summary present in the worktree or HEAD must not fall back to
-local mode because it is damaged, deleted, uncommitted, or stale. Ordinary local
-mode requires complete private materials. Public artifacts retain a digest of
-private inputs without their bodies. Both modes produce identical complete
-artifact bytes for the same frozen source.
+Changed source, notes, configuration, or package bytes invalidate prior bindings.
+To keep an acceptance claim, repeat the applicable host verification and export.
+To prepare a new version without acceptance, the local `prepare-version` helper
+can explicitly reset old evidence references and remove a recognized generated
+summary, retaining private files and published history. Its preview lists those
+changes. New hosts stay unverified; clearing a slot never establishes acceptance.
 
-This summary is a factual declaration committed by a maintainer after local
-verification, not a signing service or platform certification. CI cannot prove
-the authenticity of private sessions again. Do not handwrite a summary in place
-of acceptance. Human approval in `plugin-release` and `plugin-marketplace`
-continues to provide the respective publication authorization; no new remote
-keys are introduced.
-
-accepted in evidence JSON is a factual declaration. Tooling cannot independently
-prove session authenticity, platform approval, or model effectiveness. An Agent
-writing accepted does not authorize a tag, Release, submission, or Publish.
-See the [publishing process](publishing.md).
+The summary is a maintainer's factual declaration, not platform certification,
+a signature service, or proof that CI reran a private session. CI cannot establish
+session authenticity or model effectiveness from hashes. Evidence JSON, an
+Agent-written `accepted` marker, a plan hash, and the summary grant no permission
+to commit, push, tag, publish, deploy, install, or submit to an official directory.
+The authorized Actions publication still uses `plugin-release` and
+`plugin-marketplace`; configured environment reviewers may pause the run. See the
+[publishing process](publishing.md).
