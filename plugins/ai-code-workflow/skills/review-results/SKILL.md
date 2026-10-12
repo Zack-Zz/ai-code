@@ -1,6 +1,6 @@
 ---
 name: review-results
-description: Use when presenting code review, security review, audit, or re-review findings to a human reader who needs to understand business impact and decide whether work may proceed.
+description: Use when presenting review or investigation findings so the user can assess impact and next steps; report recommendations without granting repair or merge permission
 origin: ai-code
 ---
 
@@ -8,16 +8,18 @@ origin: ai-code
 
 把审查证据转换成读者可以直接决策的结果。保持技术结论准确，但先解释业务链路、用户影响和下一步，再展示实现细节。跟随用户语言；用户使用中文时，正文使用中文。
 
+呈现前沿用 [workflow 的请求与授权上下文](../workflow/SKILL.md#request-and-authorization-context)；缺失时先读取并核对。建议修复、阻塞等级和“可以合并”都不构成修复或 Git 操作授权。只读调查或审查可以在报告未修复缺陷后完成。
+
 ## 输出契约
 
 按以下顺序输出：
 
-1. **一句话结论**：`可以合并`、`修改后可以合并` 或 `暂时不能合并`，并说明最主要原因。
+1. **一句话结论**：按任务目标给出调查结论或代码交付建议，并说明最主要原因。调查可写“已确认存在问题，建议修复”；合并审查可写 `可以合并`、`修改后可以合并` 或 `暂时不能合并`。
 2. **结果概览**：列出阻塞、应修复、可选优化的数量，以及必须处理的问题编号。
 3. **问题详情**：先阻塞项，再应修复项，最后可选优化项。每个问题使用下方的问题视图。
 4. **已确认正常**：只列实际检查过且有证据的关键项。
 5. **范围与限制**：说明审查范围、未验证内容和未运行检查。
-6. **下一步**：明确是修复、复审还是继续交付。
+6. **下一步**：说明建议修复、等待用户确认、复审或继续已授权交付；区分建议与已经获得授权的动作。
 
 没有发现问题时也要给出结论、已确认正常和范围与限制；“未发现问题”不等于证明没有风险。
 

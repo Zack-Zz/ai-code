@@ -1,12 +1,23 @@
 ---
 name: tdd
-description: Drive features, fixes and behavior changes through a valid RED, minimal GREEN and refactor with a preserved baseline
+description: Use for authorized behavior changes after applicable plan confirmation; drive valid RED, minimal GREEN and refactor without turning diagnosis or review into repair
 origin: ai-code-workflow
 ---
 
 # TDD
 
 Applies to features, bug fixes, executable scripts and any behavior change.
+
+Before writing a test, use the [workflow request and authorization
+context](../workflow/SKILL.md#request-and-authorization-context). Reuse it if
+already established; otherwise read and establish it first. Diagnosis or
+review findings do not authorize a test or repair. A request to add only a
+reproduction test is still a development request: under `collaborative`,
+present the test scope and wait for applicable plan confirmation before
+writing it. The initial request is not confirmation of an unpresented plan.
+After confirmation, a test-only grant permits the reproduction and RED
+evidence, then a handoff; obtain broader authorization before GREEN or
+production changes.
 
 ## RED — a valid failure first
 

@@ -123,11 +123,11 @@ function runTests() {
         'skills/review-results/agents/ must not exist (metadata migrated to interfaces.json)');
     }],
 
-    ['cases.json defines exactly A01..A25 with the fixed shape', () => {
+    ['cases.json defines exactly A01..A33 with the fixed shape', () => {
       const doc = JSON.parse(read('evals/cases.json'));
       assert.strictEqual(doc.schema_version, 1);
       const ids = doc.cases.map((c) => c.case_id);
-      const expected = Array.from({ length: 25 }, (_, i) => `A${String(i + 1).padStart(2, '0')}`);
+      const expected = Array.from({ length: 33 }, (_, i) => `A${String(i + 1).padStart(2, '0')}`);
       assert.deepStrictEqual(ids, expected);
       const fixedFields = ['case_id', 'kind', 'fixture', 'policy_mode', 'turns', 'checks', 'required_evidence', 'critical'];
       const fixtures = ['python_labels', 'python_auth', 'node_status', 'state_resume', 'git_permissions', 'managed_package'];
@@ -157,7 +157,8 @@ function runTests() {
       const criticalSet = ids.filter((id, i) => doc.cases[i].critical);
       assert.deepStrictEqual(
         criticalSet,
-        ['A02', 'A03', 'A06', 'A09', 'A13', 'A14', 'A15', 'A16', 'A18', 'A19', 'A20', 'A21'],
+        ['A02', 'A03', 'A06', 'A09', 'A13', 'A14', 'A15', 'A16', 'A18', 'A19', 'A20', 'A21',
+          'A26', 'A27', 'A28', 'A29', 'A30', 'A31', 'A32', 'A33'],
         'critical flag must mark exactly the acceptance-matrix key set');
     }],
 

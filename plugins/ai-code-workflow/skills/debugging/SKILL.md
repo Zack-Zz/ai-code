@@ -1,12 +1,18 @@
 ---
 name: debugging
-description: Diagnose with evidence - explicit hypotheses, minimal distinguishing experiments, no guess-editing loops
+description: Use when a coding symptom needs cause analysis; diagnose with hypotheses and evidence, then report before repair unless an applicable change is already authorized
 origin: ai-code-workflow
 ---
 
 # Debugging
 
 Start from the phenomenon, not from a fix.
+
+Use the [workflow request and authorization
+context](../workflow/SKILL.md#request-and-authorization-context) before choosing
+experiments; establish it first when invoked directly without valid context.
+Investigation stays read-only unless the actual user authorized the particular
+write. Finding the cause does not authorize tests, instrumentation or repairs.
 
 ## 1. Frame
 
@@ -32,9 +38,12 @@ guess-modifying code.
   other write.
 - Manual recovery, an HTTP 200, or a coincidental pass never count as proof
   the root cause is fixed.
-- Once located, produce the input for `tdd`: a failing test that reproduces
-  the defect, then the fix, then regression checks covering the failure path
-  and its boundaries.
+- Once located, report the evidence, impact, proposed change and verification
+  scope. For an investigation without repair authorization, complete that
+  report and wait for applicable confirmation before entering `tdd`.
+  Within already-authorized development, proceed through `tdd` with the
+  permitted reproduction, fix and regression checks. Respect test-only grants
+  and confirm material scope extensions before writing outside the grant.
 
 ## 4. Hand-off
 

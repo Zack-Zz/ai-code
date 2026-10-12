@@ -19,7 +19,7 @@
         "shortDescription": "AI coding workflow",
         "category": "Developer Tools",
         "defaultPrompt": [
-          "Use the workflow skill: classify this request, confirm scope and applicable authorization, then organize the work"
+          "Use $workflow to establish this coding request's intent and authorization, confirm the plan when required, and read only the skills needed next."
         ],
         "brandColor": "#2563EB",
         "longDescription": "CodeVow provides six AI coding skills for planning, TDD, evidence-driven debugging, risk-focused review, final-state verification and readable review results. Two collaboration policies preserve user authorization. Optional local Python tools resolve policies, maintain workspace-bound task/evidence records and stage owned files with receipts. It has no MCP server, background service or autonomous Git publishing. Native host behavior remains unverified.",

@@ -24,6 +24,41 @@ You can also ask for a focused investigation or review:
 >
 > Review this diff for authorization and data consistency risks.
 
+## Connect a project entry
+
+Skill descriptions help the host select skills; they do not guarantee that
+`workflow` is read before every request. For a persistent entry for coding-related
+tasks, use a project-instruction entry your host actually provides and whose
+loading you have checked. Add a short instruction yourself:
+
+```text
+For coding-related tasks, first load the installed CodeVow workflow skill to
+classify the request and check actual user conversation authorization.
+Without development authorization, questions, investigations and independent
+reviews default to read-only; confirmed defects do not authorize tests,
+diagnostic files or fixes. Follow-up questions during authorized development
+do not revoke that authorization; explicit stop requests and limits still apply.
+In collaborative mode, show proposed changes and wait for applicable
+confirmation; reuse confirmation covering the scope and keep moving within it.
+Continuous mode grants no new authorization. Load other skill bodies only for
+the current stage and reuse valid context. If workflow cannot load, report it
+and remain read-only.
+```
+
+Keep this entry separate from the skill bodies: workflow rules remain in the
+skills. Use a project-instruction entry your host actually provides, after
+checking how it loads in your session. This snippet is for your active opt-in;
+CodeVow does not silently edit existing `AGENTS.md`, `CLAUDE.md` or host settings.
+This does not assume a fixed installation-cache path or that a bundled
+`AGENTS.md` activates automatically. The exact instruction location and
+loading behavior need verification in your actual host session.
+
+You can explicitly ask the host to load the installed CodeVow `workflow` skill
+and check that it can read it, keeping the check read-only. If loading fails,
+the assistant should tell you and remain read-only. Successful loading proves
+access in that session, not automatic routing or compliance for every request.
+See the [usage guide](https://github.com/Zack-Zz/ai-code/blob/main/plugins/ai-code-workflow/docs/usage.md#connect-the-project-entry).
+
 ## How it works
 
 | Skill | What it helps with |
@@ -35,10 +70,14 @@ You can also ask for a focused investigation or review:
 | `verification` | Check the final code state and report actual verification |
 | `review-results` | Present conclusions with clear impact and clickable evidence |
 
-Read-only questions stay read-only. The default `collaborative` mode confirms
-the development plan before implementation and does not re-ask an already
-confirmed scope. `continuous` mode keeps work moving within the scope you have
-explicitly authorized.
+Without development authorization, questions, investigations and independent
+reviews default to read-only; confirming a defect does not authorize tests,
+diagnostic files or fixes. Follow-up questions during authorized development
+do not revoke that authorization; explicit stop requests and scope limits still
+apply. The default `collaborative` mode shows proposed changes and waits for applicable
+confirmation before implementation, reusing confirmation that covers the
+scope. `continuous` mode keeps work moving within the scope you have explicitly
+authorized and grants no new authorization.
 
 Both modes preserve existing edits. Commit, push, tag, merge, PR creation,
 installation and external publication each need your explicit authorization.

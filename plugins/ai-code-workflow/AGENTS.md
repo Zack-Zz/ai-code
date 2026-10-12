@@ -16,7 +16,7 @@
 | `adapters/` | 三端原生清单/市场模板/界面元数据/Reviewer 声明与能力说明 |
 | `assets/`、`release/`、`release.json` | PNG 发布图标与 SVG 备用标识、可移植包说明、草稿备注和逐宿主验收证据槽 |
 | `schemas/`、`templates/` | 固定数据契约文档、任务/证据输入模板 |
-| `evals/` | A01–A25 验收场景、fixture 与 prepare/collect/grade |
+| `evals/` | A01–A33 验收场景、fixture 与 prepare/collect/grade |
 | 显式临时输出目录 | 本地可复现构建产物；`dist/` 被忽略，不提交 |
 | `docs/design/` | 本轮开发的设计文档（任务设计/实现规格/数据契约/验收矩阵） |
 

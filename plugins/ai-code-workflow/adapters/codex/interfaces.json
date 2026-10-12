@@ -3,37 +3,37 @@
   "skills": {
     "workflow": {
       "display_name": "CodeVow",
-      "short_description": "Classify the request, plan with the user, and organize TDD, debugging, review and verification",
+      "short_description": "Route coding questions, diagnosis, review and authorized changes",
       "brand_color": "#2563EB",
-      "default_prompt": "Use the workflow skill: classify this request, confirm scope and applicable authorization, then organize the work",
+      "default_prompt": "Use $workflow to establish this coding request's intent and authorization, confirm the plan when required, and read only the skills needed next.",
       "allow_implicit_invocation": true
     },
     "tdd": {
       "display_name": "TDD",
-      "short_description": "Valid RED first, minimal GREEN, refactor under a preserved baseline",
+      "short_description": "Valid RED/GREEN within an authorized and confirmed change scope",
       "brand_color": "#16A34A",
-      "default_prompt": "Use the tdd skill for this behavior change: write the failing test first and drive it green",
+      "default_prompt": "Use $tdd after checking workflow's authorization and plan context; write the permitted failing test and proceed to GREEN only when implementation is authorized.",
       "allow_implicit_invocation": true
     },
     "debugging": {
       "display_name": "Debugging",
-      "short_description": "Evidence-driven diagnosis with explicit hypotheses and minimal distinguishing experiments",
+      "short_description": "Diagnose from evidence; report before unauthorized repair",
       "brand_color": "#D97706",
-      "default_prompt": "Use the debugging skill: frame the symptom, then run minimal experiments that distinguish hypotheses",
+      "default_prompt": "Use $debugging with workflow's request and authorization context to investigate and report this symptom, repairing only within an applicable grant.",
       "allow_implicit_invocation": true
     },
     "review": {
       "display_name": "Review",
-      "short_description": "Risk-focused review of the final diff with independent review when required",
+      "short_description": "Review affected risks; findings do not authorize repairs",
       "brand_color": "#DC2626",
-      "default_prompt": "Use the review skill on the final diff, including an independent reviewer when risk requires it",
+      "default_prompt": "Use $review with workflow's request and authorization context to inspect affected risks and report findings, fixing only within an applicable development grant.",
       "allow_implicit_invocation": true
     },
     "verification": {
       "display_name": "Verification",
-      "short_description": "Bind completion claims to the final code state with explicit verification levels",
+      "short_description": "Verify current evidence within the task's authorized scope",
       "brand_color": "#0891B2",
-      "default_prompt": "Use the verification skill: report what was actually verified against the final state",
+      "default_prompt": "Use $verification with workflow's request and authorization context to report current evidence without expanding permission for tests or repairs.",
       "allow_implicit_invocation": true
     },
     "review-results": {

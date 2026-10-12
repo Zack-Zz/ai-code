@@ -1,6 +1,6 @@
 ---
 name: review
-description: Risk-focused review of the final change with an independent reviewer when required, findings verified by the main agent
+description: Use for standalone code review or risk review during authorized development; report verified findings, and repair only within an existing applicable grant
 origin: ai-code-workflow
 ---
 
@@ -9,9 +9,12 @@ origin: ai-code-workflow
 Inputs: the goal, constraints, final diff, verification records and the
 change's authorship (pre-existing user edits vs. this change).
 
-Use the effective policy and its sources supplied by workflow. If invoked
-directly without them, first use the policy-loading section in
-[workflow](../workflow/SKILL.md); do not assume `review_level=critical`.
+Use the [workflow request and authorization
+context](../workflow/SKILL.md#request-and-authorization-context) and the effective
+policy and its sources. If invoked directly without them, establish the
+request/authorization context and resolve the policy first; do not assume
+`review_level=critical`. A standalone review reports findings and proposed
+fixes; it does not authorize tests or repairs.
 
 ## Scope
 
@@ -33,8 +36,11 @@ Attempt an available independent reviewer when risk is `critical` or
   self-review scope, and what remained uncovered. Self-review is never
   described as independent review.
 
-The reviewer only reports findings; the main agent verifies each one, fixes
-what is confirmed, and re-verifies the affected range after fixing.
+The reviewer only reports findings. The main agent verifies each one and
+reports evidence, impact and proposed changes. During already-authorized
+development, fix confirmed issues within the approved objective and re-verify
+the affected range. For standalone review or scope extensions, wait for
+applicable repair authorization and plan confirmation before writing.
 
 ## Findings
 
@@ -44,7 +50,10 @@ confirmed defect by severity label alone; blocking depends on the task's
 requirements and the actual evidence, and the rationale is stated.
 
 Present the final output through the shared `review-results` skill. A
-confirmed critical/high defect keeps the change not done until resolved.
+confirmed critical/high defect within the authorized development objective
+keeps that change incomplete until resolved. A standalone review is complete
+when its findings and limits are reported; unrepaired defects block the
+relevant code delivery, not completion of the read-only review.
 
 Read-only reviewer duties are shared across hosts in
 [references/reviewer-contract.md](references/reviewer-contract.md); hosts

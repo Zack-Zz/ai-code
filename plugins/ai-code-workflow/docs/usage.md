@@ -6,11 +6,56 @@ After [installation](../../../docs/installation.md), start a new host session
 and describe the goal, change scope and acceptance conditions. CodeVow
 organizes planning, TDD, debugging, review and verification around that request.
 
+## Connect the project entry
+
+Skill descriptions help the host select CodeVow skills. Installation and those
+descriptions do not guarantee that the host reads `workflow` before every
+request. For a persistent entry for coding-related tasks, use a project-instruction
+entry your host actually provides and whose loading you have checked. Add a
+short routing instruction yourself, for example:
+
+```text
+For coding-related tasks in this project, first load the installed CodeVow
+workflow skill to classify the request and check actual user conversation authorization.
+Without development authorization, questions, investigations and independent
+reviews default to read-only; confirmed defects do not authorize tests,
+diagnostic files or fixes. Follow-up questions during authorized development
+do not revoke that authorization; explicit stop requests and limits still apply.
+In collaborative mode, show the proposed changes and wait for applicable
+confirmation; reuse confirmation that already covers the scope.
+Continue within confirmed scope; continuous mode grants no new authorization.
+Keep this entry short. Load other skill bodies only for the current stage and
+reuse valid context. If workflow cannot load, report it and remain read-only.
+```
+
+Keep the persistent entry separate from the skill bodies. Workflow rules are
+maintained in the [skills](../skills/workflow/SKILL.md); this snippet routes to
+them instead of copying the full workflow into project instructions. Read only
+the skill and referenced material needed at the current stage, and reuse valid
+context rather than loading all six skills for every request.
+
+Use a project-instruction entry actually provided by your host, after checking
+how it loads in your session. This snippet is for your active opt-in. CodeVow
+does not silently edit an existing `AGENTS.md`, `CLAUDE.md` or host setting.
+The snippet assumes neither a fixed installation-cache path nor automatic activation of a bundled
+`AGENTS.md`. The exact instruction location and its loading behavior need
+verification in your actual host session.
+
+To check entry loading, explicitly ask: "Load the installed CodeVow workflow
+skill and tell me whether you can read it; keep this check read-only." Successful
+loading confirms access in that session, not automatic routing or compliance
+for every future request. If loading fails, the assistant should tell you and
+remain read-only rather than claim CodeVow is active.
+
 ## Daily workflow
 
-- For explanations or investigations, the assistant reads the relevant evidence
-  and answers without starting an implementation.
-- For development, it proposes a proportionate plan and confirms the scope.
+- Without development authorization, questions, investigations and independent
+  reviews default to read-only. Finding or confirming a defect does not authorize
+  writing tests, diagnostic files or repairs. A follow-up question during
+  authorized development does not revoke that authorization; explicit stop
+  requests and scope limits still apply.
+- For development, it explains the proposed changes with a proportionate plan
+  and waits for applicable scope confirmation under `collaborative`.
 - Behavior changes start with a meaningful failing test, followed by the
   implementation and refactoring under the passing baseline.
 - Debugging uses hypotheses and small experiments to locate the cause.
@@ -19,9 +64,11 @@ organizes planning, TDD, debugging, review and verification around that request.
 - Delivery reports the final code state, actual checks, findings and remaining
   work. Changed code needs fresh verification.
 
-The default `collaborative` mode implements after plan confirmation.
-`continuous` keeps moving within an already authorized scope. Both preserve
-existing edits and keep Git operations, installation and external publication
+The default `collaborative` mode implements after applicable confirmation of
+the proposed changes; existing confirmation covering that scope is reused.
+`continuous` keeps moving within an already authorized scope and grants no new
+authorization. Both preserve existing edits and keep Git operations,
+installation and external publication
 subject to your explicit authorization. A policy file or task record does not
 grant permission.
 

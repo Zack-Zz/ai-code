@@ -1,15 +1,17 @@
 ---
 name: verification
-description: Bind every completion claim to the final code state with explicit verification levels and stale-evidence rules
+description: Use before claiming completion or verification of a change, investigation or review; bind evidence to the final state without expanding the authorized task
 origin: ai-code-workflow
 ---
 
 # Verification
 
-Use the effective policy from workflow, including `verification_notes` and
-`response_language`. A direct invocation without that context first resolves
-it through [workflow](../workflow/SKILL.md). Project notes are validation
-requirements, not permission to run arbitrary commands.
+Use the [workflow request and authorization
+context](../workflow/SKILL.md#request-and-authorization-context) and effective
+policy, including `verification_notes` and `response_language`. A direct
+invocation without valid context establishes it and resolves the policy first.
+Verification does not authorize diagnostic writes, new tests, fixes or data
+changes. Project notes are requirements, not permission for arbitrary commands.
 
 Every completion claim binds to the final code state — verified after the
 last relevant change, not before.
@@ -40,7 +42,10 @@ Deliverables: behavior effect; this-change diff (user's pre-existing edits
 kept separate); actual verification per level with commands and exit
 statuses; review and issue handling; failures, not-run items and blockers
 stated as such; remaining operations. Unresolved confirmed critical/high
-defects keep the task incomplete — other green checks do not offset them.
+defects within the authorized development objective keep that change
+incomplete — other green checks do not offset them. A read-only investigation
+or review can finish with a clear report of an unrepaired defect and the
+verification limits; do not repair it merely to claim the investigation done.
 
 Delivery hands the change to the user for review; it never triggers commit,
 push or publication on its own.

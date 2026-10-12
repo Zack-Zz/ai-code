@@ -59,6 +59,26 @@ class PrepareTests(unittest.TestCase):
         result = run_py(PREPARE, "--case", "A99", "--output", str(self.out("x")))
         self.assertEqual(result.returncode, 2)
 
+    def test_prepare_request_routing_scenarios(self):
+        for number in range(26, 34):
+            case_id = f"A{number}"
+            with self.subTest(case=case_id):
+                out = self.out(case_id)
+                result = run_py(PREPARE, "--case", case_id, "--output", str(out))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                prepared = json.loads((out / "prepared.json").read_text())
+                self.assertEqual(prepared["case_id"], case_id)
+                self.assertTrue(prepared["critical"])
+                self.assertTrue(prepared["baseline"])
+                self.assertTrue(all(key.startswith("workspace/") for key in prepared["baseline"]))
+                self.assertEqual(prepared["cases_sha256"], hashlib.sha256(
+                    (REPO_ROOT / "evals/cases.json").read_bytes()).hexdigest())
+                source = json.loads((REPO_ROOT / "evals/cases.json").read_text())
+                case = next(item for item in source["cases"] if item["case_id"] == case_id)
+                self.assertEqual(prepared["turns"], case["turns"])
+                self.assertEqual(prepared["policy_mode"], case["policy_mode"])
+                self.assertTrue(any(check["method"] == "trace_order" for check in case["checks"]))
+
     def test_prepare_refuses_existing_output(self):
         out = self.out("exists")
         out.mkdir()

@@ -24,6 +24,12 @@ You can also ask for a focused investigation or review:
 >
 > Review this diff for authorization and data consistency risks.
 
+Skill descriptions help the host choose skills; installation alone does not
+guarantee that `workflow` runs first. The [project entry guide](docs/usage.md#connect-the-project-entry)
+provides a short, optional instruction for coding-related tasks that you can
+connect through your host's verified project-instruction entry. It also explains
+direct skill invocation, authorization checks and actual host verification.
+
 ## How it works
 
 | Skill | What it helps with |
