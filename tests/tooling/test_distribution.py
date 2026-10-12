@@ -31,9 +31,35 @@ class HostedConfigTests(unittest.TestCase):
     def test_repository_config_selects_main_latest_stable_and_native_transports(self):
         config = distribution.load_config(Path(__file__).resolve().parents[2])
         self.assertEqual(config.get("source_branch"), "main")
-        self.assertEqual(config.get("marketplace"), {"branch": "main", "name": "ai-code-preview",
+        self.assertEqual(config.get("marketplace"), {"branch": "main", "name": "ai-code",
                                                    "version_policy": "latest-stable"})
         self.assertEqual(config["transports"], {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip"})
+
+    def test_requested_marketplace_name_is_accepted_without_an_alias(self):
+        config = json.loads((Path(__file__).resolve().parents[2] / "distribution.json").read_text())
+        config["marketplace"]["name"] = "ai-code"
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "distribution.json").write_bytes(io.dump_json(config))
+            self.assertEqual(distribution.load_config(root)["marketplace"]["name"], "ai-code")
+
+    def test_previous_marketplace_name_is_rejected(self):
+        config = json.loads((Path(__file__).resolve().parents[2] / "distribution.json").read_text())
+        config["marketplace"]["name"] = "ai-code-preview"
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "distribution.json").write_bytes(io.dump_json(config))
+            with self.assertRaises(io.DataError):
+                distribution.load_config(root)
+
+    def test_public_market_names_and_ownership_hashes_match(self):
+        root = Path(__file__).resolve().parents[2]
+        lock = json.loads((root / distribution.LOCK_PATH).read_text())
+        for path in distribution.NATIVE_PATHS:
+            with self.subTest(path=path):
+                raw = (root / path).read_bytes()
+                self.assertEqual(json.loads(raw)["name"], "ai-code")
+                self.assertEqual(lock["files"][path], hashlib.sha256(raw).hexdigest())
 
 
 class HostedMarketTests(unittest.TestCase):
@@ -85,6 +111,7 @@ class HostedMarketTests(unittest.TestCase):
         self.assertEqual(plan["status"], "plan_ready")
         self.assertEqual(set(plan["record"]["readiness"]["accepted_hosts"]), {"claude", "codex", "zcode"})
         self.assertEqual(plan["branch"], "main")
+        self.assertEqual(plan["marketplace_name"], "ai-code")
         self.assertTrue(plan["bootstrap"])
         self.assertEqual(json.loads(json.dumps(plan)), plan)
 
@@ -94,6 +121,9 @@ class HostedMarketTests(unittest.TestCase):
         self.assertTrue(stage)
         self.assertTrue(all(path.startswith("published/codex/ai-one/1.0.0/") for path in stage))
         final = distribution.finalize_files(plan, "d" * 40)
+        for path in distribution.NATIVE_PATHS:
+            with self.subTest(path=path):
+                self.assertEqual(json.loads(final[path])["name"], "ai-code")
         claude = json.loads(final[".claude-plugin/marketplace.json"])["plugins"][0]
         zcode = json.loads(final["marketplace.json"])["plugins"][0]
         codex = json.loads(final[".agents/plugins/marketplace.json"])["plugins"][0]
@@ -115,6 +145,16 @@ class HostedMarketTests(unittest.TestCase):
             distribution.check_plan(plan, expected_commit="a" * 40)
         plan["version"] = "9.9.9"
         with self.assertRaises(io.DataError):
+            distribution.check_plan(plan)
+
+    def test_plan_rejects_previous_namespace_even_with_recomputed_hash(self):
+        plan = self.plan()
+        config = json.loads((self.root / "distribution.json").read_text())
+        config["marketplace"]["name"] = "ai-code-preview"
+        plan["marketplace_name"] = "ai-code-preview"
+        plan["config_hash"] = io.sha256(io.canonical_json(config))
+        plan["plan_hash"] = distribution._digest(plan)
+        with self.assertRaisesRegex(io.DataError, "trusted main/latest-stable"):
             distribution.check_plan(plan)
 
     def test_public_release_visibility_channel_and_asset_binding_are_required(self):

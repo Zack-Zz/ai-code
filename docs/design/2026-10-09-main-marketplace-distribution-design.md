@@ -1,5 +1,8 @@
 # main 统一源码与插件分发改造
 
+> 历史资料：本文保留原日期的市场名称、命令与验证事实，不作为当前安装入口。
+> 当前公开市场名为 `ai-code`；现行操作见[安装指南](../installation.zh-CN.md)与[发布指南](../publishing.zh-CN.md)。
+
 日期：2026-10-09（Asia/Shanghai）。状态：已按本稿实施本地代码与空正式市场，
 最终验证见[实施记录](../reviews/2026-10-09-main-marketplace-implementation.md)；
 尚未提交、推送或验证远端 Actions 与新 main 宿主链路。

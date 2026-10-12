@@ -72,7 +72,7 @@ python3 tooling/plugin_tool.py marketplace sync --output /tmp/ai-code-developmen
 
 ## main 市场记录
 
-`distribution.json` 维护 main、市场名 `ai-code-preview`、latest-stable 策略和
+`distribution.json` 维护 main、市场名 `ai-code`、latest-stable 策略和
 宿主运输方式。同一插件 ID 只有一个当前正式入口。
 
 | 路径 | 内容 |

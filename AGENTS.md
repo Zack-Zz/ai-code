@@ -44,7 +44,8 @@
 - 新公开版本只接受 `X.Y.Z` 或 `X.Y.Z-preview.N`，数字无前导零；统一按
   数字比较 preview 序号，同核心正式版在其后。发行种类从版本派生，不能
   自由组合 mode/prerelease。
-- 源码与公开市场统一使用 main，每个插件 ID 只有一个当前正式入口；
+- 源码与公开市场统一使用 main，公开市场名统一为 `ai-code`；
+  每个插件 ID 只有一个当前正式入口；
   preview 只公开 Release，不更新市场。没有正式版的插件不回退到 preview。
   `product.json` 是开发权威，`published/` 是已上线来源，允许版本不同。
 - `dist/` 不得进入新提交或远端分支，CI 拒绝任何跟踪文件。公开 ZIP 是

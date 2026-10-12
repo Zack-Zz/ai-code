@@ -29,7 +29,7 @@ features and configuration, with shared tooling for packaging and distribution.
 ## Install and use
 
 Install through the ai-code marketplace or download a package for your coding
-assistant from GitHub Releases. The marketplace name is `ai-code-preview`, from
+assistant from GitHub Releases. The marketplace name is `ai-code`, from
 `Zack-Zz/ai-code` at `main`. Available plugins are listed in the marketplace;
 it currently has no installable plugins.
 

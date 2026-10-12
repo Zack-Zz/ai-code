@@ -1,6 +1,18 @@
 # Support matrix and current verification status
 
-## Current package targets (1.0.2 candidate, 2026-10-08)
+## Current distribution
+
+The public marketplace is `ai-code` from `Zack-Zz/ai-code` at `main`.
+Shared development builds and Release download packages use `ai-code-local`;
+CodeVow's standalone build helper uses `ai-code-workflow-local`. These local
+sources are separate from the public marketplace. Build output belongs in an
+explicit temporary directory; `dist/` is ignored and is not a public source.
+Current installation steps are in the [installation guide](../../../docs/installation.md).
+
+The dated verification records below retain their original versions, names,
+commands and results. Their migration descriptions do not define today's sources.
+
+## Historical package targets (1.0.2 candidate, 2026-10-08)
 
 | Target | Native package format | Runtime acceptance |
 |---|---|---|

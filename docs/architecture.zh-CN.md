@@ -43,8 +43,16 @@ Reviewer、策略或 `.ai-workflow` 任务记录。
 
 ## 市场与发行
 
-源码和公开市场都使用 `Zack-Zz/ai-code` 的 `main`，市场名为 `ai-code-preview`。
+源码和公开市场都使用 `Zack-Zz/ai-code` 的 `main`，市场名为 `ai-code`。
 同一插件 ID 的市场入口指向最新成功同步的正式版本。
+
+本地包使用独立名称，注册开发来源时不会复用公开市场身份：
+
+| 市场名 | 来源与用途 |
+|---|---|
+| `ai-code` | main 公开市场 |
+| `ai-code-local` | 公共构建及带本地市场的 Release 下载包 |
+| `ai-code-workflow-local` | CodeVow 自带构建工具的本地试用市场 |
 
 | 输入或输出 | 职责 |
 |---|---|

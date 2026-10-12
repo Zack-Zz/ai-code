@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
   "source_branch": "main",
-  "marketplace": {"branch": "main", "name": "ai-code-preview", "version_policy": "latest-stable"},
+  "marketplace": {"branch": "main", "name": "ai-code", "version_policy": "latest-stable"},
   "transports": {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip"}
 }

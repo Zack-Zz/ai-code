@@ -1,5 +1,8 @@
 # main 统一分发实施与验证
 
+> 历史资料：本文保留原日期的市场名称、命令与验证事实，不作为当前安装入口。
+> 当前公开市场名为 `ai-code`；现行操作见[安装指南](../installation.zh-CN.md)与[发布指南](../publishing.zh-CN.md)。
+
 日期：2026-10-09（Asia/Shanghai）。本轮为本地代码实施，Git 交付与远端发布
 分别记录；不把测试 fixture 的 accepted 状态当作真实宿主验收。
 

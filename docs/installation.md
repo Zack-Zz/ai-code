@@ -16,7 +16,7 @@ install a listed plugin.
 ## Install from the marketplace
 
 The source is `Zack-Zz/ai-code` at `main`; its marketplace name is
-`ai-code-preview`. Register it once, then choose either or both plugins.
+`ai-code`. Register it once, then choose either or both plugins.
 
 ### Codex
 
@@ -26,12 +26,12 @@ Register the marketplace:
 codex plugin marketplace add Zack-Zz/ai-code --ref main
 ```
 
-In the desktop client's Plugins Directory, select `ai-code-preview`, choose
+In the desktop client's Plugins Directory, select `ai-code`, choose
 the plugin, and install and enable it. The CLI installation commands are:
 
 ```sh
-codex plugin add ai-code-workflow@ai-code-preview
-codex plugin add ai-agent-delegation@ai-code-preview
+codex plugin add ai-code-workflow@ai-code
+codex plugin add ai-agent-delegation@ai-code
 ```
 
 ### Claude Code
@@ -39,8 +39,8 @@ codex plugin add ai-agent-delegation@ai-code-preview
 ```sh
 claude plugin marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
-claude plugin install ai-code-workflow@ai-code-preview
-claude plugin install ai-agent-delegation@ai-code-preview
+claude plugin install ai-code-workflow@ai-code
+claude plugin install ai-agent-delegation@ai-code
 ```
 
 Choose only the installation command for the plugin you want, then enable it
@@ -54,14 +54,14 @@ In the native plugin marketplace, add this URL:
 https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
 ```
 
-Select `ai-code-preview`, choose the plugin, and install and enable it.
+Select `ai-code`, choose the plugin, and install and enable it.
 With the macOS bundled CLI:
 
 ```sh
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code-preview
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-agent-delegation@ai-code-preview
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-agent-delegation@ai-code
 ```
 
 After installation in any host, start a new session. Your host continues to

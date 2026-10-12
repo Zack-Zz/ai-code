@@ -23,7 +23,7 @@ from .rendering import marketplace_entry, marketplace_path
 HASH = re.compile(r"[0-9a-f]{64}")
 REVISION = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 TRANSPORTS = {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip"}
-MARKETPLACE = {"branch": "main", "name": "ai-code-preview", "version_policy": "latest-stable"}
+MARKETPLACE = {"branch": "main", "name": "ai-code", "version_policy": "latest-stable"}
 INDEX_PATH = "published/index.json"
 LOCK_PATH = "published/marketplaces.lock.json"
 NATIVE_PATHS = {marketplace_path(host) for host in HOSTS}

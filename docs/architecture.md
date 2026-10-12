@@ -48,8 +48,17 @@ CodeVow's six skills, reviewer, policies or `.ai-workflow` task records.
 ## Marketplace and releases
 
 Source and the public marketplace use `Zack-Zz/ai-code` at `main`. The marketplace
-name is `ai-code-preview`. Each plugin ID points to its latest successfully
+name is `ai-code`. Each plugin ID points to its latest successfully
 synchronized stable release.
+
+Local packages have separate names so registering a development source does not
+reuse the public marketplace identity:
+
+| Marketplace name | Source and purpose |
+|---|---|
+| `ai-code` | Public main marketplace |
+| `ai-code-local` | Shared builds and Release downloads with a local marketplace |
+| `ai-code-workflow-local` | CodeVow's standalone build helper; local trials only |
 
 | Input or output | Purpose |
 |---|---|

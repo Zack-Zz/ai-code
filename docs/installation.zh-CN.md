@@ -14,7 +14,7 @@
 
 ## 从插件市场安装
 
-来源为 `Zack-Zz/ai-code` 的 `main`，市场名称为 `ai-code-preview`。
+来源为 `Zack-Zz/ai-code` 的 `main`，市场名称为 `ai-code`。
 注册一次后，可以按需要选择其中一个或两个插件。
 
 ### Codex
@@ -25,12 +25,12 @@
 codex plugin marketplace add Zack-Zz/ai-code --ref main
 ```
 
-在桌面客户端的插件目录选择 `ai-code-preview`，选择插件并安装、启用。
+在桌面客户端的插件目录选择 `ai-code`，选择插件并安装、启用。
 CLI 安装命令为：
 
 ```sh
-codex plugin add ai-code-workflow@ai-code-preview
-codex plugin add ai-agent-delegation@ai-code-preview
+codex plugin add ai-code-workflow@ai-code
+codex plugin add ai-agent-delegation@ai-code
 ```
 
 ### Claude Code
@@ -38,8 +38,8 @@ codex plugin add ai-agent-delegation@ai-code-preview
 ```sh
 claude plugin marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
-claude plugin install ai-code-workflow@ai-code-preview
-claude plugin install ai-agent-delegation@ai-code-preview
+claude plugin install ai-code-workflow@ai-code
+claude plugin install ai-agent-delegation@ai-code
 ```
 
 只执行你需要的插件安装命令，再通过原生插件管理界面启用。
@@ -52,13 +52,13 @@ claude plugin install ai-agent-delegation@ai-code-preview
 https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
 ```
 
-选择 `ai-code-preview`，选择插件并安装、启用。macOS 自带 CLI 可使用：
+选择 `ai-code`，选择插件并安装、启用。macOS 自带 CLI 可使用：
 
 ```sh
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code-preview
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-agent-delegation@ai-code-preview
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-agent-delegation@ai-code
 ```
 
 任一宿主安装后，都开启新会话。账号和所选模型仍由宿主管理。

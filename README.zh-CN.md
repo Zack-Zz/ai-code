@@ -27,7 +27,7 @@ ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 Z
 ## 安装与使用
 
 通过 ai-code 插件市场安装，或从 GitHub Release 下载对应编码助手的安装包。
-插件市场名为 `ai-code-preview`，来源是 `Zack-Zz/ai-code` 的 `main` 分支。
+插件市场名为 `ai-code`，来源是 `Zack-Zz/ai-code` 的 `main` 分支。
 可安装插件以市场列表为准，当前市场暂无可安装插件。
 
 - [安装指南](docs/installation.zh-CN.md)：Claude Code、Codex、ZCode 的市场安装、下载包安装、更新和卸载。

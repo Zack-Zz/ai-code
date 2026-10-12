@@ -1,5 +1,8 @@
 # GitHub 插件市场与制品分发设计
 
+> 历史资料：本文保留原日期的市场名称、命令与验证事实，不作为当前安装入口。
+> 当前公开市场名为 `ai-code`；现行操作见[安装指南](../installation.zh-CN.md)与[发布指南](../publishing.zh-CN.md)。
+
 2026-10-09 补充：后续改造目标已调整为 main 统一源码和公开市场、预览版
 只发布 Release、市场只更新正式版，见
 [新版设计](2026-10-09-main-marketplace-distribution-design.md)。下文双分支方案

@@ -35,7 +35,7 @@ class PublicMarketTests(unittest.TestCase):
         (self.root / "distribution.json").write_bytes((ROOT / "distribution.json").read_bytes())
         files = {}
         for host, path in PATHS.items():
-            market = {"name": "ai-code-preview", "plugins": []}
+            market = {"name": "ai-code", "plugins": []}
             if host == "claude":
                 market["owner"] = {"name": "ai-code"}
             files[path] = io.dump_json(market)

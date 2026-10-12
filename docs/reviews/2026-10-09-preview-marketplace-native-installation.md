@@ -1,5 +1,8 @@
 # CodeVow preview 市场部署与原生安装
 
+> 历史资料：本文保留原日期的市场名称、命令与验证事实，不作为当前安装入口。
+> 当前公开市场名为 `ai-code`；现行操作见[安装指南](../installation.zh-CN.md)与[发布指南](../publishing.zh-CN.md)。
+
 日期：2026-10-09（Asia/Shanghai）。插件：`ai-code-workflow`，版本：`1.0.2`。
 这是[首次 Release 记录](2026-10-09-codevow-first-release.md)之后的执行结果，
 保留前一报告在其记录时点的事实。发行文件和源码标签没有改写。

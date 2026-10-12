@@ -1,5 +1,11 @@
 # CodeVow release notes — preview
 
+Current distribution uses the `ai-code` public main marketplace. Shared local
+builds and Release download packages use `ai-code-local`; CodeVow's standalone
+build helper uses `ai-code-workflow-local`. See the
+[installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md).
+The entries below retain their dated release context, including earlier migration plans.
+
 ## 1.0.2 — 2026-10-08 candidate
 
 - Prepares GitHub marketplace distribution with schema 2 release bundles and separate plugin-only native installer ZIPs, including artifact.json.

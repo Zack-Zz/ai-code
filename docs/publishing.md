@@ -83,7 +83,7 @@ not be committed. Public ZIPs are stored as Release attachments.
 
 ## main marketplace records
 
-`distribution.json` maintains main, the marketplace name `ai-code-preview`, the
+`distribution.json` maintains main, the marketplace name `ai-code`, the
 latest-stable policy, and host transport methods. Each plugin ID has only one
 current stable entry.
 
