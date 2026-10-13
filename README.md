@@ -35,11 +35,41 @@ assistant from GitHub Releases. The marketplace name is `ai-code`, from
 repository but has not entered the stable marketplace. Check the current
 marketplace list for the latest installable plugins.
 
-Register the marketplace using the source for your coding assistant:
+Run the following CLI commands in your system terminal, one at a time after
+each succeeds. If you have already added `ai-code` with the correct source,
+start with the second command to refresh the marketplace.
 
-- **Codex:** `codex plugin marketplace add Zack-Zz/ai-code --ref main`.
-- **Claude Code 2.1.224+:** use the [dedicated marketplace JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json). GitHub shorthand is also supported; see the installation guide.
-- **ZCode desktop:** add the [dedicated marketplace JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json). A repository-only source selects the Claude manifest first, whose `archive` transport ZCode does not support, so use this URL.
+### Codex CLI quick start
+
+```sh
+codex plugin marketplace add Zack-Zz/ai-code --ref main
+codex plugin marketplace upgrade ai-code
+codex plugin add ai-code-workflow@ai-code
+```
+
+### Claude Code CLI quick start
+
+Use **Claude Code 2.1.224 or later**:
+
+```sh
+claude plugin marketplace add https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
+claude plugin marketplace update ai-code
+claude plugin install ai-code-workflow@ai-code --scope user
+```
+
+After installation, restart the session or run `/reload-plugins` inside your
+Claude Code session. GitHub shorthand is also supported; see the
+[installation guide](docs/installation.md#claude-code).
+
+### ZCode
+
+Open a workspace in the ZCode desktop app, then go to **Settings → Plugins →
+Create → Add plugin marketplace**. Add the
+[dedicated marketplace JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json),
+then select `ai-code` and install and enable CodeVow. A repository-only source
+selects the Claude manifest first, whose `archive` transport ZCode does not
+support, so use this URL. For the macOS bundled CLI commands, see the
+[ZCode installation guide](docs/installation.md#zcode).
 
 For detailed installation steps and plugin usage:
 

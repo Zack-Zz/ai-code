@@ -32,11 +32,37 @@ ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 Z
 Agent Delegation 在本仓库中已有源码，尚未进入正式市场。最新可安装插件以
 当前市场列表为准。
 
-按所用编码助手选择市场来源：
+在系统终端执行以下 CLI 命令，每条成功后再执行下一条。如果已使用正确来源
+添加 `ai-code`，从第二条命令的刷新市场步骤继续。
 
-- **Codex：** `codex plugin marketplace add Zack-Zz/ai-code --ref main`。
-- **Claude Code 2.1.224+：** 推荐使用[专用市场 JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json)。也支持 GitHub 简写，详见安装指南。
-- **ZCode 桌面端：** 添加[专用市场 JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json)。只填仓库会优先读取 Claude 清单，而 ZCode 不支持其中的 `archive` 分发方式，因此请使用此 URL。
+### Codex CLI 快速开始
+
+```sh
+codex plugin marketplace add Zack-Zz/ai-code --ref main
+codex plugin marketplace upgrade ai-code
+codex plugin add ai-code-workflow@ai-code
+```
+
+### Claude Code CLI 快速开始
+
+使用 **Claude Code 2.1.224 或以上版本**：
+
+```sh
+claude plugin marketplace add https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
+claude plugin marketplace update ai-code
+claude plugin install ai-code-workflow@ai-code --scope user
+```
+
+安装后重新开启会话，或在 Claude Code 会话内执行 `/reload-plugins`。
+也支持 GitHub 简写，详见[安装指南](docs/installation.zh-CN.md#claude-code)。
+
+### ZCode
+
+在 ZCode 桌面端先打开工作区，再进入 **设置 → 插件 → 创建 → 添加插件市场**，
+添加[专用市场 JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json)，
+然后选择 `ai-code`，安装并启用 CodeVow。只填仓库会优先读取 Claude 清单，
+而 ZCode 不支持其中的 `archive` 分发方式，因此请使用此 URL。
+macOS 内置 CLI 的完整命令见 [ZCode 安装指南](docs/installation.zh-CN.md#zcode)。
 
 完整安装步骤和插件用法见以下指南：
 

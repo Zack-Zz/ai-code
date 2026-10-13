@@ -20,6 +20,10 @@ Agent Delegation 已有源码，但目前无法通过 `ai-agent-delegation@ai-co
 用户无需手动克隆源码仓库或构建安装包，编码助手会自行获取所登记的来源。
 注册一次后，再安装市场列表中已有的插件。
 
+下面的 `sh` 命令块在系统终端执行，不是在编码助手的交互会话中输入。
+每条命令成功后再执行下一条。如果已使用正确来源注册 `ai-code`，跳过添加
+市场的命令，从刷新市场、安装插件开始。
+
 三个宿主分别使用自己的市场清单和安装来源：
 
 | 宿主 | 添加方式 | 本仓库中的清单 | 插件安装来源 |
@@ -30,20 +34,23 @@ Agent Delegation 已有源码，但目前无法通过 `ai-agent-delegation@ai-co
 
 ### Codex
 
-使用支持原生插件市场的 Codex 版本。注册 GitHub 来源，
+使用支持原生插件市场的 Codex 版本。注册 GitHub 来源、刷新列表，再安装 CodeVow，
 其中 `owner/repo` 是客户端支持的 GitHub 仓库简写：
 
 ```sh
 codex plugin marketplace add Zack-Zz/ai-code --ref main
-```
-
-Codex 读取 `.agents/plugins/marketplace.json`。
-在桌面客户端的插件目录选择 `ai-code`，选择 CodeVow 并安装、启用。
-CLI 安装命令为：
-
-```sh
+codex plugin marketplace upgrade ai-code
 codex plugin add ai-code-workflow@ai-code
 ```
+
+检查插件状态：
+
+```sh
+codex plugin list --marketplace ai-code
+```
+
+Codex 读取 `.agents/plugins/marketplace.json`。也可以在桌面客户端的插件目录
+选择 `ai-code`，选择 CodeVow 并安装、启用。安装后开启新会话。
 
 ### Claude Code
 
@@ -51,12 +58,13 @@ codex plugin add ai-code-workflow@ai-code
 根据 [Claude Code 官方市场参考](https://code.claude.com/docs/en/plugins/marketplace-reference#plugin-sources)，
 这种来源要求该最低版本。安装前执行 `claude --version` 核对版本。
 
-添加 Claude 专用清单的完整 URL，再安装 CodeVow：
+添加 Claude 专用清单的完整 URL、刷新列表，再为本机当前用户安装 CodeVow：
 
 ```sh
-claude plugin marketplace add \
-  https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
-claude plugin install ai-code-workflow@ai-code
+claude plugin marketplace add https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
+claude plugin marketplace update ai-code
+claude plugin install ai-code-workflow@ai-code --scope user
+claude plugin list
 ```
 
 也可以用 GitHub 简写替代上面的 URL 添加方式；
@@ -66,7 +74,18 @@ Claude Code 会读取 `.claude-plugin/marketplace.json`：
 claude plugin marketplace add "Zack-Zz/ai-code#main"
 ```
 
-为 `ai-code` 市场选择其中一种添加方式，再通过原生插件管理安装、启用 CodeVow。
+两种添加方式任选其一；GitHub 命令只替换上面安装命令块的第一条命令。
+安装后重启 Claude Code，或在**已打开的 Claude Code 会话内**执行：
+
+```text
+/reload-plugins
+```
+
+可在 `/plugin` 的 Installed（已安装）页检查并启用 CodeVow。
+安装范围与加载方式见[官方命令行安装指南](https://code.claude.com/docs/en/discover-plugins#install-from-your-shell)。
+
+如果版本已满足要求，交互式插件面板仍提示不支持该来源，在系统终端执行上面
+的刷新市场、安装插件命令，然后重启会话。不能仅凭这条错误判断 CLI 版本过低。
 
 ### ZCode
 
@@ -87,13 +106,20 @@ Claude 清单中的 `archive` 安装来源不受 ZCode 安装器支持；
 在“市场源”面板移除该 `ai-code` 来源，重新添加上面的完整 URL，
 刷新市场后再打开插件详情或安装。
 
-选择 `ai-code`，选择 CodeVow 并安装、启用。macOS 自带 CLI 可使用：
+选择 `ai-code`，选择 CodeVow 并安装、启用。也可以在 **macOS 且 ZCode 安装于
+`/Applications/ZCode.app`** 时，用应用自带 CLI 注册来源、刷新列表、安装并启用 CodeVow：
 
 ```sh
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace update ai-code
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins enable ai-code-workflow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins list
 ```
+
+该示例要求 `node` 已在 `PATH` 中。如果应用安装于其他位置，调整应用路径。
+其他平台使用上面的桌面端步骤。
 
 任一宿主安装后，都开启新会话。账号和所选模型仍由宿主管理。
 
@@ -133,8 +159,25 @@ codex plugin add ai-code-workflow@ai-code-local
 
 ## 更新与卸载
 
-更新时，在宿主原生市场管理中刷新来源、更新已安装插件，再重新加载或开启新
-会话。本地下载方式使用新包作为注册来源。
+刷新市场用于获取最新目录。在系统终端更新已安装插件时，使用对应宿主的命令。
+
+Claude Code：
+
+```sh
+claude plugin marketplace update ai-code
+claude plugin update ai-code-workflow@ai-code --scope user
+```
+
+macOS 上的 ZCode：
+
+```sh
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace update ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins update ai-code-workflow@ai-code
+```
+
+Codex 执行 `codex plugin marketplace upgrade ai-code` 后，在原生插件管理中检查
+已安装版本。任一宿主更新后，重新加载或开启新会话。本地下载方式使用新包
+作为注册来源。
 
 卸载时，在宿主原生插件管理中禁用并移除插件。不再使用该市场的插件时，再
 单独移除市场来源。卸载插件不会删除项目记录，也不会卸载单独安装的 Agent Bridge。

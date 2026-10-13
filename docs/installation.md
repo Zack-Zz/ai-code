@@ -22,6 +22,11 @@ You do not need to clone the source repository or build packages. Your coding
 assistant fetches the registered source itself. Register the source once, then
 install a plugin listed in that marketplace.
 
+Run the `sh` command blocks below in your system terminal, outside an interactive
+coding-assistant session. Run each command after the previous one succeeds. If
+`ai-code` is already registered with the correct source, skip the registration
+command and continue with the marketplace refresh and plugin installation.
+
 Each host has its own marketplace manifest and installation source:
 
 | Host | Registration method | Manifest in this repository | Plugin installation source |
@@ -33,19 +38,24 @@ Each host has its own marketplace manifest and installation source:
 ### Codex
 
 Use a Codex version that supports native plugin marketplaces. Register the
-GitHub source; `owner/repo` is a supported GitHub shorthand:
+GitHub source, refresh its listing, then install CodeVow.
+`owner/repo` is a supported GitHub shorthand:
 
 ```sh
 codex plugin marketplace add Zack-Zz/ai-code --ref main
-```
-
-Codex reads `.agents/plugins/marketplace.json`. In the desktop client's Plugins
-Directory, select `ai-code`, choose CodeVow, and install and enable it. The CLI
-installation command is:
-
-```sh
+codex plugin marketplace upgrade ai-code
 codex plugin add ai-code-workflow@ai-code
 ```
+
+Check the plugin's status with:
+
+```sh
+codex plugin list --marketplace ai-code
+```
+
+Codex reads `.agents/plugins/marketplace.json`. You can also select `ai-code`
+in the desktop client's Plugins Directory, choose CodeVow, and install and
+enable it there. Start a new session after installation.
 
 ### Claude Code
 
@@ -54,12 +64,14 @@ plugin source, which requires that minimum version according to the
 [Claude Code marketplace reference](https://code.claude.com/docs/en/plugins/marketplace-reference#plugin-sources).
 Check your version with `claude --version` before installing.
 
-Register the Claude-specific manifest URL, then install CodeVow:
+Register the Claude-specific manifest URL, refresh its listing, then install
+CodeVow for your user on this machine:
 
 ```sh
-claude plugin marketplace add \
-  https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
-claude plugin install ai-code-workflow@ai-code
+claude plugin marketplace add https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
+claude plugin marketplace update ai-code
+claude plugin install ai-code-workflow@ai-code --scope user
+claude plugin list
 ```
 
 As an alternative to the URL registration, Claude Code also supports GitHub
@@ -69,8 +81,22 @@ shorthand and reads `.claude-plugin/marketplace.json`:
 claude plugin marketplace add "Zack-Zz/ai-code#main"
 ```
 
-Choose one registration method for the `ai-code` marketplace, then install and
-enable CodeVow in the native plugin controls.
+Choose one registration method; the GitHub command replaces only the first
+command in the installation block above. After installation, restart Claude Code
+or run this command **inside an existing Claude Code session**:
+
+```text
+/reload-plugins
+```
+
+You can inspect and enable CodeVow in the Installed tab of `/plugin`. See the
+[official shell installation guide](https://code.claude.com/docs/en/discover-plugins#install-from-your-shell)
+for scope and loading behavior.
+
+If the interactive plugin panel reports an unsupported source despite meeting
+the version requirement, run the marketplace update and plugin install commands
+above in your terminal, then restart the session. That error alone does not
+establish that the CLI version is too old.
 
 ### ZCode
 
@@ -91,14 +117,21 @@ If you already added the repository and see
 remove that `ai-code` source in the marketplace-source panel, add the direct URL
 above, and refresh it before opening the plugin details or installing.
 
-Select `ai-code`, choose CodeVow, and install and enable it. With the macOS
-bundled CLI:
+Select `ai-code`, choose CodeVow, and install and enable it. Alternatively, on
+**macOS with ZCode installed at `/Applications/ZCode.app`**, use the bundled CLI
+to register the source, refresh its listing, install and enable CodeVow:
 
 ```sh
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace update ai-code
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins enable ai-code-workflow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins list
 ```
+
+This example requires `node` on `PATH`. Adjust the application path if ZCode is
+installed elsewhere. On other platforms, use the desktop steps above.
 
 After installation in any host, start a new session. Your host continues to
 manage the account and selected model.
@@ -141,9 +174,27 @@ directory while the local marketplace is registered.
 
 ## Update and uninstall
 
-To update, refresh the source in the host's native marketplace controls, update
-the installed plugin, then reload or start a new session. For a local download,
-use the new package as the registered source.
+Marketplace refresh fetches the latest catalog. To update an installed plugin
+from your terminal, use the commands for your host:
+
+Claude Code:
+
+```sh
+claude plugin marketplace update ai-code
+claude plugin update ai-code-workflow@ai-code --scope user
+```
+
+ZCode on macOS:
+
+```sh
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace update ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins update ai-code-workflow@ai-code
+```
+
+For Codex, run `codex plugin marketplace upgrade ai-code`, then check the
+installed version in the native plugin controls. After any update, reload or
+start a new session. For a local download, use the new package as the registered
+source.
 
 To uninstall, disable and remove the plugin in the host's native plugin
 controls. Remove the marketplace separately if you no longer need its plugins.
