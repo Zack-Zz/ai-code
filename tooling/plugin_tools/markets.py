@@ -335,13 +335,18 @@ def verify_public_sources(root, records, files):
             spec = _source_snapshot(root, record, snapshot)
             if spec.version != record["version"] or spec.source_tree_hash != record["source_tree_hash"] or set(spec.hosts) != set(record["hosts"]):
                 raise DataError("published identity/version/hosts/hash differs from frozen source")
-            # Live acceptance was checked before publication. A public checkout
-            # must never need private records/logs again or invent a fresh pass.
+            # Technical publication may leave hosts pending. Evidence paths do
+            # not establish acceptance, and public checks never reread private logs.
             release_config, _ = io.read_json(spec.root, "release.json")
             acceptance = release_config.get("acceptance")
-            if not isinstance(acceptance, dict) or set(acceptance) != set(spec.hosts) or any(
-                    not isinstance(value, str) or not value for value in acceptance.values()):
-                raise DataError("frozen source did not declare evidence for every published host")
+            if not isinstance(acceptance, dict) or set(acceptance) != set(spec.hosts):
+                raise DataError("frozen source acceptance must cover exactly the published hosts")
+            for host, path in acceptance.items():
+                if path is None:
+                    if host in record["readiness"]["accepted_hosts"]:
+                        raise DataError(f"published accepted host lacks frozen evidence reference: {host}")
+                else:
+                    io.relative_path(path, what=f"frozen {host} evidence path")
             outputs = package_outputs(spec, {"source_revision": record["source_revision"],
                                               "working_tree_dirty": False})
             for host in spec.hosts:

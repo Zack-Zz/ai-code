@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 from plugin_tools import io, markets
 from tests.tooling.test_registry import add_plugin, write_json
@@ -86,6 +87,9 @@ class PublicMarketTests(unittest.TestCase):
 
 
 class FrozenPublicSourceTests(unittest.TestCase):
+    accepted_hosts = ("claude", "codex", "zcode")
+    unverified_hosts = ()
+
     def setUp(self):
         self.case = release_fixtures.ReleaseTests()
         self.case.setUp()
@@ -97,7 +101,12 @@ class FrozenPublicSourceTests(unittest.TestCase):
         write_json(product_path, product)
         (self.root / "distribution.json").write_bytes((ROOT / "distribution.json").read_bytes())
         # Actual private fixture evidence is verified once, and never enters Git.
-        hosted_fixtures.accept_fixture(self.root, "ai-one")
+        self.case.accept(hosts=(*self.accepted_hosts, *self.unverified_hosts))
+        for host in self.unverified_hosts:
+            path = self.case.plugin / f"release/{host}-accepted.json"
+            evidence = json.loads(path.read_text())
+            evidence.update(status="unverified", host_version=None, artifacts=[])
+            write_json(path, evidence)
         (self.root / ".gitignore").write_text("plugins/*/release/*-raw.txt\nplugins/*/release/*-accepted.json\n")
         self.git("init", "-b", "main")
         self.git("config", "user.name", "Fixture")
@@ -137,7 +146,13 @@ class FrozenPublicSourceTests(unittest.TestCase):
             path.unlink()
         for path in self.case.plugin.glob("release/*-accepted.json"):
             path.unlink()
+        before = markets.read_public_files(self.root)
+        record = json.loads(before["published/releases/ai-one/1.0.0.json"])
+        self.assertEqual(record["readiness"]["accepted_hosts"], sorted(self.accepted_hosts))
+        self.assertEqual(record["readiness"]["pending_acceptance"],
+                         sorted(set(PATHS) - set(self.accepted_hosts)))
         self.assertTrue(markets.check_public_markets(self.root)["ok"])
+        self.assertEqual(markets.read_public_files(self.root), before)
 
     def test_rehashed_old_installer_digest_cannot_change_the_frozen_source(self):
         record_path = self.root / "published/releases/ai-one/1.0.0.json"
@@ -158,3 +173,44 @@ class FrozenPublicSourceTests(unittest.TestCase):
         lock_path.write_bytes(io.dump_json(lock))
         with self.assertRaisesRegex(io.DataError, "installer"):
             markets.check_public_markets(self.root)
+
+    def test_frozen_acceptance_rejects_missing_extra_and_invalid_slots(self):
+        read_json = io.read_json
+        config = json.loads((self.case.plugin / "release.json").read_text())
+        slots = config["acceptance"]
+        invalid = [None, [], {host: value for host, value in slots.items() if host != "claude"},
+                   {**slots, "unknown": None}, {**slots, "claude": True},
+                   {**slots, "claude": ""}, {**slots, "claude": "../private.json"},
+                   {**slots, "claude": "/private/evidence.json"}]
+        for acceptance in invalid:
+            with self.subTest(acceptance=acceptance):
+                def corrupt_config(root, relative, *, boundary_root=None):
+                    if relative == "release.json":
+                        return {**config, "acceptance": acceptance}, b""
+                    return read_json(root, relative, boundary_root=boundary_root)
+
+                with mock.patch.object(io, "read_json", side_effect=corrupt_config):
+                    with self.assertRaises(io.DataError):
+                        markets.check_public_markets(self.root)
+
+
+class PendingFrozenPublicSourceTests(FrozenPublicSourceTests):
+    accepted_hosts = ()
+
+    def test_null_slot_cannot_claim_host_acceptance(self):
+        path = self.root / "published/releases/ai-one/1.0.0.json"
+        record = json.loads(path.read_text())
+        record["readiness"]["accepted_hosts"] = ["claude"]
+        record["readiness"]["pending_acceptance"] = ["codex", "zcode"]
+        write_json(path, record)
+        with self.assertRaisesRegex(io.DataError, "accepted host.*evidence"):
+            markets.check_public_markets(self.root)
+
+
+class MixedFrozenPublicSourceTests(FrozenPublicSourceTests):
+    accepted_hosts = ("claude",)
+
+
+class UnverifiedFrozenPublicSourceTests(FrozenPublicSourceTests):
+    accepted_hosts = ("claude", "codex")
+    unverified_hosts = ("zcode",)
