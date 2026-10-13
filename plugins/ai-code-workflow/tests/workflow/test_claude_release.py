@@ -77,6 +77,8 @@ class ClaudeReleaseTests(unittest.TestCase):
 
     def test_declared_claude_subset_does_not_require_other_host_adapters(self):
         self.data.update(hosts=["claude"], generated_agents=[CLAUDE_AGENT])
+        self.data["host_listings"] = {host: listing for host, listing in self.data.get("host_listings", {}).items()
+                                      if host in self.data["hosts"]}
         self.write_manifest()
         shutil.rmtree(self.source / "adapters/codex")
         shutil.rmtree(self.source / "adapters/zcode")

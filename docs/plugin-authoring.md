@@ -103,6 +103,52 @@ Validation and packaging of resources do not prove that a runtime capability is
 available. Before supporting a new host component type, establish its native
 manifest, startup and permission behavior, and acceptance in a real session.
 
+### Optional marketplace listing metadata
+
+Declare `host_listings` in `product.json` to enable marketplace display metadata
+for selected hosts. Each key must name a host already declared in `hosts`.
+`claude: {}` enables `displayName`; ZCode requires exactly `icon_path` and
+`icon_url` and enables both `displayName` and `icon`. The generated `displayName`
+always comes from `product.display_name`, the single source for the display name.
+Do not repeat the name in `host_listings` or adapter templates.
+
+For CodeVow, this declaration fragment uses its existing public PNG:
+
+```json
+{
+  "host_listings": {
+    "claude": {},
+    "zcode": {
+      "icon_path": "assets/codevow.png",
+      "icon_url": "https://raw.githubusercontent.com/Zack-Zz/ai-code/91dec3a64731f8de2fb68e49bce9f4228289bbbd/plugins/ai-code-workflow/assets/codevow.png"
+    }
+  }
+}
+```
+
+This fragment requires `claude` and `zcode` in `hosts`, and the PNG registered in
+`resources`. Adapt the host and resource declarations together for another
+plugin. `icon_path` is the normalized packaged **target** of an explicitly
+allowlisted PNG or SVG file. `icon_url` must point to its actual **source** path
+in the same GitHub repository declared by `repository`; source and target may
+differ. Use an HTTPS `raw.githubusercontent.com` URL with a full fixed 40-character
+Git commit SHA. Branches, `main`, tags, credentials, query strings, and fragments
+are rejected.
+
+Hosts without a listing declaration retain their existing output. Declared
+metadata is generated in local marketplaces and captured in stable release
+records for the public marketplace. Native plugin manifests continue to follow
+each host's own contract; this option adds no branding fields to the ZCode
+manifest. Claude Code does not read the PNG `icon` field, so its empty object
+enables only the marketplace name shown before installation. See the official
+[directory listing field reference](https://code.claude.com/docs/en/plugins/manifest-reference#directory-listing-fields).
+
+Static URL validation does not establish that the image is reachable or displayed
+by the host. Report URL retrieval and real host verification separately. Frozen
+public records, including CodeVow 1.0.3, must not be edited by hand. After committing
+the source change, publish a subsequent version through the normal
+[release workflow](publishing.md) to update the public marketplace.
+
 ## 3. Provide host adapters
 
 Skill frontmatter uses single-line name, description, and optional origin fields:

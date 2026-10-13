@@ -77,6 +77,11 @@ def marketplace_entry(spec, host):
                      category="developer-tools")
     else:
         entry.update(source=f"./{spec.product_id}", description=spec.adapters[host]["description"])
+    listings = spec.manifest.get("host_listings", {})
+    if host in listings:
+        entry["displayName"] = spec.manifest["display_name"]
+        if host == "zcode":
+            entry["icon"] = listings[host]["icon_url"]
     return entry
 
 

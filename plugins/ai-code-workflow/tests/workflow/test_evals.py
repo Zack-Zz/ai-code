@@ -163,6 +163,8 @@ class PrepareTests(unittest.TestCase):
         product = json.loads(product_path.read_text())
         product["hosts"] = ["claude"]
         product["generated_agents"] = [a for a in product["generated_agents"] if a["host"] == "claude"]
+        product["host_listings"] = {host: listing for host, listing in product.get("host_listings", {}).items()
+                                    if host in product["hosts"]}
         product_path.write_text(json.dumps(product))
         for case_id in ("A23", "A24", "A25"):
             with self.subTest(case=case_id):
@@ -385,6 +387,8 @@ class GradeTests(unittest.TestCase):
         path = source / "product.json"
         product = json.loads(path.read_text())
         product.pop("generated_agents")
+        # Legacy products also predate opt-in marketplace presentation.
+        product.pop("host_listings", None)
         if hosts is None:
             product.pop("hosts")
         else:

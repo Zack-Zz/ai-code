@@ -10,6 +10,13 @@
     "codex",
     "zcode"
   ],
+  "host_listings": {
+    "claude": {},
+    "zcode": {
+      "icon_path": "assets/codevow.png",
+      "icon_url": "https://raw.githubusercontent.com/Zack-Zz/ai-code/91dec3a64731f8de2fb68e49bce9f4228289bbbd/plugins/ai-code-workflow/assets/codevow.png"
+    }
+  },
   "profiles": [
     "collaborative",
     "continuous"

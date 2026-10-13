@@ -7,7 +7,7 @@ import posixpath
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import quote, unquote, urlsplit
 
 from . import io
 from .io import DataError
@@ -26,7 +26,7 @@ _PRODUCT_KEYS = {
     "schema_version", "product_id", "display_name", "version", "repository",
     "license", "core_skills", "shared_skills", "resources",
 }
-_PACKAGING_KEYS = {"hosts", "profiles", "generated_agents", "publisher"}
+_PACKAGING_KEYS = {"hosts", "profiles", "generated_agents", "publisher", "host_listings"}
 HOSTS = ("claude", "codex", "zcode")
 _CACHE_PARTS = {"__pycache__"}
 _INTERFACE_FIELDS = {"display_name", "short_description", "brand_color", "default_prompt",
@@ -218,6 +218,7 @@ class ProductSpec:
     shared_skills: list
     hosts: list = field(default_factory=lambda: ["zcode", "codex"])
     publisher: dict | None = None
+    host_listings: dict = field(default_factory=dict)
     files: list = field(default_factory=list)  # [(source_abs, target_rel)] sorted by target
     manifest_bytes: bytes = field(default=b"", repr=False)
 
@@ -289,6 +290,53 @@ def _validate_resource_entry(entry, index):
     if not isinstance(include, list) or not all(isinstance(v, str) for v in include):
         raise DataError(f"resources[{index}].include must be a list of strings")
     return source, target, include
+
+
+def _validate_host_listings(data, spec, resources) -> dict:
+    """Validate opt-in market branding against the explicit resource mapping."""
+    listings = data.get("host_listings", {})
+    if not isinstance(listings, dict) or set(listings) - {"claude", "zcode"}:
+        raise DataError("host_listings must be an object with only supported claude/zcode metadata")
+    if set(listings) - set(spec.hosts):
+        raise DataError("host_listings must only name declared hosts")
+    validated = {}
+    for host, listing in listings.items():
+        what = f"host_listings.{host}"
+        if host == "claude":
+            if not isinstance(listing, dict) or listing:
+                raise DataError(f"{what} must be an empty object")
+            validated[host] = {}
+            continue
+        if not isinstance(listing, dict) or set(listing) != {"icon_path", "icon_url"}:
+            raise DataError(f"{what} must have exactly icon_path/icon_url keys")
+        target = io.check_relative(listing["icon_path"], what=f"{what}.icon_path")
+        source = resources.get(target)
+        if source is None or Path(target).suffix.lower() not in {".png", ".svg"} or \
+                source.suffix.lower() not in {".png", ".svg"}:
+            raise DataError(f"{what}.icon_path must name an explicitly registered PNG/SVG resource")
+        value = listing["icon_url"]
+        if not isinstance(value, str) or len(value) > 2048 or any(character.isspace() for character in value):
+            raise DataError(f"{what}.icon_url must be an immutable GitHub raw HTTPS URL")
+        try:
+            repository = urlsplit(spec.repository)
+            repo_path = repository.path.rstrip("/").removesuffix(".git").removeprefix("/")
+            valid_repository = repository.scheme == "https" and repository.netloc == "github.com" and \
+                not repository.query and not repository.fragment and \
+                re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repo_path) and \
+                not any(part in {".", ".."} for part in repo_path.split("/")) and \
+                not any(character.isspace() for character in spec.repository)
+        except ValueError as exc:
+            raise DataError(f"{what}.icon_url requires a valid GitHub repository") from exc
+        source_relative = source.relative_to(spec.root).as_posix()
+        # This workflow-specific loader also operates on private captured roots;
+        # its published source directory remains fixed within the ai-code repo.
+        prefix = f"https://raw.githubusercontent.com/{repo_path}/"
+        suffix = "/" + quote(f"plugins/ai-code-workflow/{source_relative}", safe="/")
+        if not valid_repository or not re.fullmatch(
+                re.escape(prefix) + r"[0-9a-fA-F]{40}" + re.escape(suffix), value):
+            raise DataError(f"{what}.icon_url must pin this repository's mapped source with a full Git SHA")
+        validated[host] = dict(listing)
+    return validated
 
 
 def _validate_packaging_metadata(data, root: Path) -> None:
@@ -440,6 +488,9 @@ def load_product(root: Path) -> ProductSpec:
         else:
             raise DataError(f"resources[{index}].source is neither file nor directory: {source_abs}")
 
+    skill_targets = {f"skills/{name}/SKILL.md" for name in spec.all_skills}
+    resource_targets = {target: source for target, source in resolved.items() if target not in skill_targets}
+    spec.host_listings = _validate_host_listings(data, spec, resource_targets)
     spec.files = sorted(
         ((source, target) for target, source in resolved.items()),
         key=lambda pair: pair[1],

@@ -18,7 +18,7 @@ INTERFACE_FIELDS = {"display_name", "short_description", "brand_color", "default
                     "allow_implicit_invocation"}
 REQUIRED_PRODUCT_FIELDS = {"schema_version", "product_id", "display_name", "version",
                            "repository", "license", "hosts", "resources"}
-OPTIONAL_PRODUCT_FIELDS = {"core_skills", "shared_skills", "profiles", "generated_agents", "publisher"}
+OPTIONAL_PRODUCT_FIELDS = {"core_skills", "shared_skills", "profiles", "generated_agents", "publisher", "host_listings"}
 
 
 @dataclass
@@ -238,6 +238,8 @@ def load_product(root, *, catalog_path="", boundary_root=None):
                 raise DataError("file resource requires empty include list")
             register(source, target)
     validate_skill_references({target: spec.inputs[source] for target, source in spec.files.items()})
+    from .listings import validate_host_listings
+    validate_host_listings(spec)
     for host in hosts:
         adapter = _load_json_input(spec, f"adapters/{host}/plugin.json")
         if (not isinstance(adapter, dict) or not isinstance(adapter.get("description"), str) or

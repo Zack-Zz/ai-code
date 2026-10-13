@@ -105,6 +105,39 @@
         "continuous"
       ]
     },
+    "host_listings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "claude": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {},
+          "description": "An explicit empty object enables the market displayName derived from display_name."
+        },
+        "zcode": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "icon_path",
+            "icon_url"
+          ],
+          "properties": {
+            "icon_path": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Normalized packaged target of an explicitly registered PNG/SVG resource."
+            },
+            "icon_url": {
+              "type": "string",
+              "maxLength": 2048,
+              "pattern": "^https://raw\\.githubusercontent\\.com/[^/]+/[^/]+/[0-9a-fA-F]{40}/plugins/ai-code-workflow/.+\\.([pP][nN][gG]|[sS][vV][gG])(?![\\s\\S])",
+              "description": "Immutable raw GitHub URL in this repository, mapping to the registered source rather than its packaged target."
+            }
+          }
+        }
+      }
+    },
     "generated_agents": {
       "type": "array",
       "uniqueItems": true,
@@ -167,6 +200,7 @@
     "source and target are normalized relative paths: absolute paths, '..' segments and symlinked components are rejected.",
     "Each skill contributes exactly skills/<name>/SKILL.md as a packaged component; any extra file under a skill directory must be registered as an explicit resource entry.",
     "All resolved target paths must be unique (mapping conflicts are rejected).",
+    "host_listings is opt-in and may only name a declared supported listing host. displayName is derived from display_name; icon_path must resolve through the resource whitelist and icon_url must match the source path in this repository at a full Git SHA.",
     "Optional packaging metadata declares a supported host subset; native Claude/ZCode reviewer templates both use the single shared reviewer contract. Publisher metadata is injected into host output rather than duplicated in adapters."
   ]
 }

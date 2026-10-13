@@ -99,6 +99,7 @@ class FrozenPublicSourceTests(unittest.TestCase):
         product = json.loads(product_path.read_text())
         product["repository"] = "https://github.com/Example/ai-code"
         write_json(product_path, product)
+        self.configure_source()
         (self.root / "distribution.json").write_bytes((ROOT / "distribution.json").read_bytes())
         # Actual private fixture evidence is verified once, and never enters Git.
         self.case.accept(hosts=(*self.accepted_hosts, *self.unverified_hosts))
@@ -125,6 +126,9 @@ class FrozenPublicSourceTests(unittest.TestCase):
         self.installation = self.git("rev-parse", "HEAD")
         self.write(distribution.finalize_files(plan, self.installation))
         self.commit("public market")
+
+    def configure_source(self):
+        pass
 
     def git(self, *arguments):
         result = subprocess.run(["git", *arguments], cwd=self.root, capture_output=True, text=True)

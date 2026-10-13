@@ -86,6 +86,45 @@ source 是文件时 include 必须为 `[]`；source 是目录时 include 必须�
 纯资源能被校验和打包，不能证明某个运行能力已可用。新的宿主组件形态必须
 先明确原生清单、启动/权限行为及真实会话验收，再扩展支持。
 
+### 可选市场展示元数据
+
+在 `product.json` 中声明 `host_listings`，可为指定宿主启用市场展示元数据。
+每个键对应的宿主必须已在 `hosts` 中声明。`claude: {}` 启用 `displayName`；
+ZCode 必须且只能声明 `icon_path` 与 `icon_url`，启用 `displayName` 和 `icon`。
+生成的 `displayName` 始终来自显示名称的唯一来源 `product.display_name`，
+不要在 `host_listings` 或适配模板中复制名称。
+
+CodeVow 可使用已有公开 PNG，声明片段如下：
+
+```json
+{
+  "host_listings": {
+    "claude": {},
+    "zcode": {
+      "icon_path": "assets/codevow.png",
+      "icon_url": "https://raw.githubusercontent.com/Zack-Zz/ai-code/91dec3a64731f8de2fb68e49bce9f4228289bbbd/plugins/ai-code-workflow/assets/codevow.png"
+    }
+  }
+}
+```
+
+该片段要求 `hosts` 已声明 `claude`、`zcode`，且 PNG 已登记到 `resources`。
+用于其他插件时，宿主和资源声明需一起匹配。`icon_path` 是显式资源白名单中
+PNG 或 SVG 文件的规范打包 **target**；`icon_url` 对应实际 **source** 路径，
+必须属于 `repository` 声明的同一 GitHub 仓库，source 与 target 可以不同。
+URL 使用 HTTPS `raw.githubusercontent.com`，固定到完整的 40 位 Git commit SHA；
+拒绝 branch、`main`、tag、凭据、query string 和 fragment。
+
+未声明 listing 的宿主保持原有输出。已声明的元数据会生成到本地市场，并记录到
+正式发行记录中供公开市场使用。原生插件清单继续遵守各宿主契约，该选项不向
+ZCode manifest 额外添加品牌字段。Claude Code 不读取 PNG `icon` 字段，因此
+其空对象只启用安装前的市场显示名称，见官方
+[目录展示字段说明](https://code.claude.com/docs/en/plugins/manifest-reference#directory-listing-fields)。
+
+URL 静态校验不能证明图片可访问或宿主实际展示成功；URL 获取与真实宿主验证
+需分别报告。包括 CodeVow 1.0.3 在内的冻结公开记录不可手工修改。源码变更提交后，
+通过正常[发行流程](publishing.zh-CN.md)发布后续新版本，公开市场才会更新。
+
 ## 3. 提供宿主适配
 
 技能 frontmatter 使用单行 name、description 和可选 origin：

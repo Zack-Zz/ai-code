@@ -19,6 +19,7 @@ from .registry import HOSTS, ID_PATTERN, VERSION_PATTERN, load_catalog
 from .release import verify_release
 from .release import integrity, metadata, source_git
 from .rendering import marketplace_entry, marketplace_path
+from .listings import validate_icon_url
 
 HASH = re.compile(r"[0-9a-f]{64}")
 REVISION = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
@@ -212,6 +213,11 @@ def _record(record, channel, repository, *, staged=False):
             raise DataError("record readiness/package hashes differ")
         entry = item["entry"]
         fields = {"name", "version", "policy", "category"} if host == "codex" else {"name", "version", "description"}
+        if isinstance(entry, dict):
+            if host == "claude" and "displayName" in entry:
+                fields.add("displayName")
+            elif host == "zcode" and set(entry) & {"displayName", "icon"}:
+                fields.update({"displayName", "icon"})
         _object(entry, fields, "record native entry")
         if entry["name"] != identity or entry["version"] != version:
             raise DataError("record native identity/version differs")
@@ -220,6 +226,10 @@ def _record(record, channel, repository, *, staged=False):
                 raise DataError("invalid Codex native policy/category")
         elif not isinstance(entry["description"], str):
             raise DataError("native description must be text")
+        if "displayName" in entry and (not isinstance(entry["displayName"], str) or not entry["displayName"].strip()):
+            raise DataError("native displayName must be nonempty text")
+        if host == "zcode" and "icon" in entry:
+            validate_icon_url(entry["icon"], repository)
     _revision(record["codex_revision"], "record Codex revision", nullable=staged or "codex" not in hosts)
     if "codex" not in hosts and record["codex_revision"] is not None:
         raise DataError("non-Codex record requires null Codex revision")

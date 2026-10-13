@@ -293,6 +293,11 @@ def _build_packages_staged(source_root: Path, hosts, output_root: Path, provenan
             dict(entry, name=spec.product_id, version=spec.version)
             for entry in market_template["plugins"]
         ]
+        if host in spec.host_listings:
+            for entry in market_template["plugins"]:
+                entry["displayName"] = spec.display_name
+                if host == "zcode":
+                    entry["icon"] = spec.host_listings[host]["icon_url"]
         if host == "claude" and spec.publisher:
             market_template["owner"] = dict(spec.publisher)
         market_rel = wpackage.MARKETPLACE_PATHS[host]
