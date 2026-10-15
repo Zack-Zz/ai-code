@@ -6,13 +6,14 @@
   "plugins": [
     {
       "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+      "displayName": "CodeVow",
       "name": "ai-code-workflow",
       "source": {
-        "sha256": "9683ee111f144e56a021afe7fe18064f117e3d63e5b850282f4ba9638d90ed07",
+        "sha256": "c0683272d8b370b794ff698a0cf9f96030de65ad407902965b7c6a46e79276b0",
         "source": "archive",
-        "url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-workflow%2Fv1.0.3/ai-code-workflow-1.0.3-claude-plugin.zip"
+        "url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-workflow%2Fv1.0.4/ai-code-workflow-1.0.4-claude-plugin.zip"
       },
-      "version": "1.0.3"
+      "version": "1.0.4"
     }
   ]
 }

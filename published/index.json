@@ -1,16 +1,16 @@
 {
   "plugins": {
     "ai-code-workflow": {
-      "codex_revision": "04a52fbaa25c4e1779c57aff5a80f409be6496c3",
+      "codex_revision": "2cd9d673f242e4610db8865642a45b653200b28c",
       "installers": {
-        "claude": "9683ee111f144e56a021afe7fe18064f117e3d63e5b850282f4ba9638d90ed07",
-        "codex": "c009834fc90d3cddb68c2dc6aec79d6b266d8a30d7f71d6c642bf068b190939a",
-        "zcode": "88c48ee73a662df0781f1a0d193e6c1f1221bc40f8462213f50fb842faa1df85"
+        "claude": "c0683272d8b370b794ff698a0cf9f96030de65ad407902965b7c6a46e79276b0",
+        "codex": "28a7c524d96389ea1e77d52990d49bc986c12789b5b46b3251ddc0cb3078fc91",
+        "zcode": "111b11b6ce315a3d364bee7de51ff313c39b89ff3bebf4b230fb208b2e22e0ea"
       },
-      "release_id": 410477577,
-      "source_revision": "91dec3a64731f8de2fb68e49bce9f4228289bbbd",
-      "source_tree_hash": "daae29eac5cb65c141b1c97ef675d50741446f8b35dbe9037a7505f238accd60",
-      "version": "1.0.3"
+      "release_id": 413552884,
+      "source_revision": "351087b8e75188def8facac803cd053f2f0b9e84",
+      "source_tree_hash": "73ac9926726fb044e8c7105fbd236aa07abef8b7e8cfd9930a6b2c20a8201c9b",
+      "version": "1.0.4"
     }
   },
   "schema_version": 2
