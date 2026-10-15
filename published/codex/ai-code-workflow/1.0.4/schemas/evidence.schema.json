@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ai-code-workflow/evidence.schema.json",
+  "title": "Evidence record",
+  "description": "Describes the evidence contract implemented by scripts/workflow/state.py. Evidence files record observed facts; they are not proof of authorization or business success by themselves.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "evidence_id", "kind", "workspace_root", "subject_fingerprints", "execution", "host_context", "capture", "result", "observations", "started_at", "finished_at"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "evidence_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$"},
+    "kind": {"enum": ["test", "review", "inspection", "host_run"]},
+    "workspace_root": {"type": "string", "minLength": 1},
+    "subject_fingerprints": {
+      "type": "object",
+      "additionalProperties": {"type": ["string", "null"]}
+    },
+    "execution": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["argv", "cwd", "exit_code", "signal", "start_error"],
+          "properties": {
+            "argv": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+            "cwd": {"type": "string", "minLength": 1},
+            "exit_code": {"type": ["integer", "null"]},
+            "signal": {"type": ["string", "null"]},
+            "start_error": {"type": ["string", "null"]}
+          }
+        }
+      ]
+    },
+    "host_context": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["host", "host_version", "model", "case_id", "package_content_hash", "policy_hash"],
+          "properties": {
+            "host": {"enum": ["claude", "codex", "zcode"]},
+            "host_version": {"type": ["string", "null"]},
+            "model": {"type": ["string", "null"]},
+            "case_id": {"type": "string", "pattern": "^A(0[1-9]|1[0-9]|2[0-5])$"},
+            "package_content_hash": {"type": ["string", "null"]},
+            "policy_hash": {"type": ["string", "null"]}
+          }
+        }
+      ]
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "relative_path", "content_sha256"],
+      "properties": {
+        "origin": {"enum": ["tool_output", "native_export", "manual_annotation"]},
+        "relative_path": {"type": "string", "minLength": 1},
+        "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "result": {"enum": ["pass", "fail", "not_run", "blocked_env", "needs_revalidation", "manual_review"]},
+    "observations": {"type": "array", "items": {"type": "string"}},
+    "started_at": {"type": ["string", "null"]},
+    "finished_at": {"type": ["string", "null"]}
+  },
+  "notes": [
+    "subject_fingerprints maps workspace-relative paths to SHA256 or null (file absent); null never means unknown.",
+    "A test evidence with result=pass requires: execution non-null with exit_code=0, signal=null, start_error=null, a non-null finished_at and a capture record.",
+    "host_run requires host_context; missing host version or model must stay null and the result must remain manual_review/not_run/blocked_env instead of pass.",
+    "When host_run supplies execution, result=pass requires exit_code=0, signal=null and start_error=null; null execution remains allowed for sourced native session exports.",
+    "capture.relative_path stays inside the task directory; its content_sha256 is recomputed from the actual raw file at registration and at every check.",
+    "Editing the evidence JSON, losing or changing the raw file, changing subject files, workspace identity mismatch or an impossible execution state invalidates the evidence at task check."
+  ]
+}
