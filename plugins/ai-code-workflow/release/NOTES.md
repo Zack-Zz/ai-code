@@ -8,6 +8,24 @@ build helper uses `ai-code-workflow-local`. See the
 [installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md).
 The entries below retain their dated release context, including earlier migration plans.
 
+## 1.0.4
+
+### English
+
+- Add lightweight guidance for native subagent collaboration: define task scope, coordinate overlapping writes, preserve others' changes, and inspect partial work before taking over interrupted tasks.
+- Clarify that returned artifacts and the integrated result need verification; local passing tests and subagent completion messages alone do not establish delivery readiness.
+- Respect existing host, role and model settings for independent review, while preserving authorization boundaries and risk-based review requirements.
+- Add bilingual usage guidance and internal MA1–MA6 evaluation scenarios with a two-module integration fixture. Keep policy fields, management tools and host adapters unchanged.
+- Real Claude Code, Codex and ZCode installation, upgrade and runtime acceptance for these release bytes remain unverified. Limited task probes do not establish a general improvement or host acceptance.
+
+### 中文
+
+- 为宿主原生子智能体协作补充轻量提醒：明确任务范围，协调重叠写入，保留他人修改，并在接管中断任务前核查已有工作。
+- 明确需要核实返回产物及整合后的结果；局部测试通过和子智能体的完成消息不能单独证明可交付。
+- 独立审查尊重已有宿主、角色及模型设置，同时保留授权边界和按风险触发审查的要求。
+- 补充双语使用说明、内部 MA1–MA6 验收场景和两模块集成样例；保持策略字段、管理工具及宿主适配配置不变。
+- 本次发行字节在 Claude Code、Codex 和 ZCode 的真实安装、升级及运行验收仍未完成；有限任务试跑不能证明普遍改善或宿主验收通过。
+
 ## 1.0.3
 
 ### English
