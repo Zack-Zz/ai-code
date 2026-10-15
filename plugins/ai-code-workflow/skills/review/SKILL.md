@@ -19,22 +19,26 @@ fixes; it does not authorize tests or repairs.
 ## Scope
 
 Check only the affected dimensions — correctness, authorization, public
-contracts, concurrency, consistency. Do not load generic framework tutorial
-libraries and do not review unrelated code.
+contracts, concurrency, consistency — including interfaces between separately
+developed parts. Do not load generic framework tutorial libraries and do not
+review unrelated code.
 
 ## Independent review
 
 Attempt an available independent reviewer when risk is `critical` or
 `review_level=all`:
 
-- Give it a clear scope, the requirements, the diff and the evidence; it
-  inherits the current model; prefer the host's read-only restriction when
-  one actually exists.
+- Give it a clear scope, the requirements, the diff and the evidence. Respect
+  the user's existing host, role and model settings; prefer the host's read-only
+  restriction when one actually exists.
 - If the restriction is instruction-level only, mark the attempt
   `policy_only` — never claim the host blocks writes when it does not.
 - Reviewer unavailable or the call failed: state the concrete reason, your
   self-review scope, and what remained uncovered. Self-review is never
   described as independent review.
+
+Delegation alone does not require a separate reviewer for every subtask.
+An implementer's check of its own changes remains self-review.
 
 The reviewer only reports findings. The main agent verifies each one and
 reports evidence, impact and proposed changes. During already-authorized

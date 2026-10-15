@@ -100,6 +100,30 @@ remain read-only rather than claim CodeVow is active.
 - Delivery reports the final code state, actual checks, findings and remaining
   work. Changed code needs fresh verification.
 
+## Working with subagents
+
+CodeVow adds brief coordination guidance to the host's existing agent capabilities.
+The assistant chooses sequential or parallel work based on dependencies, write
+overlap and useful deliverables, within your instructions and the host's limits.
+
+- Two independent modules with agreed interfaces can be implemented in parallel,
+  then integrated and checked together.
+- If a shared interface is still undecided, settle it before dependent
+  implementation; unrelated work can continue meanwhile.
+
+Delegated work needs enough context, a clear change scope and an expected result.
+In a shared checkout, coordinate overlapping writes and preserve others' edits.
+Separate workspaces can produce alternative patches for integration, but may
+still share resources such as a database or port. Before taking over interrupted
+work, check its actual state and partial changes. The main assistant checks the
+returned artifacts and the integrated result; separate passing tests alone do
+not establish that the complete change works.
+
+`max_parallel_tasks` is an upper limit, not a target team size. Scheduling,
+permissions and isolation come from the host; CodeVow does not create a required
+agent pipeline, worktree or task record. Existing authorization and review rules
+still apply.
+
 ## Project policy
 
 Save preferences in `<project>/.ai-workflow/policy.json`:

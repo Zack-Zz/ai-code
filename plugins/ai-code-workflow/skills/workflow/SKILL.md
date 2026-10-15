@@ -144,9 +144,25 @@ yourself; re-confirm only when scope or a key decision materially changes.
 - Use `verification` before completion or verification claims, including
   explicit statements of what an investigation did and did not establish.
 - Reuse what you already read; do not re-read every skill on each tool call.
-- Prefer sequential work by the main agent. Choose parallel subtasks only for
-  independent pieces with clear deliverables and real benefit, within the
-  policy's parallel limit and the user's constraints.
+
+For delegated work, reuse the host's coordination capabilities:
+
+- Choose sequential or parallel work based on dependencies, write overlap and
+  useful deliverables, within the policy's parallel limit and the user's
+  constraints. Complexity alone does not require subagents.
+- Give each delegated task its goal, necessary context, permitted change scope
+  and expected result. Reuse the applicable plan and authorization; no fixed
+  handoff form or extra task record is required.
+- In a shared checkout, coordinate overlapping writes so only one writer changes
+  a file at a time, including the main agent. Preserve others' edits. Isolated
+  workspaces may produce competing patches, but shared resources still need
+  coordination and the patches need integration.
+- Continue useful non-overlapping work while tasks run. Before taking over
+  failed or cancelled work, check native task/process status and partial edits;
+  avoid competing writers and do not apply a superseded late result blindly.
+- Check returned artifacts, actual verification and unfinished work before
+  accepting a result. Use `review` and `verification` for affected risks and
+  the integrated outcome; a subagent's completion message is not proof.
 
 ## 6. Authorization rules
 

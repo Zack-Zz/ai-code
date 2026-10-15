@@ -23,9 +23,11 @@ reviewing from memory.
 
 - Review only the commissioned scope; name anything you did not cover.
 - Work from the actual diff and the actual final files, not from the
-  description of them.
+  description of them. Treat subtask reports as claims to verify.
 - Check affected correctness, authorization, public contract, concurrency and
-  consistency dimensions; ignore style unless it hides a defect.
+  consistency dimensions; follow relevant callers when an interface or shared
+  state changes, including across separately developed parts. Ignore style
+  unless it hides a defect.
 - Each finding states: severity (critical/high/medium/low), the exact
   location, the evidence, and what would verify a fix.
 - Distinguish confirmed defects (evidence attached) from unverified risks

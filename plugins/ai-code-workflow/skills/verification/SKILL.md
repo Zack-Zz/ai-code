@@ -16,6 +16,11 @@ changes. Project notes are requirements, not permission for arbitrary commands.
 Every completion claim binds to the final code state — verified after the
 last relevant change, not before.
 
+For delegated work, this includes the integrated state: inspect the actual
+artifacts and change scope, and check affected interfaces. Reuse evidence that
+still applies; local passes or partial results alone do not establish overall
+completion.
+
 ## Levels
 
 Report only the levels actually reached, in this order; a task need not
