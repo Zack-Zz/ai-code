@@ -1,5 +1,17 @@
 {
   "plugins": {
+    "ai-code-stack-standards": {
+      "codex_revision": "667670a6ac5cc1966e3d5c47a4b8c2d2e8ecc55d",
+      "installers": {
+        "claude": "13db650abf18e5c6ac5cad665d105b13badca749dcd20c9edae33e484b7e2a98",
+        "codex": "a43e6e77cbcfc201dedc13e4a0cf575889e1f864fafd279b79e26fb59399d869",
+        "zcode": "209bb59496ccf9709007cb4c0793dca1eb4abacb829cf7866d90b7c6b12bd520"
+      },
+      "release_id": 417154654,
+      "source_revision": "065296b5d5785c79cbbd432aa775000c616450bf",
+      "source_tree_hash": "d8247cdbe25350bf554681022356986c116f88966f2a02f8493a139da288d36f",
+      "version": "0.1.0"
+    },
     "ai-code-workflow": {
       "codex_revision": "3e8ca4b79260c092263eea8b21e65015857a58ff",
       "installers": {

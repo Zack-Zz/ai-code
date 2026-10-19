@@ -1,8 +1,8 @@
 {
   "files": {
-    ".agents/plugins/marketplace.json": "2640ea7dbd0a4d9264731668fa8d6418a764772c3205196e8012f338192ab46a",
-    ".claude-plugin/marketplace.json": "e6bd3abfdc7b54ae3674c622cf49641f896ed7d374303ed3814a03fdea93072b",
-    "marketplace.json": "a4ab692dd432393e0ebe075d67f671fcd6329e8e0babb70e2968b723a2241d41"
+    ".agents/plugins/marketplace.json": "db3f6b0d25f39ba04c4d408aa4204f1836ae08192b209ec49226f58a14f37817",
+    ".claude-plugin/marketplace.json": "8c4db421f633e509797b1f6f44f53a97aff515d9babe0d8e436f7961224919d3",
+    "marketplace.json": "c3e45c31070248ed44c98081374e72db6df54f1f0aa65044d27b10ec49d1ad87"
   },
   "schema_version": 1
 }
