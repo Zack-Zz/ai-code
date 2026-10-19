@@ -34,8 +34,9 @@ count as behavioral RED. Candidate syntax errors, missing modules and broken
 exports in an existing workspace instead fail the module contract with exit **1**
 and a separate 0/1 result; they are not mislabeled as environment trouble.
 The oracle checks both locales, visible form text, placeholder, accessible name,
-validation before default/explicit confirmation, dialog buttons/body, success
-Toast, full interpolated templates, email trimming, literal placeholder-like
+validation before default/explicit confirmation, dialog buttons/body for both
+omitted and explicitly false confirmation arguments in both locales and for both
+users, success Toast, full interpolated templates, email trimming, literal placeholder-like
 business data and retained protocol data. A successful action is exercised before
 requesting its confirmation and after a different user's confirmation; it must
 use its own arguments rather than hidden pending data. Member preservation uses
@@ -91,6 +92,7 @@ model successes nor model failures and do not demonstrate automatic selection.
 | `validation-after-confirmation` | exit 1; 13/17 | Central resources remain, but empty/invalid email is checked only when already confirmed. Default and explicit unconfirmed calls incorrectly return dialogs. |
 | `mutating-member-order` | exit 1; 14/17 | Central resources remain, but `renderBoard()` sorts the input members in place. Independent input/output snapshots detect the regression. |
 | `sequence-dependent-confirmation` | exit 1; 13/17 | Central resources remain, but confirmed actions reuse a module-level pending user. Direct and interleaved calls must use the supplied user instead. |
+| `explicit-false-bypasses-confirmation` | exit 1; 13/17 | Central resources remain, but valid calls return a dialog only when the fourth argument is omitted. Explicit `false` must also require confirmation for both users and locales. |
 
 The script asserts only functional outcomes and leaves `organization` as
 `manual_review`. The control labels document author intent, not an algorithmic

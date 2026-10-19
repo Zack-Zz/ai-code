@@ -92,7 +92,7 @@ python3 tooling/plugin_tool.py release verify --plugin ai-code-workflow --path /
 
 | 输入 | 选项 |
 |---|---|
-| `plugin` | `ai-code-workflow`、`ai-agent-delegation` |
+| `plugin` | `ai-code-workflow`、`ai-agent-delegation`、`ai-code-stack-standards` |
 | `operation` | `build`、`publish` |
 
 版本和说明读取已提交的插件源码，无需填写源码标签、计划哈希或证据路径。

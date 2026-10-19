@@ -32,10 +32,11 @@ features and configuration, with shared tooling for packaging and distribution.
 Install through the ai-code marketplace or download a package for your coding
 assistant from GitHub Releases. The marketplace name is `ai-code`, from
 `Zack-Zz/ai-code` at `main`. The repository's current
-[release record](published/index.json) and three host marketplace manifests list
-**CodeVow** (`ai-code-workflow`) **1.0.4**. Agent Delegation and CodeStack have source
-in this repository but have not entered the stable marketplace. These are repository
-records; refresh the marketplace in your host to check current installable versions.
+[release record](published/index.json) and three host marketplace manifests determine
+stable availability and versions. **CodeVow** (`ai-code-workflow`) and **CodeStack**
+(`ai-code-stack-standards`) share this marketplace and are installed and released
+independently. Refresh the marketplace in your host before selecting a plugin.
+Agent Delegation currently has source only and has not entered the stable marketplace.
 
 Run the following CLI commands in your system terminal, one at a time after
 each succeeds. If you have already added `ai-code` with the correct source,
@@ -78,7 +79,7 @@ For detailed installation steps and plugin usage:
 - [Installation guide](docs/installation.md): full marketplace registration and installation steps, downloaded packages, updates, removal and troubleshooting for Claude Code, Codex and ZCode.
 - [CodeVow guide](plugins/ai-code-workflow/README.md): task examples, collaboration modes and project configuration.
 - [Agent Delegation guide](plugins/ai-agent-delegation/README.md): requirements, handoffs, continuation and cancellation.
-- [CodeStack guide](plugins/ai-code-stack-standards/README.md): supported rule scope, automatic selection and development-preview availability.
+- [CodeStack guide](plugins/ai-code-stack-standards/README.md): supported rule scope, automatic selection and marketplace availability.
 
 After installation, start a new session and describe what you want to do.
 

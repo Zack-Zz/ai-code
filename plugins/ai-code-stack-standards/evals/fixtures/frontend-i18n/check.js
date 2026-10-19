@@ -97,13 +97,15 @@ function check(workspace) {
                 assert.deepEqual(inviteMember(locale, person.name, ` ${person.email} `, true), result);
             });
             verify(`${locale}: confirmation for ${person.email}`, () => {
-                assert.deepEqual(inviteMember(locale, person.name, ` ${person.email} `), {
-                    ok: false,
-                    confirmation: {
-                        title: copy.dialogTitle, body: interpolate(copy.dialogBody, person),
-                        cancel: copy.cancel, confirm: copy.confirm
-                    }
-                });
+                for (const confirmation of [[], [false]]) {
+                    assert.deepEqual(inviteMember(locale, person.name, ` ${person.email} `, ...confirmation), {
+                        ok: false,
+                        confirmation: {
+                            title: copy.dialogTitle, body: interpolate(copy.dialogBody, person),
+                            cancel: copy.cancel, confirm: copy.confirm
+                        }
+                    });
+                }
             });
         }
     }

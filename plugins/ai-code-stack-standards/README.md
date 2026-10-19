@@ -8,7 +8,8 @@ CodeStack supplies a coding assistant with selected project conventions across
 supported languages and stacks. It currently covers Java writing, targeted
 SQL/JPA/MyBatis pitfalls, and shared multilingual frontend copy organization.
 Its plugin ID is `ai-code-stack-standards`.
-This is a development preview; it has not been published to the stable marketplace.
+Stable releases are distributed through the shared `ai-code` marketplace. Check the
+[current release record](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json) for availability.
 
 ## Use
 
@@ -25,11 +26,9 @@ your ordinary implementation or review task:
 The `code-standards` skill is intended to be selected automatically for relevant
 work. You can explicitly invoke it if needed. Automatic discovery and task
 outcomes must be verified in the actual host; installation alone does not prove
-that every task will use the skill. See the repository's
-[development guide](../../CONTRIBUTING.md) for local packages and trials.
-The repository's [installation guide](../../docs/installation.md) lists release
-records and marketplace sources. This preview is not currently listed there for
-stable installation. CodeStack can be used independently of CodeVow and Agent
+that every task will use the skill. Follow the [installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md)
+and select `ai-code-stack-standards` from the `ai-code` marketplace. Each plugin
+is installed independently. CodeStack can be used independently of CodeVow and Agent
 Delegation; it introduces no dependency on either plugin.
 
 ## What it applies
@@ -66,7 +65,7 @@ One English skill loads only relevant English references. CodeStack requires no
 project configuration, injected AGENTS instruction, runtime, hook or separate
 agent. Existing workflows, tools and dependencies remain the task's context.
 Reviews report findings within their authorized scope. Formatting, generic
-tutorials and rules beyond the explicitly supported areas are outside this preview.
+tutorials and rules beyond the explicitly supported areas are outside this plugin's scope.
 These are explicit project conventions; behavioral improvement and native host
 selection require measured evidence rather than the existence of a rule file.
 
@@ -77,7 +76,8 @@ selection require measured evidence rather than the existence of a rule file.
 - [Evaluation cases](evals/cases.md): source-only fixtures and acceptance criteria
 
 The shared build packages only the allowlisted skill, references, icon and license.
-Human-facing source guides and evaluation inputs are not execution resources.
-Release workflow registration and public publication are separate from this preview.
+Portable English and Chinese READMEs accompany the execution resources. Evaluation
+inputs stay outside installation packages. Publishing and real host acceptance
+are separate results.
 
 [MIT](LICENSE). Maintained by Zack-Zz.

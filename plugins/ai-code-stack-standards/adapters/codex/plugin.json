@@ -8,7 +8,7 @@
     "com.openai": {
       "interface": {
         "displayName": "CodeStack",
-        "shortDescription": "Java, data-access and multilingual frontend conventions",
+        "shortDescription": "Targeted coding conventions",
         "category": "Developer Tools",
         "defaultPrompt": ["Use $code-standards to apply the relevant CodeStack conventions to this implementation or review."],
         "brandColor": "#0284C7",

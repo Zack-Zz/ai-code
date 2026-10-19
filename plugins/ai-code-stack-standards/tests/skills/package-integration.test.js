@@ -92,6 +92,30 @@ test('trusted tooling builds and independently checks all three host packages', 
   });
 });
 
+test('trusted release tools prepare and independently verify CodeStack for all declared hosts', () => {
+  withSourceFixture(({ root, temporary }) => {
+    const checked = succeeds(runTool(root, 'release', 'check', '--plugin', identity, '--mode', 'draft'));
+    const report = JSON.parse(checked.stdout);
+    assert.equal(report.ok, true);
+    assert.deepEqual(report.pending_acceptance, ['claude', 'codex', 'zcode']);
+    assert.equal(report.publication_ready, false, 'Local checks must not claim frozen-source publication readiness.');
+    const output = path.join(temporary, 'release-bundle');
+    succeeds(runTool(root, 'release', 'prepare', '--plugin', identity, '--mode', 'draft', '--output', output));
+    const verified = succeeds(runTool(root, 'release', 'verify', '--plugin', identity, '--path', output));
+    assert.equal(JSON.parse(verified.stdout).ok, true);
+    const record = JSON.parse(fs.readFileSync(path.join(output, 'release.json'), 'utf8'));
+    for (const host of ['claude', 'codex', 'zcode']) {
+      assert.ok(fs.existsSync(path.join(output, 'installers', `${identity}-${record.version}-${host}-plugin.zip`)));
+      const packageRoot = path.join(output, 'packages', host, identity);
+      for (const name of ['README.md', 'README_CN.md']) {
+        const readme = fs.readFileSync(path.join(packageRoot, name), 'utf8');
+        assert.match(readme, /ai-code-stack-standards/);
+        assert.doesNotMatch(readme, /\.\.\//, 'Installed READMEs must not link outside the portable plugin.');
+      }
+    }
+  });
+});
+
 const brokenSources = [
   {
     name: 'an unresolved rule reference',

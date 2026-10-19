@@ -8,7 +8,7 @@ on:
         required: true
         default: ai-code-workflow
         type: choice
-        options: [ai-code-workflow, ai-agent-delegation]
+        options: [ai-code-workflow, ai-agent-delegation, ai-code-stack-standards]
       operation:
         description: Build only / 仅构建；Publish + stable market / 发布并更新正式市场
         required: true

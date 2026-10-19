@@ -8,6 +8,24 @@ build helper uses `ai-code-workflow-local`. See the
 [installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md).
 The entries below retain their dated release context, including earlier migration plans.
 
+## 1.0.5
+
+### English
+
+- Require applicable user authorization and plan confirmation before the first project write, including tests, diagnostic files and delegated writes. Reuse an already confirmed scope without asking again for ordinary implementation details.
+- Clarify mixed requests for advice and development, and keep workflow mode selection separate from implementation authorization.
+- Document ZCode's workspace instruction entry and the distinction between CodeVow workflow modes and native execution modes.
+- Add A34–A36 scenarios and strengthen A03 evidence requirements for confirmation boundaries.
+- Real Claude Code, Codex and ZCode installation, upgrade, implicit selection and runtime behavior for these release bytes remain unverified.
+
+### 中文
+
+- 首次项目写入前检查适用的用户授权和方案确认，覆盖测试、诊断文件及委派写入；已有确认范围内的普通实现细节不重复询问。
+- 明确同时包含咨询与开发意愿的请求如何处理，并区分工作流模式选择与实际开发授权。
+- 补充 ZCode 工作区指令入口，区分 CodeVow 工作流模式与宿主原生执行模式。
+- 增加 A34–A36 场景，并强化 A03 的首次写入确认边界证据要求。
+- 本次发行字节在 Claude Code、Codex 和 ZCode 的真实安装、升级、自动选用及运行行为仍未验证。
+
 ## 1.0.4
 
 ### English

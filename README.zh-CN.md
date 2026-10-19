@@ -29,9 +29,10 @@ ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 Z
 
 通过 ai-code 插件市场安装，或从 GitHub Release 下载对应编码助手的安装包。
 插件市场名为 `ai-code`，来源是 `Zack-Zz/ai-code` 的 `main` 分支。
-仓库当前的[发行记录](published/index.json)和三宿主市场清单登记了
-**CodeVow**（`ai-code-workflow`）**1.0.4**。Agent Delegation 与 CodeStack 在本仓库中已有源码，
-尚未进入正式市场。这里描述的是仓库记录；当前可安装版本请在宿主中刷新市场后核对。
+正式可用版本以仓库当前的[发行记录](published/index.json)和三宿主市场清单为准。
+**CodeVow**（`ai-code-workflow`）与 **CodeStack**（`ai-code-stack-standards`）
+共享同一个市场，分别安装、分别发布。选择插件前先在宿主中刷新市场。
+Agent Delegation 当前只有源码，尚未进入正式市场。
 
 在系统终端执行以下 CLI 命令，每条成功后再执行下一条。如果已使用正确来源
 添加 `ai-code`，从第二条命令的刷新市场步骤继续。
@@ -70,7 +71,7 @@ macOS 内置 CLI 的完整命令见 [ZCode 安装指南](docs/installation.zh-CN
 - [安装指南](docs/installation.zh-CN.md)：Claude Code、Codex、ZCode 的完整市场注册与安装步骤、下载包安装、更新、卸载及故障处理。
 - [CodeVow 使用说明](plugins/ai-code-workflow/README.zh-CN.md)：任务示例、协作模式和项目配置。
 - [Agent Delegation 使用说明](plugins/ai-agent-delegation/README.zh-CN.md)：依赖准备、任务派发、续接和取消。
-- [CodeStack 使用说明](plugins/ai-code-stack-standards/README.zh-CN.md)：支持的规则范围、自动选择和开发预览状态。
+- [CodeStack 使用说明](plugins/ai-code-stack-standards/README.zh-CN.md)：支持的规则范围、自动选择和市场可用状态。
 
 安装后新建会话，告诉编码助手你要完成什么任务。
 

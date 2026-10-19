@@ -121,6 +121,12 @@ function sequenceDependentConfirmation(project) {
         '    if (confirmed) ({ name, email } = pending);\n    else pending = { name, email };\n    const values = { name, email };');
 }
 
+function explicitFalseBypassesConfirmation(project) {
+    centralized(project);
+    replaceSource(project, 'invitation.js', 'confirmed = false', 'confirmed');
+    replaceSource(project, 'invitation.js', 'if (!confirmed)', 'if (confirmed === undefined)');
+}
+
 function runControl(root, name, mutate, expectedExit, expectedPassed, expectedTotal = 17) {
     const project = path.join(root, name);
     fs.cpSync(path.join(__dirname, 'seed'), project, { recursive: true });
@@ -160,6 +166,12 @@ function runControl(root, name, mutate, expectedExit, expectedPassed, expectedTo
             'zh-CN: successful action for ari@example.com', 'zh-CN: successful action for bo+test@example.org'
         ]);
     }
+    if (name === 'explicit-false-bypasses-confirmation') {
+        assert.deepEqual(report.failures.map(failure => failure.name), [
+            'en: confirmation for ari@example.com', 'en: confirmation for bo+test@example.org',
+            'zh-CN: confirmation for ari@example.com', 'zh-CN: confirmation for bo+test@example.org'
+        ]);
+    }
     console.log(`${name}: exit ${result.status}, ${report.passed}/${report.total} functional; organization unscored`);
 }
 
@@ -179,7 +191,8 @@ try {
     runControl(root, 'validation-after-confirmation', validationAfterConfirmation, 1, 13);
     runControl(root, 'mutating-member-order', mutatingMemberOrder, 1, 14);
     runControl(root, 'sequence-dependent-confirmation', sequenceDependentConfirmation, 1, 13);
-    console.log('8 hand-control outcomes matched; no model, reference selection, or organization score was inferred.');
+    runControl(root, 'explicit-false-bypasses-confirmation', explicitFalseBypassesConfirmation, 1, 13);
+    console.log('9 hand-control outcomes matched; no model, reference selection, or organization score was inferred.');
     if (keep) console.log(`Inspect generated controls at ${root}; no report file was generated.`);
 } finally {
     if (!keep) fs.rmSync(root, { recursive: true, force: true });

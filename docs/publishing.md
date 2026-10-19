@@ -103,7 +103,7 @@ on **main**. There are two inputs:
 
 | Input | Choices |
 |---|---|
-| `plugin` | `ai-code-workflow`, `ai-agent-delegation` |
+| `plugin` | `ai-code-workflow`, `ai-agent-delegation`, `ai-code-stack-standards` |
 | `operation` | `build`, `publish` |
 
 Version and notes come from the committed plugin source. There is no source-tag,

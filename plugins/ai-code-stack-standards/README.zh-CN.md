@@ -6,7 +6,8 @@
 
 CodeStack 为编码助手提供多个语言和技术栈中精选的项目规范，当前覆盖 Java 写法、
 SQL/JPA/MyBatis 易错点及前端共享的多语言文案组织约定。插件 ID 为
-`ai-code-stack-standards`。当前为开发预览，尚未发布到正式市场。
+`ai-code-stack-standards`。正式版通过同一个 `ai-code` 市场分发，
+可安装版本以[当前发行记录](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json)为准。
 
 ## 使用
 
@@ -21,9 +22,8 @@ SQL/JPA/MyBatis 易错点及前端共享的多语言文案组织约定。插件 
 
 `code-standards` 技能以相关任务自动选用为目标，也可以在需要时显式调用。
 原生发现和实际行为需要在宿主中验证，安装成功不代表每次任务都会使用技能。
-本地包与试用方式见仓库[开发指南](../../CONTRIBUTING.zh-CN.md)，
-仓库[安装指南](../../docs/installation.zh-CN.md)列出发行记录与市场来源，当前预览尚未列入
-正式市场。CodeStack 可以独立于 CodeVow 与 Agent Delegation 使用，无需依赖这两个插件。
+按[安装指南](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md)
+从 `ai-code` 市场选择 `ai-code-stack-standards`，各插件分别安装。CodeStack 可以独立于 CodeVow 与 Agent Delegation 使用，无需依赖这两个插件。
 
 ## 具体要求
 
@@ -42,7 +42,7 @@ TypeScript 任务和不涉及文案的改动不因此引入国际化要求；Jav
 
 执行内容只有一个英文技能及按需读取的英文规则，不要求项目新增配置、AGENTS 指令、
 运行时、Hook 或独立 Agent。沿用当前任务的工作流、工具与依赖；审查请求按授权范围报告发现。
-本预览不提供排版规则、通用教程或超出明确支持范围的规则。这些是明确采用的项目约定；
+本插件不提供排版规则、通用教程或超出明确支持范围的规则。这些是明确采用的项目约定；
 行为改善和宿主自动选择需要实测证据，不能从规则文件存在推导。
 
 ## 资源与许可证
@@ -51,7 +51,7 @@ TypeScript 任务和不涉及文案的改动不因此引入国际化要求；Jav
 - [Java](skills/code-standards/references/java.md)、[数据访问](skills/code-standards/references/data-access.md)、[JPA](skills/code-standards/references/jpa.md)、[MyBatis](skills/code-standards/references/mybatis.md)、[前端](skills/code-standards/references/frontend.md)
 - [评测用例](evals/cases.md)：仅用于源码评测的输入和验收标准
 
-执行资源按显式白名单打包，仅包括技能、规则、图标与许可证；人类使用说明和评测输入不进入执行包。
-发行工作流接入与公开发布是本地预览开发之外的步骤。
+执行资源按显式白名单打包，包括技能、规则、图标与许可证，并附带可移植的中英 README。
+评测输入不进入安装包。正式发布与真实宿主验收分别报告。
 
 [MIT](LICENSE)，维护者 Zack-Zz。

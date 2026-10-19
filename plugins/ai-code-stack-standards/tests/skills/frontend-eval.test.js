@@ -11,4 +11,6 @@ test('frontend oracle calibration rejects contract regressions without scoring m
   assert.ifError(result.error);
   assert.equal(result.signal, null, result.stderr);
   assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /explicit-false-bypasses-confirmation: exit 1, 13\/17 functional; organization unscored/);
+  assert.match(result.stdout, /9 hand-control outcomes matched/);
 });

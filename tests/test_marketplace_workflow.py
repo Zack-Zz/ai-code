@@ -62,7 +62,7 @@ class HostedWorkflowTests(unittest.TestCase):
         self.assertIn('options: [build, publish]', text)
         self.assertNotIn('inputs.source_tag', text)
         self.assertNotIn('source_tag:\n        description:', text)
-        self.assertIn('options: [ai-code-workflow, ai-agent-delegation]', text)
+        self.assertIn('options: [ai-code-workflow, ai-agent-delegation, ai-code-stack-standards]', text)
         self.assertIn('--from-main --revision "$DISPATCH_SHA"', text)
         self.assertIn('--ensure-tag', text)
         self.assertIn('include-hidden-files: true', text)

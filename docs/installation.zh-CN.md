@@ -2,19 +2,20 @@
 
 [English](installation.md) | 简体中文
 
-通过 Claude Code、Codex 或 ZCode 安装已发布的插件。以下状态来自仓库当前的
-[发行记录](../published/index.json)和三宿主市场清单，不代表已在线核验宿主列表：
+通过 Claude Code、Codex 或 ZCode 安装已发布的插件。正式可用版本以仓库当前的
+[发行记录](../published/index.json)和三宿主市场清单为准；安装前先刷新宿主中的列表。
+CodeVow 与 CodeStack 共享同一个 `ai-code` 市场，各自独立：
 
 | 插件 | ID | 用途 | 正式市场 |
 |---|---|---|---|
-| [CodeVow](../plugins/ai-code-workflow/README.zh-CN.md) | `ai-code-workflow` | 计划、TDD、排查、审查和验证 | 已登记：`1.0.4` |
+| [CodeVow](../plugins/ai-code-workflow/README.zh-CN.md) | `ai-code-workflow` | 计划、TDD、排查、审查和验证 | 见当前发行记录 |
 | [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md) | `ai-agent-delegation` | 将任务交给独立编码助手会话 | 尚未发布 |
-| [CodeStack](../plugins/ai-code-stack-standards/README.zh-CN.md) | `ai-code-stack-standards` | 精选的 Java、数据访问和多语言前端约定 | 开发预览，未进入正式市场 |
+| [CodeStack](../plugins/ai-code-stack-standards/README.zh-CN.md) | `ai-code-stack-standards` | 精选的 Java、数据访问和多语言前端约定 | 见当前发行记录 |
 
-当前可安装项和版本以市场列表为准。下面的命令用于安装 CodeVow。
-Agent Delegation 与 CodeStack 已有源码，但正式市场尚未列出
-`ai-agent-delegation@ai-code` 或 `ai-code-stack-standards@ai-code`；
-本地开发包和试用方式见[开发指南](../CONTRIBUTING.zh-CN.md)。
+下面的命令用于安装 CodeVow。安装 CodeStack 时，将同一宿主安装命令中的插件
+替换为 `ai-code-stack-standards@ai-code`，或刷新市场后在界面中选择 CodeStack。
+可以只安装其中一个，也可以同时安装。Agent Delegation 当前只有源码，尚未进入
+正式市场。源码开发见[开发指南](../CONTRIBUTING.zh-CN.md)。
 
 ## 从插件市场安装
 
@@ -129,7 +130,7 @@ node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins list
 
 打开 [GitHub Releases](https://github.com/Zack-Zz/ai-code/releases)，选择已发布
 插件的 Release，再选择宿主文件：`claude`、`codex` 或 `zcode`。
-仓库发行记录登记的是 CodeVow `1.0.4`；只下载目标插件实际存在的公开 Release，
+以仓库当前发行记录为准；只下载目标插件实际存在的公开 Release，
 在该 Release 页面核对版本与附件。
 
 | 下载文件 | 适用方式 |
@@ -209,4 +210,4 @@ Agent Delegation 使用前，请按
 
 - [CodeVow 使用与配置](../plugins/ai-code-workflow/docs/usage.zh-CN.md)
 - [Agent Delegation 使用示例](../plugins/ai-agent-delegation/README.zh-CN.md)
-- [CodeStack 范围与预览状态](../plugins/ai-code-stack-standards/README.zh-CN.md)
+- [CodeStack 范围与市场可用状态](../plugins/ai-code-stack-standards/README.zh-CN.md)

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "product_id": "ai-code-stack-standards",
   "display_name": "CodeStack",
-  "version": "0.1.0-preview.1",
+  "version": "0.1.0",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "license": "MIT",
   "publisher": {
@@ -21,6 +21,8 @@
   "shared_skills": [],
   "resources": [
     {"source": "LICENSE", "target": "LICENSE", "include": []},
+    {"source": "release/README.md", "target": "README.md", "include": []},
+    {"source": "release/README_CN.md", "target": "README_CN.md", "include": []},
     {"source": "assets/codestack.png", "target": "assets/codestack.png", "include": []},
     {
       "source": "skills/code-standards/references",
