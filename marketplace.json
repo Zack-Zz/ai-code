@@ -8,12 +8,12 @@
       "name": "ai-code-workflow",
       "source": {
         "path": "ai-code-workflow",
-        "sha256": "111b11b6ce315a3d364bee7de51ff313c39b89ff3bebf4b230fb208b2e22e0ea",
+        "sha256": "72d5342605b74a5fcd05f4b4623473efa58172dc296d38117253f51ebfc70e65",
         "source": "url",
         "type": "zip",
-        "url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-workflow%2Fv1.0.4/ai-code-workflow-1.0.4-zcode-plugin.zip"
+        "url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-workflow%2Fv1.0.5/ai-code-workflow-1.0.5-zcode-plugin.zip"
       },
-      "version": "1.0.4"
+      "version": "1.0.5"
     }
   ]
 }

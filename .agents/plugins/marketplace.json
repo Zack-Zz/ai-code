@@ -9,12 +9,12 @@
         "installation": "AVAILABLE"
       },
       "source": {
-        "path": "./published/codex/ai-code-workflow/1.0.4",
-        "sha": "2cd9d673f242e4610db8865642a45b653200b28c",
+        "path": "./published/codex/ai-code-workflow/1.0.5",
+        "sha": "3e8ca4b79260c092263eea8b21e65015857a58ff",
         "source": "git-subdir",
         "url": "https://github.com/Zack-Zz/ai-code.git"
       },
-      "version": "1.0.4"
+      "version": "1.0.5"
     }
   ]
 }

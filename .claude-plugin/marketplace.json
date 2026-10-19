@@ -9,11 +9,11 @@
       "displayName": "CodeVow",
       "name": "ai-code-workflow",
       "source": {
-        "sha256": "c0683272d8b370b794ff698a0cf9f96030de65ad407902965b7c6a46e79276b0",
+        "sha256": "70dd74acee20622e92cfecae79c878a64512398fe6b6499f252e534a7fc45887",
         "source": "archive",
-        "url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-workflow%2Fv1.0.4/ai-code-workflow-1.0.4-claude-plugin.zip"
+        "url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-workflow%2Fv1.0.5/ai-code-workflow-1.0.5-claude-plugin.zip"
       },
-      "version": "1.0.4"
+      "version": "1.0.5"
     }
   ]
 }
