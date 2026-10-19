@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Package contracts only: passing this runner does not certify model behavior.
+// Development contracts and fixture calibration do not certify model behavior.
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');

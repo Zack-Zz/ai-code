@@ -54,27 +54,48 @@ function check(workspace) {
             failures.push({ name, detail: error.message });
         }
     }
-    const members = [{ id: 'user-7', name: 'Ari 中文', status: 'active' }];
+    const expectedMembers = [
+        { id: 'user-9', name: 'Zoe 中文', status: 'invited' },
+        { id: 'user-7', name: 'Ari 中文', status: 'active' }
+    ];
+    const freshMembers = () => expectedMembers.map(member => ({ ...member }));
     for (const [locale, copy] of Object.entries(expected)) {
         verify(`${locale}: existing title and business data`, () => {
+            const members = freshMembers();
             const actual = renderBoard(locale, members);
-            assert.deepEqual({ title: actual.title, members: actual.members }, { title: copy.title, members });
+            assert.deepEqual({ title: actual.title, members: actual.members }, { title: copy.title, members: expectedMembers });
+            assert.deepEqual(members, expectedMembers);
         });
         verify(`${locale}: invitation presentation`, () => {
-            assert.deepEqual(renderBoard(locale, members).invite, {
+            assert.deepEqual(renderBoard(locale, freshMembers()).invite, {
                 label: copy.label, placeholder: copy.placeholder, ariaLabel: copy.ariaLabel, submit: copy.submit
             });
         });
         verify(`${locale}: required validation`, () => {
-            assert.deepEqual(inviteMember(locale, 'Ari 中文', '  ', true), { ok: false, error: copy.required });
+            // Exercise the default, explicitly unconfirmed and confirmed paths.
+            for (const confirmation of [[], [false], [true]]) {
+                assert.deepEqual(inviteMember(locale, 'Ari 中文', '  ', ...confirmation), { ok: false, error: copy.required });
+            }
         });
         verify(`${locale}: invalid email validation`, () => {
-            assert.deepEqual(inviteMember(locale, 'Ari 中文', 'invalid', true), { ok: false, error: copy.invalid });
+            for (const confirmation of [[], [false], [true]]) {
+                assert.deepEqual(inviteMember(locale, 'Ari 中文', 'invalid', ...confirmation), { ok: false, error: copy.invalid });
+            }
         });
         for (const person of [
             { name: 'Ari 中文', email: 'ari@example.com' },
             { name: 'Bo {email}', email: 'bo+test@example.org' }
         ]) {
+            verify(`${locale}: successful action for ${person.email}`, () => {
+                const result = {
+                    ok: true, toast: interpolate(copy.toast, person),
+                    payload: { ...person, status: 'invited' }
+                };
+                // Confirmation must use its current arguments, without prior pending data.
+                assert.deepEqual(inviteMember(locale, person.name, ` ${person.email} `, true), result);
+                inviteMember(locale, 'Other member', 'other@example.com');
+                assert.deepEqual(inviteMember(locale, person.name, ` ${person.email} `, true), result);
+            });
             verify(`${locale}: confirmation for ${person.email}`, () => {
                 assert.deepEqual(inviteMember(locale, person.name, ` ${person.email} `), {
                     ok: false,
@@ -84,18 +105,14 @@ function check(workspace) {
                     }
                 });
             });
-            verify(`${locale}: successful action for ${person.email}`, () => {
-                assert.deepEqual(inviteMember(locale, person.name, ` ${person.email} `, true), {
-                    ok: true, toast: interpolate(copy.toast, person),
-                    payload: { ...person, status: 'invited' }
-                });
-            });
         }
     }
     verify('input members remain unchanged', () => {
-        renderBoard('en', members);
-        renderBoard('zh-CN', members);
-        assert.deepEqual(members, [{ id: 'user-7', name: 'Ari 中文', status: 'active' }]);
+        for (const locale of Object.keys(expected)) {
+            const members = freshMembers();
+            renderBoard(locale, members);
+            assert.deepEqual(members, expectedMembers);
+        }
     });
     console.log(JSON.stringify({ functional: failures.length ? 'fail' : 'pass', passed,
         total: passed + failures.length, failures, organization: 'manual_review' }, null, 2));

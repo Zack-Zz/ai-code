@@ -96,6 +96,31 @@ function untranslated(project) {
     fs.writeFileSync(file, content.replace(copies['zh-CN'].toast, copies.en.toast));
 }
 
+function replaceSource(project, file, before, after) {
+    const original = fs.readFileSync(path.join(project, 'src', file), 'utf8');
+    assert.ok(original.includes(before), `${file}: control must actually change its target`);
+    write(project, file, original.replace(before, after));
+}
+
+function validationAfterConfirmation(project) {
+    centralized(project);
+    replaceSource(project, 'invitation.js', 'if (!email)', 'if (confirmed && !email)');
+    replaceSource(project, 'invitation.js', 'if (!/', 'if (confirmed && !/');
+}
+
+function mutatingMemberOrder(project) {
+    centralized(project);
+    replaceSource(project, 'board.js', 'members.map(',
+        'members.sort((left, right) => left.name.localeCompare(right.name)).map(');
+}
+
+function sequenceDependentConfirmation(project) {
+    centralized(project);
+    replaceSource(project, 'invitation.js', 'function inviteMember(', 'let pending;\n\nfunction inviteMember(');
+    replaceSource(project, 'invitation.js', '    const values = { name, email };',
+        '    if (confirmed) ({ name, email } = pending);\n    else pending = { name, email };\n    const values = { name, email };');
+}
+
 function runControl(root, name, mutate, expectedExit, expectedPassed, expectedTotal = 17) {
     const project = path.join(root, name);
     fs.cpSync(path.join(__dirname, 'seed'), project, { recursive: true });
@@ -117,6 +142,24 @@ function runControl(root, name, mutate, expectedExit, expectedPassed, expectedTo
             'zh-CN: successful action for bo+test@example.org'
         ]);
     }
+    if (name === 'validation-after-confirmation') {
+        assert.deepEqual(report.failures.map(failure => failure.name), [
+            'en: required validation', 'en: invalid email validation',
+            'zh-CN: required validation', 'zh-CN: invalid email validation'
+        ]);
+    }
+    if (name === 'mutating-member-order') {
+        assert.deepEqual(report.failures.map(failure => failure.name), [
+            'en: existing title and business data', 'zh-CN: existing title and business data',
+            'input members remain unchanged'
+        ]);
+    }
+    if (name === 'sequence-dependent-confirmation') {
+        assert.deepEqual(report.failures.map(failure => failure.name), [
+            'en: successful action for ari@example.com', 'en: successful action for bo+test@example.org',
+            'zh-CN: successful action for ari@example.com', 'zh-CN: successful action for bo+test@example.org'
+        ]);
+    }
     console.log(`${name}: exit ${result.status}, ${report.passed}/${report.total} functional; organization unscored`);
 }
 
@@ -133,7 +176,10 @@ try {
     runControl(root, 'dispersed', dispersed, 0, 17);
     runControl(root, 'missing-translation', untranslated, 1, 15);
     runControl(root, 'broken-export', project => write(project, 'invitation.js', 'module.exports = {};\n'), 1, 0, 1);
-    console.log('5 hand-control outcomes matched; no model, reference selection, or organization score was inferred.');
+    runControl(root, 'validation-after-confirmation', validationAfterConfirmation, 1, 13);
+    runControl(root, 'mutating-member-order', mutatingMemberOrder, 1, 14);
+    runControl(root, 'sequence-dependent-confirmation', sequenceDependentConfirmation, 1, 13);
+    console.log('8 hand-control outcomes matched; no model, reference selection, or organization score was inferred.');
     if (keep) console.log(`Inspect generated controls at ${root}; no report file was generated.`);
 } finally {
     if (!keep) fs.rmSync(root, { recursive: true, force: true });

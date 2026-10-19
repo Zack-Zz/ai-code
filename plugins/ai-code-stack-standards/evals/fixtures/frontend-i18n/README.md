@@ -34,8 +34,13 @@ count as behavioral RED. Candidate syntax errors, missing modules and broken
 exports in an existing workspace instead fail the module contract with exit **1**
 and a separate 0/1 result; they are not mislabeled as environment trouble.
 The oracle checks both locales, visible form text, placeholder, accessible name,
-validation, dialog buttons/body, success Toast, full interpolated templates,
-email trimming, literal placeholder-like business data and retained protocol data.
+validation before default/explicit confirmation, dialog buttons/body, success
+Toast, full interpolated templates, email trimming, literal placeholder-like
+business data and retained protocol data. A successful action is exercised before
+requesting its confirmation and after a different user's confirmation; it must
+use its own arguments rather than hidden pending data. Member preservation uses
+fresh, nonalphabetical multi-member inputs and independent expected data, so an
+in-place sort cannot change both the input and its expected result unnoticed.
 It accepts behavior-correct centralized and dispersed implementations equally.
 There is no source parsing, word count, grep, filename or directory-name score.
 
@@ -64,7 +69,9 @@ above checklist into a keyword-based source classifier.
 
 `calibrate.js` generates fresh temporary copies and uses the frozen oracle in
 separate Node processes. It checks syntax first and removes its temporary source
-on completion. To inspect the actual generated call paths, retain controls in a
+on completion. The plugin test runner and repository `npm test` also run this
+calibration; that checks the authored oracle controls, not model behavior or
+native selection. To inspect the actual generated call paths, retain controls in a
 new **external** directory (must not exist):
 
 ```sh
@@ -81,6 +88,9 @@ model successes nor model failures and do not demonstrate automatic selection.
 | `dispersed` | exit 0; 17/17 | Fail: `dispersed()` leaves the title resource but gives `board.js` and `invitation.js` separate `localCopy` dictionaries and local lookups. Full translation coverage does not repair ownership. |
 | `missing-translation` | exit 1; 15/17 | Centralized organization still requires source review; Chinese success Toast falls back to English in two exercised inputs. Functional failure is distinct. |
 | `broken-export` | exit 1; 0/1 module contract | A syntactically valid candidate removes the action export. This is a candidate failure, not an unavailable runtime. |
+| `validation-after-confirmation` | exit 1; 13/17 | Central resources remain, but empty/invalid email is checked only when already confirmed. Default and explicit unconfirmed calls incorrectly return dialogs. |
+| `mutating-member-order` | exit 1; 14/17 | Central resources remain, but `renderBoard()` sorts the input members in place. Independent input/output snapshots detect the regression. |
+| `sequence-dependent-confirmation` | exit 1; 13/17 | Central resources remain, but confirmed actions reuse a module-level pending user. Direct and interleaved calls must use the supplied user instead. |
 
 The script asserts only functional outcomes and leaves `organization` as
 `manual_review`. The control labels document author intent, not an algorithmic
