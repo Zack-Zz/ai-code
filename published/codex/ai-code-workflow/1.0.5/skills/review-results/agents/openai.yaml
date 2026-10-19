@@ -1,0 +1,7 @@
+interface:
+  display_name: "Review Results"
+  short_description: "Turn technical review findings into clear business flows, impact, decisions, and clickable evidence"
+  brand_color: "#3B82F6"
+  default_prompt: "Present these review findings using the review-results decision-first format"
+policy:
+  allow_implicit_invocation: true

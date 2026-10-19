@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "plan": {
+    "goal": "Describe the user-confirmed goal in one sentence",
+    "scope": ["src/some_module"],
+    "acceptance": ["Observable condition that defines done"],
+    "change_type": "feature",
+    "risk": "normal",
+    "depth": "standard"
+  },
+  "authorization_refs": [
+    {
+      "message_ref": "Where the authorization came from (e.g. user message quote or pointer)",
+      "actions": ["plan"],
+      "scope_summary": "What this authorization covers"
+    }
+  ],
+  "protected_paths": ["path/owned/by/user/before/this/task.txt"]
+}
