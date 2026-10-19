@@ -10,14 +10,22 @@
     "url": "https://github.com/Zack-Zz"
   },
   "hosts": ["claude", "codex", "zcode"],
+  "host_listings": {
+    "claude": {},
+    "zcode": {
+      "icon_path": "assets/codestack.png",
+      "icon_url": "https://raw.githubusercontent.com/Zack-Zz/ai-code/27131993b1b1976244273f842a36e3a8fb7414a6/plugins/ai-code-stack-standards/assets/codestack.png"
+    }
+  },
   "core_skills": ["code-standards"],
   "shared_skills": [],
   "resources": [
     {"source": "LICENSE", "target": "LICENSE", "include": []},
+    {"source": "assets/codestack.png", "target": "assets/codestack.png", "include": []},
     {
       "source": "skills/code-standards/references",
       "target": "skills/code-standards/references",
-      "include": ["java.md", "data-access.md", "jpa.md", "mybatis.md"]
+      "include": ["java.md", "data-access.md", "jpa.md", "mybatis.md", "frontend.md"]
     }
   ]
 }

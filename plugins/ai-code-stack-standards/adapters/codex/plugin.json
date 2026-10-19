@@ -1,18 +1,20 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "description": "CodeStack applies explicit Java writing conventions and targeted SQL, JPA and MyBatis mistake prevention to the current task.",
+  "description": "CodeStack applies targeted project conventions across supported stacks: Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
   "license": "MIT",
   "repository": "https://github.com/Zack-Zz/ai-code",
-  "keywords": ["java", "code-standards", "jpa", "mybatis"],
+  "keywords": ["code-standards", "java", "jpa", "mybatis", "frontend", "i18n"],
   "extensions": {
     "com.openai": {
       "interface": {
         "displayName": "CodeStack",
-        "shortDescription": "Task-scoped Java and persistence writing rules",
+        "shortDescription": "Java, data-access and multilingual frontend conventions",
         "category": "Developer Tools",
-        "defaultPrompt": ["Use $code-standards to apply the relevant CodeStack rules to this Java change or review."],
-        "brandColor": "#0F766E",
-        "longDescription": "One skill selects English Java, shared SQL data-access, JPA and MyBatis references from the current module and actual call paths. It covers multiline Javadoc, comment language, production/test construction boundaries, hidden per-item queries, bounded loading and framework-specific pitfalls. No runtime, hooks, separate agents or project configuration. Native loading, implicit selection and task outcomes require separate host evidence."
+        "defaultPrompt": ["Use $code-standards to apply the relevant CodeStack conventions to this implementation or review."],
+        "brandColor": "#0284C7",
+        "longDescription": "One skill selects relevant English references from the current task and actual stack. It covers Java writing conventions, targeted SQL/JPA/MyBatis pitfalls, and centrally maintained language resources for multilingual frontend copy across frameworks such as React and Vue. It adds no general TypeScript, React or Vue style guide. No runtime, hooks, separate agents or project configuration. Native loading, implicit selection and task outcomes require separate host evidence.",
+        "logo": "./assets/codestack.png",
+        "composerIcon": "./assets/codestack.png"
       }
     }
   }

@@ -35,13 +35,15 @@ reported independently.
    is not a model failure, and a manually repaired fixture is not a model pass.
    If baseline runs already behave correctly, record no demonstrated improvement.
 8. Judge actual Java declarations, Javadoc, changed production APIs and database
-   behavior. Do not implement a keyword-based model-routing classifier or infer
-   SQL counts from Repository/Mapper invocation assertions.
+   behavior where applicable; judge frontend resource ownership through actual
+   call paths and source review. Java-specific requirements do not extend to TSX,
+   Vue or TypeScript. Do not implement a keyword-based model-routing classifier
+   or infer SQL counts from Repository/Mapper invocation assertions.
 
 ## Case matrix
 
-`Java`, `SQL`, `JPA`, and `MyBatis` below refer to the corresponding four packaged
-references. Selection is limited to the actual task, not the entire fixture.
+`Java`, `SQL`, `JPA`, `MyBatis`, and `frontend` below refer to the corresponding
+five packaged references. Selection is limited to the actual task, not the entire fixture.
 
 | Case | Input and ordinary task | Expected selection and behavior | Important failure to detect |
 | --- | --- | --- | --- |
@@ -61,7 +63,7 @@ references. Selection is limited to the actual task, not the entire fixture.
 | R14 | Same JPA module: review whether the protected no-argument entity constructor should remain. | Java + JPA; preserve the legitimate framework constructor. | Removing it as a test backdoor or using it as a reason to add test-only production overloads. |
 | R15 | `hidden-sql`: improve database access in `UserReport.names` while preserving tenant isolation, request order, duplicate IDs, missing-user behavior and the existing size limit. | Java + SQL; remove the hidden per-reference SELECT and satisfy the frozen engine-count check. | Moving the loop into a helper/thread/stream, per-item cache-miss queries, unbounded loading, changing result semantics or editing the evaluator's checker. |
 | R16 | A disposable new module based on the parent POM with no ORM dependency yet: implement a tenant-scoped lookup using explicitly requested MyBatis. | Java + SQL + MyBatis as the requested target; dependency changes only within the authorized development scope. | Ignoring the explicit target because the dependency does not exist yet, or choosing another ORM. |
-| R17 | `routing-context/frontend`: change the label from Items to Entries; separately ask a conceptual Java question or edit an ordinary prose document. | No default Java reference loading for these unrelated tasks. | Injecting Java templates or treating a concept question as authority to modify code. |
+| R17 | `routing-context/frontend`: change the label from Items to Entries; separately ask a conceptual Java question or edit an ordinary prose document. | The single-language Counter loads neither Java nor frontend; other unrelated tasks do not load Java by default. | Introducing i18n into the single-language Counter, injecting Java templates or treating a concept question as authority to modify code. |
 | R18 | Repeat R04 with CodeVow enabled in both paired environments and CodeStack enabled only in the treatment environment. | Existing workflow governs authorization/testing; CodeStack supplies code constraints. | Duplicate plans/approval cycles, forced reviewers, state files, or a new runtime coordinator. |
 | R19 | `routing-context/jpa`: clarify only the Javadoc of `getLines`; change no persistence annotations or executable code. | Java plus only context needed to describe the existing behavior accurately. | Running a SQL tuning project or changing mappings because the file happens to be an entity. |
 | R20 | `selection-boundaries/empty-filter`: repair empty required-positive IDs as part of the combined R20–R22 task. | Java + SQL; return an empty result without SQL, while retaining existing input validation. | Dropping the required positive filter and querying a broader tenant page, or querying before returning empty. |
@@ -77,6 +79,11 @@ references. Selection is limited to the actual task, not the entire fixture.
 | R30 | `contract-boundaries/incompatible-reuse`: implement a read-only purchase preview while an existing checkout returns a similar total but reserves inventory and throws for unavailable stock. | Java only; inspect existing contracts, reuse compatible reads or pure calculations, and preserve preview, tenant and checkout semantics. | Forcing reuse of the state-changing command; returning the right amount while changing inventory, leaking tenant data or changing unavailable-item behavior. |
 | R31 | `contract-boundaries/public-nested-api`: fix delivery days while independently deployed clients use the public nested `ShipmentService.Quote`. | Java only; preserve the deployed binary API while repairing the requested behavior. Execute a client compiled against the original library with the candidate library, without recompiling the client. | Moving the public result type to satisfy a placement preference, or treating a migrated/recompiled caller as proof of compatibility. |
 | R32 | `required-nesting/seed`: newly implement private attachment scanning through the existing JDK `FileVisitor` protocol. | Java only; preserve traversal, quota, I/O, isolation and public API. A small new nested visitor can be justified by concrete SDK adaptation and encapsulation; an equivalent top-level adapter is also acceptable. | Treating nesting as categorically forbidden or required; exposing state or adding API to remove it; claiming necessity from functional success or class counts alone. |
+| R33 | `frontend-i18n/seed`: add invitation form, validation, confirmation and success feedback to the existing bilingual member console. Use the frozen ordinary prompt and product acceptance README. | Frontend only; use independent unified language resources through keys and the existing mechanism. Functional behavior and organization review are separate. | Translated labels but missed aria/validation/Toast; correct output with component/action-local dictionaries, language branches or fragmented interpolated text. |
+| R34 | `frontend-i18n` React TSX inspection snapshot: add the Active/启用 status label to an existing bilingual page. | Frontend only; inspect the actual locale mechanism and consume the resource key. | Inferring Java obligations from general code rules, hardcoding translations in TSX, or claiming framework runtime evidence from source inspection. |
+| R35 | `frontend-i18n` Vue inspection snapshot: add search label and placeholder to an existing bilingual page. | Frontend only; same resource boundary as React, retaining existing Vue locale wiring. | Creating Vue-specific duplicate rules or local language dictionaries; missing placeholder text; treating a snapshot as rendered acceptance. |
+| R36 | `frontend-i18n` TypeScript backend snapshot: change the returned protocol state without changing the log. | Neither frontend nor Java; backend protocol values and operator logs are outside user-visible locale copy. | Loading frontend just because a file is TypeScript, translating protocol values or imposing Java language requirements. |
+| R37 | `frontend-i18n` multilingual page CSS snapshot: change only the action gap from 4px to 8px. | Neither frontend multilingual resource rules nor Java are needed for pure CSS without copy changes. | Loading copy rules merely because the wider product is multilingual, or expanding layout work into a locale migration. |
 
 R11 and R16 require the operator to freeze the precise proposed operation or new
 module request before a paired run. They are scenario recipes using the supplied
@@ -137,6 +144,20 @@ behavior and API; review the actual new implementation to assess nesting and its
 reason. Hand controls are evaluator calibration, not model outcomes.
 Supplemental historical-rule/current-rule comparisons must identify both exact
 snapshots and cannot be reported as plugin-enabled/plugin-disabled trials.
+
+For R33–R37, follow the [frontend multilingual operator instructions](fixtures/frontend-i18n/README.md).
+Copy only the ordinary seed or selected anonymous inspection snapshot. Freeze
+and retain the external functional oracle and calibration controls outside the
+candidate workspace. The dependency-free CommonJS model checks actual bilingual
+presentation/action outputs; it does not execute React, Vue or a browser. R34–R37
+are selection/source-inspection recipes only. The behavior-correct dispersed
+control must pass functional checks and fail independent organization review;
+no filename, word-count or grep classifier can establish that review. R17 remains
+a single-language negative case and must not become an i18n construction task.
+The new frontend convention is the user's explicit project requirement; earlier
+small-sample exploration did not observe improvement. Hand controls, static tests
+and package checks do not establish model benefit, implicit invocation or host
+acceptance. Keep those outcomes pending until separately observed.
 
 ## Record for each attempt
 

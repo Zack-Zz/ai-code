@@ -9,7 +9,7 @@
 |---|---|---|---|
 | [CodeVow](../plugins/ai-code-workflow/README.zh-CN.md) | `ai-code-workflow` | 计划、TDD、排查、审查和验证 | 已登记：`1.0.4` |
 | [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md) | `ai-agent-delegation` | 将任务交给独立编码助手会话 | 尚未发布 |
-| [CodeStack](../plugins/ai-code-stack-standards/README.zh-CN.md) | `ai-code-stack-standards` | Java 写法与持久化规则 | 开发预览，未进入正式市场 |
+| [CodeStack](../plugins/ai-code-stack-standards/README.zh-CN.md) | `ai-code-stack-standards` | 精选的 Java、数据访问和多语言前端约定 | 开发预览，未进入正式市场 |
 
 当前可安装项和版本以市场列表为准。下面的命令用于安装 CodeVow。
 Agent Delegation 与 CodeStack 已有源码，但正式市场尚未列出

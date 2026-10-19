@@ -16,7 +16,7 @@ features and configuration, with shared tooling for packaging and distribution.
 |---|---|---|
 | **CodeVow** | Plan changes, develop with TDD, debug problems, review code and verify results | [CodeVow](plugins/ai-code-workflow/README.md) |
 | **Agent Delegation** | Hand tasks to independent Claude Code, Codex or ZCode sessions and bring results back; requires Agent Bridge | [Agent Delegation](plugins/ai-agent-delegation/README.md) |
-| **CodeStack** | Apply explicit Java writing conventions and targeted SQL, JPA and MyBatis rules to the current change or review | [CodeStack](plugins/ai-code-stack-standards/README.md) |
+| **CodeStack** | Apply selected Java, data-access and multilingual frontend conventions to the current change or review | [CodeStack](plugins/ai-code-stack-standards/README.md) |
 
 | Path | Contents |
 |---|---|
@@ -78,7 +78,7 @@ For detailed installation steps and plugin usage:
 - [Installation guide](docs/installation.md): full marketplace registration and installation steps, downloaded packages, updates, removal and troubleshooting for Claude Code, Codex and ZCode.
 - [CodeVow guide](plugins/ai-code-workflow/README.md): task examples, collaboration modes and project configuration.
 - [Agent Delegation guide](plugins/ai-agent-delegation/README.md): requirements, handoffs, continuation and cancellation.
-- [CodeStack guide](plugins/ai-code-stack-standards/README.md): Java rule scope, automatic selection and development-preview availability.
+- [CodeStack guide](plugins/ai-code-stack-standards/README.md): supported rule scope, automatic selection and development-preview availability.
 
 After installation, start a new session and describe what you want to do.
 
@@ -101,8 +101,8 @@ development requirements are in the development guide.
 
 **Must I use all three plugins together?** Each plugin can be used independently.
 CodeVow organizes coding work in your current session. Agent Delegation handles
-tasks you explicitly hand to an independent session. CodeStack guides Java writing
-and persistence choices without requiring either plugin. Marketplace availability
+tasks you explicitly hand to an independent session. CodeStack supplies selected
+code and project conventions without requiring either plugin. Marketplace availability
 is separate from these functional relationships.
 
 **How do I update or report a problem?** Follow the installation guide for

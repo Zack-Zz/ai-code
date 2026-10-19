@@ -1,6 +1,6 @@
 ---
 name: code-standards
-description: Use when implementing, changing, or reviewing Java code or JPA/MyBatis persistence mappings; apply CodeStack's comment, test-construction, and data-access rules to the affected code.
+description: Use when implementing, changing, or reviewing Java code, SQL/JPA/MyBatis persistence, or user-visible frontend copy in a product with existing or explicitly requested multilingual support; apply only CodeStack's relevant conventions.
 origin: ai-code-stack-standards
 ---
 
@@ -23,6 +23,7 @@ that apply:
 | [Data access](references/data-access.md) | Implementing, changing or reviewing confirmed relational/SQL access or its cost | Hidden per-item queries, bounded loading, result contracts and actual database work |
 | [JPA](references/jpa.md) | The change affects JPA mapping, entity construction, lifecycle, queries or persistence calls | Implicit loading/writes, delete propagation, pagination and provider-specific batching |
 | [MyBatis](references/mybatis.md) | The change affects actual MyBatis Mapper, XML, SqlSession or related calls | Binding, dynamic SQL, nested selects and actual pagination/batch execution |
+| [Frontend](references/frontend.md) | Implementing, changing or reviewing fixed user-visible copy in a frontend product with existing or explicitly requested multilingual support | Centrally maintained language resources, referenced by keys across pages, components and actions |
 
 Combine references for one operation that actually uses both JPA and MyBatis.
 Keep shared data-access requirements in their shared reference; framework rules
@@ -39,8 +40,12 @@ select shared data-access rules when SQL behavior or cost is affected. Other
 XML does not acquire persistence rules from its file extension. Apply Java
 rules to related handwritten Java declarations only when those declarations
 are in the task scope. Pure conceptual questions, unrelated prose edits and
-work unrelated to Java or these persistence mechanisms need no default loading
-of these references.
+work unrelated to these supported mechanisms need no default loading of their
+references. For frontend work, select the shared frontend reference only when
+the task affects user-visible copy and the product has existing or explicitly
+requested multilingual support. A single-language UI label, backend-only
+TypeScript change or CSS-only edit does not select that reference. Frontend work
+does not select Java or persistence references without a relevant affected path.
 
 ## Establish the actual stack
 
@@ -63,6 +68,12 @@ of these references.
 - A user-specified stack for a new module is a valid development target even
   before its dependencies exist. It does not authorize unrelated dependency
   installation or silently converting an existing module to another stack.
+- Establish multilingual frontend scope from the current application's locale
+  switching, message lookups and resource configuration, or an explicit product
+  requirement. An internationalization dependency, a React/Vue file or another
+  application's languages alone is not enough. Follow the current application's
+  resource boundary in a mixed repository; do not introduce multilingual support
+  into an unrelated single-language product.
 
 If the user's description and source disagree, investigate first. Ask only when
 the unresolved difference affects the authorized work. Never require a new
@@ -72,7 +83,7 @@ project configuration file to select these rules.
 
 Reuse the current scope, selection evidence and already-read references while
 they remain applicable. Add a reference when a new affected call path requires
-it; do not rescan the repository before every edit or load all four by default.
+it; do not rescan the repository before every edit or load every reference by default.
 Keep this decision in conversation context, not a project cache or task file.
 
 Follow explicit user requirements and applicable project contracts. Existing

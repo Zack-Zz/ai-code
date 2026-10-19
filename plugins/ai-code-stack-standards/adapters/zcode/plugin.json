@@ -1,4 +1,4 @@
 {
-  "description": "CodeStack applies explicit Java writing conventions and targeted SQL, JPA and MyBatis mistake prevention to the current task.",
+  "description": "CodeStack applies targeted project conventions across supported stacks: Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
   "license": "MIT"
 }

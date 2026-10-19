@@ -3,9 +3,9 @@
   "skills": {
     "code-standards": {
       "display_name": "CodeStack",
-      "short_description": "Apply relevant Java, SQL, JPA and MyBatis writing rules",
-      "brand_color": "#0F766E",
-      "default_prompt": "Use $code-standards to apply the relevant CodeStack rules to this Java change or review.",
+      "short_description": "Apply relevant Java, data-access and multilingual frontend rules",
+      "brand_color": "#0284C7",
+      "default_prompt": "Use $code-standards to apply the relevant CodeStack conventions to this implementation or review.",
       "allow_implicit_invocation": true
     }
   }

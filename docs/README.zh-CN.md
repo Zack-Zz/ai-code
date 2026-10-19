@@ -10,7 +10,7 @@
 - [CodeVow](../plugins/ai-code-workflow/README.zh-CN.md)：功能、示例和配置。
 - [CodeVow 详细用法](../plugins/ai-code-workflow/docs/usage.zh-CN.md)：配置、任务记录和可选文件工具。
 - [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md)：依赖准备、派发、续接和取消。
-- [CodeStack](../plugins/ai-code-stack-standards/README.zh-CN.md)：Java 写法与持久化易错点规则，当前为开发预览。
+- [CodeStack](../plugins/ai-code-stack-standards/README.zh-CN.md)：精选的 Java、数据访问和多语言前端约定，当前为开发预览。
 - [Agent Bridge 使用与配置](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置)：外置运行时的准备入口。
 
 ## 开发插件

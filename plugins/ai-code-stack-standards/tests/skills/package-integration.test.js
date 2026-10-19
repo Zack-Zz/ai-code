@@ -9,8 +9,9 @@ const repository = path.resolve(__dirname, '../../../..');
 const source = path.resolve(__dirname, '../..');
 const identity = 'ai-code-stack-standards';
 const skillPath = 'skills/code-standards/SKILL.md';
-const references = ['data-access.md', 'java.md', 'jpa.md', 'mybatis.md'];
+const references = ['data-access.md', 'frontend.md', 'java.md', 'jpa.md', 'mybatis.md'];
 const referenceDirectory = 'skills/code-standards/references';
+const iconPath = 'assets/codestack.png';
 
 function runTool(root, ...args) {
   const result = spawnSync('python3', ['-B', path.join(repository, 'tooling/plugin_tool.py'), '--root', root, ...args], {
@@ -68,12 +69,22 @@ test('trusted tooling builds and independently checks all three host packages', 
       for (const relative of [skillPath, ...references.map((name) => `${referenceDirectory}/${name}`)]) {
         assert.deepEqual(fs.readFileSync(path.join(packageRoot, relative)), fs.readFileSync(path.join(plugin, relative)));
       }
+      assert.ok(fs.existsSync(path.join(packageRoot, iconPath)), 'The CodeStack PNG must be packaged for every host.');
+      assert.deepEqual(fs.readFileSync(path.join(packageRoot, iconPath)), fs.readFileSync(path.join(plugin, iconPath)));
       assert.ok(listFiles(packageRoot).every((relative) =>
         !relative.split('/').some((part) => ['tests', 'evals', 'AGENTS.md'].includes(part))),
       'Development instructions, tests and evaluation fixtures must not enter a host package.');
     }
 
     const codexPackage = path.join(output, packages.codex.package_dir);
+    const codexManifest = JSON.parse(fs.readFileSync(path.join(codexPackage, 'plugin.json'), 'utf8'));
+    const codexInterface = codexManifest.extensions['com.openai'].interface;
+    assert.equal(codexInterface.logo, `./${iconPath}`);
+    assert.equal(codexInterface.composerIcon, `./${iconPath}`);
+    const zcodeMarket = JSON.parse(fs.readFileSync(path.join(output, 'zcode/marketplace.json'), 'utf8'));
+    const zcodeEntry = zcodeMarket.plugins.find((entry) => entry.name === identity);
+    assert.equal(zcodeEntry.displayName, 'CodeStack');
+    assert.match(zcodeEntry.icon, /^https:\/\/raw\.githubusercontent\.com\/Zack-Zz\/ai-code\/[0-9a-f]{40}\/plugins\/ai-code-stack-standards\/assets\/codestack\.png$/);
     fs.appendFileSync(path.join(codexPackage, referenceDirectory, 'jpa.md'), '\nUnexpected rule change.\n');
     const tampered = runTool(root, 'package', 'check', '--path', codexPackage, '--host', 'codex');
     assert.notEqual(tampered.status, 0, tampered.stdout + tampered.stderr);
@@ -89,22 +100,32 @@ const brokenSources = [
     },
     diagnostic: /missing-rule\.md/,
   },
-  {
-    name: 'a required rule omitted from the resource allowlist',
+  ...['jpa.md', 'frontend.md'].map((rule) => ({
+    name: `a required rule omitted from the resource allowlist (${rule})`,
     mutate(plugin) {
       const filename = path.join(plugin, 'product.json');
       const product = JSON.parse(fs.readFileSync(filename, 'utf8'));
       const original = JSON.stringify(product.resources);
-      product.resources = product.resources.filter((entry) => entry.source !== `${referenceDirectory}/jpa.md`);
+      product.resources = product.resources.filter((entry) => entry.source !== `${referenceDirectory}/${rule}`);
       for (const entry of product.resources) {
         if (entry.source === referenceDirectory) {
-          entry.include = entry.include.filter((name) => name !== 'jpa.md');
+          entry.include = entry.include.filter((name) => name !== rule);
         }
       }
-      assert.notEqual(JSON.stringify(product.resources), original, 'The fixture must actually remove the JPA rule allowance.');
+      assert.notEqual(JSON.stringify(product.resources), original, `The fixture must actually remove the ${rule} allowance.`);
       fs.writeFileSync(filename, JSON.stringify(product));
     },
-    diagnostic: /jpa\.md/,
+    diagnostic: new RegExp(rule.replaceAll('.', '\\.')),
+  })),
+  {
+    name: 'a marketplace icon omitted from the resource allowlist',
+    mutate(plugin) {
+      const filename = path.join(plugin, 'product.json');
+      const product = JSON.parse(fs.readFileSync(filename, 'utf8'));
+      product.resources = product.resources.filter((entry) => entry.source !== iconPath);
+      fs.writeFileSync(filename, JSON.stringify(product));
+    },
+    diagnostic: /icon_path.*registered PNG/,
   },
   {
     name: 'a Codex interface bound to the wrong skill',

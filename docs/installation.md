@@ -10,7 +10,7 @@ manifests list the following stable availability; this is not an online host che
 |---|---|---|---|
 | [CodeVow](../plugins/ai-code-workflow/README.md) | `ai-code-workflow` | Planning, TDD, debugging, review and verification | Recorded: `1.0.4` |
 | [Agent Delegation](../plugins/ai-agent-delegation/README.md) | `ai-agent-delegation` | Handoff to an independent coding assistant session | Not yet published |
-| [CodeStack](../plugins/ai-code-stack-standards/README.md) | `ai-code-stack-standards` | Java writing and persistence rules | Development preview; not in stable marketplace |
+| [CodeStack](../plugins/ai-code-stack-standards/README.md) | `ai-code-stack-standards` | Selected Java, data-access and multilingual frontend conventions | Development preview; not in stable marketplace |
 
 The marketplace listing determines current availability and versions. The commands
 below install CodeVow. Agent Delegation and CodeStack exist in source but are not

@@ -14,7 +14,7 @@ ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 Z
 |---|---|---|
 | **CodeVow** | 规划改动、测试驱动开发、排查问题、审查代码与验证结果 | [CodeVow](plugins/ai-code-workflow/README.zh-CN.md) |
 | **Agent Delegation** | 将任务交给独立的 Claude Code、Codex 或 ZCode 会话，并收回结果；需要 Agent Bridge | [Agent Delegation](plugins/ai-agent-delegation/README.zh-CN.md) |
-| **CodeStack** | 为当前改动或审查应用明确的 Java 写法及 SQL、JPA、MyBatis 易错点规则 | [CodeStack](plugins/ai-code-stack-standards/README.zh-CN.md) |
+| **CodeStack** | 为当前改动或审查应用精选的 Java、数据访问和多语言前端约定 | [CodeStack](plugins/ai-code-stack-standards/README.zh-CN.md) |
 
 | 目录或文件 | 内容 |
 |---|---|
@@ -70,7 +70,7 @@ macOS 内置 CLI 的完整命令见 [ZCode 安装指南](docs/installation.zh-CN
 - [安装指南](docs/installation.zh-CN.md)：Claude Code、Codex、ZCode 的完整市场注册与安装步骤、下载包安装、更新、卸载及故障处理。
 - [CodeVow 使用说明](plugins/ai-code-workflow/README.zh-CN.md)：任务示例、协作模式和项目配置。
 - [Agent Delegation 使用说明](plugins/ai-agent-delegation/README.zh-CN.md)：依赖准备、任务派发、续接和取消。
-- [CodeStack 使用说明](plugins/ai-code-stack-standards/README.zh-CN.md)：Java 规则范围、自动选择和开发预览状态。
+- [CodeStack 使用说明](plugins/ai-code-stack-standards/README.zh-CN.md)：支持的规则范围、自动选择和开发预览状态。
 
 安装后新建会话，告诉编码助手你要完成什么任务。
 
@@ -90,7 +90,7 @@ Bridge。CodeStack 只提供 Markdown 指令，无需额外运行时。完整要
 源码开发环境见开发指南。
 
 **三个插件必须一起使用吗？** 每个插件都可以独立使用。CodeVow 组织当前编码工作，
-Agent Delegation 负责你明确要求的独立会话任务；CodeStack 指导 Java 写法与持久化选择，
+Agent Delegation 负责你明确要求的独立会话任务；CodeStack 提供精选的代码和项目约定，
 无需依赖前两个插件。功能上的独立关系不代表三个插件都已进入正式市场。
 
 **如何更新或报告问题？** 更新步骤见安装指南；问题和建议请提交到

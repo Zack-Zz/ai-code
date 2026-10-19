@@ -2,19 +2,25 @@
 
 English | [简体中文](README.zh-CN.md)
 
-CodeStack guides a coding assistant through explicit Java writing conventions
-and targeted persistence pitfalls. Its plugin ID is `ai-code-stack-standards`.
+<img src="assets/codestack.png" alt="CodeStack icon" width="96" />
+
+CodeStack supplies a coding assistant with selected project conventions across
+supported languages and stacks. It currently covers Java writing, targeted
+SQL/JPA/MyBatis pitfalls, and shared multilingual frontend copy organization.
+Its plugin ID is `ai-code-stack-standards`.
 This is a development preview; it has not been published to the stable marketplace.
 
 ## Use
 
 Once installed and enabled through your host's native plugin mechanism, describe
-your ordinary Java implementation or review task:
+your ordinary implementation or review task:
 
 - “Add this field and its accessors to the existing Java class.”
 - “Add tests for this service using its production construction path.”
 - “Fix the order-list query that loads each customer separately.”
 - “Review this MyBatis Mapper and its XML parameter bindings.”
+- “Add a confirmation dialog and feedback to this multilingual React page.”
+- “Review the validation messages in this multilingual Vue form.”
 
 The `code-standards` skill is intended to be selected automatically for relevant
 work. You can explicitly invoke it if needed. Automatic discovery and task
@@ -43,20 +49,34 @@ Delegation; it introduces no dependency on either plugin.
 - JPA and MyBatis references are selected only for the affected mechanisms.
   A mixed project can use both; a MapStruct mapper or an unrelated XML file does
   not imply MyBatis.
+- In a frontend product with existing or explicitly requested multilingual
+  support, keep affected fixed user-visible copy in a dedicated, centrally
+  maintained language-resource area. Pages, components and actions use resource
+  keys. This includes labels, placeholders, accessible text, dialogs, validation
+  and feedback; dynamic business data remains data. Resources may be split by
+  language or domain using the existing localization mechanism.
+
+The frontend convention is shared across JavaScript/TypeScript, React, Vue and
+other frontend stacks. Single-language products, backend-only TypeScript and
+copy-unrelated edits do not acquire this requirement. Existing Java conventions
+are not generalized to frontend code. There are no separate TypeScript, React or
+Vue rule references without additional approved rules.
 
 One English skill loads only relevant English references. CodeStack requires no
 project configuration, injected AGENTS instruction, runtime, hook or separate
 agent. Existing workflows, tools and dependencies remain the task's context.
-Reviews report findings within their authorized scope. Java formatting, generic
-tutorials and non-Java stack rules are outside this preview.
+Reviews report findings within their authorized scope. Formatting, generic
+tutorials and rules beyond the explicitly supported areas are outside this preview.
+These are explicit project conventions; behavioral improvement and native host
+selection require measured evidence rather than the existence of a rule file.
 
 ## Resources and license
 
 - [Skill entry](skills/code-standards/SKILL.md)
-- [Java](skills/code-standards/references/java.md), [data access](skills/code-standards/references/data-access.md), [JPA](skills/code-standards/references/jpa.md), [MyBatis](skills/code-standards/references/mybatis.md)
+- [Java](skills/code-standards/references/java.md), [data access](skills/code-standards/references/data-access.md), [JPA](skills/code-standards/references/jpa.md), [MyBatis](skills/code-standards/references/mybatis.md), [frontend](skills/code-standards/references/frontend.md)
 - [Evaluation cases](evals/cases.md): source-only fixtures and acceptance criteria
 
-The shared build packages only the allowlisted skill, references and license.
+The shared build packages only the allowlisted skill, references, icon and license.
 Human-facing source guides and evaluation inputs are not execution resources.
 Release workflow registration and public publication are separate from this preview.
 
