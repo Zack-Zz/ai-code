@@ -2,17 +2,19 @@
 
 [English](installation.md) | 简体中文
 
-通过 Claude Code、Codex 或 ZCode 安装已发布的插件。
-截至 **2026-10-12**，正式市场的可安装情况如下：
+通过 Claude Code、Codex 或 ZCode 安装已发布的插件。以下状态来自仓库当前的
+[发行记录](../published/index.json)和三宿主市场清单，不代表已在线核验宿主列表：
 
 | 插件 | ID | 用途 | 正式市场 |
 |---|---|---|---|
-| [CodeVow](../plugins/ai-code-workflow/README.zh-CN.md) | `ai-code-workflow` | 计划、TDD、排查、审查和验证 | 可安装：`1.0.3` |
+| [CodeVow](../plugins/ai-code-workflow/README.zh-CN.md) | `ai-code-workflow` | 计划、TDD、排查、审查和验证 | 已登记：`1.0.4` |
 | [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md) | `ai-agent-delegation` | 将任务交给独立编码助手会话 | 尚未发布 |
+| [CodeStack](../plugins/ai-code-stack-standards/README.zh-CN.md) | `ai-code-stack-standards` | Java 写法与持久化规则 | 开发预览，未进入正式市场 |
 
 当前可安装项和版本以市场列表为准。下面的命令用于安装 CodeVow。
-Agent Delegation 已有源码，但目前无法通过 `ai-agent-delegation@ai-code` 安装；
-本地开发和试用见[开发指南](../CONTRIBUTING.zh-CN.md)。
+Agent Delegation 与 CodeStack 已有源码，但正式市场尚未列出
+`ai-agent-delegation@ai-code` 或 `ai-code-stack-standards@ai-code`；
+本地开发包和试用方式见[开发指南](../CONTRIBUTING.zh-CN.md)。
 
 ## 从插件市场安装
 
@@ -127,8 +129,8 @@ node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins list
 
 打开 [GitHub Releases](https://github.com/Zack-Zz/ai-code/releases)，选择已发布
 插件的 Release，再选择宿主文件：`claude`、`codex` 或 `zcode`。
-CodeVow 已有正式版 `1.0.3` Release；只下载目标插件实际存在的公开 Release，
-版本以该 Release 显示的版本为准。
+仓库发行记录登记的是 CodeVow `1.0.4`；只下载目标插件实际存在的公开 Release，
+在该 Release 页面核对版本与附件。
 
 | 下载文件 | 适用方式 |
 |---|---|
@@ -186,9 +188,10 @@ Codex 执行 `codex plugin marketplace upgrade ai-code` 后，在原生插件管
 
 | 插件或功能 | 要求 |
 |---|---|
-| 两个插件 | 支持原生插件的宿主、宿主账号和所选模型 |
+| 每个插件 | 支持原生插件的宿主、宿主账号和所选模型 |
 | Claude Code 正式市场安装 | 支持 `archive` 来源的 Claude Code **2.1.224+** |
 | CodeVow Markdown 技能 | 无需额外 Node.js 或 Python |
+| CodeStack 指令 | 无需额外运行时，也不依赖其他 ai-code 插件 |
 | CodeVow 可选工具 | Python 3.11+；文件暂存需要支持 POSIX 文件操作的平台 |
 | Agent Delegation | Python 3，以及单独配置的 `agent-bridge/v1` CLI |
 | Agent Bridge | Node.js 22.16+；目标编码工具另行安装并完成原生认证 |
@@ -206,3 +209,4 @@ Agent Delegation 使用前，请按
 
 - [CodeVow 使用与配置](../plugins/ai-code-workflow/docs/usage.zh-CN.md)
 - [Agent Delegation 使用示例](../plugins/ai-agent-delegation/README.zh-CN.md)
+- [CodeStack 范围与预览状态](../plugins/ai-code-stack-standards/README.zh-CN.md)

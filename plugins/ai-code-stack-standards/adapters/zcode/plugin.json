@@ -1,0 +1,4 @@
+{
+  "description": "CodeStack applies explicit Java writing conventions and targeted SQL, JPA and MyBatis mistake prevention to the current task.",
+  "license": "MIT"
+}

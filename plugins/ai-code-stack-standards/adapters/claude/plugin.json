@@ -1,0 +1,6 @@
+{
+  "description": "CodeStack applies explicit Java writing conventions and targeted SQL, JPA and MyBatis mistake prevention to the current task.",
+  "license": "MIT",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "keywords": ["java", "code-standards", "jpa", "mybatis"]
+}

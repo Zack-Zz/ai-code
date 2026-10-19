@@ -1,0 +1,7 @@
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.1">
+  <persistence-unit name="example-orders">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>example.OrderEntity</class>
+    <class>example.OrderLine</class>
+  </persistence-unit>
+</persistence>

@@ -2,18 +2,21 @@
 
 English | [简体中文](installation.zh-CN.md)
 
-Install published plugins through Claude Code, Codex or ZCode. Stable marketplace
-availability, checked on **2026-10-12**:
+Install published plugins through Claude Code, Codex or ZCode. The repository's
+current [release record](../published/index.json) and three host marketplace
+manifests list the following stable availability; this is not an online host check:
 
 | Plugin | ID | Purpose | Stable marketplace |
 |---|---|---|---|
-| [CodeVow](../plugins/ai-code-workflow/README.md) | `ai-code-workflow` | Planning, TDD, debugging, review and verification | Available: `1.0.3` |
+| [CodeVow](../plugins/ai-code-workflow/README.md) | `ai-code-workflow` | Planning, TDD, debugging, review and verification | Recorded: `1.0.4` |
 | [Agent Delegation](../plugins/ai-agent-delegation/README.md) | `ai-agent-delegation` | Handoff to an independent coding assistant session | Not yet published |
+| [CodeStack](../plugins/ai-code-stack-standards/README.md) | `ai-code-stack-standards` | Java writing and persistence rules | Development preview; not in stable marketplace |
 
 The marketplace listing determines current availability and versions. The commands
-below install CodeVow. Agent Delegation exists in the source repository but cannot
-currently be installed as `ai-agent-delegation@ai-code`; see the
-[development guide](../CONTRIBUTING.md) for local development and trials.
+below install CodeVow. Agent Delegation and CodeStack exist in source but are not
+listed for stable installation as `ai-agent-delegation@ai-code` or
+`ai-code-stack-standards@ai-code`. See the [development guide](../CONTRIBUTING.md)
+for local development packages and trials.
 
 ## Install from the marketplace
 
@@ -140,8 +143,9 @@ manage the account and selected model.
 
 Open [GitHub Releases](https://github.com/Zack-Zz/ai-code/releases), choose the
 published plugin's Release, and select the file for your host: `claude`, `codex`
-or `zcode`. CodeVow has a stable `1.0.3` Release; only use a public Release that
-actually exists for the plugin you want. Use the version shown on that Release.
+or `zcode`. The repository's release record identifies CodeVow `1.0.4`; use only a
+public Release that actually exists for the plugin you want and confirm its version
+and assets on that Release page.
 
 | Download | When to choose it |
 |---|---|
@@ -205,9 +209,10 @@ Agent Bridge.
 
 | Plugin or feature | Requirements |
 |---|---|
-| Both plugins | A host with native plugin support, its account and selected model |
+| Each plugin | A host with native plugin support, its account and selected model |
 | Claude Code stable marketplace installation | Claude Code **2.1.224+** for `archive` sources |
 | CodeVow Markdown skills | No additional Node.js or Python runtime |
+| CodeStack instructions | No additional runtime or dependency on another ai-code plugin |
 | CodeVow optional tools | Python 3.11+; file staging needs a platform supporting POSIX file operations |
 | Agent Delegation | Python 3 and a separately configured `agent-bridge/v1` CLI |
 | Agent Bridge | Node.js 22.16+ and the target coding tools, installed and authenticated separately |
@@ -226,3 +231,4 @@ Installing a plugin does not install its dependencies.
 
 - [CodeVow usage and configuration](../plugins/ai-code-workflow/docs/usage.md)
 - [Agent Delegation examples](../plugins/ai-agent-delegation/README.md)
+- [CodeStack scope and preview status](../plugins/ai-code-stack-standards/README.md)

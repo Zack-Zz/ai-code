@@ -16,6 +16,7 @@ features and configuration, with shared tooling for packaging and distribution.
 |---|---|---|
 | **CodeVow** | Plan changes, develop with TDD, debug problems, review code and verify results | [CodeVow](plugins/ai-code-workflow/README.md) |
 | **Agent Delegation** | Hand tasks to independent Claude Code, Codex or ZCode sessions and bring results back; requires Agent Bridge | [Agent Delegation](plugins/ai-agent-delegation/README.md) |
+| **CodeStack** | Apply explicit Java writing conventions and targeted SQL, JPA and MyBatis rules to the current change or review | [CodeStack](plugins/ai-code-stack-standards/README.md) |
 
 | Path | Contents |
 |---|---|
@@ -30,10 +31,11 @@ features and configuration, with shared tooling for packaging and distribution.
 
 Install through the ai-code marketplace or download a package for your coding
 assistant from GitHub Releases. The marketplace name is `ai-code`, from
-`Zack-Zz/ai-code` at `main`. As of **2026-10-12**, the stable marketplace contains
-**CodeVow** (`ai-code-workflow`) **1.0.3**. Agent Delegation has source in this
-repository but has not entered the stable marketplace. Check the current
-marketplace list for the latest installable plugins.
+`Zack-Zz/ai-code` at `main`. The repository's current
+[release record](published/index.json) and three host marketplace manifests list
+**CodeVow** (`ai-code-workflow`) **1.0.4**. Agent Delegation and CodeStack have source
+in this repository but have not entered the stable marketplace. These are repository
+records; refresh the marketplace in your host to check current installable versions.
 
 Run the following CLI commands in your system terminal, one at a time after
 each succeeds. If you have already added `ai-code` with the correct source,
@@ -76,6 +78,7 @@ For detailed installation steps and plugin usage:
 - [Installation guide](docs/installation.md): full marketplace registration and installation steps, downloaded packages, updates, removal and troubleshooting for Claude Code, Codex and ZCode.
 - [CodeVow guide](plugins/ai-code-workflow/README.md): task examples, collaboration modes and project configuration.
 - [Agent Delegation guide](plugins/ai-agent-delegation/README.md): requirements, handoffs, continuation and cancellation.
+- [CodeStack guide](plugins/ai-code-stack-standards/README.md): Java rule scope, automatic selection and development-preview availability.
 
 After installation, start a new session and describe what you want to do.
 
@@ -92,12 +95,15 @@ See the [architecture](docs/architecture.md) for project boundaries and the
 
 **Do I need Node.js or Python?** CodeVow's Markdown skills need neither runtime;
 its optional management tools need Python 3.11+. Agent Delegation needs Python 3
-and an external Agent Bridge. Each plugin's guide lists its requirements. Source
+and an external Agent Bridge. CodeStack provides Markdown instructions and needs
+no additional runtime. Each plugin's guide lists its requirements. Source
 development requirements are in the development guide.
 
-**Must I use both plugins together?** You can choose them independently. CodeVow
-organizes coding work in your current session. Agent Delegation handles tasks
-you explicitly hand to an independent session.
+**Must I use all three plugins together?** Each plugin can be used independently.
+CodeVow organizes coding work in your current session. Agent Delegation handles
+tasks you explicitly hand to an independent session. CodeStack guides Java writing
+and persistence choices without requiring either plugin. Marketplace availability
+is separate from these functional relationships.
 
 **How do I update or report a problem?** Follow the installation guide for
 updates. Submit problems and suggestions through

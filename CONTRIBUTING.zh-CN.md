@@ -37,6 +37,7 @@ python3 tooling/plugin_tool.py list
 |---|---|---|
 | CodeVow | `plugins/ai-code-workflow/skills/`、`policies/`、`scripts/workflow/` | Node 技能契约和插件 Python 测试 |
 | Agent Delegation | `plugins/ai-agent-delegation/skills/`、`scripts/bridge_client.py` | 插件 Python 测试 |
+| CodeStack | `plugins/ai-code-stack-standards/skills/code-standards/` | Node 发现、包和汇总器契约；行为评测单独执行 |
 | 公共工具 | `tooling/plugin_tools/` | `tests/run_python_tests.py` |
 
 行为变更先写有意义的失败测试，再做最小实现并跑绿。文档调整按影响检查内容、
@@ -48,7 +49,12 @@ python3 tooling/plugin_tool.py list
 node plugins/ai-code-workflow/tests/skills/run-skills.js
 PYTHONDONTWRITEBYTECODE=1 python3 plugins/ai-code-workflow/tests/run_python_tests.py
 PYTHONDONTWRITEBYTECODE=1 python3 plugins/ai-agent-delegation/tests/run_python_tests.py
+node plugins/ai-code-stack-standards/tests/skills/run-skills.js
 ```
+
+CodeStack 的[评测用例](plugins/ai-code-stack-standards/evals/cases.md)分别验证规则选择、
+任务结果和原生宿主加载；契约测试和包检查不能证明这些行为。执行用技能与规则保持英文，
+人类使用说明保持中英双语。
 
 ## 完整检查与构建
 

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "skills": {
+    "code-standards": {
+      "display_name": "CodeStack",
+      "short_description": "Apply relevant Java, SQL, JPA and MyBatis writing rules",
+      "brand_color": "#0F766E",
+      "default_prompt": "Use $code-standards to apply the relevant CodeStack rules to this Java change or review.",
+      "allow_implicit_invocation": true
+    }
+  }
+}

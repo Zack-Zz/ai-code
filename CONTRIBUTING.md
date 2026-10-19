@@ -39,6 +39,7 @@ Locate the plugin and update its features and tests:
 |---|---|---|
 | CodeVow | `plugins/ai-code-workflow/skills/`, `policies/`, `scripts/workflow/` | Node skill contracts and plugin Python tests |
 | Agent Delegation | `plugins/ai-agent-delegation/skills/`, `scripts/bridge_client.py` | Plugin Python tests |
+| CodeStack | `plugins/ai-code-stack-standards/skills/code-standards/` | Node discovery, package and runner contracts; separate behavioral evaluations |
 | Shared tooling | `tooling/plugin_tools/` | `tests/run_python_tests.py` |
 
 For behavior changes, write a meaningful failing test, implement the smallest
@@ -51,7 +52,13 @@ To run the plugin tests separately:
 node plugins/ai-code-workflow/tests/skills/run-skills.js
 PYTHONDONTWRITEBYTECODE=1 python3 plugins/ai-code-workflow/tests/run_python_tests.py
 PYTHONDONTWRITEBYTECODE=1 python3 plugins/ai-agent-delegation/tests/run_python_tests.py
+node plugins/ai-code-stack-standards/tests/skills/run-skills.js
 ```
+
+CodeStack's [evaluation cases](plugins/ai-code-stack-standards/evals/cases.md)
+separate rule selection, task outcomes and native host loading. Contract tests and
+package checks do not prove those behaviors. Keep its runtime skill and references
+in English; human-facing guides remain bilingual.
 
 ## Check and build
 

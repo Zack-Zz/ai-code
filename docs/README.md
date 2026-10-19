@@ -11,6 +11,7 @@ records appear in the reference section at the end.
 - [CodeVow](../plugins/ai-code-workflow/README.md): features, examples and configuration.
 - [Detailed CodeVow usage](../plugins/ai-code-workflow/docs/usage.md): configuration, task records and optional file tools.
 - [Agent Delegation](../plugins/ai-agent-delegation/README.md): requirements, handoffs, continuation and cancellation.
+- [CodeStack](../plugins/ai-code-stack-standards/README.md): Java writing conventions and targeted persistence rules; development preview.
 - [Agent Bridge setup](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置): preparation of the external runtime.
 
 ## Develop plugins

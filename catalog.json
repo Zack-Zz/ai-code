@@ -2,6 +2,7 @@
   "schema_version": 1,
   "plugins": [
     { "path": "plugins/ai-code-workflow" },
-    { "path": "plugins/ai-agent-delegation" }
+    { "path": "plugins/ai-agent-delegation" },
+    { "path": "plugins/ai-code-stack-standards" }
   ]
 }

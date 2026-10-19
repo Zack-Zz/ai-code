@@ -15,6 +15,7 @@ ai-code/
   plugins/
     ai-code-workflow/             CodeVow
     ai-agent-delegation/          Agent Delegation
+    ai-code-stack-standards/      CodeStack
   tooling/plugin_tool.py          Shared CLI
   tooling/plugin_tools/           Validation, builds, checks and releases
   tests/                          Shared tests and the plugin test runner

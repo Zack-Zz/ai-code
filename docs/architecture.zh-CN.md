@@ -14,6 +14,7 @@ ai-code/
   plugins/
     ai-code-workflow/             CodeVow
     ai-agent-delegation/          Agent Delegation
+    ai-code-stack-standards/      CodeStack
   tooling/plugin_tool.py          公共 CLI
   tooling/plugin_tools/           通用校验、构建、检查与发行
   tests/                          公共测试和插件测试汇总
