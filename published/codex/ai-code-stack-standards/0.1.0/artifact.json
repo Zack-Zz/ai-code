@@ -1,0 +1,61 @@
+{
+  "content_hash": "967003b632c1f51f69d7f9dacbd079c343c9f7f7b38f1f02cbe140de36cfe964",
+  "files": [
+    [
+      "LICENSE",
+      "9dd7243a184fe5bf71f8ab9589d4ee5b39eca61babbc9cab86fb3409d9e345e1"
+    ],
+    [
+      "README.md",
+      "5abd3e237e6e48f98e9bcead70d85078d7d078e2d74ec0c75ead791db6ee339d"
+    ],
+    [
+      "README_CN.md",
+      "4cbc2a1cf70751952bf7f8c1a7043dc3151b2d8a0e6c211e9a28d3e93b4259c3"
+    ],
+    [
+      "assets/codestack.png",
+      "620d80de95511cb2efb62334349aa9f9e5b59eba24aa3ce45b90104cdb37c694"
+    ],
+    [
+      "plugin.json",
+      "57ef61a5bd04cfd98a1f368640fcc43853b6cf5bda7af62695f41dfeb16695e2"
+    ],
+    [
+      "skills/code-standards/SKILL.md",
+      "9f82d3296665f74a6a86b4f2adeed2f058635a501e1f2aece98cea2c4d57aada"
+    ],
+    [
+      "skills/code-standards/agents/openai.yaml",
+      "cacbf7e33e3dd94a22b49b0c516605267f3175067f42a6db56365f1f036cccd6"
+    ],
+    [
+      "skills/code-standards/references/data-access.md",
+      "7a2f03e90fbbf80ee147ca10c90947849322f0fda451e86092e688cd7866bafe"
+    ],
+    [
+      "skills/code-standards/references/frontend.md",
+      "74d5d3e19c50edc1404e3a27f2cc2540e06b8b924595798f966aa4f4775a618e"
+    ],
+    [
+      "skills/code-standards/references/java.md",
+      "0dcdb49101fc97c4db84fd2870d765172b489e42aba650aedb5fd03aa47dc950"
+    ],
+    [
+      "skills/code-standards/references/jpa.md",
+      "0afafd0858f5bfa37a63eea9fe0491bbd5bee798d18e2f1777c0411a49663d24"
+    ],
+    [
+      "skills/code-standards/references/mybatis.md",
+      "e0ba6f182bc2202e23a170b66e857f5abe6aed6d650bb14f8b1acb90eff7594b"
+    ]
+  ],
+  "host": "codex",
+  "product_id": "ai-code-stack-standards",
+  "profiles": [],
+  "schema_version": 1,
+  "source_revision": "065296b5d5785c79cbbd432aa775000c616450bf",
+  "source_tree_hash": "d8247cdbe25350bf554681022356986c116f88966f2a02f8493a139da288d36f",
+  "version": "0.1.0",
+  "working_tree_dirty": false
+}
