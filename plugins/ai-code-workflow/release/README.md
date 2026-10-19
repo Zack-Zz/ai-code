@@ -45,13 +45,21 @@ the current stage and reuse valid context. If workflow cannot load, report it
 and remain read-only.
 ```
 
-Keep this entry separate from the skill bodies: workflow rules remain in the
-skills. Use a project-instruction entry your host actually provides, after
-checking how it loads in your session. This snippet is for your active opt-in;
-CodeVow does not silently edit existing `AGENTS.md`, `CLAUDE.md` or host settings.
-This does not assume a fixed installation-cache path or that a bundled
-`AGENTS.md` activates automatically. The exact instruction location and
-loading behavior need verification in your actual host session.
+Keep this entry separate from the skill bodies. Actively add or merge it
+into your host's project instructions, preserving existing content. CodeVow
+does not write configuration automatically. The snippet assumes neither a
+fixed installation-cache path nor automatic activation of a bundled `AGENTS.md`.
+
+ZCode natively reads global `~/.zcode/AGENTS.md` and `AGENTS.md` at the current
+Workspace root. For this project, add or merge the snippet into the Workspace-root
+file; ZCode does not scan subdirectories or expand `@include`. `CLAUDE.md` is
+only offered for a one-time onboarding migration, not read as a native entry
+afterward. See [ZCode's AGENTS.md guide](https://zcode.z.ai/en/docs/agents).
+
+CodeVow's `collaborative` / `continuous` are workflow instructions; they do not
+switch ZCode's native execution mode or intercept editing tools. ZCode's Plan
+Mode can present a plan for confirmation before editing. These instructions
+do not establish real-host acceptance; verify loading and adherence in your session.
 
 You can explicitly ask the host to load the installed CodeVow `workflow` skill
 and check that it can read it, keeping the check read-only. If loading fails,
@@ -85,6 +93,15 @@ editing:
 |---|---|---|
 | `collaborative` — collaborative mode (default) | The assistant investigates, explains the proposed change and waits for you to confirm the plan before editing. | You want to review the approach before implementation. |
 | `continuous` — continuous mode | After you ask it to implement a task, the assistant explains a short plan and proceeds within the scope you authorized. | The goal and scope are clear, and you want the assistant to carry the task through. |
+
+Mixed wording needs the same authorization check. For example: "Add an entry
+in DevOps to initialize product-line application clients. Could you look into
+how to handle this?" With no prior authorization, the assistant first
+investigates read-only and proposes an approach; the word "add" alone does
+not authorize development. In default `collaborative` mode, even an explicit
+implementation request needs a presented plan and your confirmation before
+any project write, including tests or diagnostic files. Ordinary follow-up
+questions within an already confirmed scope do not require confirmation again.
 
 Once implementation starts, both modes continue through coding, testing and
 review without asking you to approve every ordinary step. Previously confirmed

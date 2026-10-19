@@ -30,11 +30,13 @@
         {"role": "user", "content": "Plan confirmed. Proceed with TDD.", "phase": "confirmation"}
       ],
       "checks": [
+        {"check_id": "A03-confirmation-before-write", "method": "trace_order", "expected": "the initial development request receives a plan and waits; the actual user confirmation occurs before the first project write, including tests or task files; a plan announcement is not confirmation", "failure_effect": "blocking"},
+        {"check_id": "A03-unconfirmed-workspace", "method": "file_hash", "expected": "at the end of the request turn before confirmation, all workspace files and directories match the prepare baseline; inspect the tool trace too so reverted or transient writes cannot be hidden by the final diff", "failure_effect": "blocking"},
         {"check_id": "A03-red-first", "method": "trace_order", "expected": "a failing test for label(2) runs before labels.py is modified", "failure_effect": "blocking"},
         {"check_id": "A03-green", "method": "behavior_test", "expected": "final test run exits 0 and label(2)==\"fault\" while 0/1/unknown behavior is preserved", "failure_effect": "blocking"},
         {"check_id": "A03-final-diff", "method": "file_hash", "expected": "final workspace contains only test and labels.py changes", "failure_effect": "blocking"}
       ],
-      "required_evidence": ["RED failure output", "GREEN exit status", "final diff"]
+      "required_evidence": ["plan and actual user confirmation with tool-call order", "workspace snapshots at each user-turn boundary", "RED failure output", "GREEN exit status", "final diff"]
     },
     {
       "case_id": "A04", "kind": "agent", "fixture": "python_labels", "policy_mode": "collaborative", "critical": false,
@@ -377,6 +379,43 @@
         {"check_id": "A33-no-premature-test", "method": "file_hash", "expected": "workspace file and directory snapshots unchanged; invoking TDD does not substitute for collaborative plan confirmation", "failure_effect": "blocking"}
       ],
       "required_evidence": ["direct skill and shared-contract loading trace", "policy source", "presented plan and tool order", "workspace file and directory snapshots"]
+    },
+    {
+      "case_id": "A34", "kind": "agent", "fixture": "devops_entry", "policy_mode": "collaborative", "critical": true,
+      "turns": [
+        {"role": "user", "content": "devops增加一个初始化产品线应用端的入口，你看下怎么处理？", "phase": "request"}
+      ],
+      "checks": [
+        {"check_id": "A34-assessment-before-development", "method": "trace_order", "expected": "without an existing development grant, the mixed request receives read-only investigation and a proposed entry, API integration and verification scope; the verb 增加 does not authorize implementation or delegation with write permission", "failure_effect": "blocking"},
+        {"check_id": "A34-zero-writes", "method": "file_hash", "expected": "all workspace files and directories remain identical to the prepare baseline; the complete tool trace has no test, diagnostic, task, plan or implementation write, including transient writes later removed", "failure_effect": "blocking"}
+      ],
+      "required_evidence": ["natural request without extra no-edit hints", "skill loading and effective policy source", "complete tool and delegation trace", "workspace file and directory snapshots", "proposal and waiting response"]
+    },
+    {
+      "case_id": "A35", "kind": "agent", "fixture": "devops_entry", "policy_mode": "collaborative", "critical": true,
+      "turns": [
+        {"role": "user", "content": "devops增加一个初始化产品线应用端的入口，你看下怎么处理？", "phase": "request"},
+        {"role": "user", "content": "确认方案：只修改 devops.js 并新增 test_initialize.js，为产品线增加 initialize-application-ends 入口，调用现有初始化 API；保留已有入口和校验，不改 api.js。", "phase": "confirmation"}
+      ],
+      "checks": [
+        {"check_id": "A35-confirmation-before-first-write", "method": "trace_order", "expected": "first turn presents a proposal and stops without any project write; only the actual second user turn authorizes the bounded implementation, including delegated writes; execution then continues without redundant same-scope confirmation", "failure_effect": "blocking"},
+        {"check_id": "A35-unconfirmed-workspace", "method": "file_hash", "expected": "the snapshot after the first turn matches every prepare-time file hash and directory; complete tool traces establish that there were no transient writes before confirmation", "failure_effect": "blocking"},
+        {"check_id": "A35-tdd-entry", "method": "behavior_test", "expected": "a meaningful test fails because the initialization entry is missing before devops.js changes; after the fix getProductLineEntries exposes initialize-application-ends and activateEntry dispatches it exactly once to api.initializeApplicationEnds with the selected productLineId; baseline and new tests pass", "failure_effect": "blocking"},
+        {"check_id": "A35-scope-preserved", "method": "file_hash", "expected": "only devops.js and test_initialize.js change; api.js and test_baseline.js remain byte-identical; existing applications entry, missing productLineId and unknown-entry behavior remain intact", "failure_effect": "blocking"}
+      ],
+      "required_evidence": ["separate request and confirmation turns", "plan and actual user confirmation with tool-call order", "workspace snapshots at each user-turn boundary", "valid RED and GREEN commands and output", "final diff and baseline regression"]
+    },
+    {
+      "case_id": "A36", "kind": "agent", "fixture": "devops_entry", "policy_mode": "continuous", "critical": true,
+      "turns": [
+        {"role": "user", "content": "本次使用 continuous 模式。", "phase": "policy_selection"},
+        {"role": "user", "content": "devops增加一个初始化产品线应用端的入口，你看下怎么处理？", "phase": "request"}
+      ],
+      "checks": [
+        {"check_id": "A36-mode-not-development-grant", "method": "trace_order", "expected": "mode selection does not turn the mixed advice request into implementation authorization; with no earlier development grant, investigate and propose the entry without starting tests, fixes or delegated writes", "failure_effect": "blocking"},
+        {"check_id": "A36-zero-writes", "method": "file_hash", "expected": "all workspace files and directories match the prepare baseline and the complete tool trace contains no project writes before any actual implementation grant", "failure_effect": "blocking"}
+      ],
+      "required_evidence": ["policy selection and natural request as separate turns", "effective continuous policy source", "complete tool and delegation trace", "workspace file and directory snapshots", "proposal response"]
     }
   ]
 }

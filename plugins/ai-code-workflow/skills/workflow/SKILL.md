@@ -1,6 +1,6 @@
 ---
 name: workflow
-description: Use for coding questions, diagnosis, review, development requests and scope changes; establish intent and authorization before choosing skills or starting writes
+description: Use for coding questions, change proposals, diagnosis, review and implementation; check user authorization and plan confirmation before any project write
 origin: ai-code-workflow
 ---
 
@@ -17,23 +17,27 @@ scope and applicable plan confirmation in the conversation context. Use the
 whole relevant conversation; neither the newest sentence nor a skill name
 alone determines permission. No task record is required for this check.
 
-- Asking whether something is wrong, requesting diagnosis, or requesting an
-  independent review authorizes investigation and reporting, not repairs.
-  Confirming a defect is not confirmation of a change plan. Invoking a skill
-  is not a substitute for development authorization and plan confirmation.
-- Before the first project write, a transition from analysis to development,
-  or a material scope change, check the actual user's grant and the plan rules
-  below. Project writes include tests, diagnostic instrumentation, configuration,
-  documentation, data and task files; test-only permission does not permit a
-  production-code fix. State the findings, impact, proposed changes and checks,
-  and wait for applicable confirmation when it is missing.
-- Reuse valid context and already-read rules while the objective and scope
-  remain applicable. A follow-up question during approved development does not
-  revoke that grant; an explicit stop or new restriction does. Ordinary fixes
-  and re-verification within the approved objective continue without re-asking.
-- If intent or coverage is unclear, continue useful read-only investigation
-  and clarify before the dependent write. Neither urgency, defect severity,
-  `continuous` mode nor another agent's findings creates permission.
+Before any project write or delegation that permits writes, apply this check:
+
+| Actual conversation context | Next action |
+|---|---|
+| Question, investigation, review or proposed-change assessment without an applicable development grant | Investigate and report findings, impact, proposed changes and checks; remain read-only in either mode. |
+| Development requested under `collaborative`, but no user confirmation covers a presented plan for this scope | Present a proportionate plan and wait for the user's reply or native plan confirmation. Stop after the proposal until that response arrives. |
+| A confirmed plan already covers this development scope | Continue within that scope without asking again about ordinary implementation details. |
+| `continuous` and the user explicitly authorized this implementation scope | State a short plan and proceed within that grant; mode selection alone grants nothing. |
+| Intent, scope or prior confirmation cannot be established | Continue useful read-only investigation and clarify before the dependent write. |
+
+Project writes include tests, diagnostic instrumentation, configuration,
+documentation, data and task/plan files. A development request is not confirmation
+of a plan that has not been presented. Announcing a plan or saying "I will start"
+does not supply the user's reply. Do not write a test or task file while waiting.
+Test-only permission does not permit a production-code fix.
+
+Confirming a defect, invoking a skill, urgency, severity, another agent's findings
+and an agent-written approval flag never create permission. Reuse valid context
+and already-read rules while the objective and scope remain applicable. A follow-up
+question during approved development does not revoke the grant; an explicit stop,
+new restriction or material scope change requires checking the affected part again.
 
 Specialist skills invoked directly use this context before their own steps.
 These are instruction constraints; they do not intercept host editing tools.
@@ -48,6 +52,15 @@ These are instruction constraints; they do not intercept host editing tools.
   and the user's pre-existing modifications. Never treat existing uncommitted
   edits as yours, never overwrite them, and keep their diff separate from
   yours in every report.
+
+Interpret the whole request, including requests for advice attached to a desired
+change. "Add an initialization entry for product-line application clients in
+DevOps; how should we handle it?" ("devops增加一个初始化产品线应用端的入口，你看下怎么处理？")
+asks for an assessment and proposal when no existing development grant covers it.
+Likewise, "how should we fix this?" and "look at how to improve it" do not alone
+authorize edits. Do not infer permission from verbs such as "add" or "fix".
+Even an unambiguous new development request needs a presented plan and confirmation
+under `collaborative`. These examples do not cancel a valid earlier grant.
 
 ## 2. Read at the point of need
 
@@ -151,8 +164,9 @@ For delegated work, reuse the host's coordination capabilities:
   useful deliverables, within the policy's parallel limit and the user's
   constraints. Complexity alone does not require subagents.
 - Give each delegated task its goal, necessary context, permitted change scope
-  and expected result. Reuse the applicable plan and authorization; no fixed
-  handoff form or extra task record is required.
+  and expected result. Reuse the applicable plan and authorization; before required
+  confirmation, delegate only read-only investigation, not test or implementation
+  writes. No fixed handoff form or extra task record is required.
 - In a shared checkout, coordinate overlapping writes so only one writer changes
   a file at a time, including the main agent. Preserve others' edits. Isolated
   workspaces may produce competing patches, but shared resources still need

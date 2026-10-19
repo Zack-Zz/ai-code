@@ -32,7 +32,7 @@ def _copy_file_fixture(fixture: str, workspace: Path) -> None:
     src = FIXTURES / fixture
     workspace.mkdir(parents=True, exist_ok=True)
     for name in ("labels.py", "test_baseline.py", "auth.py", "audit.py",
-                 "status.js", "test_baseline.js", "user", "calc.py",
+                 "status.js", "test_baseline.js", "devops.js", "api.js", "user", "calc.py",
                  "test_calc.py", "user_notes.txt", ".ai-workflow"):
         source = src / name
         if source.is_dir():
@@ -80,7 +80,7 @@ def prepare(case_id: str, output: Path) -> dict:
 
     prefixes = ["workspace"]
     git_baselines = None
-    if fixture in ("python_labels", "python_auth", "node_status", "state_resume"):
+    if fixture in ("python_labels", "python_auth", "node_status", "state_resume", "devops_entry"):
         workspace = output / "workspace"
         _copy_file_fixture(fixture, workspace)
         if fixture == "state_resume":

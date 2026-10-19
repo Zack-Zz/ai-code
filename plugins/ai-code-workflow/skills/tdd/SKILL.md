@@ -14,7 +14,9 @@ already established; otherwise read and establish it first. Diagnosis or
 review findings do not authorize a test or repair. A request to add only a
 reproduction test is still a development request: under `collaborative`,
 present the test scope and wait for applicable plan confirmation before
-writing it. The initial request is not confirmation of an unpresented plan.
+writing it. If confirmation is missing, stop after the proposal and wait for the
+user's reply or native plan confirmation. The initial request to add a test and
+the assistant's own plan do not by themselves supply that confirmation.
 After confirmation, a test-only grant permits the reproduction and RED
 evidence, then a handoff; obtain broader authorization before GREEN or
 production changes.

@@ -2,7 +2,7 @@
 
 这是内部验收方案，不是新的代理流水线或运行时。MA1–MA6 用真实宿主会话观察
 主代理如何选择分工、约定接口、控制写入、整合结果及处理失效证据。它们独立于
-现有 A01–A33、CLI 确定性检查及 `host_context.case_id`；不把 MA 编号写入现有
+现有 A01–A36、CLI 确定性检查及 `host_context.case_id`；不把 MA 编号写入现有
 闭字段，不扩展 policy、task、evidence schema，不新增调度器。
 
 这份说明与[两模块样例](fixtures/multi_agent_contract/README.md)是维护材料，

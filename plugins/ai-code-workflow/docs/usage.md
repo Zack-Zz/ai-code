@@ -24,6 +24,15 @@ module, and run its tests."
 - In `continuous`, it investigates, explains a short plan, and carries out the
   fix and tests within the scope you specified.
 
+Mixed wording needs the same authorization check. For example: "Add an entry
+in DevOps to initialize product-line application clients. Could you look into
+how to handle this?" With no prior authorization, the assistant first
+investigates read-only and proposes an approach; the word "add" alone does
+not authorize development. In default `collaborative` mode, even an explicit
+implementation request needs a presented plan and your confirmation before
+any project write, including tests or diagnostic files. Ordinary follow-up
+questions within an already confirmed scope do not require confirmation again.
+
 Once implementation starts, both modes continue through coding, testing and
 review without asking you to approve every ordinary step. Previously confirmed
 plans are reused. If the scope or a key decision changes materially, the assistant
@@ -70,12 +79,22 @@ them instead of copying the full workflow into project instructions. Read only
 the skill and referenced material needed at the current stage, and reuse valid
 context rather than loading all six skills for every request.
 
-Use a project-instruction entry actually provided by your host, after checking
-how it loads in your session. This snippet is for your active opt-in. CodeVow
-does not silently edit an existing `AGENTS.md`, `CLAUDE.md` or host setting.
-The snippet assumes neither a fixed installation-cache path nor automatic activation of a bundled
-`AGENTS.md`. The exact instruction location and its loading behavior need
-verification in your actual host session.
+Actively add or merge this snippet into your host's project instructions,
+preserving existing content. CodeVow does not write configuration automatically.
+The snippet assumes neither a fixed installation-cache path nor automatic
+activation of a bundled `AGENTS.md`.
+
+For ZCode, the native entries are global `~/.zcode/AGENTS.md` and `AGENTS.md`
+at the current Workspace root. Add or merge the snippet into the Workspace-root
+file for this project; ZCode does not scan subdirectories or expand `@include`.
+`CLAUDE.md` is only offered for a one-time migration during onboarding, not
+read as a native entry afterward. See [ZCode's AGENTS.md guide](https://zcode.z.ai/en/docs/agents).
+
+CodeVow's `collaborative` and `continuous` are workflow instructions; they do
+not switch ZCode's native execution mode or intercept its editing tools.
+ZCode's Plan Mode can present a plan for confirmation before editing. This
+setup guidance does not establish real-host acceptance: verify loading and
+adherence in your actual session.
 
 To check entry loading, explicitly ask: "Load the installed CodeVow workflow
 skill and tell me whether you can read it; keep this check read-only." Successful
