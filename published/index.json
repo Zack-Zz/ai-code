@@ -1,7 +1,9 @@
 {
   "plugins": {
     "ai-code-stack-standards": {
-      "codex_revision": "667670a6ac5cc1966e3d5c47a4b8c2d2e8ecc55d",
+      "git_revisions": {
+        "codex": "667670a6ac5cc1966e3d5c47a4b8c2d2e8ecc55d"
+      },
       "installers": {
         "claude": "13db650abf18e5c6ac5cad665d105b13badca749dcd20c9edae33e484b7e2a98",
         "codex": "a43e6e77cbcfc201dedc13e4a0cf575889e1f864fafd279b79e26fb59399d869",
@@ -12,18 +14,25 @@
       "source_tree_hash": "d8247cdbe25350bf554681022356986c116f88966f2a02f8493a139da288d36f",
       "version": "0.1.0"
     },
-    "ai-code-workflow": {
-      "codex_revision": "3e8ca4b79260c092263eea8b21e65015857a58ff",
-      "installers": {
-        "claude": "70dd74acee20622e92cfecae79c878a64512398fe6b6499f252e534a7fc45887",
-        "codex": "65043fea55aafdca37412bd626ef4c79b6ba502eb6518eca9e5b0b50d1efe5bc",
-        "zcode": "72d5342605b74a5fcd05f4b4623473efa58172dc296d38117253f51ebfc70e65"
+    "codevow": {
+      "git_revisions": {
+        "codex": "c299410c580613b0275dee463b6b5fcb8fdf4e23",
+        "dsh": "c299410c580613b0275dee463b6b5fcb8fdf4e23"
       },
-      "release_id": 417136004,
-      "source_revision": "b212544b99b08548b309f5a26f24f795893d04ac",
-      "source_tree_hash": "50d13e19db122b9400f2c2528d413afd155a0a4b10636884a112e685da5bf925",
-      "version": "1.0.5"
+      "installers": {
+        "claude": "77ad7400a3386e34ac19d2b52077f5c97fc40b07dccc67cc89da89f678cbd6df",
+        "codex": "194a12090deffec40dc331f6b60ec72acf81b80e1092668a985f4a076ec5473a",
+        "dsh": "cc71d46379ecc3f0fe9cd0b411e1de50d49bddaa4a196612ed3266031b8b9ea9",
+        "zcode": "53960e06aff2b842ef1dc0c60ac2ddfa79d0a6584d4da6770b10f70e07778c5c"
+      },
+      "release_id": 425455697,
+      "source_revision": "5458a69579260d0259e35ac0a8ff05e07179a85e",
+      "source_tree_hash": "c886accd72e972590ea43e6b7795321f1f569f60dac346369d91aadd4518d72f",
+      "version": "1.0.6"
     }
   },
-  "schema_version": 2
+  "retired": {
+    "ai-code-workflow": "codevow"
+  },
+  "schema_version": 3
 }

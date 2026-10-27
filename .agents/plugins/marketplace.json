@@ -18,18 +18,18 @@
     },
     {
       "category": "developer-tools",
-      "name": "ai-code-workflow",
+      "name": "codevow",
       "policy": {
         "authentication": "ON_INSTALL",
         "installation": "AVAILABLE"
       },
       "source": {
-        "path": "./published/codex/ai-code-workflow/1.0.5",
-        "sha": "3e8ca4b79260c092263eea8b21e65015857a58ff",
+        "path": "./published/codex/codevow/1.0.6",
+        "sha": "c299410c580613b0275dee463b6b5fcb8fdf4e23",
         "source": "git-subdir",
         "url": "https://github.com/Zack-Zz/ai-code.git"
       },
-      "version": "1.0.5"
+      "version": "1.0.6"
     }
   ]
 }

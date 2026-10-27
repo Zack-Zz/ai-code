@@ -19,15 +19,15 @@
       "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
       "displayName": "CodeVow",
       "icon": "https://raw.githubusercontent.com/Zack-Zz/ai-code/91dec3a64731f8de2fb68e49bce9f4228289bbbd/plugins/ai-code-workflow/assets/codevow.png",
-      "name": "ai-code-workflow",
+      "name": "codevow",
       "source": {
-        "path": "ai-code-workflow",
-        "sha256": "72d5342605b74a5fcd05f4b4623473efa58172dc296d38117253f51ebfc70e65",
+        "path": "codevow",
+        "sha256": "53960e06aff2b842ef1dc0c60ac2ddfa79d0a6584d4da6770b10f70e07778c5c",
         "source": "url",
         "type": "zip",
-        "url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-workflow%2Fv1.0.5/ai-code-workflow-1.0.5-zcode-plugin.zip"
+        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.6/codevow-1.0.6-zcode-plugin.zip"
       },
-      "version": "1.0.5"
+      "version": "1.0.6"
     }
   ]
 }
