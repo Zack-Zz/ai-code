@@ -2,11 +2,10 @@
 
 English | [简体中文](README.zh-CN.md)
 
-> Source candidate: CodeVow now uses `codevow` (1.0.6) and CodeStack uses
-> `codestack` (1.0.0), including a `dsh` adapter. This change is not published yet.
-> The frozen published snapshot still determines what can be installed today.
-> Use the new-ID commands below after those entries appear in the marketplace.
-> See the [identity migration](docs/migrations/2026-10-27-plugin-identities.md).
+> Current stable releases: CodeVow `codevow` 1.0.6 and CodeStack `codestack` 1.0.0.
+> The old plugin IDs are retired. The [published record](published/index.json)
+> is authoritative; released snapshots remain immutable. Existing users can follow
+> the [identity migration](docs/migrations/2026-10-27-plugin-identities.md).
 
 ai-code is a collection of AI coding plugins for Claude Code, Codex, ZCode and DeepSeek Harness.
 They help you plan tasks, develop code, review changes and collaborate with
@@ -44,6 +43,15 @@ stable availability and versions. **CodeVow** (`codevow`) and **CodeStack**
 independently. Refresh the marketplace in your host before selecting a plugin.
 Agent Delegation currently has source only and has not entered the stable marketplace.
 
+Choose the desktop or CLI instructions for your host:
+
+| Host | Installation guide |
+|---|---|
+| Codex | [Desktop app and CLI](docs/installation.md#codex) |
+| Claude Code | [Desktop app and CLI](docs/installation.md#claude-code) |
+| ZCode | [Desktop app and macOS bundled CLI](docs/installation.md#zcode) |
+| DeepSeek Harness | [Desktop app and standalone npm CLI](docs/installation.md#deepseek-harness) |
+
 Run the following CLI commands in your system terminal, one at a time after
 each succeeds. If you have already added `ai-code` with the correct source,
 start with the second command to refresh the marketplace.
@@ -72,13 +80,10 @@ Claude Code session. GitHub shorthand is also supported; see the
 
 ### ZCode
 
-Open a workspace in the ZCode desktop app, then go to **Settings → Plugins →
-Create → Add plugin marketplace**. Add the
-[dedicated marketplace JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json),
-then select `ai-code` and install and enable CodeVow. A repository-only source
-selects the Claude manifest first, whose `archive` transport ZCode does not
-support, so use this URL. For the macOS bundled CLI commands, see the
-[ZCode installation guide](docs/installation.md#zcode).
+Use the desktop app's plugin marketplace with the
+[dedicated ZCode index](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json).
+See the [ZCode installation guide](docs/installation.md#zcode) for desktop steps
+and the CLI bundled with the macOS app.
 
 For detailed installation steps and plugin usage:
 
@@ -91,10 +96,13 @@ After installation, start a new session and describe what you want to do.
 
 ### DeepSeek Harness
 
-The source candidate provides two standard DSH bundles, with native profile,
-TGZ and fixed Git installation. Start with the [Harness installation steps](docs/installation.md#deepseek-harness).
-The stable DSH index will be available after publication; native runtime
-acceptance remains separate from package verification.
+The [DSH custom marketplace index](https://raw.githubusercontent.com/Zack-Zz/ai-code/main/published/dsh/index.json)
+and both plugin bundles are published. The desktop app bundles Node.js and pnpm;
+it does not require a separate npm CLI installation. See the
+[Harness guide](docs/installation.md#deepseek-harness) for desktop and standalone
+npm CLI paths. Both released bundles pin `engines.dsh` and their DSH peer
+dependencies to `0.2.1-rc.2`. Desktop `0.2.1-rc.3` is outside that declaration,
+and real desktop acceptance remains pending.
 
 ## Develop and contribute
 

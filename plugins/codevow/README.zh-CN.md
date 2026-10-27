@@ -2,16 +2,23 @@
 
 [English](README.md) | 简体中文
 
-当前新 ID `codevow` 是尚未发布的源码候选。线上入口仍以 `published/` 中旧 ID 的已发布快照为准；本页的新安装命令须在新发行上线后使用。
+CodeVow `codevow` 1.0.6 已发布，旧插件 ID 已退役。
+[已发布记录](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json)
+是可安装版本的权威来源，已发行快照保持不可变。
 
 CodeVow 帮助 AI 编码助手把需求变成有计划、经过测试和审查的代码变更。
-它为 Claude Code、Codex 和 ZCode 提供先计划后开发、测试先行、证据驱动排查
+它为 Claude Code、Codex、ZCode 和 DeepSeek Harness 提供先计划后开发、测试先行、证据驱动排查
 和最终状态验证的工作方式。插件 ID 为 `codevow`。
 
 ## 安装与开始使用
 
 按[安装指南](../../docs/installation.zh-CN.md)注册市场、选择 CodeVow 并安装、启用，
 可安装插件以市场列表为准。指南还提供 Release 下载、更新和卸载步骤。
+
+按宿主选择安装路径：[Codex 桌面端与 CLI](../../docs/installation.zh-CN.md#codex)、
+[Claude Code 桌面端与 CLI](../../docs/installation.zh-CN.md#claude-code)、
+[ZCode 桌面端与 macOS 应用内置 CLI](../../docs/installation.zh-CN.md#zcode)，或
+[DeepSeek Harness 桌面端与独立 npm CLI](../../docs/installation.zh-CN.md#deepseek-harness)。
 
 开启新会话，说明目标、范围和验收条件，例如：
 
@@ -92,13 +99,16 @@ Affaan Mustafa 的 ai-code。
 
 ## DeepSeek Harness
 
-DSH 原生 bundle 声明目标为 `0.2.1-rc.2`，实际加载、自动选择、长会话和生命周期验收仍待完成。
-使用现有 Web profile，按官方方式安装构建目录或 Release 的 `codevow-<version>-dsh-plugin.tgz`；
-构建和包检查不能代替宿主验收。技能使用官方 `/workflow` 显式调用。两个插件通过各自的官方文件系统提供方读取包内资源，启停互不替代。
+插件包与[自定义市场索引](https://raw.githubusercontent.com/Zack-Zz/ai-code/main/published/dsh/index.json)均已发布。
+桌面端自带 Node.js 与 pnpm，无需另行安装 npm CLI。桌面端与独立 npm CLI 步骤见
+[Harness 安装指南](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md#deepseek-harness)。
+已发行包的 `engines.dsh` 与 DSH peerDependencies 均精确锁定 `0.2.1-rc.2`；
+桌面端 `0.2.1-rc.3` 尚未被当前声明覆盖。真实桌面端、实际加载、自动选择、长会话和
+生命周期验收仍待完成，构建和包检查不能代替宿主验收。技能使用官方 `/workflow` 显式调用。两个插件通过各自的官方文件系统提供方读取包内资源，启停互不替代。
 
 独立审查使用 `workflow_reviewer` 与 `codevow-reviewer` preset，仅允许 read/grep/glob。
 目标 profile 必须提供 agentPresets、Agent/工具/提示词及 subagents spawn 服务；缺失时原生 Loader
 报告无法激活，该 profile 不受完整支持。Python 辅助工具仍要求 Python 3.11+；缺 Python 时按技能
 手工解析策略并披露未验证项。工具白名单不构成独立文件系统沙箱，读取根沿用宿主权限。
 
-身份变更的卸载和重装步骤见[本次迁移说明](https://github.com/Zack-Zz/ai-code/blob/main/plugins/codevow/docs/2026-10-27-identity-migration.zh-CN.md)。
+身份变更的卸载和重装步骤见[本次迁移说明](https://github.com/Zack-Zz/ai-code/blob/main/docs/migrations/2026-10-27-plugin-identities.zh-CN.md)。

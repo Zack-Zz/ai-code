@@ -6,11 +6,12 @@
 
 ## 使用插件
 
-- [安装指南](installation.zh-CN.md)：各编码助手的市场安装、下载包安装、更新和卸载。
+- [安装指南](installation.zh-CN.md)：[Codex](installation.zh-CN.md#codex)、[Claude Code](installation.zh-CN.md#claude-code)、[ZCode](installation.zh-CN.md#zcode) 和 [DeepSeek Harness](installation.zh-CN.md#deepseek-harness) 的桌面端与 CLI 安装、更新和卸载。
+- [身份迁移](migrations/2026-10-27-plugin-identities.zh-CN.md)：将已退役的旧插件 ID 重装为已发布的 `codevow` 1.0.6 和 `codestack` 1.0.0。
 - [CodeVow](../plugins/codevow/README.zh-CN.md)：功能、示例和配置。
 - [CodeVow 详细用法](../plugins/codevow/docs/usage.zh-CN.md)：配置、任务记录和可选文件工具。
 - [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md)：依赖准备、派发、续接和取消。
-- [CodeStack](../plugins/codestack/README.zh-CN.md)：精选的 Java、数据访问和多语言前端约定，新增身份仍为未发布候选。
+- [CodeStack](../plugins/codestack/README.zh-CN.md)：精选的 Java、数据访问和多语言前端约定，以及当前市场安装入口。
 - [Agent Bridge 使用与配置](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置)：外置运行时的准备入口。
 
 ## 开发插件
@@ -32,5 +33,3 @@
 - [迁移来源](../plugins/codevow/docs/migration.md)与[历史资料](../plugins/codevow/docs/bel-history/README.md)：来源、许可证和早期记录。
 
 日常安装和开发使用上方当前指南。历史资料保留原日期和命令，仅用于追溯。
-
-- [身份迁移](migrations/2026-10-27-plugin-identities.zh-CN.md)：新 ID、重新安装与历史保留。

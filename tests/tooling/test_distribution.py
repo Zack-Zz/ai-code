@@ -58,7 +58,12 @@ class HostedConfigTests(unittest.TestCase):
         for path in lock["files"]:
             with self.subTest(path=path):
                 raw = (root / path).read_bytes()
-                self.assertEqual(json.loads(raw)["name"], "ai-code")
+                market = json.loads(raw)
+                if path == "published/dsh/index.json":
+                    self.assertEqual(market["format"], 1)
+                    self.assertEqual(market["title"], {"en": "ai-code", "zh": "ai-code"})
+                else:
+                    self.assertEqual(market["name"], "ai-code")
                 self.assertEqual(lock["files"][path], hashlib.sha256(raw).hexdigest())
 
 

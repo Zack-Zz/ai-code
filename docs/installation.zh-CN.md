@@ -2,252 +2,370 @@
 
 [English](installation.md) | 简体中文
 
-> 当前源码候选：CodeVow 使用 `codevow`（1.0.6），CodeStack 使用
-> `codestack`（1.0.0），新增 `dsh` 适配。本次改动尚未发布，实际可安装版本仍由
-> 冻结的 published 快照决定。以下新 ID 命令须在市场出现新入口后使用。
-> 重新安装步骤见[身份迁移](migrations/2026-10-27-plugin-identities.zh-CN.md)。
+CodeVow **1.0.6**（`codevow`）和 CodeStack **1.0.0**（`codestack`）已发布到
+共享的 **ai-code** 市场。实际可安装版本以[发行记录](../published/index.json)
+和宿主刷新后的列表为准。两个插件分别安装，可以只使用其中一个，也可以同时使用。
+[Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md) 尚未发布。
 
-通过 Claude Code、Codex 或 ZCode 安装已发布的插件。正式可用版本以仓库当前的
-[发行记录](../published/index.json)和三宿主市场清单为准；安装前先刷新宿主中的列表。
-CodeVow 与 CodeStack 共享同一个 `ai-code` 市场，各自独立：
+## 选择你使用的应用
 
-| 插件 | ID | 用途 | 正式市场 |
+| 宿主 | 桌面端操作 | 终端操作 | 市场来源 |
 |---|---|---|---|
-| [CodeVow](../plugins/codevow/README.zh-CN.md) | `codevow` | 计划、TDD、排查、审查和验证 | 见当前发行记录 |
-| [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md) | `ai-agent-delegation` | 将任务交给独立编码助手会话 | 尚未发布 |
-| [CodeStack](../plugins/codestack/README.zh-CN.md) | `codestack` | 精选的 Java、数据访问和多语言前端约定 | 见当前发行记录 |
+| Codex | [桌面端](#codex-桌面端) | [CLI](#codex-cli) | `Zack-Zz/ai-code`，`main` 分支 |
+| Claude Code | [桌面端 Code 页](#claude-code-桌面端) | [CLI](#claude-code-cli) | Claude 专用清单或 `Zack-Zz/ai-code#main` |
+| ZCode | [桌面端](#zcode-桌面端) | [macOS 内置 CLI](#zcode-cli) | 根目录 `marketplace.json` 完整 URL |
+| DeepSeek Harness | [桌面端](#deepseek-harness-桌面端) | [独立 CLI / Web](#deepseek-harness-cli) | DSH 原生索引或 Release TGZ |
 
-下面的命令用于安装 CodeVow。安装 CodeStack 时，将同一宿主安装命令中的插件
-替换为 `codestack@ai-code`，或刷新市场后在界面中选择 CodeStack。
-可以只安装其中一个，也可以同时安装。Agent Delegation 当前只有源码，尚未进入
-正式市场。源码开发见[开发指南](../CONTRIBUTING.zh-CN.md)。
+用户无需克隆本仓库或构建插件。桌面端使用各应用的原生插件管理。
+`sh` 命令块在系统终端执行，斜杠命令在编码助手会话内执行。每条命令成功后再执行下一条。
+市场只需注册一次；已经使用正确来源注册时，跳过添加命令。
 
-## 从插件市场安装
+## 插件 ID 变更后的重装
 
-来源为 `Zack-Zz/ai-code` 的 `main`，市场名称为 `ai-code`。
-用户无需手动克隆源码仓库或构建安装包，编码助手会自行获取所登记的来源。
-注册一次后，再安装市场列表中已有的插件。
+| 卸载旧 ID | 安装已发布 ID | 版本 |
+|---|---|---|
+| `ai-code-workflow` | `codevow` | 1.0.6 |
+| `ai-code-stack-standards` | `codestack` | 1.0.0 |
 
-下面的 `sh` 命令块在系统终端执行，不是在编码助手的交互会话中输入。
-每条命令成功后再执行下一条。如果已使用正确来源注册 `ai-code`，跳过添加
-市场的命令，从刷新市场、安装插件开始。
+1. 刷新 `ai-code`，确认新入口可见且兼容当前宿主。
+2. 通过宿主插件管理或下文 CLI 命令卸载已安装的旧 ID。新旧插件提供同名技能。
+3. 安装、启用新 ID，再开启新会话。
+4. 保留项目 `.ai-workflow/` 中的策略、任务和证据。
 
-声明宿主分别使用自己的市场清单和安装来源：
+如果新版本已经安装，只需清理仍存在的旧 ID。旧入口从市场退役后，本机的旧安装
+仍可能保留。不要手动修改插件缓存或全局配置。
+详见[身份迁移指南](migrations/2026-10-27-plugin-identities.zh-CN.md)。
 
-| 宿主 | 添加方式 | 本仓库中的清单 | 插件安装来源 |
-|---|---|---|---|
-| Codex | `main` 分支的 GitHub 仓库 | `.agents/plugins/marketplace.json` | `git-subdir` |
-| Claude Code | 清单的完整 URL，或 `main` 分支的 GitHub 仓库 | `.claude-plugin/marketplace.json` | `archive` |
-| ZCode | 清单的完整 URL | `marketplace.json` | `url`，`type: zip` |
-| DeepSeek Harness | 显式原生插件索引 | `published/dsh/index.json` | 固定 Git bundle 或下载 TGZ |
+## Codex
 
-### Codex
+### Codex 桌面端
 
-使用支持原生插件市场的 Codex 版本。注册 GitHub 来源、刷新列表，再安装 CodeVow，
-其中 `owner/repo` 是客户端支持的 GitHub 仓库简写：
+1. 打开 **Plugins Directory（插件目录）**，选择 **ai-code** 来源。
+2. 使用下方命令刷新来源，仅在来源不存在时先注册。重新打开目录，确认两个替代
+   入口均可用；来源仍未显示时重启桌面应用。
+3. 在已安装插件管理中卸载仍存在的 `ai-code-workflow`、`ai-code-stack-standards`。
+   即使当前市场不再列出旧 ID，也可以使用下文的 CLI 卸载命令。
+4. 分别打开 **CodeVow**、**CodeStack**，安装需要的插件并确认启用。
+5. 核对版本为 **1.0.6**、**1.0.0**，再开启新聊天。
 
 ```sh
 codex plugin marketplace add Zack-Zz/ai-code --ref main
 codex plugin marketplace upgrade ai-code
-codex plugin add codevow@ai-code
 ```
 
-检查插件状态：
+使用 Codex 原生市场注册，不需要手工修改 `config.toml`。
+见 [OpenAI 官方市场指南](https://developers.openai.com/plugins/build/plugins#add-a-marketplace-from-the-cli)。
+
+### Codex CLI
+
+使用提供 `codex plugin` 的 CLI。市场不存在时才执行注册命令，再刷新：
 
 ```sh
+codex --version
+codex plugin marketplace add Zack-Zz/ai-code --ref main
+codex plugin marketplace upgrade ai-code
+```
+
+迁移前先确认刷新后的市场中替代入口可见。仅对实际已安装的旧项执行对应卸载命令：
+
+```sh
+codex plugin remove ai-code-workflow@ai-code
+codex plugin remove ai-code-stack-standards@ai-code
+```
+
+安装并检查两个正式插件：
+
+```sh
+codex plugin add codevow@ai-code
+codex plugin add codestack@ai-code
 codex plugin list --marketplace ai-code
 ```
 
-Codex 读取 `.agents/plugins/marketplace.json`。也可以在桌面客户端的插件目录
-选择 `ai-code`，选择 CodeVow 并安装、启用。安装后开启新会话。
+预期显示 **installed, enabled** 及上述版本。市场读取
+`.agents/plugins/marketplace.json`，使用固定 Git 子目录安装。
+安装或卸载后开启新的 Codex 会话。
 
-### Claude Code
+## Claude Code
 
-使用 **Claude Code 2.1.224 或以上版本**。本市场使用 `archive` 插件来源，
-根据 [Claude Code 官方市场参考](https://code.claude.com/docs/en/plugins/marketplace-reference#plugin-sources)，
-这种来源要求该最低版本。安装前执行 `claude --version` 核对版本。
+使用 **Claude Code 2.1.224+**，本市场的 `archive` 来源要求该最低版本。
+本节面向 Claude Code 本地会话，包含桌面应用的 **Code** 页；普通 Claude 聊天
+和 Cowork 的安装方式不在本节范围。
+见[来源版本要求](https://code.claude.com/docs/en/plugins/marketplace-reference#archive-plugin-source)。
 
-添加 Claude 专用清单的完整 URL、刷新列表，再为本机当前用户安装 CodeVow：
+### Claude Code 桌面端
 
-```sh
-claude plugin marketplace add https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
-claude plugin marketplace update ai-code
-claude plugin install codevow@ai-code --scope user
-claude plugin list
-```
-
-也可以用 GitHub 简写替代上面的 URL 添加方式；
-Claude Code 会读取 `.claude-plugin/marketplace.json`：
+1. 在桌面应用的 **Code** 页打开本地项目。
+2. 点击输入框旁的 **+ → Add plugins（添加插件）**。如果菜单显示 **Plugins**，
+   选择 **Plugins → Browse plugins**；启用、停用和卸载使用 **Manage plugins**。
+3. 若未列出 `ai-code`，执行下面的 CLI 注册命令，再重新打开插件浏览器；
+   已有来源则刷新。确认两个替代入口可用后再移除旧安装。
+4. 在原安装范围卸载已安装的旧 ID。选择 **CodeVow**、**CodeStack**，
+   按用户、项目或仅本地范围安装需要的插件。
+5. 检查已安装版本和启用状态，再开启新会话。
 
 ```sh
 claude plugin marketplace add "Zack-Zz/ai-code#main"
+claude plugin marketplace update ai-code
 ```
 
-两种添加方式任选其一；GitHub 命令只替换上面安装命令块的第一条命令。
-安装后重启 Claude Code，或在**已打开的 Claude Code 会话内**执行：
+同一机器上的本地桌面端与终端共享 Claude Code 设置。这不会把插件安装到云端
+会话或另一台机器。见[桌面端插件指南](https://code.claude.com/docs/en/desktop#install-plugins)。
 
-```text
-/reload-plugins
+### Claude Code CLI
+
+市场不存在时才注册 Claude 专用清单，再刷新：
+
+```sh
+claude --version
+claude plugin marketplace add https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
+claude plugin marketplace update ai-code
 ```
 
-可在 `/plugin` 的 Installed（已安装）页检查并启用 CodeVow。
-安装范围与加载方式见[官方命令行安装指南](https://code.claude.com/docs/en/discover-plugins#install-from-your-shell)。
+迁移前先在刷新后的插件浏览器中确认替代入口可用，再卸载已安装的旧 ID。
+以下按 `user` 范围举例；原来装在 `project` 或
+`local` 范围时，改用相应范围。
 
-如果版本已满足要求，交互式插件面板仍提示不支持该来源，在系统终端执行上面
-的刷新市场、安装插件命令，然后重启会话。不能仅凭这条错误判断 CLI 版本过低。
-
-### ZCode
-
-在 ZCode 桌面端先打开工作区，再进入 **设置 → 插件 → 创建 → 添加插件市场**，
-填写以下清单的完整 URL：
-
-```text
-https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
+```sh
+claude plugin uninstall ai-code-workflow@ai-code --scope user
+claude plugin uninstall ai-code-stack-standards@ai-code --scope user
 ```
 
-本仓库应使用这个完整 URL。ZCode 的 Git 导入在只填写 `Zack-Zz/ai-code` 时，
-可能优先选择 `.claude-plugin/marketplace.json`，再考虑根目录清单。
-Claude 清单中的 `archive` 安装来源不受 ZCode 安装器支持；
-根目录清单使用 ZCode 的 `url`、`type: zip` 安装来源。
+为当前用户安装两个插件并检查结果：
 
-如果已添加仓库并出现
-`Plugin source is invalid or unsupported for codevow@ai-code: archive`，
-在“市场源”面板移除该 `ai-code` 来源，重新添加上面的完整 URL，
-刷新市场后再打开插件详情或安装。
+```sh
+claude plugin install codevow@ai-code --scope user
+claude plugin install codestack@ai-code --scope user
+claude plugin list
+```
 
-选择 `ai-code`，选择 CodeVow 并安装、启用。也可以在 **macOS 且 ZCode 安装于
-`/Applications/ZCode.app`** 时，用应用自带 CLI 注册来源、刷新列表、安装并启用 CodeVow：
+开启新会话，或在**已有 Claude Code 会话内**执行 `/reload-plugins`。
+`/plugin` 的 **Installed** 页可查看范围和启用状态。技能以
+`/codevow:workflow`、`/codestack:code-standards` 等名称显示。
+见[安装及范围说明](https://code.claude.com/docs/en/discover-plugins)。
+
+## ZCode
+
+### ZCode 桌面端
+
+1. 打开工作区，进入 **设置 → 插件**。
+2. 进入 **创建 → 添加插件市场**，填写下面的完整 URL；已有来源正确时只需刷新：
+
+   ```text
+   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
+   ```
+
+3. 确认“个人”分段的 **ai-code** 市场中 **CodeVow 1.0.6**、**CodeStack 1.0.0**
+   可用，再到“管理已安装”卸载已安装的旧 ID。
+4. 安装 **CodeVow**、**CodeStack**，确认启用。
+5. 核对已安装版本，再开启新会话。
+
+使用完整 URL。仅添加仓库时，ZCode 可能选中 Claude 清单，其 `archive` 来源
+不受 ZCode 安装器支持。若错误包含 `unsupported ... archive`，在“市场源”中
+移除错误来源，添加上述完整 URL 并刷新。移除市场来源和卸载插件是两个操作。
+见 [ZCode 插件指南](https://zcode.z.ai/cn/docs/plugin)。
+
+### ZCode CLI
+
+以下示例使用 **macOS 应用内置 CLI**，要求 ZCode 安装于 `/Applications/ZCode.app`，
+且 `node` 在 `PATH` 中。安装位置不同时调整路径；其他平台使用上述桌面操作。
 
 ```sh
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace update ai-code
+```
+
+已有正确来源时跳过添加。迁移前先在刷新后的桌面市场中确认替代入口可用，
+再仅卸载实际已安装的旧项：
+
+```sh
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins uninstall ai-code-workflow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins uninstall ai-code-stack-standards@ai-code
+```
+
+安装、启用并检查两个插件：
+
+```sh
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install codevow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install codestack@ai-code
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins enable codevow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins enable codestack@ai-code
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins list
 ```
 
-该示例要求 `node` 已在 `PATH` 中。如果应用安装于其他位置，调整应用路径。
-其他平台使用上面的桌面端步骤。
-
-任一宿主安装后，都开启新会话。账号和所选模型仍由宿主管理。
+开启新会话，并检查 Plugin 技能分组。
 
 ## DeepSeek Harness
 
-`dsh` 适配面向标准 Web profile，声明 `engines.dsh` 为 `0.2.1-rc.2`；真实宿主
-验收仍待完成。CodeVow 需要原生 Agent Preset 服务和 spawn 后端；首轮不声明
-支持 minimal/SDK/ACP profile。安装依赖成功不等于插件激活成功。
+### 版本兼容性
 
-本地试用请使用未占用的 profile 名称。首条命令创建 Web profile 并打印组合配置，
-不要用它覆盖已有设置。下载匹配版本的 Release TGZ 后逐条执行：
+已发布的 CodeVow 1.0.6、CodeStack 1.0.0 安装包与索引精确声明 DSH 版本
+**`0.2.1-rc.2`**，**未声明兼容 `0.2.1-rc.3`**。安装前在桌面应用的
+**About DeepSeek Harness（关于）** 或实际 CLI 的 `--version` 核对版本。
+市场中不兼容条目的安装按钮可能禁用；安装 npm 或改用 TGZ 不会取消版本检查。
+不要把版本豁免当作兼容性证据。
+
+桌面端使用相同的底层应用，但完整桌面端和 Web 宿主验收仍为 **pending**。
+CodeVow 需要 Agent Preset 服务和 spawn 后端；minimal/SDK/ACP profile
+不在声明的试用范围。本指南说明原生安装入口，不代表 rc.3 适配已经完成。
+当前兼容范围见[正式索引](../published/dsh/index.json)。
+
+### DeepSeek Harness 桌面端
+
+**直接使用已安装的桌面应用。桌面端自带 Node/pnpm 安装运行环境，不需要另装
+npm CLI，也不需要创建 Web 试用 profile。**
+
+1. 按上文检查应用版本和插件兼容性。
+2. 打开 **Plugins（插件）**，在 **Experimental plugins** 旁选择 **More**，
+   开启 **Custom plugin markets（自定义插件市场）**。这是可选的内置功能。
+3. 进入 **Discover → Add index source**；已有来源可用 **Manage index sources…**
+   管理并刷新。添加：
+
+   ```text
+   https://raw.githubusercontent.com/Zack-Zz/ai-code/main/published/dsh/index.json
+   ```
+
+4. 选择 **CodeVow** 或 **CodeStack**，检查版本、兼容状态及固定 Git 提交/子目录，
+   仅对**兼容版本**确认安装。当前 rc.3 用户需要等待兼容的插件发行版本。
+5. 在 **Installed** 页核对安装和 bundle 启用状态，必要时重启应用，再新建会话
+   检查技能。
+
+市场索引安装预构建 Git bundle。Release 中的 TGZ 是另一种原生包格式；插件
+无需发布到 npm registry 才能进入市场。
+见[桌面端内置运行环境](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.3/apps/desktop/README.md#application-overview)、
+[自定义插件市场](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.3/packages/experimental/plugin-market-bundle/README.md#use-this-package)
+及 [Discover](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.3/packages/client/ui-plugin-market/README.md#use-this-package)。
+
+### DeepSeek Harness CLI
+
+以下步骤启动独立 **Web profile**，与桌面端 profile 分开。使用官方 npm 启动入口，
+固定到兼容运行时。准备 Node.js 24+，并确保 `pnpm` 在 `PATH` 中；上游仓库也
+支持 22.x 范围内的 Node 22.19+。系统 pnpm 前置条件用于独立 npm CLI，
+不适用于桌面端内置安装器。
+
+下载 [CodeVow TGZ](https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.6/codevow-1.0.6-dsh-plugin.tgz)
+和 [CodeStack TGZ](https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.0/codestack-1.0.0-dsh-plugin.tgz)，
+以及各自 Release 的 `SHA256SUMS`。对照对应 `installers/` 条目核对 TGZ 哈希。
+下面假设文件在 `$HOME/Downloads`；其他平台改为实际路径。
 
 ```sh
-dsh --profile ai-code-trial --from-default-profile web --dump-config
-dsh plugin --profile ai-code-trial add ./codevow-1.0.6-dsh-plugin.tgz
-dsh plugin --profile ai-code-trial add ./codestack-1.0.0-dsh-plugin.tgz
-dsh --profile ai-code-trial --dump-config
-dsh --profile ai-code-trial
+cd /path/to/your/project
+npx --yes @deepseek-ai/dsh@0.2.1-rc.2 --version
 ```
 
-源码试用可将 TGZ 参数替换为构建包的绝对目录，例如
-`/private/tmp/ai-code-packages/dsh/codevow`。插件不提供安装时构建脚本。
-在新会话使用 `/workflow` 或 `/code-standards`，引用资源随独立 bundle 保留。
-CodeStack 不含自定义运行逻辑；CodeVow 使用原生 spawn Reviewer 和现有 Python 工具。
+选择**未占用**的 profile 名，仅首次执行下一条命令：
+**`--from-default-profile` 会替换已有同名 profile，包括插件依赖和用户 patch。**
+不要对现有桌面端或个人 profile 执行该命令。
 
-正式发布后，可以启用 Harness 可选的“自定义插件索引”组合包，并添加本仓库
-`published/dsh/index.json` 的 raw HTTPS 地址。这是显式索引源，不是宿主自动扫描
-的仓库清单。安装前核对 Harness 展示的固定 Git 提交和 bundle 子目录。
-直接安装 TGZ/目录不需要该实验性发现功能；正式索引仅列稳定版本。
+```sh
+npx --yes @deepseek-ai/dsh@0.2.1-rc.2 --profile ai-code-trial --from-default-profile web --dump-config
+```
 
-Git 安装使用正式索引生成的精确提交和子目录，不使用源码仓库根目录。
-Git bundle 已含全部产物；升级按宿主卸载再安装的方式完成。
-卸载使用 `dsh plugin --profile ai-code-trial remove codevow`（或 `codestack`），
-不支持 HMR 的 profile 需要重启；无需自制安装器或修改宿主缓存。
+将预构建 bundle 安装到该 profile，检查配置后启动：
+
+```sh
+npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile ai-code-trial add "$HOME/Downloads/codevow-1.0.6-dsh-plugin.tgz"
+npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile ai-code-trial add "$HOME/Downloads/codestack-1.0.0-dsh-plugin.tgz"
+npx --yes @deepseek-ai/dsh@0.2.1-rc.2 --profile ai-code-trial --dump-config
+npx --yes @deepseek-ai/dsh@0.2.1-rc.2 --profile ai-code-trial
+```
+
+打开终端打印的地址，默认为 `http://127.0.0.1:3080`。在 **Settings → Models**
+配置并保存模型凭据，再用 **Choose workspace** 选择项目后开始会话。
+以后只执行最后一条启动命令，不重复初始化 profile。Web 界面也可按上文的
+Plugins 步骤通过市场索引安装。
+见[官方 CLI 参考](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/apps/cli/README.md)
+及 [Web 配置指南](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/docs/user/guide/index.md)。
+
+### Harness 首次使用与卸载
+
+在兼容的新会话中，用 `/workflow` 调用 CodeVow，或用 `/code-standards` 调用
+CodeStack。只读检查时，让助手列出这两个技能并读取指令，不修改项目文件。
+`/review` 调用审查技能；其原生只读 Reviewer 仍需单独做运行验证。
+技能可见不代表自动选用和任务结果已经通过验收。
+
+桌面端在 **Plugins → Installed** 停用、卸载对应 bundle。独立 profile 使用
+相同的固定版本 CLI，并指定实际安装插件的 profile：
+
+```sh
+npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile ai-code-trial remove codevow
+npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile ai-code-trial remove codestack
+```
+
+Git bundle 升级按同一宿主/profile 的卸载、安装兼容替代版本流程完成，必要时
+重启。DSH 没有旧 ID 需要迁移。升级、卸载时不要加入 profile 初始化参数。
 
 ## 下载包安装
 
-打开 [GitHub Releases](https://github.com/Zack-Zz/ai-code/releases)，选择已发布
-插件的 Release，再选择宿主文件：`claude`、`codex` 或 `zcode`。
-以仓库当前发行记录为准；只下载目标插件实际存在的公开 Release，
-在该 Release 页面核对版本与附件。
+Claude Code、Codex 和 ZCode 从插件的公开
+[Release](https://github.com/Zack-Zz/ai-code/releases) 选择对应宿主文件。
 
-| 下载文件 | 适用方式 |
+| 文件 | 用途 |
 |---|---|
-| `<ID>-<VERSION>-<HOST>.zip` | 手动本地市场安装，包含插件和市场文件 |
-| `<ID>-<VERSION>-<HOST>-plugin.zip` | 市场分发使用的纯插件包，不包含本地市场 |
+| `<ID>-<VERSION>-<HOST>.zip` | 包含市场元数据的本地市场下载包 |
+| `<ID>-<VERSION>-<HOST>-plugin.zip` | 公开市场使用的纯插件安装包 |
+| `<ID>-<VERSION>-dsh-plugin.tgz` | Harness 原生安装包，按上文宿主/profile 流程安装 |
 
-以下 ZIP 解压注册步骤适用于原三个宿主。DSH 使用上文的原生 TGZ/profile 安装流程。
+下载同一插件、同一版本 Release 的 `SHA256SUMS`。ZIP 下载包核对 `downloads/`
+条目，原生安装包核对 `installers/` 条目。将本地市场 ZIP 解压到稳定目录，
+注册解压后的根目录，不要注册内部插件子目录：
 
-Release 套件中，本地市场包位于 `downloads/`，纯插件包位于 `installers/`。
-手动安装选择第一种格式，同时下载 `SHA256SUMS`，核对下载包与对应
-`downloads/` 条目的 SHA256，再解压到稳定目录。注册包含市场文件的解压根
-目录，不是内部的插件目录：
-
-| 宿主 | 解压根目录中的市场文件 | 注册方式 |
+| 宿主 | 解压根目录中的清单 | 注册 |
 |---|---|---|
-| Claude Code | `.claude-plugin/marketplace.json` | `claude plugin marketplace add /path/to/extracted` |
 | Codex | `.agents/plugins/marketplace.json` | `codex plugin marketplace add /path/to/extracted` |
-| ZCode | `marketplace.json` | 在原生市场界面添加该文件 |
+| Claude Code | `.claude-plugin/marketplace.json` | `claude plugin marketplace add /path/to/extracted` |
+| ZCode | `marketplace.json` | 通过桌面市场界面添加该文件 |
 
-选择注册后的来源，再安装插件。本地下载包使用 `ai-code-local`，实际名称以
-解压后的市场文件为准。例如：
+从这些本地下载包声明的 **ai-code-local** 安装。例如
+`codex plugin add codevow@ai-code-local` 或
+`claude plugin install codevow@ai-code-local --scope user`。
+注册期间保留解压后的源目录。
 
-```sh
-claude plugin install codevow@ai-code-local
-codex plugin add codevow@ai-code-local
-```
+## 安装后检查
 
-`-plugin.zip` 用于市场分发，手动本地安装使用带市场的下载包。保留已注册
-本地市场的解压目录。
+- 通过原生插件管理或宿主列表命令检查 ID、版本、来源和启用状态，避免新旧 ID 同时启用。
+- 在新会话请求：“加载已安装的 CodeVow workflow 和 CodeStack code-standards 指令，
+  告诉我是否都能读取；本次保持只读。”
+- CodeVow 提供 `workflow`、`tdd`、`debugging`、`review`、`review-results`、
+  `verification`；CodeStack 提供 `code-standards`。选择语法依宿主而异，
+  不确定时使用技能选择器或自然语言请求。
+- 包完整性、安装、技能可见性和实际行为分别检查。构建通过或列出技能不代表真实宿主验收。
 
-## 更新与卸载
+## 更新和卸载
 
-刷新市场用于获取最新目录。在系统终端更新已安装插件时，使用对应宿主的命令。
+先刷新市场。目录刷新本身不能证明运行中的会话已加载新版本。
+下表以 CodeVow 举例，操作 CodeStack 时替换成 `codestack`；需要时分别处理两个插件。
 
-Claude Code：
+| 宿主 | 更新 | 卸载 |
+|---|---|---|
+| Codex | `codex plugin marketplace upgrade ai-code` 后在桌面管理中检查版本，仍旧时通过原生 remove/add 重装 | `codex plugin remove codevow@ai-code` |
+| Claude Code | `claude plugin marketplace update ai-code` 后执行 `claude plugin update codevow@ai-code --scope user` | `claude plugin uninstall codevow@ai-code --scope user` |
+| ZCode 桌面端 | 市场源刷新 `ai-code`，再在管理已安装中检查更新 | 已安装插件详情 → 卸载 |
+| ZCode macOS CLI | 刷新市场后执行 `node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins update codevow@ai-code` | `node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins uninstall codevow@ai-code` |
+| Harness | 刷新索引、检查兼容性，再按上文同一宿主/profile 卸载并安装 | Plugins → Installed，或上文固定版本的 profile 卸载命令 |
 
-```sh
-claude plugin marketplace update ai-code
-claude plugin update codevow@ai-code --scope user
-```
+变更后重新加载或开启新会话，Harness 按需重启。市场源不再需要时单独移除。
+不要因为卸载插件而删除项目 `.ai-workflow/` 记录。
 
-macOS 上的 ZCode：
+## 故障处理与依赖
 
-```sh
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace update ai-code
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins update codevow@ai-code
-```
-
-Codex 执行 `codex plugin marketplace upgrade ai-code` 后，在原生插件管理中检查
-已安装版本。任一宿主更新后，重新加载或开启新会话。本地下载方式使用新包
-作为注册来源。
-
-卸载时，在宿主原生插件管理中禁用并移除插件。不再使用该市场的插件时，再
-单独移除市场来源。卸载插件不会删除项目记录，也不会卸载单独安装的 Agent Bridge。
-
-## 依赖要求
-
-| 插件或功能 | 要求 |
+| 症状 / 功能 | 检查 |
 |---|---|
-| 每个插件 | 支持原生插件的宿主、宿主账号和所选模型 |
-| Claude Code 正式市场安装 | 支持 `archive` 来源的 Claude Code **2.1.224+** |
-| CodeVow Markdown 技能 | 无需额外 Node.js 或 Python |
-| CodeStack 指令 | 无需额外运行时，也不依赖其他 ai-code 插件 |
-| CodeVow 可选工具 | Python 3.11+；文件暂存需要支持 POSIX 文件操作的平台 |
-| Agent Delegation | Python 3，以及单独配置的 `agent-bridge/v1` CLI |
-| Agent Bridge | Node.js 22.16+；目标编码工具另行安装并完成原生认证 |
+| 找不到新 ID | 刷新正确的 `ai-code` 来源，对照发行记录。注册/移除来源与安装/卸载插件是两个操作。 |
+| 重复的工作流或规范技能 | 清理已安装的旧 ID，再开启新会话。 |
+| Claude 不支持 `archive` | 核对 2.1.224+ 和正确清单；交互面板仍拒绝时使用 CLI 安装路径。 |
+| ZCode 不支持 `archive` | 将市场来源改为上文根目录 `marketplace.json` 完整 URL。 |
+| Harness 安装按钮禁用 | 对照实际 DSH 运行时与索引精确的 `engines.dsh`，当前未覆盖 rc.3。 |
+| Harness 已安装但无技能 | 检查 bundle 启用状态、重启/新会话、所需服务与 profile 兼容性，不从包安装推断激活。 |
+| CodeVow 可选 Python 工具 | Python 3.11+；可选文件暂存需要 POSIX 文件操作。Markdown 技能本身不需要 Python。 |
+| CodeStack | 不需要额外运行时，不依赖其他 ai-code 插件。 |
 
-Agent Delegation 使用前，请按
-[Agent Bridge 入门与配置](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置)
-登记项目、目标工具和发起会话。可执行文件不在 `PATH` 时设置
-`AGENT_BRIDGE_BIN`；配置和调用者使用 `AGENT_BRIDGE_CONFIG`、
-`AGENT_BRIDGE_CALLER_REF`。使用 Bridge 支持的平台，本插件不提供 Windows
-原生执行入口。
+账号和模型由各宿主管理。尚未发布的 Agent Delegation 另需 Python 3 和配置好的
+`agent-bridge/v1` CLI；[Bridge 配置](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置)
+还要求其支持的平台及已认证的目标编码工具。
 
-安装插件不会自动安装依赖。
+## 下一步
 
-## 接下来
-
-- [CodeVow 使用与配置](../plugins/codevow/docs/usage.zh-CN.md)
-- [Agent Delegation 使用示例](../plugins/ai-agent-delegation/README.zh-CN.md)
-- [CodeStack 范围与市场可用状态](../plugins/codestack/README.zh-CN.md)
+- [CodeVow 使用和配置](../plugins/codevow/docs/usage.zh-CN.md)
+- [CodeStack 规范](../plugins/codestack/README.zh-CN.md)
+- [Agent Delegation 源码示例](../plugins/ai-agent-delegation/README.zh-CN.md)

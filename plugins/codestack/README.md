@@ -2,7 +2,9 @@
 
 English | [简体中文](README.zh-CN.md)
 
-The new `codestack` identity is an unpublished source candidate. Current online entries follow the old-ID snapshots under `published/`; use new installation commands after the new release is available.
+CodeStack `codestack` 1.0.0 is published. The old plugin ID is retired.
+The [published record](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json)
+is authoritative; released snapshots remain immutable.
 
 <img src="assets/codestack.png" alt="CodeStack icon" width="96" />
 
@@ -12,6 +14,15 @@ SQL/JPA/MyBatis pitfalls, and shared multilingual frontend copy organization.
 Its plugin ID is `codestack`.
 Stable releases are distributed through the shared `ai-code` marketplace. Check the
 [current release record](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json) for availability.
+
+## Install
+
+Choose the guide for your host: [Codex desktop and CLI](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md#codex),
+[Claude Code desktop and CLI](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md#claude-code),
+[ZCode desktop and macOS bundled CLI](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md#zcode), or
+[DeepSeek Harness desktop and standalone npm CLI](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md#deepseek-harness).
+
+Select `codestack` from the shared `ai-code` marketplace.
 
 ## Use
 
@@ -28,10 +39,9 @@ your ordinary implementation or review task:
 The `code-standards` skill is intended to be selected automatically for relevant
 work. You can explicitly invoke it if needed. Automatic discovery and task
 outcomes must be verified in the actual host; installation alone does not prove
-that every task will use the skill. Follow the [installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md)
-and select `codestack` from the `ai-code` marketplace. Each plugin
-is installed independently. CodeStack can be used independently of CodeVow and Agent
-Delegation; it introduces no dependency on either plugin.
+that every task will use the skill. CodeStack is installed independently and can
+be used independently of CodeVow and Agent Delegation; it introduces no dependency
+on either plugin.
 
 ## What it applies
 
@@ -86,11 +96,15 @@ are separate results.
 
 ## DeepSeek Harness
 
-The native DSH bundle targets `0.2.1-rc.2`; native loading, implicit selection,
-long sessions and lifecycle acceptance remain unverified. Use an existing Web
-profile and the official directory or Release `codestack-<version>-dsh-plugin.tgz`
-installation flow. Build and package checks do not establish host acceptance.
+The bundle and [custom marketplace index](https://raw.githubusercontent.com/Zack-Zz/ai-code/main/published/dsh/index.json)
+are published. The desktop app bundles Node.js and pnpm; a separate npm CLI
+installation is unnecessary. Desktop and standalone npm CLI steps are in the
+[Harness installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md#deepseek-harness).
+The released bundle pins `engines.dsh` and its DSH peer dependencies to
+`0.2.1-rc.2`; desktop `0.2.1-rc.3` is outside that declaration. Real desktop
+acceptance, native loading, implicit selection, long sessions and lifecycle
+acceptance remain unverified. Build and package checks do not establish host acceptance.
 Invoke the skill with `/code-standards`. Independent
 official filesystem providers expose each plugin's bundled resources.
 
-See the [identity migration guide](https://github.com/Zack-Zz/ai-code/blob/main/plugins/codestack/docs/2026-10-27-identity-migration.md) for uninstall and reinstall steps.
+See the [identity migration guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/migrations/2026-10-27-plugin-identities.md) for uninstall and reinstall steps.

@@ -2,11 +2,13 @@
 
 English | [简体中文](README.zh-CN.md)
 
-The new `codevow` identity is an unpublished source candidate. Current online entries follow the old-ID snapshots under `published/`; use new installation commands after the new release is available.
+CodeVow `codevow` 1.0.6 is published. The old plugin ID is retired.
+The [published record](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json)
+is authoritative; released snapshots remain immutable.
 
 CodeVow helps your AI coding assistant turn a request into a planned, tested
 and reviewed change. It brings plan-first collaboration, TDD, evidence-driven
-debugging and final-state verification to Claude Code, Codex and ZCode.
+debugging and final-state verification to Claude Code, Codex, ZCode and DeepSeek Harness.
 The plugin ID is `codevow`.
 
 ## Install and start
@@ -14,6 +16,11 @@ The plugin ID is `codevow`.
 Follow the [installation guide](../../docs/installation.md) to register the marketplace,
 choose CodeVow, and install and enable it. Available plugins are listed in the
 marketplace. The guide also covers Release downloads, updates and uninstalling.
+
+Choose the guide for your host: [Codex desktop and CLI](../../docs/installation.md#codex),
+[Claude Code desktop and CLI](../../docs/installation.md#claude-code),
+[ZCode desktop and macOS bundled CLI](../../docs/installation.md#zcode), or
+[DeepSeek Harness desktop and standalone npm CLI](../../docs/installation.md#deepseek-harness).
 
 Start a new session and describe your goal, scope and acceptance conditions:
 
@@ -103,10 +110,14 @@ the repository's early history derives from Affaan Mustafa's ai-code.
 
 ## DeepSeek Harness
 
-The native DSH bundle targets `0.2.1-rc.2`; native loading, implicit selection,
-long sessions and lifecycle acceptance remain unverified. Use an existing Web
-profile and the official directory or Release `codevow-<version>-dsh-plugin.tgz`
-installation flow. Build and package checks do not establish host acceptance.
+The bundle and [custom marketplace index](https://raw.githubusercontent.com/Zack-Zz/ai-code/main/published/dsh/index.json)
+are published. The desktop app bundles Node.js and pnpm; a separate npm CLI
+installation is unnecessary. Desktop and standalone npm CLI steps are in the
+[Harness installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md#deepseek-harness).
+The released bundle pins `engines.dsh` and its DSH peer dependencies to
+`0.2.1-rc.2`; desktop `0.2.1-rc.3` is outside that declaration. Real desktop
+acceptance, native loading, implicit selection, long sessions and lifecycle
+acceptance remain unverified. Build and package checks do not establish host acceptance.
 Invoke the skill with `/workflow`. Independent
 official filesystem providers expose each plugin's bundled resources.
 
@@ -118,4 +129,4 @@ Python 3.11+; without Python, follow the skill's manual policy resolution and
 report unavailable checks. The tool allowlist is separate from filesystem isolation;
 read roots continue to use the host's permissions.
 
-See the [identity migration guide](https://github.com/Zack-Zz/ai-code/blob/main/plugins/codevow/docs/2026-10-27-identity-migration.md) for uninstall and reinstall steps.
+See the [identity migration guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/migrations/2026-10-27-plugin-identities.md) for uninstall and reinstall steps.

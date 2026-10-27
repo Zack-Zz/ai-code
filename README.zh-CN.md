@@ -2,12 +2,12 @@
 
 [English](README.md) | 简体中文
 
-> 当前源码候选：CodeVow 使用 `codevow`（1.0.6），CodeStack 使用
-> `codestack`（1.0.0），新增 `dsh` 适配。本次改动尚未发布，实际可安装版本仍由
-> 冻结的 published 快照决定。以下新 ID 命令须在市场出现新入口后使用。
-> 重新安装步骤见[身份迁移](docs/migrations/2026-10-27-plugin-identities.zh-CN.md)。
+> 当前正式版：CodeVow `codevow` 1.0.6、CodeStack `codestack` 1.0.0。
+> 旧插件 ID 已退役。[已发布记录](published/index.json)是可安装版本的权威来源，
+> 已发行快照保持不可变。已有用户的重新安装步骤见
+> [身份迁移](docs/migrations/2026-10-27-plugin-identities.zh-CN.md)。
 
-ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 ZCode 中
+ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex、ZCode 和 DeepSeek Harness 中
 规划任务、开发代码、审查改动，以及与其他编码助手协作。
 
 项目把可复用的技能、规则和辅助工具组织成独立插件。你可以按需要选择插件，
@@ -34,10 +34,19 @@ ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 Z
 
 通过 ai-code 插件市场安装，或从 GitHub Release 下载对应编码助手的安装包。
 插件市场名为 `ai-code`，来源是 `Zack-Zz/ai-code` 的 `main` 分支。
-正式可用版本以仓库当前的[发行记录](published/index.json)和三宿主市场清单为准。
+正式可用版本以仓库当前的[发行记录](published/index.json)和各宿主市场清单为准。
 **CodeVow**（`codevow`）与 **CodeStack**（`codestack`）
 共享同一个市场，分别安装、分别发布。选择插件前先在宿主中刷新市场。
 Agent Delegation 当前只有源码，尚未进入正式市场。
+
+按宿主选择桌面端或 CLI 安装步骤：
+
+| 宿主 | 安装指南 |
+|---|---|
+| Codex | [桌面端与 CLI](docs/installation.zh-CN.md#codex) |
+| Claude Code | [桌面端与 CLI](docs/installation.zh-CN.md#claude-code) |
+| ZCode | [桌面端与 macOS 应用内置 CLI](docs/installation.zh-CN.md#zcode) |
+| DeepSeek Harness | [桌面端与独立 npm CLI](docs/installation.zh-CN.md#deepseek-harness) |
 
 在系统终端执行以下 CLI 命令，每条成功后再执行下一条。如果已使用正确来源
 添加 `ai-code`，从第二条命令的刷新市场步骤继续。
@@ -65,15 +74,14 @@ claude plugin install codevow@ai-code --scope user
 
 ### ZCode
 
-在 ZCode 桌面端先打开工作区，再进入 **设置 → 插件 → 创建 → 添加插件市场**，
-添加[专用市场 JSON](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json)，
-然后选择 `ai-code`，安装并启用 CodeVow。只填仓库会优先读取 Claude 清单，
-而 ZCode 不支持其中的 `archive` 分发方式，因此请使用此 URL。
-macOS 内置 CLI 的完整命令见 [ZCode 安装指南](docs/installation.zh-CN.md#zcode)。
+在桌面端插件市场使用
+[ZCode 专用索引](https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json)。
+桌面端步骤与 macOS 应用内置 CLI 命令见
+[ZCode 安装指南](docs/installation.zh-CN.md#zcode)。
 
 完整安装步骤和插件用法见以下指南：
 
-- [安装指南](docs/installation.zh-CN.md)：Claude Code、Codex、ZCode 的完整市场注册与安装步骤、下载包安装、更新、卸载及故障处理。
+- [安装指南](docs/installation.zh-CN.md)：Claude Code、Codex、ZCode 和 DeepSeek Harness 的桌面端与 CLI 市场注册及安装步骤、下载包安装、更新、卸载及故障处理。
 - [CodeVow 使用说明](plugins/codevow/README.zh-CN.md)：任务示例、协作模式和项目配置。
 - [Agent Delegation 使用说明](plugins/ai-agent-delegation/README.zh-CN.md)：依赖准备、任务派发、续接和取消。
 - [CodeStack 使用说明](plugins/codestack/README.zh-CN.md)：支持的规则范围、自动选择和市场可用状态。
@@ -82,9 +90,12 @@ macOS 内置 CLI 的完整命令见 [ZCode 安装指南](docs/installation.zh-CN
 
 ### DeepSeek Harness
 
-当前源码候选提供两个标准 DSH bundle，通过原生 profile、TGZ 或固定 Git 安装。
-步骤见 [Harness 安装说明](docs/installation.zh-CN.md#deepseek-harness)。正式发布后
-才会生成稳定索引；真实宿主验收与包检查分别报告。
+[DSH 自定义市场索引](https://raw.githubusercontent.com/Zack-Zz/ai-code/main/published/dsh/index.json)
+和两个插件包均已发布。桌面端自带 Node.js 与 pnpm，无需另行安装 npm CLI。
+桌面端与独立 npm CLI 的安装路径见
+[Harness 安装说明](docs/installation.zh-CN.md#deepseek-harness)。两个已发行包的
+`engines.dsh` 与 DSH peerDependencies 均精确锁定 `0.2.1-rc.2`；桌面端
+`0.2.1-rc.3` 尚未被当前声明覆盖，真实桌面端验收仍为 pending。
 
 ## 开发与贡献
 

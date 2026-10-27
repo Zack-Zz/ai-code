@@ -26,7 +26,7 @@ module.exports = [
         }
     },
     {
-        files: ['plugins/*/adapters/dsh/**/*.js', 'plugins/*/tests/dsh/**/*.mjs'],
+        files: ['plugins/*/adapters/dsh/**/*.js', 'plugins/*/tests/dsh/**/*.mjs', 'published/dsh/**/*.js'],
         languageOptions: { sourceType: 'module' }
     }
 ];

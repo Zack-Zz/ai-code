@@ -2,7 +2,9 @@
 
 [English](README.md) | 简体中文
 
-当前新 ID `codestack` 是尚未发布的源码候选。线上入口仍以 `published/` 中旧 ID 的已发布快照为准；本页的新安装命令须在新发行上线后使用。
+CodeStack `codestack` 1.0.0 已发布，旧插件 ID 已退役。
+[已发布记录](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json)
+是可安装版本的权威来源，已发行快照保持不可变。
 
 <img src="assets/codestack.png" alt="CodeStack 图标" width="96" />
 
@@ -10,6 +12,15 @@ CodeStack 为编码助手提供多个语言和技术栈中精选的项目规范�
 SQL/JPA/MyBatis 易错点及前端共享的多语言文案组织约定。插件 ID 为
 `codestack`。正式版通过同一个 `ai-code` 市场分发，
 可安装版本以[当前发行记录](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json)为准。
+
+## 安装
+
+按宿主选择安装路径：[Codex 桌面端与 CLI](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md#codex)、
+[Claude Code 桌面端与 CLI](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md#claude-code)、
+[ZCode 桌面端与 macOS 应用内置 CLI](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md#zcode)，或
+[DeepSeek Harness 桌面端与独立 npm CLI](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md#deepseek-harness)。
+
+从共享的 `ai-code` 市场选择 `codestack`。
 
 ## 使用
 
@@ -24,8 +35,7 @@ SQL/JPA/MyBatis 易错点及前端共享的多语言文案组织约定。插件 
 
 `code-standards` 技能以相关任务自动选用为目标，也可以在需要时显式调用。
 原生发现和实际行为需要在宿主中验证，安装成功不代表每次任务都会使用技能。
-按[安装指南](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md)
-从 `ai-code` 市场选择 `codestack`，各插件分别安装。CodeStack 可以独立于 CodeVow 与 Agent Delegation 使用，无需依赖这两个插件。
+各插件分别安装。CodeStack 可以独立于 CodeVow 与 Agent Delegation 使用，无需依赖这两个插件。
 
 ## 具体要求
 
@@ -60,8 +70,11 @@ TypeScript 任务和不涉及文案的改动不因此引入国际化要求；Jav
 
 ## DeepSeek Harness
 
-DSH 原生 bundle 声明目标为 `0.2.1-rc.2`，实际加载、自动选择、长会话和生命周期验收仍待完成。
-使用现有 Web profile，按官方方式安装构建目录或 Release 的 `codestack-<version>-dsh-plugin.tgz`；
-构建和包检查不能代替宿主验收。技能使用官方 `/code-standards` 显式调用。两个插件通过各自的官方文件系统提供方读取包内资源，启停互不替代。
+插件包与[自定义市场索引](https://raw.githubusercontent.com/Zack-Zz/ai-code/main/published/dsh/index.json)均已发布。
+桌面端自带 Node.js 与 pnpm，无需另行安装 npm CLI。桌面端与独立 npm CLI 步骤见
+[Harness 安装指南](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md#deepseek-harness)。
+已发行包的 `engines.dsh` 与 DSH peerDependencies 均精确锁定 `0.2.1-rc.2`；
+桌面端 `0.2.1-rc.3` 尚未被当前声明覆盖。真实桌面端、实际加载、自动选择、长会话和
+生命周期验收仍待完成，构建和包检查不能代替宿主验收。技能使用官方 `/code-standards` 显式调用。两个插件通过各自的官方文件系统提供方读取包内资源，启停互不替代。
 
-身份变更的卸载和重装步骤见[本次迁移说明](https://github.com/Zack-Zz/ai-code/blob/main/plugins/codestack/docs/2026-10-27-identity-migration.zh-CN.md)。
+身份变更的卸载和重装步骤见[本次迁移说明](https://github.com/Zack-Zz/ai-code/blob/main/docs/migrations/2026-10-27-plugin-identities.zh-CN.md)。
