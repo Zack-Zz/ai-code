@@ -35,9 +35,9 @@ python3 tooling/plugin_tool.py list
 
 | 插件 | 主要源码 | 测试入口 |
 |---|---|---|
-| CodeVow | `plugins/ai-code-workflow/skills/`、`policies/`、`scripts/workflow/` | Node 技能契约和插件 Python 测试 |
+| CodeVow | `plugins/codevow/skills/`、`policies/`、`scripts/workflow/` | Node 技能契约和插件 Python 测试 |
 | Agent Delegation | `plugins/ai-agent-delegation/skills/`、`scripts/bridge_client.py` | 插件 Python 测试 |
-| CodeStack | `plugins/ai-code-stack-standards/skills/code-standards/` | Node 发现、包和汇总器契约；行为评测单独执行 |
+| CodeStack | `plugins/codestack/skills/code-standards/` | Node 发现、包和汇总器契约；行为评测单独执行 |
 | 公共工具 | `tooling/plugin_tools/` | `tests/run_python_tests.py` |
 
 行为变更先写有意义的失败测试，再做最小实现并跑绿。文档调整按影响检查内容、
@@ -46,13 +46,13 @@ python3 tooling/plugin_tool.py list
 需要单独运行目标插件测试时：
 
 ```sh
-node plugins/ai-code-workflow/tests/skills/run-skills.js
-PYTHONDONTWRITEBYTECODE=1 python3 plugins/ai-code-workflow/tests/run_python_tests.py
+node plugins/codevow/tests/skills/run-skills.js
+PYTHONDONTWRITEBYTECODE=1 python3 plugins/codevow/tests/run_python_tests.py
 PYTHONDONTWRITEBYTECODE=1 python3 plugins/ai-agent-delegation/tests/run_python_tests.py
-node plugins/ai-code-stack-standards/tests/skills/run-skills.js
+node plugins/codestack/tests/skills/run-skills.js
 ```
 
-CodeStack 的[评测用例](plugins/ai-code-stack-standards/evals/cases.md)分别验证规则选择、
+CodeStack 的[评测用例](plugins/codestack/evals/cases.md)分别验证规则选择、
 任务结果和原生宿主加载；契约测试和包检查不能证明这些行为。执行用技能与规则保持英文，
 人类使用说明保持中英双语。
 
@@ -66,14 +66,14 @@ python3 tooling/plugin_tool.py build --all --host all --output /tmp/ai-code-dev-
 ```
 
 输出目录必须不存在或为空；再次构建时使用新的空目录。只处理一个插件可将
-`--all` 改成 `--plugin ai-code-workflow`，`--host` 可选 `claude`、`codex`、
+`--all` 改成 `--plugin codevow`，`--host` 可选 `claude`、`codex`、
 `zcode` 或 `all`。
 
 用可信源码独立检查生成的包，以 CodeVow 的 Codex 包为例：
 
 ```sh
 python3 tooling/plugin_tool.py package check \
-  --path /tmp/ai-code-dev-packages/codex/ai-code-workflow --host codex --root .
+  --path /tmp/ai-code-dev-packages/codex/codevow --host codex --root .
 ```
 
 发布前对选定插件的每个宿主包执行相同检查。统一 `npm test` 覆盖公共工具
@@ -86,7 +86,7 @@ python3 tooling/plugin_tool.py package check \
 
 ```sh
 codex plugin marketplace add /tmp/ai-code-dev-packages/codex
-codex plugin add ai-code-workflow@ai-code-local
+codex plugin add codevow@ai-code-local
 ```
 
 Claude Code 与 ZCode 的本地市场操作见[下载包安装](docs/installation.zh-CN.md#下载包安装)。
@@ -116,3 +116,17 @@ python3 tooling/plugin_tool.py marketplace sync --output /tmp/ai-code-dev-market
 
 提交改动时包含相关源码、测试和文档，说明实际运行的检查及结果。发布、市场
 更新和用户安装是各自独立的操作，按维护指南处理。
+
+## 验证 DSH API 组合
+
+常规 npm test 和可信包检查完成后，可用已有隔离开发依赖目录运行原生 API 测试：
+
+```sh
+DSH_NATIVE_NODE_MODULES=/absolute/isolated/node_modules node plugins/codevow/tests/dsh/native-api.mjs
+```
+
+该入口要求精确的官方 DSH 0.2.1-rc.2 包与 Cordis 4.0.5，依赖缺失或不兼容时
+失败，不以 skip 充当通过。它构建两个 DSH 包，通过官方 Loader 激活真实 overlays 和
+Reviewer 预设；同时使用真实 Cordis/Tools/AgentRegistry/Skill API 和合成 Agent、工具定义。
+它不运行模型、不安装用户 profile，也不证明完整 Web UI、
+文件工具、spawn 和生命周期验收。依赖和安装缓存放在临时开发目录。

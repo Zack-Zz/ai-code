@@ -37,9 +37,10 @@ def release_assets(captured, private, spec):
     checksum = private / f"{complete.stem}.sha256"
     checksum.write_text(f"{io.sha256(complete.read_bytes())}  {complete.name}\n")
     assets = [complete, checksum, captured / "release.json", captured / "release-notes.md", captured / "SHA256SUMS"]
-    assets.extend(captured / f"downloads/{spec.product_id}-{spec.version}-{host}.zip" for host in spec.hosts)
-    if record(payload)["schema_version"] == 2:
-        assets.extend(captured / f"installers/{spec.product_id}-{spec.version}-{host}-plugin.zip" for host in spec.hosts)
+    assets.extend(captured / f"downloads/{spec.product_id}-{spec.version}-{host}.{'tgz' if host == 'dsh' else 'zip'}" for host in spec.hosts)
+    if record(payload)["schema_version"] >= 2:
+        from plugin_tools.archives import installer_name
+        assets.extend(captured / f"installers/{installer_name(spec.product_id, spec.version, host)}" for host in spec.hosts)
     return assets
 
 

@@ -2,7 +2,7 @@
   "name": "ai-code",
   "version": "2.0.0",
   "private": true,
-  "description": "Repository for AI-related plugins with shared validation, reproducible packaging and release preparation for Claude Code, Codex and ZCode",
+  "description": "Repository for AI-related plugins with shared validation, reproducible packaging and release preparation for Claude Code, Codex, ZCode and DeepSeek Harness",
   "keywords": [
     "ai",
     "zcode",

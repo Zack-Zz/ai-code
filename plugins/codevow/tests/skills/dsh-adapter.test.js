@@ -1,0 +1,37 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = path.resolve(__dirname, '../..');
+const product = JSON.parse(fs.readFileSync(path.join(root, 'product.json')));
+assert.equal(product.product_id, 'codevow');
+assert.equal(product.schema_version, 2);
+assert.ok(product.hosts.includes('dsh'));
+const manifest = JSON.parse(fs.readFileSync(path.join(root, 'adapters/dsh/package.json')));
+assert.equal(manifest.type, 'module');
+assert.deepEqual(manifest.dsh, { bundle: { patch: './cordis.patch.yml' } });
+assert.equal(manifest.engines.dsh, '0.2.1-rc.2');
+assert.ok(!manifest.scripts && !manifest.private);
+const patch = fs.readFileSync(path.join(root, 'adapters/dsh/cordis.patch.yml'), 'utf8');
+assert.match(patch, /includeDefaultRoots: false/);
+assert.match(patch, /watch: false/);
+assert.match(patch, /bundledSkillDir:/);
+assert.match(patch, /providerName: codevow/);
+assert.ok(!('version' in manifest) && !('name' in manifest), 'product owns generated identity');
+assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'release.json'))).acceptance.dsh, null);
+console.log('DSH bundle identity and native provider contracts passed');
+const workflow = fs.readFileSync(path.join(root, 'skills/workflow/SKILL.md'), 'utf8');
+// Mirror official renderSkillContent framing with a 300-character installation path budget.
+const rendered = `<skill_content name="workflow">\n<skill_resources>\nBase directory for this skill: ${'x'.repeat(300)}\nResolve relative paths mentioned by this skill against the base directory before using them. Load referenced resources only as needed.\n</skill_resources>\n\n<skill_instructions>\n${workflow}\n</skill_instructions>\n</skill_content>`;
+assert.ok([...rendered].length < 8192, 'rendered skill must fit pressure-pruning threshold');
+assert.match(workflow, /references\/execution.md/);
+assert.match(fs.readFileSync(path.join(root, 'skills/workflow/references/execution.md'), 'utf8'), /Resolve the effective policy/);
+const reviewPatch = fs.readFileSync(path.join(root, 'adapters/dsh/cordis.patch.yml'), 'utf8');
+assert.match(reviewPatch, /agentPreset: codevow-reviewer/);
+assert.match(reviewPatch, /inject: \[agentPresets/);
+assert.match(reviewPatch, /provider: spawn/);
+assert.doesNotMatch(reviewPatch, /allowedAgentPresets|toolFilter|model:/);
+
+assert.match(reviewPatch, /name: '@deepseek-ai\/dsh-agent-tool-presentation'/);
+assert.match(reviewPatch, /mode: native/);
+assert.match(reviewPatch, /modelSelectionSettings: false/);
+assert.doesNotMatch(reviewPatch, /modelSelection:|modelDiscovery:/);

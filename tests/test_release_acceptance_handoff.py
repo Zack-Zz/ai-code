@@ -32,7 +32,9 @@ class AcceptanceHandoffTests(unittest.TestCase):
         product = json.loads((self.plugin / "product.json").read_text())
         product["repository"] = "https://github.com/Example/ai-code"
         write_json(self.plugin / "product.json", product)
-        (self.root / "distribution.json").write_bytes((ROOT / "distribution.json").read_bytes())
+        config = json.loads((ROOT / "distribution.json").read_bytes())
+        config["identity_replacements"] = {}
+        (self.root / "distribution.json").write_bytes(io.dump_json(config))
         accept_fixture(self.root, "ai-one")
         (self.root / ".gitignore").write_text("plugins/*/release/*-raw.txt\nplugins/*/release/*-accepted.json\n")
         self.tag = "ai-one/v1.0.0"
@@ -90,6 +92,7 @@ class AcceptanceHandoffTests(unittest.TestCase):
             def release(inner, tag):
                 return {"id": 73, "tag_name": tag, "draft": False, "prerelease": False,
                     "html_url": "https://github.com/Example/ai-code/releases/tag/ai-one%2Fv1.0.0",
+                    "published_at": "2026-10-27T00:00:00Z",
                     "assets": [{"id": number, "name": name, "size": len(github.assets[number]),
                         "browser_download_url": "https://github.com/Example/ai-code/releases/download/ai-one%2Fv1.0.0/" + name}
                         for number, name in github.names.items()]}

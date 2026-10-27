@@ -33,7 +33,7 @@ class HostedConfigTests(unittest.TestCase):
         self.assertEqual(config.get("source_branch"), "main")
         self.assertEqual(config.get("marketplace"), {"branch": "main", "name": "ai-code",
                                                    "version_policy": "latest-stable"})
-        self.assertEqual(config["transports"], {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip"})
+        self.assertEqual(config["transports"], {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip", "dsh": "git-subdir"})
 
     def test_requested_marketplace_name_is_accepted_without_an_alias(self):
         config = json.loads((Path(__file__).resolve().parents[2] / "distribution.json").read_text())
@@ -55,7 +55,7 @@ class HostedConfigTests(unittest.TestCase):
     def test_public_market_names_and_ownership_hashes_match(self):
         root = Path(__file__).resolve().parents[2]
         lock = json.loads((root / distribution.LOCK_PATH).read_text())
-        for path in distribution.NATIVE_PATHS:
+        for path in lock["files"]:
             with self.subTest(path=path):
                 raw = (root / path).read_bytes()
                 self.assertEqual(json.loads(raw)["name"], "ai-code")
@@ -71,7 +71,7 @@ class HostedMarketTests(unittest.TestCase):
         product = json.loads((self.case.plugin / "product.json").read_text())
         product["repository"] = "https://github.com/Example/ai-code"
         release_fixtures.write_json(self.case.plugin / "product.json", product)
-        self.config = distribution.load_config(Path(__file__).resolve().parents[2])
+        self.config = dict(distribution.load_config(Path(__file__).resolve().parents[2]), identity_replacements={})
         (self.root / "distribution.json").write_bytes(io.dump_json(self.config))
         accept_fixture(self.root, "ai-one")
         self.git("init", "-q", "-b", "main")
@@ -93,12 +93,12 @@ class HostedMarketTests(unittest.TestCase):
         tag = f"{spec.product_id}/v{spec.version}"
         assets = []
         # Actual prepared installer bytes, never invented host acceptance.
-        for number, path in enumerate(sorted((bundle / "installers").glob("*.zip")), 1):
+        for number, path in enumerate(sorted((bundle / "installers").iterdir()), 1):
             assets.append({"id": number, "name": path.name, "size": path.stat().st_size,
                 "sha256": io.sha256(path.read_bytes()),
                 "browser_download_url": f"{repository}/releases/download/{quote(tag, safe='')}/{path.name}"})
         return {"id": 21, "tag_name": tag, "draft": False, "prerelease": False,
-                "html_url": f"{repository}/releases/tag/{quote(tag, safe='')}", "assets": assets}
+                "html_url": f"{repository}/releases/tag/{quote(tag, safe='')}", "published_at": "2026-10-27T00:00:00Z", "assets": assets}
 
     def plan(self, **options):
         options.setdefault("base_commit", "b" * 40)
@@ -119,11 +119,11 @@ class HostedMarketTests(unittest.TestCase):
         plan = self.plan()
         stage = distribution.stage_files(plan)
         self.assertTrue(stage)
-        self.assertTrue(all(path.startswith("published/codex/ai-one/1.0.0/") for path in stage))
+        self.assertTrue(all(path.startswith("published/codex/ai-one/1.0.0/") or path == "published/staged/ai-one/1.0.0.json" for path in stage))
         final = distribution.finalize_files(plan, "d" * 40)
         for path in distribution.NATIVE_PATHS:
             with self.subTest(path=path):
-                self.assertEqual(json.loads(final[path])["name"], "ai-code")
+                self.assertEqual(json.loads(final[path])["title"]["en"] if path == "published/dsh/index.json" else json.loads(final[path])["name"], "ai-code")
         claude = json.loads(final[".claude-plugin/marketplace.json"])["plugins"][0]
         zcode = json.loads(final["marketplace.json"])["plugins"][0]
         codex = json.loads(final[".agents/plugins/marketplace.json"])["plugins"][0]
@@ -187,7 +187,8 @@ class HostedMarketTests(unittest.TestCase):
 
     def test_stable_record_can_be_technically_ready_with_pending_hosts(self):
         record = self.plan()['record']
-        record.update(channel='stable', mode='stable', codex_revision='d' * 40)
+        record.update(channel='stable', mode='stable')
+        record['git_installs']['codex']['revision'] = 'd' * 40
         record['readiness']['publication_ready'] = True
         record['readiness']['pending_acceptance'] = ['codex']
         record['readiness']['accepted_hosts'] = ['claude', 'zcode']
@@ -266,7 +267,7 @@ class HostedMarketTests(unittest.TestCase):
         retry = self.plan(market_files=staged, base_commit="d" * 40)
         self.assertEqual(distribution.stage_files(retry), {})
         final = distribution.finalize_files(retry, "d" * 40)
-        self.assertEqual(json.loads(final["published/index.json"])["plugins"]["ai-one"]["codex_revision"], "d" * 40)
+        self.assertEqual(json.loads(final["published/index.json"])["plugins"]["ai-one"]["git_revisions"]["codex"], "d" * 40)
         name = next(iter(staged))
         with self.assertRaises(io.DataError):
             self.plan(market_files=dict(staged, **{name: b"different bytes"}), base_commit="d" * 40)
@@ -324,7 +325,7 @@ class HostedMarketTests(unittest.TestCase):
         market = json.loads(final["marketplace.json"])
         self.assertEqual([item["name"] for item in market["plugins"]], ["ai-two"])
         record = json.loads(final["published/releases/ai-two/3.2.1.json"])
-        self.assertIsNone(record["codex_revision"])
+        self.assertEqual(record["git_installs"], {})
         with self.assertRaises(io.DataError):
             distribution.finalize_files(plan, "d" * 40)
 
@@ -364,7 +365,7 @@ class HostedMarketTests(unittest.TestCase):
                 for host, path in paths.items():
                     self.assertEqual(bool(json.loads(final[path])["plugins"]), host == retained)
                 lock = json.loads(final["published/marketplaces.lock.json"])
-                self.assertEqual(lock["files"], {path: io.sha256(final[path]) for path in paths.values()})
+                self.assertEqual(lock["files"], {path: io.sha256(final[path]) for path in distribution.NATIVE_PATHS})
                 for name, data in first.items():
                     if name.startswith(("published/releases/", "plugins/")):
                         self.assertEqual(final[name], data)
@@ -614,3 +615,161 @@ class DistributionTests(unittest.TestCase):
         entry["zip_sha256"] = sha(zipped.read_bytes())
         self.rewrite_index()
         self.assertNotEqual(self.check().returncode, 0)
+
+class IdentityDistributionContractTests(unittest.TestCase):
+    def test_schema3_bootstrap_binds_four_native_markets_and_index(self):
+        files = distribution.bootstrap_files()
+        index = json.loads(files[distribution.INDEX_PATH])
+        self.assertEqual(index, {"schema_version": 3, "plugins": {}, "retired": {}})
+        lock = json.loads(files[distribution.LOCK_PATH])
+        self.assertEqual(lock["schema_version"], 2)
+        self.assertEqual(set(lock["files"]), {".claude-plugin/marketplace.json", ".agents/plugins/marketplace.json", "marketplace.json", "published/dsh/index.json"})
+        self.assertEqual(lock["published_index_sha256"], io.sha256(files[distribution.INDEX_PATH]))
+        self.assertEqual(json.loads(files["published/dsh/index.json"])["format"], 1)
+
+    def test_legacy_git_inventory_normalization_does_not_mutate_record(self):
+        record = {"codex_revision": "d" * 40, "codex_files": {"published/codex/old/1.0.0/plugin.json": "a" * 64}}
+        expected = json.loads(json.dumps(record))
+        self.assertEqual(distribution.git_installs(record), {"codex": {"revision": "d" * 40, "files": record["codex_files"]}})
+        self.assertEqual(record, expected)
+
+    def test_identity_replacement_rejects_chains_cycles_and_many_to_one(self):
+        base = {"schema_version": 3, "source_branch": "main", "marketplace": distribution.MARKETPLACE,
+                "transports": {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip", "dsh": "git-subdir"}}
+        for replacements in ({"old": "new", "new": "next"}, {"old": "new", "new": "old"}, {"old": "new", "other": "new"}, {"old": "old"}):
+            with self.subTest(replacements=replacements), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                (root / "distribution.json").write_bytes(io.dump_json(dict(base, identity_replacements=replacements)))
+                with self.assertRaises(io.DataError):
+                    distribution.load_config(root)
+
+class IdentityRetirementTests(unittest.TestCase):
+    setUp = HostedMarketTests.setUp
+    git = HostedMarketTests.git
+    info = HostedMarketTests.info
+    plan = HostedMarketTests.plan
+    add_second = HostedMarketTests.add_second
+    """Migration stays atomic; successful C preserves all frozen history."""
+    def test_new_identity_retires_only_its_old_pointer_after_finalize(self):
+        first = distribution.finalize_files(self.plan(), "d" * 40)
+        self.config["identity_replacements"] = {"ai-one": "ai-two"}
+        (self.root / "distribution.json").write_bytes(io.dump_json(self.config))
+        spec, bundle, info = self.add_second(["codex"])
+        plan = distribution.plan_distribution(self.root, spec, bundle, info, "stable", market_files=first, base_commit="c" * 40)
+        self.assertEqual(json.loads(first[distribution.INDEX_PATH])["retired"], {})
+        self.assertNotIn(distribution.INDEX_PATH, distribution.stage_files(plan))
+        final = distribution.finalize_files(plan, "e" * 40)
+        snapshot = json.loads(final[distribution.INDEX_PATH])
+        self.assertEqual(set(snapshot["plugins"]), {"ai-two"})
+        self.assertEqual(snapshot["retired"], {"ai-one": "ai-two"})
+        for path, raw in first.items():
+            if path.startswith(("published/releases/", "published/codex/")):
+                self.assertEqual(final[path], raw)
+        for path in distribution.NATIVE_PATHS:
+            self.assertNotIn('"name": "ai-one"', final[path].decode())
+        with self.assertRaisesRegex(io.DataError, "retired"):
+            self.plan(market_files=final, base_commit="f" * 40)
+
+    def test_legacy_record_snapshot_lock_are_checked_and_never_rewritten_on_retry(self):
+        first = distribution.finalize_files(self.plan(), "d" * 40)
+        path = "published/releases/ai-one/1.0.0.json"
+        record = json.loads(first[path])
+        install = record.pop("git_installs")["codex"]
+        record.pop("release_published_at")
+        record.update(schema_version=2, codex_revision=install["revision"], codex_files=install["files"])
+        for item in record["hosts"].values():
+            item.pop("installer_format")
+        legacy = {name: raw for name, raw in first.items() if name.startswith("published/codex/")}
+        legacy[path] = io.dump_json(record)
+        legacy.update(distribution._catalog_files({path: record}, {"ai-one": distribution._snapshot(record, legacy=True)}, legacy=True))
+        before = dict(legacy)
+        retry = self.plan(market_files=legacy, base_commit="c" * 40)
+        self.assertEqual(retry["status"], "already_deployed")
+        self.assertEqual(distribution.stage_files(retry), {})
+        self.assertEqual(distribution.finalize_files(retry, "d" * 40), before)
+        self.assertEqual(legacy, before)
+        self.assertNotIn("published/dsh/index.json", legacy)
+        self.assertEqual(json.loads(legacy[distribution.LOCK_PATH])["schema_version"], 1)
+
+    def test_stage_has_no_D_and_orphan_or_partial_installation_is_rejected(self):
+        plan = self.plan()
+        staged = distribution.stage_files(plan)
+        path = "published/staged/ai-one/1.0.0.json"
+        receipt = json.loads(staged[path])
+        self.assertEqual(receipt["record"]["git_installs"]["codex"]["revision"], None)
+        self.assertEqual(receipt["plan_hash"], plan["plan_hash"])
+        self.assertEqual(receipt["base_commit"], plan["base_commit"])
+        self.assertEqual(set(receipt), distribution.RECEIPT_FIELDS)
+        for mutation in ({name: raw for name, raw in staged.items() if name != path},
+                         {name: raw for number, (name, raw) in enumerate(staged.items()) if number != 0}):
+            with self.assertRaises(io.DataError):
+                self.plan(market_files=mutation, base_commit="d" * 40)
+        retry = self.plan(market_files=staged, base_commit="d" * 40)
+        final = distribution.finalize_files(retry, "d" * 40)
+        self.assertNotIn(path, final)
+        self.assertEqual({name: final[name] for name in staged if name != path}, {name: raw for name, raw in staged.items() if name != path})
+
+class DshHostedMarketTests(unittest.TestCase):
+    git = HostedMarketTests.git
+    info = HostedMarketTests.info
+    plan = HostedMarketTests.plan
+
+    def setUp(self):
+        HostedMarketTests.setUp(self)
+        product = json.loads((self.case.plugin / "product.json").read_text())
+        product.update(schema_version=2, version="1.0.1", hosts=["claude", "codex", "zcode", "dsh"],
+            host_resources={"dsh": [{"source": "adapters/dsh/cordis.patch.yml", "target": "cordis.patch.yml", "include": []}]})
+        release_fixtures.write_json(self.case.plugin / "product.json", product)
+        release_fixtures.write_json(self.case.plugin / "adapters/dsh/package.json", {
+            "name": "ai-one", "version": "1.0.1", "description": "Useful AI skills", "type": "module",
+            "engines": {"dsh": "0.2.1-rc.3"}, "dsh": {"bundle": {"patch": "./cordis.patch.yml"}}, "icon": "./assets/icon.svg"})
+        (self.case.plugin / "adapters/dsh/cordis.patch.yml").write_text("plugins: {}\n")
+        config = json.loads((self.case.plugin / "release.json").read_text())
+        config["acceptance"] = {host: None for host in product["hosts"]}
+        release_fixtures.write_json(self.case.plugin / "release.json", config)
+        self.git("add", "-A")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "--no-verify", "-qm", "dsh bundle source")
+        self.git("tag", "ai-one/v1.0.1")
+        self.case.output = self.case.base / "dsh-release"
+        result = prepare_release(self.root, self.case.spec(), self.case.output, mode="stable", committed_acceptance=True)
+        self.assertTrue(result["ok"], result)
+        self.release_info = self.info(self.case.spec(), self.case.output)
+
+    def test_dsh_TGZ_git_closure_and_native_index_bind_one_actual_D(self):
+        from plugin_tools.archives import read_installer
+        plan = self.plan()
+        self.assertEqual(plan["schema_version"], 3)
+        self.assertEqual(set(plan["git_install_files"]), {"codex", "dsh"})
+        record = plan["record"]
+        self.assertTrue(record["hosts"]["dsh"]["asset"]["name"].endswith("-dsh-plugin.tgz"))
+        staged = distribution.stage_files(plan)
+        receipt_path = "published/staged/ai-one/1.0.1.json"
+        self.assertIn(receipt_path, staged)
+        self.assertNotIn("published/dsh/index.json", staged)
+        raw = (self.case.output / "installers/ai-one-1.0.1-dsh-plugin.tgz").read_bytes()
+        package = read_installer(raw, "ai-one", "dsh")
+        self.assertEqual({path.removeprefix("published/dsh/ai-one/1.0.1/"): staged[path] for path in record["git_installs"]["dsh"]["files"]}, package)
+        retry = self.plan(market_files=staged, base_commit="d" * 40)
+        final = distribution.finalize_files(retry, "d" * 40)
+        self.assertNotIn(receipt_path, final)
+        index = json.loads(final["published/dsh/index.json"])
+        self.assertEqual(index["format"], 1)
+        entry = index["plugins"][0]
+        self.assertEqual(set(entry["title"]), {"en", "zh"})
+        self.assertEqual(entry["versions"], [{"version": "1.0.1", "engines": {"dsh": "0.2.1-rc.3"},
+            "publishTimestamp": 1793059200, "source": {"type": "git", "url": "https://github.com/Example/ai-code",
+            "commit": "d" * 40, "path": "published/dsh/ai-one/1.0.1"}}])
+        self.assertEqual(entry["icon"], "https://raw.githubusercontent.com/Example/ai-code/" + "d" * 40 + "/published/dsh/ai-one/1.0.1/assets/icon.svg")
+        pointer = json.loads(final[distribution.INDEX_PATH])["plugins"]["ai-one"]
+        self.assertEqual(pointer["git_revisions"], {"codex": "d" * 40, "dsh": "d" * 40})
+        from plugin_tools import markets
+        scratch = self.case.base / "checked-distribution"
+        scratch.mkdir()
+        shutil.copytree(self.case.output / "packages", scratch / "dist")
+        hosts, captured = markets._validate_dist(scratch, [self.case.spec()])
+        self.assertEqual(hosts, {"claude", "codex", "zcode", "dsh"})
+        self.assertIn("dist/dsh/ai-one-1.0.1.tgz", captured)
+        record["git_installs"]["dsh"]["revision"] = "e" * 40
+        record["git_installs"]["codex"]["revision"] = "d" * 40
+        with self.assertRaisesRegex(io.DataError, "share one"):
+            distribution._record(record, "stable", record["repository"])

@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "product_id": "codestack",
+  "display_name": "CodeStack",
+  "version": "0.2.0",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "license": "MIT",
+  "publisher": {
+    "name": "Zack-Zz",
+    "url": "https://github.com/Zack-Zz"
+  },
+  "hosts": [
+    "claude",
+    "codex",
+    "zcode",
+    "dsh"
+  ],
+  "host_listings": {
+    "claude": {},
+    "zcode": {
+      "icon_path": "assets/codestack.png",
+      "icon_url": "https://raw.githubusercontent.com/Zack-Zz/ai-code/27131993b1b1976244273f842a36e3a8fb7414a6/plugins/ai-code-stack-standards/assets/codestack.png"
+    }
+  },
+  "core_skills": [
+    "code-standards"
+  ],
+  "shared_skills": [],
+  "resources": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE",
+      "include": []
+    },
+    {
+      "source": "release/README.md",
+      "target": "README.md",
+      "include": []
+    },
+    {
+      "source": "release/README_CN.md",
+      "target": "README_CN.md",
+      "include": []
+    },
+    {
+      "source": "assets/codestack.png",
+      "target": "assets/codestack.png",
+      "include": []
+    },
+    {
+      "source": "skills/code-standards/references",
+      "target": "skills/code-standards/references",
+      "include": [
+        "java.md",
+        "data-access.md",
+        "jpa.md",
+        "mybatis.md",
+        "frontend.md",
+        "java-design.md"
+      ]
+    }
+  ],
+  "host_resources": {
+    "dsh": [
+      {
+        "source": "adapters/dsh/cordis.patch.yml",
+        "target": "cordis.patch.yml",
+        "include": []
+      },
+      {
+        "source": "adapters/dsh/locale",
+        "target": "locale",
+        "include": [
+          "en.json",
+          "zh.json"
+        ]
+      },
+      {
+        "source": "adapters/dsh/assets/codestack.png",
+        "target": "assets/codestack-dsh.png",
+        "include": []
+      }
+    ]
+  }
+}

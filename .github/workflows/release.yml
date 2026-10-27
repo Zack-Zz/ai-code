@@ -6,9 +6,9 @@ on:
       plugin:
         description: Plugin / 插件
         required: true
-        default: ai-code-workflow
+        default: codevow
         type: choice
-        options: [ai-code-workflow, ai-agent-delegation, ai-code-stack-standards]
+        options: [codevow, ai-agent-delegation, codestack]
       operation:
         description: Build only / 仅构建；Publish + stable market / 发布并更新正式市场
         required: true

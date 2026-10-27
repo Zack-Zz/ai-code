@@ -1,6 +1,7 @@
 """A path-only catalog and each plugin's identity/resource contract."""
 
 from dataclasses import dataclass, field
+from fnmatch import fnmatchcase
 from pathlib import Path
 import re
 import stat
@@ -12,13 +13,14 @@ from .references import validate_skill_references
 from .rendering import manifest_path
 from .versions import VERSION_PATTERN
 
-HOSTS = ("claude", "codex", "zcode")
+HOSTS = ("claude", "codex", "zcode", "dsh")
 ID_PATTERN = re.compile(r"[a-z0-9][a-z0-9-]{0,63}")
 INTERFACE_FIELDS = {"display_name", "short_description", "brand_color", "default_prompt",
                     "allow_implicit_invocation"}
 REQUIRED_PRODUCT_FIELDS = {"schema_version", "product_id", "display_name", "version",
                            "repository", "license", "hosts", "resources"}
-OPTIONAL_PRODUCT_FIELDS = {"core_skills", "shared_skills", "profiles", "generated_agents", "publisher", "host_listings"}
+OPTIONAL_PRODUCT_FIELDS = {"core_skills", "shared_skills", "profiles", "generated_agents", "publisher", "host_listings",
+                           "host_resources", "generated_resources"}
 
 
 @dataclass
@@ -30,6 +32,7 @@ class PluginSpec:
     inputs: dict = field(default_factory=dict)  # source relative path -> captured bytes
     adapters: dict = field(default_factory=dict)
     interfaces: dict = field(default_factory=dict)
+    host_files: dict = field(default_factory=dict)
     boundary_root: Path | None = None
 
     @property
@@ -113,6 +116,7 @@ def _generated_targets(spec, host=None):
     if "codex" in hosts:
         targets.update(f"skills/{name}/agents/openai.yaml" for name in spec.all_skills)
     targets.update(agent["target"] for agent in spec.manifest.get("generated_agents", []) if agent["host"] in hosts)
+    targets.update(item["target"] for item in spec.manifest.get("generated_resources", []) if item["host"] in hosts)
     return targets
 
 
@@ -149,8 +153,10 @@ def load_product(root, *, catalog_path="", boundary_root=None):
         raise DataError(f"product.json missing fields: {sorted(missing)}")
     if unknown := set(manifest) - REQUIRED_PRODUCT_FIELDS - OPTIONAL_PRODUCT_FIELDS:
         raise DataError(f"product.json unknown fields: {sorted(unknown)}")
-    if type(manifest["schema_version"]) is not int or manifest["schema_version"] != 1:
-        raise DataError("product schema_version must be integer 1")
+    if type(manifest["schema_version"]) is not int or manifest["schema_version"] not in (1, 2):
+        raise DataError("product schema_version must be integer 1 or 2")
+    if manifest["schema_version"] == 1 and set(manifest) & {"host_resources", "generated_resources"}:
+        raise DataError("host/generated resources require product schema_version 2")
     for key, pattern in (("product_id", ID_PATTERN), ("version", VERSION_PATTERN)):
         if not isinstance(manifest[key], str) or not pattern.fullmatch(manifest[key]):
             raise DataError(f"invalid product {key}")
@@ -179,69 +185,91 @@ def load_product(root, *, catalog_path="", boundary_root=None):
             io.relative_path(agent[key], what=f"generated_agents.{key}")
         if not agent["target"].startswith("agents/") or not agent["target"].endswith(".md"):
             raise DataError("generated agent target must be agents/*.md")
+    generated_resources = manifest.get("generated_resources", [])
+    if not isinstance(generated_resources, list):
+        raise DataError("generated_resources must be a list")
+    for item in generated_resources:
+        if not isinstance(item, dict) or set(item) != {"host", "source", "target", "format"}:
+            raise DataError("generated_resources requires host/source/target/format")
+        if item["host"] not in hosts or item["host"] != "dsh" or item["format"] != "json-string":
+            raise DataError("generated resource host/format must be declared dsh/json-string")
+        io.relative_path(item["source"], what="generated source")
+        io.relative_path(item["target"], what="generated target")
+        if any("__pycache__" in item[key].split("/") or item[key].endswith((".pyc", ".pyo")) for key in ("source", "target")):
+            raise DataError("generated resources cannot contain cache artifacts")
+        if not item["target"].endswith(".json"):
+            raise DataError("json-string target must be JSON")
+    host_resources = manifest.get("host_resources", {})
+    if not isinstance(host_resources, dict) or set(host_resources) - set(hosts):
+        raise DataError("host_resources must name only declared hosts")
     spec = PluginSpec(root, catalog_path, manifest, inputs={"product.json": raw}, boundary_root=boundary_root)
     generated = _generated_targets(spec)
     for host in hosts:
         host_targets = _generated_targets(spec, host)
         agent_count = sum(agent["host"] == host for agent in agents)
-        if len(host_targets) != 2 + (len(spec.all_skills) if host == "codex" else 0) + agent_count:
+        extra_count = sum(item["host"] == host for item in generated_resources)
+        if len(host_targets) != 2 + (len(spec.all_skills) if host == "codex" else 0) + agent_count + extra_count:
             raise DataError(f"generated target collision for {host}")
         for target in host_targets:
             if any(target.startswith(other + "/") for other in host_targets if other != target):
                 raise DataError(f"generated target path overlap: {target}")
 
-    def register(source, target):
+    def register(source, target, host=None):
+        bucket = spec.files if host is None else spec.host_files.setdefault(host, {})
+        existing_targets = set(spec.files) | set(bucket)
+        reserved = generated if host is None else _generated_targets(spec, host)
         for relative in (source, target):
             io.relative_path(relative, what="resource path")
             if "__pycache__" in relative.split("/") or relative.endswith((".pyc", ".pyo")):
                 raise DataError(f"cache artifacts cannot be registered: {relative}")
-        if target in spec.files or target in generated:
+        if target in existing_targets or target in reserved:
             raise DataError(f"resource target collision: {target}")
         if any(target.startswith(existing + "/") or existing.startswith(target + "/")
-               for existing in (*spec.files, *generated)):
+               for existing in (*existing_targets, *reserved)):
             raise DataError(f"resource target path overlap: {target}")
         payload = io.read_file(root, source, boundary_root=boundary_root)
         if source in spec.inputs and spec.inputs[source] != payload:
             raise DataError(f"source input changed while loading: {source}")
         spec.inputs[source] = payload
-        spec.files[target] = source
+        bucket[target] = source
 
     for name in spec.all_skills:
         relative = f"skills/{name}/SKILL.md"
         register(relative, relative)
         _skill_metadata(spec.inputs[relative], name)
-    resources = manifest["resources"]
-    if not isinstance(resources, list):
-        raise DataError("resources must be a list")
-    for entry in resources:
-        if not isinstance(entry, dict) or set(entry) != {"source", "target", "include"}:
-            raise DataError("resources entries require source/target/include")
-        source = io.relative_path(entry["source"], what="resource source path")
-        target = io.relative_path(entry["target"], what="resource target path")
-        include = _string_list(entry["include"], "resource include")
-        candidate = root / source
-        try:
-            is_directory = stat.S_ISDIR(candidate.lstat().st_mode)
-        except OSError as exc:
-            raise DataError(f"resource path missing: {candidate}") from exc
-        if is_directory:
-            io.member(root, source, directory=True, boundary_root=boundary_root)
-            if not include:
-                raise DataError("directory resource requires explicit include list")
-            for relative in include:
-                io.relative_path(relative, what="resource include path")
-                if re.search(r"[*?\[\]]", relative):
-                    raise DataError("resource include cannot contain wildcards")
-                register(f"{source}/{relative}", f"{target}/{relative}")
-        else:
-            if include:
-                raise DataError("file resource requires empty include list")
-            register(source, target)
+    resources = [(None, manifest["resources"]), *host_resources.items()]
+    for host, entries in resources:
+        if not isinstance(entries, list):
+            raise DataError("resources must be a list")
+        for entry in entries:
+            if not isinstance(entry, dict) or set(entry) != {"source", "target", "include"}:
+                raise DataError("resources entries require source/target/include")
+            source = io.relative_path(entry["source"], what="resource source path")
+            target = io.relative_path(entry["target"], what="resource target path")
+            include = _string_list(entry["include"], "resource include")
+            candidate = root / source
+            try:
+                is_directory = stat.S_ISDIR(candidate.lstat().st_mode)
+            except OSError as exc:
+                raise DataError(f"resource path missing: {candidate}") from exc
+            if is_directory:
+                io.member(root, source, directory=True, boundary_root=boundary_root)
+                if not include:
+                    raise DataError("directory resource requires explicit include list")
+                for relative in include:
+                    io.relative_path(relative, what="resource include path")
+                    if re.search(r"[*?\[\]]", relative):
+                        raise DataError("resource include cannot contain wildcards")
+                    register(f"{source}/{relative}", f"{target}/{relative}", host)
+            else:
+                if include:
+                    raise DataError("file resource requires empty include list")
+                register(source, target, host)
     validate_skill_references({target: spec.inputs[source] for target, source in spec.files.items()})
     from .listings import validate_host_listings
     validate_host_listings(spec)
     for host in hosts:
-        adapter = _load_json_input(spec, f"adapters/{host}/plugin.json")
+        adapter = _load_json_input(spec, f"adapters/{host}/{'package.json' if host == 'dsh' else 'plugin.json'}")
         if (not isinstance(adapter, dict) or not isinstance(adapter.get("description"), str) or
                 not adapter["description"].strip()):
             raise DataError(f"{host} plugin adapter requires description")
@@ -264,7 +292,62 @@ def load_product(root, *, catalog_path="", boundary_root=None):
         lines = spec.inputs[agent["template"]].decode("utf-8").splitlines()
         if not lines or lines[0].strip() != "---" or not any(line.strip() == "---" for line in lines[1:]):
             raise DataError("generated agent template requires closed frontmatter")
+    for item in generated_resources:
+        relative = item["source"]
+        payload = io.read_file(root, relative, boundary_root=boundary_root)
+        if relative in spec.inputs and spec.inputs[relative] != payload:
+            raise DataError(f"source input changed while loading: {relative}")
+        try:
+            payload.decode("utf-8")
+        except UnicodeError as exc:
+            raise DataError("generated json-string source must be UTF-8") from exc
+        spec.inputs[relative] = payload
+    if "dsh" in hosts:
+        _validate_dsh(spec)
     return spec
+
+
+def _validate_dsh(spec):
+    adapter = spec.adapters["dsh"]
+    if "scripts" in adapter:
+        raise DataError("DSH bundles cannot declare install scripts")
+    if adapter.get("private") is not None and adapter["private"] is not False:
+        raise DataError("DSH bundle must not be private")
+    if adapter.get("type") != "module":
+        raise DataError("DSH bundle requires type module")
+    engines = adapter.get("engines")
+    if not isinstance(engines, dict) or not isinstance(engines.get("dsh"), str) or not engines["dsh"].strip():
+        raise DataError("DSH bundle must declare engines.dsh")
+    try:
+        patch = adapter["dsh"]["bundle"]["patch"]
+    except (KeyError, TypeError) as exc:
+        raise DataError("DSH bundle requires dsh.bundle.patch") from exc
+    patches = [patch] if isinstance(patch, str) else patch
+    if not isinstance(patches, list) or not patches or not all(isinstance(x, str) and x.startswith("./") for x in patches):
+        raise DataError("DSH bundle patch must name relative files")
+    from .rendering import package_files
+    files = package_files(spec, "dsh")
+    for name in patches:
+        relative = io.relative_path(name[2:], what="DSH bundle patch")
+        if relative not in files or not relative.endswith((".yml", ".yaml")):
+            raise DataError("DSH bundle patch must be in the trusted package closure")
+    exports = adapter.get("exports", {})
+    if not isinstance(exports, dict):
+        raise DataError("DSH exports must be an explicit subpath map")
+    for key, target in exports.items():
+        if not isinstance(key, str) or not key.startswith("./") or not isinstance(target, str) or not target.startswith("./"):
+            raise DataError("DSH exports require relative subpaths and targets")
+        io.relative_path(key[2:].replace("*", "wildcard"), what="DSH export key")
+        relative = io.relative_path(target[2:], what="DSH export target")
+        if not any(fnmatchcase(name, relative) for name in files):
+            raise DataError("DSH export target must resolve inside the trusted package closure")
+    if "icon" in adapter:
+        icon = adapter["icon"]
+        if not isinstance(icon, str) or not icon.startswith("./"):
+            raise DataError("DSH icon must be a package-relative path")
+        icon = io.relative_path(icon[2:], what="DSH icon")
+        if icon not in files or len(files[icon]) > 256 * 1024:
+            raise DataError("DSH icon must be packaged and at most 256 KiB")
 
 
 def load_catalog(root):

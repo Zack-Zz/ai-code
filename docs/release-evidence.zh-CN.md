@@ -90,7 +90,7 @@ Release 或其冻结源码。
 全部声明宿主均完成字节绑定验收后，在保留私有记录和日志的本地源码执行：
 
 ```sh
-python3 tooling/plugin_tool.py release acceptance-export --plugin ai-code-workflow
+python3 tooling/plugin_tool.py release acceptance-export --plugin codevow
 ```
 
 导出器逐项读取并核验记录和实际日志；任何宿主 pending、文件缺失或哈希
@@ -118,3 +118,12 @@ helper 可明确重置旧证据引用、移除有效生成摘要，保留私有�
 安装或官方目录投稿权限。已授权的 Actions 发布仍使用 `plugin-release` 和
 `plugin-marketplace`，环境若配置审核人，运行可能暂停等待审核。详见
 [发布流程](publishing.zh-CN.md)。
+
+## DSH 与身份改名
+
+新产品声明 claude/codex/zcode/dsh 四个验收槽；没有匹配版本及 profile 的实际
+材料时，DSH 槽保持 null。原生加载、TGZ 完整性、调用、生命周期、Reviewer
+工具只读限制和工作区隔离分别记录。guard 单元测试不代表真实宿主权限通过。
+
+ID 迁移和共同技能结构变更会使源码/包哈希绑定失效。保留旧私有材料和不可变
+公开历史，通过版本准备预览重置过期引用，不给旧证据重新贴新身份标签。

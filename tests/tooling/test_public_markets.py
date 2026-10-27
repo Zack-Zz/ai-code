@@ -33,7 +33,7 @@ class PublicMarketTests(unittest.TestCase):
         write_json(product_path, product)
         write_json(self.root / "catalog.json", {"schema_version": 1,
             "plugins": [{"path": "plugins/ai-one"}]})
-        (self.root / "distribution.json").write_bytes((ROOT / "distribution.json").read_bytes())
+        write_json(self.root / "distribution.json", dict(json.loads((ROOT / "distribution.json").read_text()), identity_replacements={}))
         files = {}
         for host, path in PATHS.items():
             market = {"name": "ai-code", "plugins": []}
@@ -100,7 +100,7 @@ class FrozenPublicSourceTests(unittest.TestCase):
         product["repository"] = "https://github.com/Example/ai-code"
         write_json(product_path, product)
         self.configure_source()
-        (self.root / "distribution.json").write_bytes((ROOT / "distribution.json").read_bytes())
+        write_json(self.root / "distribution.json", dict(json.loads((ROOT / "distribution.json").read_text()), identity_replacements={}))
         # Actual private fixture evidence is verified once, and never enters Git.
         self.case.accept(hosts=(*self.accepted_hosts, *self.unverified_hosts))
         for host in self.unverified_hosts:
@@ -140,6 +140,9 @@ class FrozenPublicSourceTests(unittest.TestCase):
         self.git("commit", "-m", message)
 
     def write(self, files):
+        for staged in self.root.glob("published/staged/*/*.json"):
+            if staged.relative_to(self.root).as_posix() not in files:
+                staged.unlink()
         for path, raw in files.items():
             target = self.root / path
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -174,6 +177,7 @@ class FrozenPublicSourceTests(unittest.TestCase):
         lock_path = self.root / "published/marketplaces.lock.json"
         lock = json.loads(lock_path.read_text())
         lock["files"][PATHS["claude"]] = io.sha256(native_path.read_bytes())
+        lock["published_index_sha256"] = io.sha256(index_path.read_bytes())
         lock_path.write_bytes(io.dump_json(lock))
         with self.assertRaisesRegex(io.DataError, "installer"):
             markets.check_public_markets(self.root)
@@ -218,3 +222,27 @@ class MixedFrozenPublicSourceTests(FrozenPublicSourceTests):
 class UnverifiedFrozenPublicSourceTests(FrozenPublicSourceTests):
     accepted_hosts = ("claude", "codex")
     unverified_hosts = ("zcode",)
+
+class PendingDistributionSourceTests(unittest.TestCase):
+    def test_D_pending_passes_independent_source_check_and_tampered_receipt_fails(self):
+        case = FrozenPublicSourceTests()
+        case.setUp()
+        self.addCleanup(case.doCleanups)
+        pending = markets._public_files_at(case.root, case.installation)
+        current = markets.read_public_files(case.root)
+        for path in set(current) - set(pending):
+            (case.root / path).unlink()
+        case.write(pending)
+        result = markets.check_public_markets(case.root)
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["pending_distributions"], [{"product_id": "ai-one", "version": "1.0.0", "source_revision": case.source, "receipt": "published/staged/ai-one/1.0.0.json"}])
+        self.assertEqual(result["remote_release_verification"], "not_performed")
+        path = "published/staged/ai-one/1.0.0.json"
+        receipt = json.loads(pending[path])
+        receipt["plan_hash"] = "f" * 64
+        (case.root / path).write_bytes(io.dump_json(receipt))
+        with self.assertRaisesRegex(io.DataError, "reviewed original plan"):
+            markets.check_public_markets(case.root)
+        (case.root / path).unlink()
+        with self.assertRaisesRegex(io.DataError, "unknown, missing"):
+            markets.check_public_markets(case.root)

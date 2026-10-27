@@ -72,8 +72,8 @@ numbers are compared numerically, and a stable version follows all previews with
 the same core version. The release kind is derived from the version.
 
 `hosts` is required and must be nonempty. The supported values are currently
-`claude`, `codex`, and `zcode`. Every declared host must have an actual
-`adapters/<host>/plugin.json`.
+`claude`, `codex`, `zcode`, and `dsh`. Declare native templates at
+`adapters/<host>/plugin.json`, or `adapters/dsh/package.json` for DSH.
 
 Declared skills automatically contribute their `skills/<name>/SKILL.md`. Register
 reference documents, scripts, and additional resources used by skills in
@@ -120,7 +120,7 @@ For CodeVow, this declaration fragment uses its existing public PNG:
     "claude": {},
     "zcode": {
       "icon_path": "assets/codevow.png",
-      "icon_url": "https://raw.githubusercontent.com/Zack-Zz/ai-code/91dec3a64731f8de2fb68e49bce9f4228289bbbd/plugins/ai-code-workflow/assets/codevow.png"
+      "icon_url": "https://raw.githubusercontent.com/Zack-Zz/ai-code/91dec3a64731f8de2fb68e49bce9f4228289bbbd/plugins/codevow/assets/codevow.png"
     }
   }
 }
@@ -278,7 +278,7 @@ collecting and rechecking registered plugin inputs. Do not treat a plugin
 subdirectory as a new trust root that permits following links in parent
 directories.
 
-The build output `<output>/index.json` uses schema_version 2. It records each
+The build output `<output>/index.json` uses schema_version 3 when DSH is included (legacy builds use 2). It records each
 package's path and hash under plugins/ID/hosts/HOST and aggregate marketplaces
 under hosts/HOST. Each plugin's artifact retains its own identity and provenance.
 When changing one plugin, verify that sibling plugin contents and hashes are
@@ -293,7 +293,7 @@ python3 tooling/plugin_tool.py marketplace check --root .
 ```
 
 sync generates development marketplaces for registered source plugins across the
-three hosts in a temporary directory. check performs read-only verification of
+declared hosts in a temporary directory. check performs read-only verification of
 the public snapshot's frozen source S, installation contents, and fixed Codex
 distribution commit D. The stable version need not equal the current development
 version. `dist/` is ignored temporary build output and must not be committed or
@@ -334,3 +334,30 @@ configuration discovery, authentication, server startup, or tool invocation.
 Leave changes uncommitted on delivery. Provide a summary, diff, validation
 results, and remaining limitations for user Review. Commit, push, tag, merge, PR,
 installation, and publication retain their separate authorization boundaries.
+
+## DeepSeek Harness adapters
+
+Products with host-specific resources use product schema 2. Schema 1 remains
+readable for frozen source and unchanged plugins. Declare `dsh` in `hosts`, put
+its native template in `adapters/dsh/package.json`, and register patch, locale
+and other files with `host_resources.dsh` using the same explicit
+`source`/`target`/`include` contract as shared resources.
+
+The DSH manifest declares `type: module`, exact `engines.dsh`, package exports
+and `dsh.bundle.patch`. Name, version and exact packaged `files` are generated
+from trusted product inputs. Install lifecycle scripts and private bundles are
+rejected. Use `locale/en.json` and `locale/zh.json` with `meta.title` and
+`meta.description`, plus a packaged icon. Runtime acceptance is independent.
+
+Mount the official skill-filesystem provider at Host scope with a unique
+provider name, `includeDefaultRoots: false` and a package-resolved
+`bundledSkillDir`. Keep skills in shared resources. A data-only bundle does not
+need a custom module. CodeVow alone declares its Reviewer guard and generates
+`reviewer-persona.json` via the fixed `json-string` transform from the shared
+review contract; no arbitrary build hook is supported.
+
+DSH installers are npm TGZs with a `package/` root. Build output with DSH uses
+schema 3 and records `archive`, `archive_sha256`, `archive_format: npm-tgz`;
+legacy host ZIP entries retain their existing fields. The local DSH format-1
+index is a structural preview. Use native absolute-directory installation for
+local development; public Git entries are generated only after publication.

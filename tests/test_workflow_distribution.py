@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-PLUGIN = ROOT / "plugins/ai-code-workflow"
+PLUGIN = ROOT / "plugins/codevow"
 
 
 class WorkflowDistributionTests(unittest.TestCase):
@@ -24,14 +24,14 @@ class WorkflowDistributionTests(unittest.TestCase):
 
     def build(self):
         result = self.command(ROOT / "tooling/plugin_tool.py", "build", "--plugin",
-                              "ai-code-workflow", "--host", "all", "--output", self.dist)
+                              "codevow", "--host", "all", "--output", self.dist)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_public_packages_satisfy_the_workflow_specific_checker(self):
         self.build()
         for host in ("zcode", "codex"):
             with self.subTest(host=host):
-                package = self.dist / host / "ai-code-workflow"
+                package = self.dist / host / "codevow"
                 result = self.command(PLUGIN / "scripts/workflow_tool.py", "package", "check",
                                       "--path", package, "--host", host)
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -39,7 +39,7 @@ class WorkflowDistributionTests(unittest.TestCase):
 
     def test_packaged_tool_resolves_policies_and_creates_workspace_bound_tasks(self):
         self.build()
-        package = self.dist / "codex/ai-code-workflow"
+        package = self.dist / "codex/codevow"
         tool = package / "tools/workflow_tool.py"
         workspace = self.base / "project"
         workspace.mkdir()

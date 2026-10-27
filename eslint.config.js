@@ -24,5 +24,9 @@ module.exports = [
             'no-undef': 'error',
             'eqeqeq': 'warn'
         }
+    },
+    {
+        files: ['plugins/*/adapters/dsh/**/*.js', 'plugins/*/tests/dsh/**/*.mjs'],
+        languageOptions: { sourceType: 'module' }
     }
 ];

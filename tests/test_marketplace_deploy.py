@@ -108,7 +108,7 @@ class FullDeploymentTests(unittest.TestCase):
         product['repository'] = 'https://github.com/example/repo'
         write_json(plugin / 'product.json', product)
         source_config = Path(__file__).resolve().parents[1] / 'distribution.json'
-        (self.root / 'distribution.json').write_bytes(source_config.read_bytes())
+        write_json(self.root / 'distribution.json', dict(json.loads(source_config.read_text()), identity_replacements={}))
         accept_fixture(self.root, "ai-one")
         def git(*arguments):
             return subprocess.check_output(['git', *arguments], cwd=self.root, stderr=subprocess.DEVNULL, text=True).strip()
@@ -136,7 +136,7 @@ class FullDeploymentTests(unittest.TestCase):
             if name.startswith(('installers/', 'downloads/')):
                 self.payloads[Path(name).name] = raw
         self.release = {'id': 1, 'tag_name': 'ai-one/v1.0.0', 'draft': False, 'prerelease': False,
-            'html_url': 'https://github.com/example/repo/releases/tag/ai-one/v1.0.0', 'assets': []}
+            'html_url': 'https://github.com/example/repo/releases/tag/ai-one/v1.0.0', 'published_at': '2026-10-27T00:00:00Z', 'assets': []}
         for index, (name, raw) in enumerate(self.payloads.items(), 1):
             self.release['assets'].append({'id': index, 'name': name, 'size': len(raw),
                 'browser_download_url': 'https://github.com/example/repo/releases/download/ai-one/v1.0.0/' + name,
@@ -169,7 +169,9 @@ class FullDeploymentTests(unittest.TestCase):
                     raise io.ConflictError('stale fixture branch')
                 self.writes += 1
                 self.revision = str(self.writes) * 40
-                self.files = dict(files)
+                self.files = {name: raw for name, raw in self.files.items() if name not in removals}
+                self.files.update(files)
+                self.removals = list(removals)
                 self.revisions[self.revision] = dict(files)
                 return self.revision
         self.api = FakeGitHub()
@@ -184,6 +186,8 @@ class FullDeploymentTests(unittest.TestCase):
         result = self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit=self.sha)
         self.assertEqual(result['status'], 'marketplace_deployed')
         self.assertEqual(self.api.writes, 2)
+        self.assertEqual(self.api.removals, ['published/staged/ai-one/1.0.0.json'])
+        self.assertNotIn('published/staged/ai-one/1.0.0.json', self.api.files)
         market = json.loads(self.api.files['.agents/plugins/marketplace.json'])
         self.assertEqual(market['plugins'][0]['source']['sha'], '1' * 40)
 
@@ -249,7 +253,7 @@ class FullDeploymentTests(unittest.TestCase):
                          if name.startswith(('installers/', 'downloads/'))})
         release = {'id': 2, 'tag_name': self.tag, 'draft': False, 'prerelease': False,
             'html_url': 'https://github.com/example/repo/releases/tag/' + self.tag,
-            'assets': [{'id': number, 'name': name, 'size': len(value),
+            'published_at': '2026-10-27T01:00:00Z', 'assets': [{'id': number, 'name': name, 'size': len(value),
                 'browser_download_url': 'https://github.com/example/repo/releases/download/' + self.tag + '/' + name}
                 for number, (name, value) in enumerate(payloads.items(), 1)]}
         self.history[self.tag] = (self.sha, release, payloads)
@@ -263,10 +267,10 @@ class FullDeploymentTests(unittest.TestCase):
         self.call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit=self.sha)
         record_path = 'published/releases/ai-one/1.0.0.json'
         record = json.loads(self.api.files[record_path])
-        record['codex_revision'] = 'f' * 40
+        record['git_installs']['codex']['revision'] = 'f' * 40
         self.api.files[record_path] = io.dump_json(record)
         channel = json.loads(self.api.files['published/index.json'])
-        channel['plugins']['ai-one']['codex_revision'] = 'f' * 40
+        channel['plugins']['ai-one']['git_revisions']['codex'] = 'f' * 40
         self.api.files['published/index.json'] = io.dump_json(channel)
         market = json.loads(self.api.files['.agents/plugins/marketplace.json'])
         market['plugins'][0]['source']['sha'] = 'f' * 40
@@ -303,6 +307,23 @@ class FullDeploymentTests(unittest.TestCase):
         self.assertEqual(result.get('status'), 'published_pending_marketplace')
         self.assertEqual(result.get('distribution_revision'), '1' * 40)
         self.assertEqual(result.get('phase'), 'publishing_catalog')
+
+    def test_staged_recovery_rejects_changed_original_plan_bindings_before_any_write(self):
+        from plugin_tools.distribution import stage_files
+        plan = self.call()
+        self.api.publish('main', self.sha, stage_files(plan), 'stage fixture')
+        staged = dict(self.api.files)
+        receipt_path = 'published/staged/ai-one/1.0.0.json'
+        for field, changed in [('plan_hash', 'f' * 64), ('config_hash', 'f' * 64), ('base_commit', '0' * 40)]:
+            with self.subTest(field=field):
+                self.api.files = dict(staged)
+                receipt = json.loads(self.api.files[receipt_path])
+                receipt[field] = changed
+                self.api.files[receipt_path] = io.dump_json(receipt)
+                writes = self.api.writes
+                with self.assertRaises(io.DataError):
+                    self.call(action='plan')
+                self.assertEqual(self.api.writes, writes)
 
     def test_final_read_failure_reports_catalog_commit_without_claiming_acceptance(self):
         plan = self.call()
@@ -382,6 +403,20 @@ class MainGitWriterTests(unittest.TestCase):
             self.writer.publish('main', self.head, {'published/index.json': b'{}'}, 'stale')
         self.assertEqual(self.git('--git-dir', str(self.bare), 'rev-parse', 'main'), revision)
 
+    def test_writer_preserves_two_git_hosts_and_removes_only_consumed_receipt(self):
+        receipt = 'published/staged/ai-one/1.0.0.json'
+        files = {'published/codex/ai-one/1.0.0/plugin.json': b'{}',
+                 'published/dsh/ai-one/1.0.0/package.json': b'{}', receipt: b'{}'}
+        staged = self.writer.publish('main', self.head, files, 'stage both Git hosts')
+        final = {name: raw for name, raw in files.items() if name != receipt}
+        final['published/dsh/index.json'] = b'{"format":1,"plugins":[]}'
+        committed = self.writer.publish('main', staged, final, 'consume receipt', removals=[receipt])
+        self.assertEqual(self.git('--git-dir', str(self.bare), 'show', committed + ':published/dsh/ai-one/1.0.0/package.json'), '{}')
+        tree = self.git('--git-dir', str(self.bare), 'ls-tree', '-r', '--name-only', committed)
+        self.assertNotIn(receipt, tree.splitlines())
+        with self.assertRaises(io.DataError):
+            self.writer.publish('main', committed, {}, 'remove frozen installation', removals=['published/dsh/ai-one/1.0.0/package.json'])
+
     def test_writer_rejects_source_dist_old_branches_and_absent_main(self):
         for files in ({'README.md': b'overwrite'}, {'dist/package.zip': b'bytes'},
                       {'published/../README.md': b'escape'}, {'.git/config': b'bad'}):
@@ -418,3 +453,67 @@ class MainGitWriterTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class DshDeploymentTests(unittest.TestCase):
+    def test_four_host_bundle_stages_one_D_and_recovery_consumes_exact_receipt(self):
+        from tests.tooling.test_distribution import DshHostedMarketTests
+        case = DshHostedMarketTests()
+        case.setUp()
+        self.addCleanup(case.doCleanups)
+        module = implementation()
+        source = case.git('rev-parse', 'HEAD')
+        case.git('update-ref', 'refs/remotes/origin/main', source)
+        tag = 'ai-one/v1.0.1'
+        bundle = read_tree(case.case.output)
+        archive_name = 'ai-one-1.0.1-release-bundle.zip'
+        archive = zip_bytes(bundle)
+        payloads = {archive_name: archive, 'ai-one-1.0.1-release-bundle.sha256': f'{io.sha256(archive)}  {archive_name}\n'.encode()}
+        payloads.update({name: bundle[name] for name in ('release.json', 'release-notes.md', 'SHA256SUMS')})
+        payloads.update({Path(name).name: raw for name, raw in bundle.items() if name.startswith(('installers/', 'downloads/'))})
+        info = dict(case.release_info, assets=[dict(id=number, name=name, size=len(raw),
+            browser_download_url='https://github.com/Example/ai-code/releases/download/ai-one%2Fv1.0.1/' + name)
+            for number, (name, raw) in enumerate(payloads.items(), 1)])
+        class API:
+            repository = 'Example/ai-code'
+            revision = source
+            files = {}
+            calls = 0
+            fail_catalog = True
+            def tag(self, _):
+                return source
+            def release(self, _):
+                return info
+            def download(self, asset, _):
+                return payloads[asset['name']]
+            def market(self, _):
+                return self.revision, dict(self.files)
+            def publish(self, branch, expected, files, message, removals=()):
+                if expected != self.revision:
+                    raise io.ConflictError('concurrent fixture write')
+                if message.startswith('Deploy') and self.fail_catalog:
+                    raise io.ConflictError('fixture interruption after D')
+                self.calls += 1
+                self.revision = str(self.calls) * 40
+                self.files = dict(files)
+                self.removals = removals
+                return self.revision
+        api = API()
+        def call(**options):
+            return module.deploy(case.root, 'ai-one', tag, 'stable', api, writer=api, **options)
+        plan = call()
+        with self.assertRaises(module.DeploymentFailure):
+            call(action='deploy', expected_plan_hash=plan['plan_hash'], expected_market_commit=source)
+        receipt = 'published/staged/ai-one/1.0.1.json'
+        self.assertIn(receipt, api.files)
+        self.assertNotIn('published/dsh/index.json', api.files)
+        self.assertEqual(api.calls, 1)
+        api.fail_catalog = False
+        retry = call()
+        result = call(action='deploy', expected_plan_hash=retry['plan_hash'], expected_market_commit=api.revision)
+        self.assertEqual(result['status'], 'marketplace_deployed')
+        self.assertEqual(api.calls, 2)
+        self.assertEqual(api.removals, [receipt])
+        self.assertNotIn(receipt, api.files)
+        record = json.loads(api.files['published/releases/ai-one/1.0.1.json'])
+        self.assertEqual({item['revision'] for item in record['git_installs'].values()}, {'1' * 40})
+        self.assertEqual(json.loads(api.files['published/dsh/index.json'])['plugins'][0]['versions'][0]['source']['commit'], '1' * 40)

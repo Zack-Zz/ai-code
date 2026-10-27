@@ -1,6 +1,6 @@
 # CodeStack 图标制作记录
 
-正式图标为 [codestack.png](../plugins/ai-code-stack-standards/assets/codestack.png)，
+正式图标为 [codestack.png](../plugins/codestack/assets/codestack.png)，
 作为普通白名单资源供三宿主包共用。Codex 的 logo / composerIcon 引用本地 PNG；
 ZCode 的市场展示声明使用固定源码提交的 raw PNG 地址，沿用 CodeVow 的接入方式。
 

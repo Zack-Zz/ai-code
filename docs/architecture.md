@@ -13,9 +13,9 @@ ai-code/
   catalog.json                    Registered plugin directories
   distribution.json               Main marketplace and host transports
   plugins/
-    ai-code-workflow/             CodeVow
+    codevow/             CodeVow
     ai-agent-delegation/          Agent Delegation
-    ai-code-stack-standards/      CodeStack
+    codestack/      CodeStack
   tooling/plugin_tool.py          Shared CLI
   tooling/plugin_tools/           Validation, builds, checks and releases
   tests/                          Shared tests and the plugin test runner
@@ -59,7 +59,7 @@ reuse the public marketplace identity:
 |---|---|
 | `ai-code` | Public main marketplace |
 | `ai-code-local` | Shared builds and Release downloads with a local marketplace |
-| `ai-code-workflow-local` | CodeVow's standalone build helper; local trials only |
+| `codevow-local` | CodeVow's standalone build helper; local trials only |
 
 | Input or output | Purpose |
 |---|---|
@@ -138,3 +138,18 @@ user request; ordinary development and native subagents keep their usual behavio
 
 For runtime setup, see [Agent Bridge](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md).
 For plugin usage, see [Agent Delegation](../plugins/ai-agent-delegation/README.md).
+
+## Native DSH bundles and publication state
+
+`dsh` is a fourth plugin host, not an Agent Bridge engine. CodeStack contributes
+only a standard skill-filesystem provider. CodeVow adds a native spawn tool and
+independent Reviewer preset; its scoped guard restricts native tools and does
+not implement a second agent loop. Installed bundle metadata uses DSH locales.
+
+Current source IDs `codevow`/`codestack` are separate from the immutable old public
+records. Replacement mappings in trusted distribution configuration become
+permanent retirement facts only after a successful stable update. DSH native
+installation bytes live at `published/dsh/ID/VERSION/`; its plugin index is
+`published/dsh/index.json`. Schema-3 Git installations bind each host to an
+actual installation commit. A staged receipt makes the intermediate D state
+verifiable before the marketplace C update. Historical snapshots remain readable.

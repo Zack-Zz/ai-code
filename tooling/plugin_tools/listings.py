@@ -1,7 +1,8 @@
 """Opt-in host presentation, separate from plugin identity and native manifests."""
 
 import re
-from pathlib import PurePosixPath
+import subprocess
+from pathlib import Path, PurePosixPath
 from urllib.parse import quote, unquote
 
 from . import io
@@ -52,5 +53,29 @@ def validate_host_listings(spec):
         if source is None or PurePosixPath(target).suffix.lower() not in {".png", ".svg"} or \
                 PurePosixPath(source).suffix.lower() not in {".png", ".svg"}:
             raise DataError("host_listings.zcode.icon_path must name a registered PNG/SVG resource")
-        validate_icon_url(listing["icon_url"], spec.manifest["repository"],
-                          source_path=f"{spec.catalog_path}/{source}" if spec.catalog_path else source)
+        expected_path = f"{spec.catalog_path}/{source}" if spec.catalog_path else source
+        try:
+            validate_icon_url(listing["icon_url"], spec.manifest["repository"], source_path=expected_path)
+        except DataError:
+            # A renamed product can retain an immutable historical image URL,
+            # but only when its actual Git blob equals the registered image.
+            validate_icon_url(listing["icon_url"], spec.manifest["repository"])
+            if spec.manifest["schema_version"] != 2 or spec.boundary_root is None:
+                raise
+            prefix = "https://raw.githubusercontent.com/" + spec.manifest["repository"].removeprefix("https://github.com/").removesuffix(".git").rstrip("/") + "/"
+            revision, path = listing["icon_url"][len(prefix):].split("/", 1)
+            verified = False
+            # Source snapshots used for independent checking do not contain a
+            # .git directory. The trusted validator's repository may supply the
+            # same content-addressed historical object without changing it.
+            for git_root in dict.fromkeys((spec.boundary_root, Path(__file__).resolve().parents[2])):
+                try:
+                    blob = subprocess.run(["git", "show", f"{revision}:{unquote(path)}"], cwd=git_root,
+                                          capture_output=True, timeout=15)
+                except (OSError, subprocess.TimeoutExpired):
+                    continue
+                if blob.returncode == 0 and blob.stdout == spec.inputs[source]:
+                    verified = True
+                    break
+            if not verified:
+                raise DataError("historical icon URL does not match the trusted image bytes")

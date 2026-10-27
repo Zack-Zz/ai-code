@@ -2,19 +2,25 @@
 
 English | [简体中文](installation.zh-CN.md)
 
+> Source candidate: CodeVow now uses `codevow` (2.0.0) and CodeStack uses
+> `codestack` (0.2.0), including a `dsh` adapter. This change is not published yet.
+> The frozen published snapshot still determines what can be installed today.
+> Use the new-ID commands below after those entries appear in the marketplace.
+> See the [identity migration](migrations/2026-10-27-plugin-identities.md).
+
 Install published plugins through Claude Code, Codex or ZCode. The repository's
-current [release record](../published/index.json) and three host marketplace
+current [release record](../published/index.json) and host marketplace
 manifests determine stable availability and versions; refresh your host's listing
 before installation. CodeVow and CodeStack share `ai-code` and are independent:
 
 | Plugin | ID | Purpose | Stable marketplace |
 |---|---|---|---|
-| [CodeVow](../plugins/ai-code-workflow/README.md) | `ai-code-workflow` | Planning, TDD, debugging, review and verification | See current release record |
+| [CodeVow](../plugins/codevow/README.md) | `codevow` | Planning, TDD, debugging, review and verification | See current release record |
 | [Agent Delegation](../plugins/ai-agent-delegation/README.md) | `ai-agent-delegation` | Handoff to an independent coding assistant session | Not yet published |
-| [CodeStack](../plugins/ai-code-stack-standards/README.md) | `ai-code-stack-standards` | Selected Java, data-access and multilingual frontend conventions | See current release record |
+| [CodeStack](../plugins/codestack/README.md) | `codestack` | Selected Java, data-access and multilingual frontend conventions | See current release record |
 
 The commands below install CodeVow. To install CodeStack, use
-`ai-code-stack-standards@ai-code` in the same host's install command, or select
+`codestack@ai-code` in the same host's install command, or select
 CodeStack in its marketplace UI after refreshing. You may install either plugin
 or both. Agent Delegation remains source-only and is not yet listed for stable
 installation. See the [development guide](../CONTRIBUTING.md) for source development.
@@ -38,6 +44,7 @@ Each host has its own marketplace manifest and installation source:
 | Codex | GitHub repository at `main` | `.agents/plugins/marketplace.json` | `git-subdir` |
 | Claude Code | Direct manifest URL, or GitHub repository at `main` | `.claude-plugin/marketplace.json` | `archive` |
 | ZCode | Direct manifest URL | `marketplace.json` | `url` with `type: zip` |
+| DeepSeek Harness | Explicit native plugin index | `published/dsh/index.json` | Fixed Git bundle or downloaded TGZ |
 
 ### Codex
 
@@ -48,7 +55,7 @@ GitHub source, refresh its listing, then install CodeVow.
 ```sh
 codex plugin marketplace add Zack-Zz/ai-code --ref main
 codex plugin marketplace upgrade ai-code
-codex plugin add ai-code-workflow@ai-code
+codex plugin add codevow@ai-code
 ```
 
 Check the plugin's status with:
@@ -74,7 +81,7 @@ CodeVow for your user on this machine:
 ```sh
 claude plugin marketplace add https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
 claude plugin marketplace update ai-code
-claude plugin install ai-code-workflow@ai-code --scope user
+claude plugin install codevow@ai-code --scope user
 claude plugin list
 ```
 
@@ -117,7 +124,7 @@ Use the direct URL for this repository. ZCode's Git import can select
 does not support. The root manifest uses ZCode's `url` / `type: zip` source.
 
 If you already added the repository and see
-`Plugin source is invalid or unsupported for ai-code-workflow@ai-code: archive`,
+`Plugin source is invalid or unsupported for codevow@ai-code: archive`,
 remove that `ai-code` source in the marketplace-source panel, add the direct URL
 above, and refresh it before opening the plugin details or installing.
 
@@ -129,8 +136,8 @@ to register the source, refresh its listing, install and enable CodeVow:
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace add \
   https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace update ai-code
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install ai-code-workflow@ai-code
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins enable ai-code-workflow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins install codevow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins enable codevow@ai-code
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins list
 ```
 
@@ -140,7 +147,49 @@ installed elsewhere. On other platforms, use the desktop steps above.
 After installation in any host, start a new session. Your host continues to
 manage the account and selected model.
 
+## DeepSeek Harness
+
+The `dsh` adapter targets the standard Web profile and declares `engines.dsh`
+`0.2.1-rc.2`; real host acceptance is still pending. CodeVow needs the native
+Agent Preset service and spawn backend. Minimal/SDK/ACP profiles are outside the
+initial support scope. Package installation alone does not prove activation.
+
+Use an unused profile name for a local trial. The first command creates a Web
+profile and prints its composed configuration; it must not replace an existing
+profile containing your settings. After downloading the matching Release TGZ:
+
+```sh
+dsh --profile ai-code-trial --from-default-profile web --dump-config
+dsh plugin --profile ai-code-trial add ./codevow-2.0.0-dsh-plugin.tgz
+dsh plugin --profile ai-code-trial add ./codestack-0.2.0-dsh-plugin.tgz
+dsh --profile ai-code-trial --dump-config
+dsh --profile ai-code-trial
+```
+
+For a source trial, replace the TGZ argument with the absolute built package
+directory, such as `/private/tmp/ai-code-packages/dsh/codevow`. No install-time
+build scripts are supplied. Use `/workflow` or `/code-standards` in a new session;
+references remain inside each installed bundle. CodeStack has no custom runtime.
+CodeVow uses native spawn for its read-only Reviewer and existing Python tools.
+
+After stable publication, enable Harness's optional **Custom plugin index**
+bundle and add the `published/dsh/index.json` raw HTTPS URL from this repository.
+This is an explicit index source, not an automatically discovered repository
+manifest. Confirm the fixed Git commit and bundle subdirectory shown by Harness
+before installing. Direct TGZ/directory installation does not need this feature.
+The index lists stable releases only.
+
+For Git installation, use the exact commit and subdirectory generated in the
+published index, never the source repository root. The Git bundle is prebuilt.
+Git-installed bundles follow the host's uninstall/reinstall update procedure.
+For removal use `dsh plugin --profile ai-code-trial remove codevow` (or
+`codestack`); restart where HMR is unavailable. No custom installer or cache edit
+is required.
+
 ## Downloaded package installation
+
+These ZIP marketplace steps apply to Claude Code, Codex and ZCode. Harness uses
+the native TGZ/profile procedure above.
 
 Open [GitHub Releases](https://github.com/Zack-Zz/ai-code/releases), choose the
 published plugin's Release, and select the file for your host: `claude`, `codex`
@@ -169,8 +218,8 @@ Select the registered source and install the plugin. Local downloads use
 `ai-code-local`; use the name declared in the extracted marketplace. For example:
 
 ```sh
-claude plugin install ai-code-workflow@ai-code-local
-codex plugin add ai-code-workflow@ai-code-local
+claude plugin install codevow@ai-code-local
+codex plugin add codevow@ai-code-local
 ```
 
 `-plugin.zip` archives serve marketplace distribution. For manual local
@@ -186,14 +235,14 @@ Claude Code:
 
 ```sh
 claude plugin marketplace update ai-code
-claude plugin update ai-code-workflow@ai-code --scope user
+claude plugin update codevow@ai-code --scope user
 ```
 
 ZCode on macOS:
 
 ```sh
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins marketplace update ai-code
-node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins update ai-code-workflow@ai-code
+node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins update codevow@ai-code
 ```
 
 For Codex, run `codex plugin marketplace upgrade ai-code`, then check the
@@ -230,6 +279,6 @@ Installing a plugin does not install its dependencies.
 
 ## Next steps
 
-- [CodeVow usage and configuration](../plugins/ai-code-workflow/docs/usage.md)
+- [CodeVow usage and configuration](../plugins/codevow/docs/usage.md)
 - [Agent Delegation examples](../plugins/ai-agent-delegation/README.md)
-- [CodeStack scope and marketplace availability](../plugins/ai-code-stack-standards/README.md)
+- [CodeStack scope and marketplace availability](../plugins/codestack/README.md)

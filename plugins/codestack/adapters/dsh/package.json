@@ -1,0 +1,21 @@
+{
+  "type": "module",
+  "description": "Selected coding conventions for the current change or review",
+  "license": "MIT",
+  "exports": {
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "icon": "./assets/codestack-dsh.png",
+  "engines": {
+    "dsh": "0.2.1-rc.2"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-skill-filesystem": "0.2.1-rc.2"
+  }
+}

@@ -2,6 +2,11 @@
 
 [English](README.md) | 简体中文
 
+> 当前源码候选：CodeVow 使用 `codevow`（2.0.0），CodeStack 使用
+> `codestack`（0.2.0），新增 `dsh` 适配。本次改动尚未发布，实际可安装版本仍由
+> 冻结的 published 快照决定。以下新 ID 命令须在市场出现新入口后使用。
+> 重新安装步骤见[身份迁移](docs/migrations/2026-10-27-plugin-identities.zh-CN.md)。
+
 ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 ZCode 中
 规划任务、开发代码、审查改动，以及与其他编码助手协作。
 
@@ -12,9 +17,9 @@ ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 Z
 
 | 插件 | 用途 | 使用说明 |
 |---|---|---|
-| **CodeVow** | 规划改动、测试驱动开发、排查问题、审查代码与验证结果 | [CodeVow](plugins/ai-code-workflow/README.zh-CN.md) |
+| **CodeVow** | 规划改动、测试驱动开发、排查问题、审查代码与验证结果 | [CodeVow](plugins/codevow/README.zh-CN.md) |
 | **Agent Delegation** | 将任务交给独立的 Claude Code、Codex 或 ZCode 会话，并收回结果；需要 Agent Bridge | [Agent Delegation](plugins/ai-agent-delegation/README.zh-CN.md) |
-| **CodeStack** | 为当前改动或审查应用精选的 Java、数据访问和多语言前端约定 | [CodeStack](plugins/ai-code-stack-standards/README.zh-CN.md) |
+| **CodeStack** | 为当前改动或审查应用精选的 Java、数据访问和多语言前端约定 | [CodeStack](plugins/codestack/README.zh-CN.md) |
 
 | 目录或文件 | 内容 |
 |---|---|
@@ -30,7 +35,7 @@ ai-code 是一个 AI 编码插件项目，帮助你在 Claude Code、Codex 和 Z
 通过 ai-code 插件市场安装，或从 GitHub Release 下载对应编码助手的安装包。
 插件市场名为 `ai-code`，来源是 `Zack-Zz/ai-code` 的 `main` 分支。
 正式可用版本以仓库当前的[发行记录](published/index.json)和三宿主市场清单为准。
-**CodeVow**（`ai-code-workflow`）与 **CodeStack**（`ai-code-stack-standards`）
+**CodeVow**（`codevow`）与 **CodeStack**（`codestack`）
 共享同一个市场，分别安装、分别发布。选择插件前先在宿主中刷新市场。
 Agent Delegation 当前只有源码，尚未进入正式市场。
 
@@ -42,7 +47,7 @@ Agent Delegation 当前只有源码，尚未进入正式市场。
 ```sh
 codex plugin marketplace add Zack-Zz/ai-code --ref main
 codex plugin marketplace upgrade ai-code
-codex plugin add ai-code-workflow@ai-code
+codex plugin add codevow@ai-code
 ```
 
 ### Claude Code CLI 快速开始
@@ -52,7 +57,7 @@ codex plugin add ai-code-workflow@ai-code
 ```sh
 claude plugin marketplace add https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
 claude plugin marketplace update ai-code
-claude plugin install ai-code-workflow@ai-code --scope user
+claude plugin install codevow@ai-code --scope user
 ```
 
 安装后重新开启会话，或在 Claude Code 会话内执行 `/reload-plugins`。
@@ -69,11 +74,17 @@ macOS 内置 CLI 的完整命令见 [ZCode 安装指南](docs/installation.zh-CN
 完整安装步骤和插件用法见以下指南：
 
 - [安装指南](docs/installation.zh-CN.md)：Claude Code、Codex、ZCode 的完整市场注册与安装步骤、下载包安装、更新、卸载及故障处理。
-- [CodeVow 使用说明](plugins/ai-code-workflow/README.zh-CN.md)：任务示例、协作模式和项目配置。
+- [CodeVow 使用说明](plugins/codevow/README.zh-CN.md)：任务示例、协作模式和项目配置。
 - [Agent Delegation 使用说明](plugins/ai-agent-delegation/README.zh-CN.md)：依赖准备、任务派发、续接和取消。
-- [CodeStack 使用说明](plugins/ai-code-stack-standards/README.zh-CN.md)：支持的规则范围、自动选择和市场可用状态。
+- [CodeStack 使用说明](plugins/codestack/README.zh-CN.md)：支持的规则范围、自动选择和市场可用状态。
 
 安装后新建会话，告诉编码助手你要完成什么任务。
+
+### DeepSeek Harness
+
+当前源码候选提供两个标准 DSH bundle，通过原生 profile、TGZ 或固定 Git 安装。
+步骤见 [Harness 安装说明](docs/installation.zh-CN.md#deepseek-harness)。正式发布后
+才会生成稳定索引；真实宿主验收与包检查分别报告。
 
 ## 开发与贡献
 
@@ -102,4 +113,4 @@ Agent Delegation 负责你明确要求的独立会话任务；CodeStack 提供�
 
 [MIT](LICENSE)，另见 [NOTICE](NOTICE)。仓库早期历史派生自 Affaan Mustafa
 的 ai-code。CodeVow 演进自 backend-engineering-lite，其许可证保留在
-[插件目录](plugins/ai-code-workflow/LICENSES/backend-engineering-lite.txt)。
+[插件目录](plugins/codevow/LICENSES/backend-engineering-lite.txt)。

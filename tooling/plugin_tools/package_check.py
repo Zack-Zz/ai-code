@@ -110,8 +110,10 @@ def check_package(package_root, host, spec):
         problems.append(f"extra active file outside trusted closure: {relative}")
     try:
         market, _ = io.read_json(package_root.parent, marketplace_path(host))
-        fields = {"name", "plugins", "owner"} if host == "claude" else {"name", "plugins"}
-        if not isinstance(market, dict) or set(market) != fields or market["name"] != "ai-code-local":
+        fields = {"format", "title", "plugins"} if host == "dsh" else ({"name", "plugins", "owner"} if host == "claude" else {"name", "plugins"})
+        valid_identity = isinstance(market, dict) and ((market.get("format") == 1 and type(market.get("format")) is int and
+                          market.get("title") == {"en": "ai-code-local", "zh": "ai-code 本地开发"}) if host == "dsh" else market.get("name") == "ai-code-local")
+        if not isinstance(market, dict) or set(market) != fields or not valid_identity:
             raise DataError("marketplace must be ai-code-local with native fields")
         if host == "claude" and market["owner"] != {"name": "ai-code"}:
             raise DataError("Claude marketplace owner must be the ai-code collection")

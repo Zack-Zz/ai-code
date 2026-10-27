@@ -1,4 +1,4 @@
-"""Committed distribution checks support actual public and workflow three-host builds."""
+"""Committed distribution checks support actual public and workflow four-host builds."""
 
 import json
 import hashlib
@@ -21,7 +21,7 @@ class ReleaseDistributionTests(unittest.TestCase):
         cls.addClassCleanup(cls.temp.cleanup)
         cls.base = Path(cls.temp.name)
         for name, tool in (("public", ROOT / "tooling/plugin_tool.py"),
-                           ("standalone", ROOT / "plugins/ai-code-workflow/scripts/workflow_tool.py")):
+                           ("standalone", ROOT / "plugins/codevow/scripts/workflow_tool.py")):
             command = [sys.executable, str(tool), "build"]
             if name == "public":
                 command.append("--all")
@@ -43,22 +43,22 @@ class ReleaseDistributionTests(unittest.TestCase):
         return subprocess.run([sys.executable, str(CHECKER), "--committed", str(committed),
                                "--fresh", str(fresh)], capture_output=True, text=True)
 
-    def test_public_three_host_distribution_passes_with_claude_native_market(self):
+    def test_public_four_host_distribution_passes_with_claude_native_market(self):
         committed, fresh = self.copied("public")
         index = json.loads((committed / "index.json").read_text())
-        self.assertEqual(set(index["hosts"]), {"claude", "codex", "zcode"})
+        self.assertEqual(set(index["hosts"]), {"claude", "codex", "zcode", "dsh"})
         self.assertTrue((committed / "claude/.claude-plugin/marketplace.json").is_file())
         result = self.check(committed, fresh)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_standalone_three_host_distribution_passes(self):
+    def test_standalone_four_host_distribution_passes(self):
         committed, fresh = self.copied("standalone")
         index = json.loads((committed / "index.json").read_text())
-        self.assertEqual(set(index["hosts"]), {"claude", "codex", "zcode"})
+        self.assertEqual(set(index["hosts"]), {"claude", "codex", "zcode", "dsh"})
         result = self.check(committed, fresh)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_two_host_declared_distribution_subset_remains_valid(self):
+    def test_declared_distribution_subset_remains_valid(self):
         for kind in ("public", "standalone"):
             with self.subTest(kind=kind):
                 committed, fresh = self.copied(kind)
@@ -97,7 +97,7 @@ class ReleaseDistributionTests(unittest.TestCase):
                     payload = (json.dumps(market, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode()
                     market_path.write_bytes(payload)
                     market_entry["marketplace_sha256"] = hashlib.sha256(payload).hexdigest()
-                    package_entry = market_entry if kind == "standalone" else index["plugins"]["ai-code-workflow"]["hosts"]["claude"]
+                    package_entry = market_entry if kind == "standalone" else index["plugins"]["codevow"]["hosts"]["claude"]
                     zipped = root / package_entry["zip"]
                     with zipfile.ZipFile(zipped) as source:
                         members = [(item, source.read(item)) for item in source.infolist()]

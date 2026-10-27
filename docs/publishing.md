@@ -37,8 +37,8 @@ The local helper reads a nonempty UTF-8 Markdown body with `### English` and
 From the repository root, preview first, then apply the local edits:
 
 ```sh
-python3 tooling/plugin_tool.py release prepare-version --plugin ai-code-workflow --version 1.0.3 --notes-file /private/tmp/codevow-1.0.3-notes.md
-python3 tooling/plugin_tool.py release prepare-version --plugin ai-code-workflow --version 1.0.3 --notes-file /private/tmp/codevow-1.0.3-notes.md --apply
+python3 tooling/plugin_tool.py release prepare-version --plugin codevow --version 1.0.3 --notes-file /private/tmp/codevow-1.0.3-notes.md
+python3 tooling/plugin_tool.py release prepare-version --plugin codevow --version 1.0.3 --notes-file /private/tmp/codevow-1.0.3-notes.md --apply
 ```
 
 The default command writes nothing. `--apply` updates only the selected plugin's
@@ -79,9 +79,9 @@ python3 tooling/plugin_tool.py validate --all
 PYTHONDONTWRITEBYTECODE=1 npm test
 npm run lint
 python3 .github/scripts/check_no_dist.py --root .
-python3 tooling/plugin_tool.py release check --plugin ai-code-workflow --mode draft
-python3 tooling/plugin_tool.py release prepare --plugin ai-code-workflow --mode draft --output /private/tmp/codevow-release
-python3 tooling/plugin_tool.py release verify --plugin ai-code-workflow --path /private/tmp/codevow-release
+python3 tooling/plugin_tool.py release check --plugin codevow --mode draft
+python3 tooling/plugin_tool.py release prepare --plugin codevow --mode draft --output /private/tmp/codevow-release
+python3 tooling/plugin_tool.py release verify --plugin codevow --path /private/tmp/codevow-release
 ```
 
 Output directories must be absent or empty. `verify` independently rebuilds the
@@ -103,7 +103,7 @@ on **main**. There are two inputs:
 
 | Input | Choices |
 |---|---|
-| `plugin` | `ai-code-workflow`, `ai-agent-delegation`, `ai-code-stack-standards` |
+| `plugin` | `codevow`, `ai-agent-delegation`, `codestack` |
 | `operation` | `build`, `publish` |
 
 Version and notes come from the committed plugin source. There is no source-tag,
@@ -169,3 +169,42 @@ If publication itself is uncertain or uploads are incomplete, inspect the remote
 state before retrying; never overwrite assets, move tags, or force push. A run is
 complete only after its Release and, for stable versions, marketplace records
 read back consistently. Host installation and runtime acceptance remain separate.
+
+## DSH artifacts and identity replacement
+
+The unreleased source IDs are `codevow` and `codestack`. Their first candidate
+versions are 2.0.0 and 0.2.0. Existing public records keep their old identities
+until a verified replacement release is synchronized. Do not edit `published/`
+or marketplace manifests to simulate that transition.
+
+A bundle containing DSH requires release schema 3 and package index schema 3.
+Both source-bound and historical verification reject older schema declarations
+for DSH; legacy release formats remain valid only for products without DSH.
+Its native asset is
+`installers/ID-VERSION-dsh-plugin.tgz`; its qualified download is
+`downloads/ID-VERSION-dsh.tgz`. Other hosts keep ZIPs. The installer has the npm
+`package/` prefix and no local index or install script. Native Git installation
+uses the same files under `published/dsh/ID/VERSION/`. The public format-1 plugin
+index lives at `published/dsh/index.json`, with a fixed commit, subdirectory,
+actual Unix-seconds publish time and matching engines. Preview releases never
+enter this index.
+
+Distribution schema 3 records `git_installs` separately for Codex and DSH.
+The first marketplace commit D contains exact installation files and a closed
+`published/staged/ID/VERSION.json` receipt. Public checking verifies this pending
+state against its frozen source and original plan; orphan directories are
+rejected. Commit C binds the actual D, updates pointers and all native listings,
+then consumes the staged receipt. Remote Release verification remains a distinct
+check; an offline source check does not claim it has read remote assets.
+
+`published/index.json` schema 3 separates active `plugins` and permanent
+`retired` old-to-new mappings. A stable replacement retires only its own old ID
+in the same successful update. Historical records, tags and installation bytes
+are not rewritten. Lock schema 2 hashes four listing files and separately hashes
+the published index. Legacy schema-2 records and schema-1 receipts are verified
+without rewriting their bytes. Failed publication leaves old active entries
+usable; a completed retirement is repaired with a higher version of the new ID.
+
+Real DSH Web-profile loading, explicit/automatic skill invocation, reference
+reading, Reviewer restrictions, long conversations and lifecycle still require
+separate evidence. See the [migration guide](migrations/2026-10-27-plugin-identities.md).

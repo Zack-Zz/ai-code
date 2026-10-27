@@ -109,7 +109,7 @@ If all declared hosts have completed byte-bound acceptance, run in a local sourc
 tree that retains the private records and logs:
 
 ```sh
-python3 tooling/plugin_tool.py release acceptance-export --plugin ai-code-workflow
+python3 tooling/plugin_tool.py release acceptance-export --plugin codevow
 ```
 
 The exporter reads and verifies every record and actual log. Any pending host,
@@ -145,3 +145,15 @@ to commit, push, tag, publish, deploy, install, or submit to an official directo
 The authorized Actions publication still uses `plugin-release` and
 `plugin-marketplace`; configured environment reviewers may pause the run. See the
 [publishing process](publishing.md).
+
+## DSH and renamed identities
+
+The new products declare `claude`, `codex`, `zcode` and `dsh` acceptance slots.
+Keep a DSH slot null until actual matching-version/profile evidence exists.
+Record native bundle loading separately from TGZ integrity, invocation, lifecycle,
+read-only Reviewer tool enforcement and workspace isolation. Guard unit tests do
+not establish a real host restriction.
+
+Renaming IDs and changing shared skill structure invalidate source/package hash
+bindings. Keep old private material and immutable public history; use the version
+preparation preview to reset stale references rather than relabel old evidence.

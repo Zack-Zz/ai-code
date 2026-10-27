@@ -26,6 +26,8 @@ INITIALIZE_PATH = ".marketplace-initialize.json"
 
 def _project_market(specs, host):
     data = marketplace([spec for spec in specs if host in spec.hosts], host)
+    if host == "dsh":
+        return data
     for entry in data["plugins"]:
         source = f"./dist/{host}/{entry['name']}"
         if host == "codex":
@@ -49,8 +51,8 @@ def _dist_files(root, relative="dist"):
 def _validate_dist(root, specs):
     index, raw = io.read_json(root, "dist/index.json")
     fields = {"schema_version", "plugins", "hosts", "source_revision", "working_tree_dirty"}
-    if not isinstance(index, dict) or set(index) != fields or type(index["schema_version"]) is not int or index["schema_version"] != 2:
-        raise DataError("dist/index.json must match distribution schema 2")
+    if not isinstance(index, dict) or set(index) != fields or type(index["schema_version"]) is not int or index["schema_version"] not in (2, 3):
+        raise DataError("dist/index.json must match distribution schema 2 or 3")
     identities = {spec.product_id for spec in specs}
     hosts = {host for spec in specs for host in spec.hosts}
     if not isinstance(index["plugins"], dict) or set(index["plugins"]) != identities:
@@ -77,11 +79,15 @@ def _validate_dist(root, specs):
         for host in spec.hosts:
             entry = plugin["hosts"][host]
             package_rel = f"dist/{host}/{spec.product_id}"
-            archive_rel = f"dist/{host}/{spec.product_id}-{spec.version}.zip"
-            required = {"package_dir", "package_content_hash", "zip", "zip_sha256", "files_count"}
+            archive_key = "archive" if host == "dsh" else "zip"
+            suffix = "tgz" if host == "dsh" else "zip"
+            archive_rel = f"dist/{host}/{spec.product_id}-{spec.version}.{suffix}"
+            required = {"package_dir", "package_content_hash", archive_key, archive_key + "_sha256", "files_count"}
+            if host == "dsh":
+                required.add("archive_format")
             if (not isinstance(entry, dict) or set(entry) != required or
                     entry["package_dir"] != package_rel.removeprefix("dist/") or
-                    entry["zip"] != archive_rel.removeprefix("dist/")):
+                    entry[archive_key] != archive_rel.removeprefix("dist/") or host == "dsh" and entry["archive_format"] != "npm-tgz"):
                 raise DataError(f"invalid distribution package/archive path: {spec.product_id}/{host}")
             package = io.member(root, package_rel, directory=True)
             report = check_package(package, host, spec)
@@ -100,9 +106,13 @@ def _validate_dist(root, specs):
                 "content_hash": report["content_hash"],
             }
             payload = io.read_file(root, archive_rel)
-            if io.sha256(payload) != entry["zip_sha256"]:
+            if io.sha256(payload) != entry[archive_key + "_sha256"]:
                 raise DataError(f"distribution archive checksum mismatch: {spec.product_id}/{host}")
-            _verify_zip(BytesIO(payload), spec, host, trusted_artifact)
+            if host == "dsh":
+                from .archives import verify_installer
+                verify_installer(payload, dict(trusted_files, **{"artifact.json": io.dump_json(trusted_artifact)}), spec.product_id, host)
+            else:
+                _verify_zip(BytesIO(payload), spec, host, trusted_artifact)
             validated.update({f"{package_rel}/{relative}": content for relative, content in trusted_files.items()})
             validated[f"{package_rel}/artifact.json"] = io.dump_json(trusted_artifact)
             validated[archive_rel] = payload
@@ -307,17 +317,22 @@ def _source_snapshot(root, record, destination):
     return load_catalog(destination)[0]
 
 
-def verify_public_sources(root, records, files):
+def verify_public_sources(root, records, files, *, staged=False, tip="HEAD"):
     """Independently bind records to actual Git source and pinned installation bytes."""
-    from .release.layout import package_outputs, zip_bytes
-    from .rendering import marketplace_entry
+    from .release.layout import package_outputs
+    from .archives import installer_bytes
+    from .distribution import git_installs, _git_prefix, _source_entry
     for record in records.values():
-        _git_read(root, "merge-base", "--is-ancestor", record["source_revision"], "HEAD")
+        _git_read(root, "merge-base", "--is-ancestor", record["source_revision"], tip)
         if _git_read(root, "rev-parse", record["tag"] + "^{commit}").decode().strip() != record["source_revision"]:
             raise DataError("published source tag moved")
-        if record["codex_revision"] is not None:
-            prefix = f"published/codex/{record['product_id']}/{record['version']}/"
-            entries = _git_read(root, "ls-tree", "-r", "-z", record["codex_revision"], "--", prefix).split(b"\0")
+        for host, install in git_installs(record).items():
+            if install["revision"] is None:
+                if staged:
+                    continue
+                raise DataError("formal Git installation revision cannot be null")
+            prefix = _git_prefix(host, record["product_id"], record["version"])
+            entries = _git_read(root, "ls-tree", "-r", "-z", install["revision"], "--", prefix).split(b"\0")
             pinned = {}
             for entry in entries:
                 if not entry:
@@ -325,18 +340,15 @@ def verify_public_sources(root, records, files):
                 metadata, path = entry.split(b"\t", 1)
                 mode, kind, blob = metadata.split()
                 if mode not in (b"100644", b"100755") or kind != b"blob":
-                    raise DataError("pinned Codex package contains a nonregular file")
-                name = path.decode()
-                pinned[name] = _git_read(root, "cat-file", "blob", blob.decode())
-            if pinned != {name: files[name] for name in record["codex_files"]}:
-                raise DataError("pinned Codex commit differs from its public record")
+                    raise DataError("pinned Git package contains a nonregular file")
+                pinned[path.decode()] = _git_read(root, "cat-file", "blob", blob.decode())
+            if pinned != {name: files[name] for name in install["files"]}:
+                raise DataError("pinned Git commit differs from its public record")
         with tempfile.TemporaryDirectory(prefix="ai-published-source-") as temporary:
             snapshot = Path(temporary)
             spec = _source_snapshot(root, record, snapshot)
             if spec.version != record["version"] or spec.source_tree_hash != record["source_tree_hash"] or set(spec.hosts) != set(record["hosts"]):
                 raise DataError("published identity/version/hosts/hash differs from frozen source")
-            # Technical publication may leave hosts pending. Evidence paths do
-            # not establish acceptance, and public checks never reread private logs.
             release_config, _ = io.read_json(spec.root, "release.json")
             acceptance = release_config.get("acceptance")
             if not isinstance(acceptance, dict) or set(acceptance) != set(spec.hosts):
@@ -347,27 +359,64 @@ def verify_public_sources(root, records, files):
                         raise DataError(f"published accepted host lacks frozen evidence reference: {host}")
                 else:
                     io.relative_path(path, what=f"frozen {host} evidence path")
-            outputs = package_outputs(spec, {"source_revision": record["source_revision"],
-                                              "working_tree_dirty": False})
+            outputs = package_outputs(spec, {"source_revision": record["source_revision"], "working_tree_dirty": False})
             for host in spec.hosts:
-                entry = marketplace_entry(spec, host)
-                del entry["source"]
+                entry = _source_entry(spec, host)
                 artifact = io.parse_json(outputs[f"{host}/{spec.product_id}/artifact.json"], what="source artifact")
                 if entry != record["hosts"][host]["entry"] or artifact["content_hash"] != record["hosts"][host]["package_content_hash"]:
                     raise DataError("published metadata/package hash differs from frozen source")
                 base = f"{host}/{spec.product_id}/"
-                installer = zip_bytes({f"{spec.product_id}/{name.removeprefix(base)}": raw
-                    for name, raw in outputs.items() if name.startswith(base)})
+                native_files = {name.removeprefix(base): raw for name, raw in outputs.items() if name.startswith(base)}
+                installer = installer_bytes(native_files, spec.product_id, host)
                 asset = record["hosts"][host]["asset"]
                 if asset["sha256"] != io.sha256(installer) or asset["size"] != len(installer):
                     raise DataError("published installer digest/size differs from frozen source")
-            if "codex" in spec.hosts:
-                original = f"codex/{spec.product_id}/"
-                published = f"published/codex/{spec.product_id}/{spec.version}/"
-                expected = {published + name.removeprefix(original): raw
-                            for name, raw in outputs.items() if name.startswith(original)}
-                if expected != {name: files[name] for name in record["codex_files"]}:
-                    raise DataError("public Codex package differs from frozen source")
+                if host in git_installs(record):
+                    published = _git_prefix(host, spec.product_id, spec.version)
+                    expected = {published + name: raw for name, raw in native_files.items()}
+                    if expected != {name: files[name] for name in git_installs(record)[host]["files"]}:
+                        raise DataError("public Git package differs from frozen source")
+
+
+def _public_files_at(root, revision):
+    from .distribution import in_scope
+    entries = _git_read(root, "ls-tree", "-r", "-z", revision).split(b"\0")
+    result = {}
+    for entry in entries:
+        if not entry:
+            continue
+        metadata, raw_path = entry.split(b"\t", 1)
+        path = raw_path.decode()
+        if not in_scope(path):
+            continue
+        mode, kind, blob = metadata.split()
+        if mode not in (b"100644", b"100755") or kind != b"blob":
+            raise DataError("publication base contains nonregular files")
+        result[path] = _git_read(root, "cat-file", "blob", blob.decode())
+    return result
+
+
+def verify_staged_sources(root, files, *, tip="HEAD"):
+    from .distribution import staged_receipts, _new_plan, _encode, _digest, _receipt, validate_config, check_plan, git_installs
+    pending = []
+    for path, receipt in staged_receipts(files).items():
+        record, installation = _receipt(receipt, path, receipt["record"]["repository"], files)
+        base = receipt["base_commit"]
+        _git_read(root, "merge-base", "--is-ancestor", base, tip)
+        _git_read(root, "merge-base", "--is-ancestor", record["source_revision"], base)
+        config = validate_config(io.parse_json(_git_read(root, "show", base + ":distribution.json"), what="staged base config"))
+        if io.sha256(io.canonical_json(config)) != receipt["config_hash"]:
+            raise DataError("staged receipt config differs from original base")
+        prior = _public_files_at(root, base)
+        plan = _new_plan(config, record, prior, base)
+        plan["git_install_files"] = {host: _encode({name: installation[name] for name in entry["files"]}) for host, entry in git_installs(record).items()}
+        plan["plan_hash"] = _digest(plan)
+        if plan["plan_hash"] != receipt["plan_hash"]:
+            raise DataError("staged receipt differs from reviewed original plan")
+        check_plan(plan)
+        verify_public_sources(root, {path: record}, files, staged=True, tip=tip)
+        pending.append({"product_id": record["product_id"], "version": record["version"], "source_revision": record["source_revision"], "receipt": path})
+    return pending
 
 
 def check_public_markets(root):
@@ -375,16 +424,24 @@ def check_public_markets(root):
     root = Path(root).absolute()
     if _existing(root, INITIALIZE_PATH) is not None:
         raise ConflictError("market initialization is incomplete; resume marketplace initialize")
-    load_config(root)
+    config = load_config(root)
     specs = load_catalog(root)
     repository = repository_url(specs[0].manifest["repository"])
     files = read_public_files(root)
     records, _, _ = validate(files, "stable", repository)
+    from .distribution import _replacement_inventory, retired_identities
+    _replacement_inventory(config, records, {spec.product_id for spec in specs})
+    if any(config.get("identity_replacements", {}).get(old) != new for old, new in retired_identities(files).items()):
+        raise DataError("retirement facts differ from trusted replacement configuration")
     if not files:
         return {"ok": False, "check": True, "problems": ["public market has not been initialized"],
                 "files": sorted(bootstrap_files())}
     verify_public_sources(root, records, files)
-    return {"ok": True, "check": True, "files": sorted(files), "problems": []}
+    pending = verify_staged_sources(root, files)
+    result = {"ok": True, "check": True, "files": sorted(files), "problems": [], "pending_distributions": pending}
+    if pending:
+        result["remote_release_verification"] = "not_performed"
+    return result
 
 
 def _initial_snapshot(current, expected, legacy, receipt_raw, migrate):

@@ -33,8 +33,8 @@
 从仓库根目录先预览，再应用本地修改：
 
 ```sh
-python3 tooling/plugin_tool.py release prepare-version --plugin ai-code-workflow --version 1.0.3 --notes-file /private/tmp/codevow-1.0.3-notes.md
-python3 tooling/plugin_tool.py release prepare-version --plugin ai-code-workflow --version 1.0.3 --notes-file /private/tmp/codevow-1.0.3-notes.md --apply
+python3 tooling/plugin_tool.py release prepare-version --plugin codevow --version 1.0.3 --notes-file /private/tmp/codevow-1.0.3-notes.md
+python3 tooling/plugin_tool.py release prepare-version --plugin codevow --version 1.0.3 --notes-file /private/tmp/codevow-1.0.3-notes.md --apply
 ```
 
 默认命令不写文件。`--apply` 只更新目标插件的 `product.json` 版本和
@@ -71,9 +71,9 @@ python3 tooling/plugin_tool.py validate --all
 PYTHONDONTWRITEBYTECODE=1 npm test
 npm run lint
 python3 .github/scripts/check_no_dist.py --root .
-python3 tooling/plugin_tool.py release check --plugin ai-code-workflow --mode draft
-python3 tooling/plugin_tool.py release prepare --plugin ai-code-workflow --mode draft --output /private/tmp/codevow-release
-python3 tooling/plugin_tool.py release verify --plugin ai-code-workflow --path /private/tmp/codevow-release
+python3 tooling/plugin_tool.py release check --plugin codevow --mode draft
+python3 tooling/plugin_tool.py release prepare --plugin codevow --mode draft --output /private/tmp/codevow-release
+python3 tooling/plugin_tool.py release verify --plugin codevow --path /private/tmp/codevow-release
 ```
 
 输出目录必须不存在或为空。`verify` 从可信源码独立重建资源与 ZIP 闭包。
@@ -92,7 +92,7 @@ python3 tooling/plugin_tool.py release verify --plugin ai-code-workflow --path /
 
 | 输入 | 选项 |
 |---|---|
-| `plugin` | `ai-code-workflow`、`ai-agent-delegation`、`ai-code-stack-standards` |
+| `plugin` | `codevow`、`ai-agent-delegation`、`codestack` |
 | `operation` | `build`、`publish` |
 
 版本和说明读取已提交的插件源码，无需填写源码标签、计划哈希或证据路径。
@@ -145,3 +145,31 @@ python3 tooling/plugin_tool.py marketplace check --root .
 若发布结果不确定或附件不完整，先检查远端状态再重试，不能覆盖附件、移动
 标签或 force push。只有 Release 与正式版市场记录均回读一致才报告完成；
 宿主安装与运行验收仍独立。
+
+## DSH 制品与身份替换
+
+未发布源码的两个 ID 为 codevow、codestack，首发候选版本为 2.0.0、0.2.0。
+新版本完成验证并同步前，公开记录继续使用旧身份；不得手工修改 published 或
+市场清单来模拟切换。
+
+包含 DSH 的 Release bundle 和包索引均须使用 schema 3。可信源码验证和历史制品验证
+都会拒绝 DSH 制品声明旧格式；旧发行格式兼容仅适用于未包含 DSH 的产品。原生安装器为
+`installers/ID-VERSION-dsh-plugin.tgz`，下载为 `downloads/ID-VERSION-dsh.tgz`；
+其他宿主保留 ZIP。安装器使用 npm package/ 前缀，不含本地索引或安装脚本。
+Git 安装使用 published/dsh/ID/VERSION 下的相同文件。公开 format-1 插件索引
+位于 published/dsh/index.json，绑定固定提交、子目录、真实 Unix 秒发布时间及
+一致的 engines；preview 永不进入索引。
+
+分发 schema 3 通过 git_installs 分别绑定 Codex 和 DSH。第一阶段提交 D 保存
+精确安装文件与 published/staged/ID/VERSION.json 闭字段回执；公开检查回到冻结
+源码和原计划验证 pending 状态，拒绝无回执孤立目录。提交 C 绑定实际 D，
+原子更新指针和各端清单，并消费暂存回执。远端 Release 回读单独核验；离线源
+检查不声称已核验远端附件。
+
+索引 schema 3 区分 active plugins 与永久 retired 旧到新映射。稳定替代版本只在
+同一次成功同步中退役自身旧 ID，历史记录、标签和安装字节不改写。lock schema 2
+绑定四份清单并单独绑定 published index；旧 schema-2 records、schema-1 receipt
+按原字节验证。失败时保留旧入口；已退役身份通过新 ID 的更高版本修复。
+
+DSH Web profile 的加载、显式/自动调用、引用读取、Reviewer 权限、长会话与
+生命周期须分别提供实测证据，见[迁移说明](migrations/2026-10-27-plugin-identities.zh-CN.md)。

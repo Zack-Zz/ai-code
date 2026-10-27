@@ -37,9 +37,9 @@ Locate the plugin and update its features and tests:
 
 | Component | Main source | Tests |
 |---|---|---|
-| CodeVow | `plugins/ai-code-workflow/skills/`, `policies/`, `scripts/workflow/` | Node skill contracts and plugin Python tests |
+| CodeVow | `plugins/codevow/skills/`, `policies/`, `scripts/workflow/` | Node skill contracts and plugin Python tests |
 | Agent Delegation | `plugins/ai-agent-delegation/skills/`, `scripts/bridge_client.py` | Plugin Python tests |
-| CodeStack | `plugins/ai-code-stack-standards/skills/code-standards/` | Node discovery, package and runner contracts; separate behavioral evaluations |
+| CodeStack | `plugins/codestack/skills/code-standards/` | Node discovery, package and runner contracts; separate behavioral evaluations |
 | Shared tooling | `tooling/plugin_tools/` | `tests/run_python_tests.py` |
 
 For behavior changes, write a meaningful failing test, implement the smallest
@@ -49,13 +49,13 @@ Register new packaged resources in the plugin's `product.json` whitelist.
 To run the plugin tests separately:
 
 ```sh
-node plugins/ai-code-workflow/tests/skills/run-skills.js
-PYTHONDONTWRITEBYTECODE=1 python3 plugins/ai-code-workflow/tests/run_python_tests.py
+node plugins/codevow/tests/skills/run-skills.js
+PYTHONDONTWRITEBYTECODE=1 python3 plugins/codevow/tests/run_python_tests.py
 PYTHONDONTWRITEBYTECODE=1 python3 plugins/ai-agent-delegation/tests/run_python_tests.py
-node plugins/ai-code-stack-standards/tests/skills/run-skills.js
+node plugins/codestack/tests/skills/run-skills.js
 ```
 
-CodeStack's [evaluation cases](plugins/ai-code-stack-standards/evals/cases.md)
+CodeStack's [evaluation cases](plugins/codestack/evals/cases.md)
 separate rule selection, task outcomes and native host loading. Contract tests and
 package checks do not prove those behaviors. Keep its runtime skill and references
 in English; human-facing guides remain bilingual.
@@ -70,14 +70,14 @@ python3 tooling/plugin_tool.py build --all --host all --output /tmp/ai-code-dev-
 ```
 
 The output must be absent or empty; use a new empty directory for another build.
-To work on one plugin, replace `--all` with `--plugin ai-code-workflow`. Select
-`claude`, `codex`, `zcode` or `all` with `--host`.
+To work on one plugin, replace `--all` with `--plugin codevow`. Select
+`claude`, `codex`, `zcode`, `dsh` or `all` with `--host`.
 
 Check each generated package against trusted source. For CodeVow on Codex:
 
 ```sh
 python3 tooling/plugin_tool.py package check \
-  --path /tmp/ai-code-dev-packages/codex/ai-code-workflow --host codex --root .
+  --path /tmp/ai-code-dev-packages/codex/codevow --host codex --root .
 ```
 
 Apply the same check to every selected host package before release. The unified
@@ -92,7 +92,7 @@ Codex:
 
 ```sh
 codex plugin marketplace add /tmp/ai-code-dev-packages/codex
-codex plugin add ai-code-workflow@ai-code-local
+codex plugin add codevow@ai-code-local
 ```
 
 For Claude Code and ZCode, follow the local-market steps in
@@ -128,3 +128,21 @@ interfaces. Dated design and verification records remain in
 Include relevant source, tests and documentation when submitting a change, and
 report the checks you ran. Publication, marketplace updates and user installation
 are separate operations described in the maintenance guide.
+
+## Verify DSH API composition
+
+After the normal `npm test` and trusted package checks, the optional isolated
+published-API test can use an existing development dependency directory:
+
+```sh
+DSH_NATIVE_NODE_MODULES=/absolute/isolated/node_modules node plugins/codevow/tests/dsh/native-api.mjs
+```
+
+It requires the exact published DSH 0.2.1-rc.2 packages and Cordis 4.0.5. Missing
+or incompatible dependencies fail the command; they are not a passing skip.
+This entry builds the two DSH bundles and activates their real overlays and
+Reviewer preset through the official Loader. It also uses real
+Cordis/Tools/AgentRegistry/Skill APIs with synthetic agents and tool definitions.
+It does not run models, install a user profile, or prove
+complete Web UI, filesystem-tool, spawn or lifecycle acceptance. Keep dependency
+installation and its cache in a temporary development directory.

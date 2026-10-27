@@ -61,7 +61,7 @@ kebab-case，建议目录名与 ID 一致。每个插件自有版本、许可证
 数字禁止前导零，不接受其他后缀或 build metadata；preview 序号按数字比较，
 同核心正式版在所有 preview 之后。发行种类由版本派生。
 
-`hosts` 必填且非空，当前接受 `claude`、`codex`、`zcode`；每个声明
+`hosts` 必填且非空，当前接受 `claude`、`codex`、`zcode`、`dsh`；每个声明
 宿主都必须有真实 `adapters/<host>/plugin.json`。
 
 声明的技能自动贡献其 `skills/<name>/SKILL.md`。技能引用的参考文档、脚本
@@ -102,7 +102,7 @@ CodeVow 可使用已有公开 PNG，声明片段如下：
     "claude": {},
     "zcode": {
       "icon_path": "assets/codevow.png",
-      "icon_url": "https://raw.githubusercontent.com/Zack-Zz/ai-code/91dec3a64731f8de2fb68e49bce9f4228289bbbd/plugins/ai-code-workflow/assets/codevow.png"
+      "icon_url": "https://raw.githubusercontent.com/Zack-Zz/ai-code/91dec3a64731f8de2fb68e49bce9f4228289bbbd/plugins/codevow/assets/codevow.png"
     }
   }
 }
@@ -274,3 +274,24 @@ catalog 登记和开发试用不等于正式发行。新预览版只进入 GitHu
 
 交付时保留未提交改动，给出摘要、diff、验证结果和剩余限制，等待用户
 Review。commit、push、tag、merge、PR、安装与发布仍遵守独立授权边界。
+
+## DeepSeek Harness 适配
+
+具有宿主专属资源的产品使用 product schema 2；冻结源码和未变化插件仍可读取
+schema 1。将 `dsh` 登记到 hosts，原生模板为 `adapters/dsh/package.json`，
+patch、locale 等在 `host_resources.dsh` 中使用显式 source/target/include 白名单。
+
+DSH 清单声明 `type: module`、精确 engines.dsh、exports 和 dsh.bundle.patch。
+name、version、精确 files 清单由可信 product 输入生成。禁止私有 bundle 和
+安装生命周期脚本。展示使用 locale/en.json、locale/zh.json 的 meta.title、
+meta.description 及包内图标；清单校验不能替代真实宿主验收。
+
+Host 层挂载官方 skill-filesystem 提供方，使用唯一 providerName、
+includeDefaultRoots:false 和按包目录解析的 bundledSkillDir；技能仍是共享资源。
+纯资源 bundle 不需要自定义模块。只有 CodeVow 提供 Reviewer guard，并以固定
+json-string 转换从共同审查合同生成 reviewer-persona.json，不支持任意构建 hook。
+
+DSH 原生安装器为 package/ 根目录的 npm TGZ。包含 DSH 的构建索引使用 schema 3，
+字段为 archive、archive_sha256、archive_format:npm-tgz；原三端 ZIP 字段保留。
+本地 format-1 索引仅为结构预览，开发使用原生绝对目录安装；公开 Git 入口必须
+在发布后生成。

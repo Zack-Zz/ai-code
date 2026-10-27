@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "plugins": [
-    { "path": "plugins/ai-code-workflow" },
+    { "path": "plugins/codevow" },
     { "path": "plugins/ai-agent-delegation" },
-    { "path": "plugins/ai-code-stack-standards" }
+    { "path": "plugins/codestack" }
   ]
 }

@@ -8,10 +8,10 @@ records appear in the reference section at the end.
 ## Use plugins
 
 - [Installation](installation.md): marketplace and downloaded-package installation, updates and removal for each coding assistant.
-- [CodeVow](../plugins/ai-code-workflow/README.md): features, examples and configuration.
-- [Detailed CodeVow usage](../plugins/ai-code-workflow/docs/usage.md): configuration, task records and optional file tools.
+- [CodeVow](../plugins/codevow/README.md): features, examples and configuration.
+- [Detailed CodeVow usage](../plugins/codevow/docs/usage.md): configuration, task records and optional file tools.
 - [Agent Delegation](../plugins/ai-agent-delegation/README.md): requirements, handoffs, continuation and cancellation.
-- [CodeStack](../plugins/ai-code-stack-standards/README.md): selected Java, data-access and multilingual frontend conventions; development preview.
+- [CodeStack](../plugins/codestack/README.md): selected Java, data-access and multilingual frontend conventions and the unreleased new-ID candidate.
 - [Agent Bridge setup](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置): preparation of the external runtime.
 
 ## Develop plugins
@@ -29,8 +29,10 @@ records appear in the reference section at the end.
 
 - [Designs](design/): dated specifications and design decisions.
 - [Development and verification records](reviews/): checks tied to their dates, source and environments.
-- [CodeVow designs](../plugins/ai-code-workflow/docs/design/) and [verification records](../plugins/ai-code-workflow/docs/reviews/): internal design and test context.
-- [Migration origins](../plugins/ai-code-workflow/docs/migration.md) and [historical material](../plugins/ai-code-workflow/docs/bel-history/README.md): provenance, licenses and early records.
+- [CodeVow designs](../plugins/codevow/docs/design/) and [verification records](../plugins/codevow/docs/reviews/): internal design and test context.
+- [Migration origins](../plugins/codevow/docs/migration.md) and [historical material](../plugins/codevow/docs/bel-history/README.md): provenance, licenses and early records.
 
 Use the current guides above for everyday installation and development.
 Historical material retains its original dates and commands for reference.
+
+- [Identity migration](migrations/2026-10-27-plugin-identities.md): new IDs, reinstallation and retained history.

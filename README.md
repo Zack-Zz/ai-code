@@ -2,7 +2,13 @@
 
 English | [简体中文](README.zh-CN.md)
 
-ai-code is a collection of AI coding plugins for Claude Code, Codex and ZCode.
+> Source candidate: CodeVow now uses `codevow` (2.0.0) and CodeStack uses
+> `codestack` (0.2.0), including a `dsh` adapter. This change is not published yet.
+> The frozen published snapshot still determines what can be installed today.
+> Use the new-ID commands below after those entries appear in the marketplace.
+> See the [identity migration](docs/migrations/2026-10-27-plugin-identities.md).
+
+ai-code is a collection of AI coding plugins for Claude Code, Codex, ZCode and DeepSeek Harness.
 They help you plan tasks, develop code, review changes and collaborate with
 other coding assistants.
 
@@ -14,9 +20,9 @@ features and configuration, with shared tooling for packaging and distribution.
 
 | Plugin | Purpose | Guide |
 |---|---|---|
-| **CodeVow** | Plan changes, develop with TDD, debug problems, review code and verify results | [CodeVow](plugins/ai-code-workflow/README.md) |
+| **CodeVow** | Plan changes, develop with TDD, debug problems, review code and verify results | [CodeVow](plugins/codevow/README.md) |
 | **Agent Delegation** | Hand tasks to independent Claude Code, Codex or ZCode sessions and bring results back; requires Agent Bridge | [Agent Delegation](plugins/ai-agent-delegation/README.md) |
-| **CodeStack** | Apply selected Java, data-access and multilingual frontend conventions to the current change or review | [CodeStack](plugins/ai-code-stack-standards/README.md) |
+| **CodeStack** | Apply selected Java, data-access and multilingual frontend conventions to the current change or review | [CodeStack](plugins/codestack/README.md) |
 
 | Path | Contents |
 |---|---|
@@ -32,9 +38,9 @@ features and configuration, with shared tooling for packaging and distribution.
 Install through the ai-code marketplace or download a package for your coding
 assistant from GitHub Releases. The marketplace name is `ai-code`, from
 `Zack-Zz/ai-code` at `main`. The repository's current
-[release record](published/index.json) and three host marketplace manifests determine
-stable availability and versions. **CodeVow** (`ai-code-workflow`) and **CodeStack**
-(`ai-code-stack-standards`) share this marketplace and are installed and released
+[release record](published/index.json) and host marketplace manifests determine
+stable availability and versions. **CodeVow** (`codevow`) and **CodeStack**
+(`codestack`) share this marketplace and are installed and released
 independently. Refresh the marketplace in your host before selecting a plugin.
 Agent Delegation currently has source only and has not entered the stable marketplace.
 
@@ -47,7 +53,7 @@ start with the second command to refresh the marketplace.
 ```sh
 codex plugin marketplace add Zack-Zz/ai-code --ref main
 codex plugin marketplace upgrade ai-code
-codex plugin add ai-code-workflow@ai-code
+codex plugin add codevow@ai-code
 ```
 
 ### Claude Code CLI quick start
@@ -57,7 +63,7 @@ Use **Claude Code 2.1.224 or later**:
 ```sh
 claude plugin marketplace add https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/.claude-plugin/marketplace.json
 claude plugin marketplace update ai-code
-claude plugin install ai-code-workflow@ai-code --scope user
+claude plugin install codevow@ai-code --scope user
 ```
 
 After installation, restart the session or run `/reload-plugins` inside your
@@ -76,12 +82,19 @@ support, so use this URL. For the macOS bundled CLI commands, see the
 
 For detailed installation steps and plugin usage:
 
-- [Installation guide](docs/installation.md): full marketplace registration and installation steps, downloaded packages, updates, removal and troubleshooting for Claude Code, Codex and ZCode.
-- [CodeVow guide](plugins/ai-code-workflow/README.md): task examples, collaboration modes and project configuration.
+- [Installation guide](docs/installation.md): full marketplace registration and installation steps, downloaded packages, updates, removal and troubleshooting for Claude Code, Codex, ZCode and DeepSeek Harness.
+- [CodeVow guide](plugins/codevow/README.md): task examples, collaboration modes and project configuration.
 - [Agent Delegation guide](plugins/ai-agent-delegation/README.md): requirements, handoffs, continuation and cancellation.
-- [CodeStack guide](plugins/ai-code-stack-standards/README.md): supported rule scope, automatic selection and marketplace availability.
+- [CodeStack guide](plugins/codestack/README.md): supported rule scope, automatic selection and marketplace availability.
 
 After installation, start a new session and describe what you want to do.
+
+### DeepSeek Harness
+
+The source candidate provides two standard DSH bundles, with native profile,
+TGZ and fixed Git installation. Start with the [Harness installation steps](docs/installation.md#deepseek-harness).
+The stable DSH index will be available after publication; native runtime
+acceptance remains separate from package verification.
 
 ## Develop and contribute
 
@@ -117,4 +130,4 @@ links the current guides and reference material.
 [MIT](LICENSE); see [NOTICE](NOTICE). The repository's early history derives from
 Affaan Mustafa's ai-code. CodeVow evolved from backend-engineering-lite, whose
 license is preserved in the
-[plugin directory](plugins/ai-code-workflow/LICENSES/backend-engineering-lite.txt).
+[plugin directory](plugins/codevow/LICENSES/backend-engineering-lite.txt).

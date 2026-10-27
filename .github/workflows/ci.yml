@@ -38,7 +38,7 @@ jobs:
         run: python3 .github/scripts/check_no_dist.py --root .
 
       - name: Validate workflow-specific contracts
-        run: python3 plugins/ai-code-workflow/scripts/workflow_tool.py validate --root plugins/ai-code-workflow
+        run: python3 plugins/codevow/scripts/workflow_tool.py validate --root plugins/codevow
 
       - name: Unified test gate (tooling and every registered plugin)
         run: npm test
@@ -59,7 +59,7 @@ jobs:
           source = json.loads(subprocess.check_output(tool + ["list"], text=True))["plugins"]
           output = Path(os.environ["RUNNER_TEMP"]) / "packages"
           index = json.loads((output / "index.json").read_text())
-          if index["schema_version"] != 2 or set(index["plugins"]) != {item["product_id"] for item in source}:
+          if index["schema_version"] != 3 or set(index["plugins"]) != {item["product_id"] for item in source}:
               raise SystemExit("build index differs from registered plugin inventory")
           for plugin in source:
               identity = plugin["product_id"]

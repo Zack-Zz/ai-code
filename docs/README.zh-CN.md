@@ -7,10 +7,10 @@
 ## 使用插件
 
 - [安装指南](installation.zh-CN.md)：各编码助手的市场安装、下载包安装、更新和卸载。
-- [CodeVow](../plugins/ai-code-workflow/README.zh-CN.md)：功能、示例和配置。
-- [CodeVow 详细用法](../plugins/ai-code-workflow/docs/usage.zh-CN.md)：配置、任务记录和可选文件工具。
+- [CodeVow](../plugins/codevow/README.zh-CN.md)：功能、示例和配置。
+- [CodeVow 详细用法](../plugins/codevow/docs/usage.zh-CN.md)：配置、任务记录和可选文件工具。
 - [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md)：依赖准备、派发、续接和取消。
-- [CodeStack](../plugins/ai-code-stack-standards/README.zh-CN.md)：精选的 Java、数据访问和多语言前端约定，当前为开发预览。
+- [CodeStack](../plugins/codestack/README.zh-CN.md)：精选的 Java、数据访问和多语言前端约定，新增身份仍为未发布候选。
 - [Agent Bridge 使用与配置](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md#构建与受控配置)：外置运行时的准备入口。
 
 ## 开发插件
@@ -28,7 +28,9 @@
 
 - [设计方案](design/)：按日期保存的规格与设计决定。
 - [开发与验证记录](reviews/)：对应日期、源码和环境的检查记录。
-- [CodeVow 设计](../plugins/ai-code-workflow/docs/design/)与[验证记录](../plugins/ai-code-workflow/docs/reviews/)：插件内部设计及测试背景。
-- [迁移来源](../plugins/ai-code-workflow/docs/migration.md)与[历史资料](../plugins/ai-code-workflow/docs/bel-history/README.md)：来源、许可证和早期记录。
+- [CodeVow 设计](../plugins/codevow/docs/design/)与[验证记录](../plugins/codevow/docs/reviews/)：插件内部设计及测试背景。
+- [迁移来源](../plugins/codevow/docs/migration.md)与[历史资料](../plugins/codevow/docs/bel-history/README.md)：来源、许可证和早期记录。
 
 日常安装和开发使用上方当前指南。历史资料保留原日期和命令，仅用于追溯。
+
+- [身份迁移](migrations/2026-10-27-plugin-identities.zh-CN.md)：新 ID、重新安装与历史保留。

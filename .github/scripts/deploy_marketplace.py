@@ -186,16 +186,16 @@ class GitWriter:
             raise io.DataError('unsupported distribution branch')
         if not isinstance(expected, str) or not SHA.fullmatch(expected):
             raise io.DataError('expected market commit is invalid')
-        native = {'.claude-plugin/marketplace.json', '.agents/plugins/marketplace.json', 'marketplace.json'}
+        native = {'.claude-plugin/marketplace.json', '.agents/plugins/marketplace.json', 'marketplace.json', 'published/dsh/index.json'}
         def allowed(name):
             io.relative_path(name)
             if '.git' in name.split('/'):
                 return False
             return name in native or name in {'published/index.json', 'published/marketplaces.lock.json'} or bool(
-                re.fullmatch(r'published/(?:releases/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+\.json|codex/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+/.+)', name))
+                re.fullmatch(r'published/(?:(?:releases|staged)/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+\.json|(?:codex|dsh)/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+/.+)', name))
         if not isinstance(files, dict) or any(not allowed(name) or not isinstance(raw, bytes) for name, raw in files.items()):
             raise io.DataError('publication may write only declared main market paths; source and dist are forbidden')
-        if not set(removals).issubset(native) or len(set(removals)) != len(removals) or set(removals) & set(files):
+        if any(name not in native and not re.fullmatch(r'published/staged/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+\.json', name) for name in removals) or len(set(removals)) != len(removals) or set(removals) & set(files):
             raise io.DataError('only explicitly reviewed managed market entries may be removed')
         env = dict(os.environ, GIT_TERMINAL_PROMPT='0')
         token = env.get('GH_TOKEN') or env.get('GITHUB_TOKEN')
@@ -263,21 +263,48 @@ class GitWriter:
 
 
 def verify_pinned_trees(api, previous):
+    from plugin_tools.distribution import git_installs, _git_prefix
     cached = {}
     for path, raw in previous.items():
         if not path.startswith('published/releases/'):
             continue
         record = io.parse_json(raw, what=path)
-        revision = record['codex_revision']
-        if revision is None:
-            continue
-        if revision not in cached:
-            _, cached[revision] = api.market(revision)
-        prefix = f"published/codex/{record['product_id']}/{record['version']}/"
-        actual = {name: value for name, value in cached[revision].items() if name.startswith(prefix)}
-        expected = {name: previous[name] for name in record['codex_files']}
-        if actual != expected:
-            raise io.DataError('previous pinned Codex commit differs from its recorded file closure')
+        for host, install in git_installs(record).items():
+            revision = install['revision']
+            if revision not in cached:
+                _, cached[revision] = api.market(revision)
+            prefix = _git_prefix(host, record['product_id'], record['version'])
+            actual = {name: value for name, value in cached[revision].items() if name.startswith(prefix)}
+            expected = {name: previous[name] for name in install['files']}
+            if actual != expected:
+                raise io.DataError('previous pinned Git commit differs from its recorded file closure')
+
+
+def verify_pending_releases(api, previous, root):
+    """Re-read public identity and actual installers before accepting staged recovery."""
+    from plugin_tools.distribution import staged_receipts
+    if staged_receipts(previous):
+        from plugin_tools.markets import verify_staged_sources
+        # Deployment checks out the frozen source tag, while the original plan
+        # base may be a newer main commit. The workflow fetched origin/main and
+        # already bound this release to it above; HEAD would reject valid retries.
+        verify_staged_sources(root, previous, tip='origin/main')
+    for receipt in staged_receipts(previous).values():
+        record = receipt['record']
+        release = api.release(record['tag'])
+        if release.get('id') != record['release_id'] or release.get('published_at') != record['release_published_at'] or release.get('draft') is not False or release.get('prerelease') is not False or api.tag(record['tag']) != record['source_revision']:
+            raise io.DataError('pending distribution differs from actual public Release/tag')
+        assets = {item['name']: item for item in release['assets']}
+        if len(assets) != len(release['assets']):
+            raise io.DataError('pending Release has duplicate assets')
+        for host, item in record['hosts'].items():
+            recorded = item['asset']
+            asset = assets.get(recorded['name'])
+            if asset is None or asset['id'] != recorded['id'] or asset['size'] != recorded['size']:
+                raise io.DataError('pending public installer identity/size differs')
+            raw = api.download(asset, record['tag'])
+            if io.sha256(raw) != recorded['sha256']:
+                raise io.DataError('pending public installer bytes differ')
 
 
 def verify_history(api, spec, bundle, root, previous, directory, channel):
@@ -321,7 +348,7 @@ def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
     if action == 'deploy' and (not re.fullmatch(r'[0-9a-f]{64}', expected_plan_hash or '') or
             not SHA.fullmatch(expected_market_commit or '')):
         raise io.DataError('deploy requires reviewed plan hash and market commit')
-    from plugin_tools.distribution import load_config, plan_distribution, stage_files, finalize_files, check_plan
+    from plugin_tools.distribution import load_config, plan_distribution, stage_files, finalize_files, check_plan, git_installs
     root = Path(root).resolve()
     spec = select_plugins(load_catalog(root), plugin_id)[0]
     if source_tag != f'{spec.product_id}/v{spec.version}':
@@ -352,8 +379,9 @@ def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
     required = [f'{spec.product_id}-{spec.version}-release-bundle.zip',
                 f'{spec.product_id}-{spec.version}-release-bundle.sha256',
                 'release.json', 'release-notes.md', 'SHA256SUMS']
-    required += [f'{spec.product_id}-{spec.version}-{host}-plugin.zip' for host in spec.hosts]
-    required += [f'{spec.product_id}-{spec.version}-{host}.zip' for host in spec.hosts]
+    from plugin_tools.archives import installer_name
+    required += [installer_name(spec.product_id, spec.version, host) for host in spec.hosts]
+    required += [f'{spec.product_id}-{spec.version}-{host}.{"tgz" if host == "dsh" else "zip"}' for host in spec.hosts]
     if not set(required).issubset(names):
         raise io.DataError('public Release is missing required assets')
     payload = {name: api.download(next(a for a in assets if a['name'] == name), source_tag) for name in required}
@@ -371,10 +399,10 @@ def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
                 raise io.DataError('public standalone asset differs from complete bundle')
         for host in spec.hosts:
             for directory, suffix in (('installers', '-plugin'), ('downloads', '')):
-                name = f'{spec.product_id}-{spec.version}-{host}{suffix}.zip'
+                name = installer_name(spec.product_id, spec.version, host) if suffix else f'{spec.product_id}-{spec.version}-{host}.{"tgz" if host == "dsh" else "zip"}'
                 if payload[name] != io.read_file(bundle, f'{directory}/{name}', limit=LIMIT):
                     raise io.DataError('public installer/download differs from complete bundle')
-        info = {key: release[key] for key in ('id', 'tag_name', 'draft', 'prerelease', 'html_url')}
+        info = {key: release[key] for key in ('id', 'tag_name', 'draft', 'prerelease', 'html_url', 'published_at')}
         canonical_url = f'https://github.com/{api.repository}/releases/tag/{quote(source_tag, safe="")}'
         if info['html_url'] not in (canonical_url, f'https://github.com/{api.repository}/releases/tag/{quote(source_tag, safe="/")}'):
             raise io.DataError('Release page does not belong to the selected source tag')
@@ -386,6 +414,7 @@ def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
         base, previous = api.market(branch)
         plan = plan_distribution(root, spec, bundle, info, channel, previous, base, control_root=control_root)
         verify_pinned_trees(api, previous)
+        verify_pending_releases(api, previous, root)
         verify_history(api, spec, bundle, root, previous, Path(temporary), channel)
         if action == 'plan':
             return plan
@@ -393,14 +422,14 @@ def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
             check_plan(plan)
             return {'ok': True, 'status': 'already_deployed', 'product_id': spec.product_id,
                 'version': spec.version, 'channel': channel, 'branch': branch,
-                'source_revision': source_sha, 'distribution_revision': plan['record']['codex_revision'],
+                'source_revision': source_sha, 'distribution_revision': next(iter(git_installs(plan['record']).values()), {}).get('revision'),
                 'market_commit': base, 'release_url': info['html_url'], 'plan_hash': plan['plan_hash']}
         check_plan(plan, expected_plan_hash, expected_market_commit)
         writer = writer or GitWriter(api.repository)
         if api.tag(source_tag) != source_sha:
             raise io.ConflictError('source tag moved before deployment')
         staged = stage_files(plan)
-        distribution_sha = base if 'codex' in plan['record']['hosts'] and not staged and base != 'absent' else None
+        distribution_sha = base if git_installs(plan['record']) and not staged and base != 'absent' else None
         current = base
         progress = {'ok': False, 'status': 'published_pending_marketplace',
             'product_id': spec.product_id, 'version': spec.version, 'channel': channel,
@@ -419,7 +448,7 @@ def deploy(root, plugin_id, source_tag, channel, api, *, action='plan',
             if api.tag(source_tag) != source_sha:
                 raise io.ConflictError('source tag moved before catalog publication')
             progress['phase'] = 'publishing_catalog'
-            removed_markets = sorted(set(previous) - set(final))
+            removed_markets = sorted((set(previous) | set(staged)) - set(final))
             catalog_sha = writer.publish(branch, current, final,
                 f'Deploy {spec.product_id} {spec.version} to {channel}', removals=removed_markets)
             progress.update(market_commit=catalog_sha, phase='verifying_catalog')
@@ -468,7 +497,7 @@ def main():
             result['output_error'] = 'Could not save result; retained complete state in console output'
             code = 1
     # Console summary excludes encoded public file payloads.
-    print(json.dumps({k: v for k, v in result.items() if k not in ('existing_files', 'codex_files')},
+    print(json.dumps({k: v for k, v in result.items() if k not in ('existing_files', 'codex_files', 'git_install_files')},
                      ensure_ascii=False, indent=2))
     return code
 

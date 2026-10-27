@@ -10,11 +10,16 @@ import hashlib
 import json
 import re
 import stat
+import sys
 import zipfile
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tooling"))
+from plugin_tools.archives import verify_installer
+from plugin_tools.io import DataError
+
 MARKETPLACE_PATHS = {"claude": ".claude-plugin/marketplace.json", "codex": ".agents/plugins/marketplace.json",
-                     "zcode": "marketplace.json"}
+                     "zcode": "marketplace.json", "dsh": "published/dsh/index.json"}
 
 
 def digest(path):
@@ -66,25 +71,30 @@ def verify_workflow(root, index):
         if artifact["source_tree_hash"] != index["source_tree_hash"]:
             raise ValueError(f"{host}: inconsistent source identity")
         market = member(root, entry["marketplace"])
-        archive = member(root, entry["zip"])
-        if digest(market) != entry["marketplace_sha256"] or digest(archive) != entry["zip_sha256"]:
+        archive_key = "archive" if host == "dsh" else "zip"
+        archive = member(root, entry[archive_key])
+        if digest(market) != entry["marketplace_sha256"] or digest(archive) != entry[f"{archive_key}_sha256"]:
             raise ValueError(f"{host}: distribution checksum mismatch")
         if host == "claude":
             native = json.loads(member(package, ".claude-plugin/plugin.json").read_text())
             owner = json.loads(market.read_text()).get("owner")
-            if not isinstance(owner, dict) or not isinstance(owner.get("name"), str) or not owner["name"].strip() or owner != native.get("author"):
+            if not isinstance(owner, dict) or not isinstance(owner.get("name"), str) or not owner["name"].strip() or owner not in ({"name": "ai-code"}, native.get("author")):
                 raise ValueError("claude: invalid native marketplace owner/publisher")
         expected = {p.relative_to(root / host).as_posix(): p.read_bytes()
                     for p in package.rglob("*") if p.is_file()}
         expected[market.relative_to(root / host).as_posix()] = market.read_bytes()
-        with zipfile.ZipFile(archive) as zipped:
-            names = zipped.namelist()
-            if len(names) != len(set(names)) or set(names) != set(expected):
-                raise ValueError(f"{host}: unexpected archive members")
-            for info in zipped.infolist():
-                if stat.S_IFMT(info.external_attr >> 16) != stat.S_IFREG or \
-                        zipped.read(info.filename) != expected[info.filename]:
-                    raise ValueError(f"{host}: archive payload mismatch: {info.filename}")
+        if host == "dsh":
+            verify_installer(archive.read_bytes(), {p.relative_to(package).as_posix(): p.read_bytes()
+                             for p in package.rglob("*") if p.is_file()}, index["product_id"], host)
+        else:
+            with zipfile.ZipFile(archive) as zipped:
+                names = zipped.namelist()
+                if len(names) != len(set(names)) or set(names) != set(expected):
+                    raise ValueError(f"{host}: unexpected archive members")
+                for info in zipped.infolist():
+                    if stat.S_IFMT(info.external_attr >> 16) != stat.S_IFREG or \
+                            zipped.read(info.filename) != expected[info.filename]:
+                        raise ValueError(f"{host}: archive payload mismatch: {info.filename}")
         stable = {key: value for key, value in artifact.items()
                   if key not in ("source_revision", "working_tree_dirty")}
         stable_bytes = json.dumps(stable, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
@@ -121,7 +131,8 @@ def verify_collection(root, index):
                 {entry["name"] for entry in entries} != expected_host_ids[host]:
             raise ValueError(f"{host}: marketplace plugin registration differs from index")
         for item in entries:
-            if item["version"] != plugins[item["name"]]["version"]:
+            version = item.get("versions", [{}])[0].get("version") if host == "dsh" else item["version"]
+            if version != plugins[item["name"]]["version"]:
                 raise ValueError(f"{host}: marketplace plugin version differs from index")
             identity = item["name"]
             if host == "codex":
@@ -129,6 +140,9 @@ def verify_collection(root, index):
                         item.get("policy") != {"installation": "AVAILABLE", "authentication": "ON_INSTALL"} or \
                         item.get("category") != "developer-tools":
                     raise ValueError(f"{host}: invalid native marketplace registration: {identity}")
+            elif host == "dsh":
+                if market.get("format") != 1 or len(item["versions"]) != 1 or item["versions"][0].get("source", {}).get("type") != "git":
+                    raise ValueError("dsh: invalid native plugin index")
             elif item.get("source") != f"./{identity}":
                 raise ValueError(f"{host}: marketplace source differs from package directory: {identity}")
         markets[host] = market
@@ -137,8 +151,10 @@ def verify_collection(root, index):
     for identity, plugin in plugins.items():
         plugin_payload = {}
         for host, entry in plugin["hosts"].items():
+            archive_key = "archive" if host == "dsh" else "zip"
+            extension = "tgz" if host == "dsh" else "zip"
             if entry["package_dir"] != f"{host}/{identity}" or \
-                    entry["zip"] != f"{host}/{identity}-{plugin['version']}.zip":
+                    entry[archive_key] != f"{host}/{identity}-{plugin['version']}.{extension}":
                 raise ValueError(f"{identity}/{host}: invalid package or archive registration")
             package = member(root, entry["package_dir"])
             paths = [p for p in package.rglob("*") if member(root, p.relative_to(root).as_posix()).is_file()]
@@ -160,23 +176,27 @@ def verify_collection(root, index):
             if hashlib.sha256(encoded).hexdigest() != entry["package_content_hash"] or \
                     artifact["content_hash"] != entry["package_content_hash"]:
                 raise ValueError(f"{identity}/{host}: invalid package content hash")
-            archive = member(root, entry["zip"])
-            if digest(archive) != entry["zip_sha256"]:
+            archive = member(root, entry[archive_key])
+            if digest(archive) != entry[f"{archive_key}_sha256"]:
                 raise ValueError(f"{identity}/{host}: archive checksum mismatch")
             expected = {p.relative_to(root / host).as_posix(): p.read_bytes() for p in paths}
             market = dict(markets[host], plugins=[item for item in markets[host]["plugins"] if item["name"] == identity])
             market_relative = Path(hosts[host]["marketplace"]).relative_to(host).as_posix()
             expected[market_relative] = (json.dumps(market, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode()
-            with zipfile.ZipFile(archive) as zipped:
-                names = zipped.namelist()
-                if len(names) != len(set(names)) or set(names) != set(expected):
-                    raise ValueError(f"{identity}/{host}: unexpected archive members")
-                for info in zipped.infolist():
-                    if stat.S_IFMT(info.external_attr >> 16) != stat.S_IFREG or \
-                            zipped.read(info.filename) != expected[info.filename]:
-                        raise ValueError(f"{identity}/{host}: archive payload mismatch: {info.filename}")
+            if host == "dsh":
+                verify_installer(archive.read_bytes(), {p.relative_to(package).as_posix(): p.read_bytes()
+                                 for p in paths}, identity, host)
+            else:
+                with zipfile.ZipFile(archive) as zipped:
+                    names = zipped.namelist()
+                    if len(names) != len(set(names)) or set(names) != set(expected):
+                        raise ValueError(f"{identity}/{host}: unexpected archive members")
+                    for info in zipped.infolist():
+                        if stat.S_IFMT(info.external_attr >> 16) != stat.S_IFREG or \
+                                zipped.read(info.filename) != expected[info.filename]:
+                            raise ValueError(f"{identity}/{host}: archive payload mismatch: {info.filename}")
             registered_files.update(p.relative_to(root).as_posix() for p in paths)
-            registered_files.add(entry["zip"])
+            registered_files.add(entry[archive_key])
             stable = {key: value for key, value in artifact.items() if key not in ("source_revision", "working_tree_dirty")}
             stable_bytes = json.dumps(stable, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
             plugin_payload[host] = (actual, stable_bytes)
@@ -194,7 +214,7 @@ def verify(root):
         raise ValueError("distribution index schema must be an integer")
     if index.get("schema_version") == 1:
         return verify_workflow(root, index)
-    if index.get("schema_version") == 2:
+    if index.get("schema_version") in (2, 3):
         return verify_collection(root, index)
     raise ValueError("unsupported distribution index schema")
 
@@ -207,7 +227,7 @@ def main():
     try:
         if verify(args.committed) != verify(args.fresh):
             raise ValueError("committed distribution payload is stale")
-    except (OSError, ValueError, TypeError, AttributeError, KeyError, zipfile.BadZipFile) as exc:
+    except (OSError, ValueError, TypeError, AttributeError, KeyError, zipfile.BadZipFile, DataError) as exc:
         print(f"distribution check failed: {exc}")
         return 1
     print("distribution payloads match; registered archives independently verified")

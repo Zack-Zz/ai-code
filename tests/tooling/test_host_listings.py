@@ -115,7 +115,7 @@ class HostListingTests(unittest.TestCase):
             self.spec({"zcode": {**self.listing, "icon_url": url.replace("%20", " ")}})
 
     def test_codevow_opts_in_to_existing_name_and_image(self):
-        spec = next(spec for spec in load_catalog(ROOT) if spec.product_id == "ai-code-workflow")
+        spec = next(spec for spec in load_catalog(ROOT) if spec.product_id == "codevow")
         zcode = marketplace_entry(spec, "zcode")
         claude = marketplace_entry(spec, "claude")
         self.assertEqual(zcode.get("displayName"), "CodeVow")

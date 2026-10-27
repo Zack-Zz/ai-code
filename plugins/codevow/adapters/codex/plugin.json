@@ -1,0 +1,31 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "codevow",
+  "version": "1.0.0",
+  "description": "CodeVow — plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+  "license": "MIT",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "keywords": [
+    "workflow",
+    "tdd",
+    "review",
+    "verification",
+    "debugging"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "CodeVow",
+        "shortDescription": "AI coding workflow",
+        "category": "Developer Tools",
+        "defaultPrompt": [
+          "Use $workflow to check intent and authorization, confirm the plan when required, and load only the next needed skill."
+        ],
+        "brandColor": "#2563EB",
+        "longDescription": "CodeVow provides six AI coding skills for planning, TDD, evidence-driven debugging, risk-focused review, final-state verification and readable review results. Two collaboration policies preserve user authorization. Optional local Python tools resolve policies, maintain workspace-bound task/evidence records and stage owned files with receipts. It has no MCP server, background service or autonomous Git publishing. Native host behavior remains unverified.",
+        "logo": "./assets/codevow.png",
+        "composerIcon": "./assets/codevow.png"
+      }
+    }
+  }
+}

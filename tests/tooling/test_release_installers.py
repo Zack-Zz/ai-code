@@ -140,7 +140,7 @@ class InstallerTests(unittest.TestCase):
         report = check_release(self.root, self.spec)
         capture = metadata.capture_release(self.spec)
         provenance = {key: report[key] for key in ("source_revision", "working_tree_dirty", "tag")}
-        for schema in (0, 3, True, "2", None):
+        for schema in (0, 4, True, "2", None):
             with self.subTest(schema=schema):
                 with self.assertRaises(io.DataError):
                     layout.payload(self.spec, capture, provenance, report, schema_version=schema)

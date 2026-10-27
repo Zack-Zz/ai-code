@@ -12,9 +12,9 @@ ai-code/
   catalog.json                    插件目录注册
   distribution.json               main 市场与宿主运输方式
   plugins/
-    ai-code-workflow/             CodeVow
+    codevow/             CodeVow
     ai-agent-delegation/          Agent Delegation
-    ai-code-stack-standards/      CodeStack
+    codestack/      CodeStack
   tooling/plugin_tool.py          公共 CLI
   tooling/plugin_tools/           通用校验、构建、检查与发行
   tests/                          公共测试和插件测试汇总
@@ -53,7 +53,7 @@ Reviewer、策略或 `.ai-workflow` 任务记录。
 |---|---|
 | `ai-code` | main 公开市场 |
 | `ai-code-local` | 公共构建及带本地市场的 Release 下载包 |
-| `ai-code-workflow-local` | CodeVow 自带构建工具的本地试用市场 |
+| `codevow-local` | CodeVow 自带构建工具的本地试用市场 |
 
 | 输入或输出 | 职责 |
 |---|---|
@@ -124,3 +124,15 @@ Claude Code 和 ZCode 从固定 Release 附件安装。Codex 使用受管安装�
 
 运行时用法见[Agent Bridge](https://github.com/Zack-Zz/ai-mcp/blob/main/packages/agent-bridge/README.md)，
 插件用法见[Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md)。
+
+## DSH 原生组合包与发布状态
+
+`dsh` 是第四个插件宿主，不是 Agent Bridge 引擎。CodeStack 只贡献标准
+skill-filesystem 提供方；CodeVow 增加原生 spawn 工具与独立 Reviewer preset，
+scope guard 约束原生工具，不实现第二套 agent 循环。安装展示采用 DSH locale。
+
+当前源码 codevow/codestack 与不可变的旧公开记录分离。可信分发配置中的替代
+映射仅在正式同步成功后成为永久退役事实。DSH 安装目录为
+published/dsh/ID/VERSION，插件索引为 published/dsh/index.json。schema-3 Git
+安装按宿主绑定实际安装提交；暂存回执使 D 中间态在市场 C 更新前也可验证。
+历史快照仍按原版本读取。
