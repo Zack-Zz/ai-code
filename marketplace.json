@@ -5,15 +5,15 @@
       "description": "CodeStack applies targeted project conventions across supported stacks: Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
       "displayName": "CodeStack",
       "icon": "https://raw.githubusercontent.com/Zack-Zz/ai-code/27131993b1b1976244273f842a36e3a8fb7414a6/plugins/ai-code-stack-standards/assets/codestack.png",
-      "name": "ai-code-stack-standards",
+      "name": "codestack",
       "source": {
-        "path": "ai-code-stack-standards",
-        "sha256": "209bb59496ccf9709007cb4c0793dca1eb4abacb829cf7866d90b7c6b12bd520",
+        "path": "codestack",
+        "sha256": "ba7869279bdde67f700f82488ce8087304768dd98c0cb12f14e2270640c75290",
         "source": "url",
         "type": "zip",
-        "url": "https://github.com/Zack-Zz/ai-code/releases/download/ai-code-stack-standards%2Fv0.1.0/ai-code-stack-standards-0.1.0-zcode-plugin.zip"
+        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.0/codestack-1.0.0-zcode-plugin.zip"
       },
-      "version": "0.1.0"
+      "version": "1.0.0"
     },
     {
       "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",

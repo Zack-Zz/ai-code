@@ -3,18 +3,18 @@
   "plugins": [
     {
       "category": "developer-tools",
-      "name": "ai-code-stack-standards",
+      "name": "codestack",
       "policy": {
         "authentication": "ON_INSTALL",
         "installation": "AVAILABLE"
       },
       "source": {
-        "path": "./published/codex/ai-code-stack-standards/0.1.0",
-        "sha": "667670a6ac5cc1966e3d5c47a4b8c2d2e8ecc55d",
+        "path": "./published/codex/codestack/1.0.0",
+        "sha": "cece9e1c8ba86cb2df05c0f2162de95279da1b3b",
         "source": "git-subdir",
         "url": "https://github.com/Zack-Zz/ai-code.git"
       },
-      "version": "0.1.0"
+      "version": "1.0.0"
     },
     {
       "category": "developer-tools",
