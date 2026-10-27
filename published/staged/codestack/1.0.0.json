@@ -1,0 +1,169 @@
+{
+  "base_commit": "448b3e105f693e7b7aec7dcc2806427867c3926f",
+  "config_hash": "81f7210eb8fe5be05f94d135ff1c83f2d897ac78579ff8b3b88499422409d0fa",
+  "plan_hash": "418e91e55af0362e187a005bf2229db7713e3aa2344e103f04a1eb8c0654893c",
+  "record": {
+    "channel": "stable",
+    "git_installs": {
+      "codex": {
+        "files": {
+          "published/codex/codestack/1.0.0/LICENSE": "9dd7243a184fe5bf71f8ab9589d4ee5b39eca61babbc9cab86fb3409d9e345e1",
+          "published/codex/codestack/1.0.0/README.md": "b942a474c1d478f3826382a9cddb3fdc950de0bcdcb96055de454e3c35088989",
+          "published/codex/codestack/1.0.0/README_CN.md": "c7ac5ec77c5f6807204a2b61374290cc58165444ee87d6957403cadcc17b7972",
+          "published/codex/codestack/1.0.0/artifact.json": "07c5669a0c6a42a7a9a65767a9fb8695cb99d42a16da9a4a2ea3497add0a07ea",
+          "published/codex/codestack/1.0.0/assets/codestack.png": "620d80de95511cb2efb62334349aa9f9e5b59eba24aa3ce45b90104cdb37c694",
+          "published/codex/codestack/1.0.0/plugin.json": "f9f93bb62c55d7a3d1a3fcf9fc03c682ab84b0ecddb06c8e7f4d42cc5aa2d127",
+          "published/codex/codestack/1.0.0/skills/code-standards/SKILL.md": "f5c367d27553a242bf7e40c810d3d784e884e4268954a9688ab4cb232039d89e",
+          "published/codex/codestack/1.0.0/skills/code-standards/agents/openai.yaml": "cacbf7e33e3dd94a22b49b0c516605267f3175067f42a6db56365f1f036cccd6",
+          "published/codex/codestack/1.0.0/skills/code-standards/references/data-access.md": "7a2f03e90fbbf80ee147ca10c90947849322f0fda451e86092e688cd7866bafe",
+          "published/codex/codestack/1.0.0/skills/code-standards/references/frontend.md": "74d5d3e19c50edc1404e3a27f2cc2540e06b8b924595798f966aa4f4775a618e",
+          "published/codex/codestack/1.0.0/skills/code-standards/references/java-design.md": "33c8095e13fadc54f6d6eb5f9dbcdb28780dd91bb4399874e6678e4e8883e56e",
+          "published/codex/codestack/1.0.0/skills/code-standards/references/java.md": "20c98c640739bc45de9c6a8c41942cc05072f0e164caa229054c347c60e7fce4",
+          "published/codex/codestack/1.0.0/skills/code-standards/references/jpa.md": "0afafd0858f5bfa37a63eea9fe0491bbd5bee798d18e2f1777c0411a49663d24",
+          "published/codex/codestack/1.0.0/skills/code-standards/references/mybatis.md": "e0ba6f182bc2202e23a170b66e857f5abe6aed6d650bb14f8b1acb90eff7594b"
+        },
+        "revision": null
+      },
+      "dsh": {
+        "files": {
+          "published/dsh/codestack/1.0.0/LICENSE": "9dd7243a184fe5bf71f8ab9589d4ee5b39eca61babbc9cab86fb3409d9e345e1",
+          "published/dsh/codestack/1.0.0/README.md": "b942a474c1d478f3826382a9cddb3fdc950de0bcdcb96055de454e3c35088989",
+          "published/dsh/codestack/1.0.0/README_CN.md": "c7ac5ec77c5f6807204a2b61374290cc58165444ee87d6957403cadcc17b7972",
+          "published/dsh/codestack/1.0.0/artifact.json": "d0ce35a9812ba1bffa6ddf209290af9245408e4a638494f768978f991f2164f0",
+          "published/dsh/codestack/1.0.0/assets/codestack-dsh.png": "a9ebc0bac58a7e9aacd07b45f1f4acf24cea7372f92cbdd15fe6e07a3518439f",
+          "published/dsh/codestack/1.0.0/assets/codestack.png": "620d80de95511cb2efb62334349aa9f9e5b59eba24aa3ce45b90104cdb37c694",
+          "published/dsh/codestack/1.0.0/cordis.patch.yml": "cc17abe2f0698d85d87a33ba84091f30fbf4bb095a1f899dbfa15d24ce420de4",
+          "published/dsh/codestack/1.0.0/locale/en.json": "12722fd6f55f0f98051f07c6e3f6cfd17dde11e1e3781f0d8691ab559c2cf992",
+          "published/dsh/codestack/1.0.0/locale/zh.json": "5b502896117ad18637513d2e1a2bd48a5afd6369f3de7585affbc44aa5f26e01",
+          "published/dsh/codestack/1.0.0/package.json": "565d7253d10d9248a8afbbf5ebbff73edc2244a60f0eb8761884e4cc1257ca0f",
+          "published/dsh/codestack/1.0.0/skills/code-standards/SKILL.md": "f5c367d27553a242bf7e40c810d3d784e884e4268954a9688ab4cb232039d89e",
+          "published/dsh/codestack/1.0.0/skills/code-standards/references/data-access.md": "7a2f03e90fbbf80ee147ca10c90947849322f0fda451e86092e688cd7866bafe",
+          "published/dsh/codestack/1.0.0/skills/code-standards/references/frontend.md": "74d5d3e19c50edc1404e3a27f2cc2540e06b8b924595798f966aa4f4775a618e",
+          "published/dsh/codestack/1.0.0/skills/code-standards/references/java-design.md": "33c8095e13fadc54f6d6eb5f9dbcdb28780dd91bb4399874e6678e4e8883e56e",
+          "published/dsh/codestack/1.0.0/skills/code-standards/references/java.md": "20c98c640739bc45de9c6a8c41942cc05072f0e164caa229054c347c60e7fce4",
+          "published/dsh/codestack/1.0.0/skills/code-standards/references/jpa.md": "0afafd0858f5bfa37a63eea9fe0491bbd5bee798d18e2f1777c0411a49663d24",
+          "published/dsh/codestack/1.0.0/skills/code-standards/references/mybatis.md": "e0ba6f182bc2202e23a170b66e857f5abe6aed6d650bb14f8b1acb90eff7594b"
+        },
+        "revision": null
+      }
+    },
+    "hosts": {
+      "claude": {
+        "asset": {
+          "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.0/codestack-1.0.0-claude-plugin.zip",
+          "id": 681592991,
+          "name": "codestack-1.0.0-claude-plugin.zip",
+          "sha256": "1cc3a282eeff0342ff7f96851ab9e52e120be88d22a3f4475afa9f13377bc3f3",
+          "size": 968833
+        },
+        "entry": {
+          "description": "CodeStack applies targeted project conventions across supported stacks: Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
+          "displayName": "CodeStack",
+          "name": "codestack",
+          "version": "1.0.0"
+        },
+        "installer_format": "zip",
+        "package_content_hash": "f6729cf378aedd6556dc502daf67560f6e02d7f436439f371068c8e8389ccf68"
+      },
+      "codex": {
+        "asset": {
+          "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.0/codestack-1.0.0-codex-plugin.zip",
+          "id": 681592993,
+          "name": "codestack-1.0.0-codex-plugin.zip",
+          "sha256": "3d12cd436903d82cc6d6e189abeec1ffa8e29276e51c96ee8bea54061a375707",
+          "size": 969704
+        },
+        "entry": {
+          "category": "developer-tools",
+          "name": "codestack",
+          "policy": {
+            "authentication": "ON_INSTALL",
+            "installation": "AVAILABLE"
+          },
+          "version": "1.0.0"
+        },
+        "installer_format": "zip",
+        "package_content_hash": "d243989638c73f32c504443fcb85f0af0f5f50ba576abd07d20fe400e836f794"
+      },
+      "dsh": {
+        "asset": {
+          "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.0/codestack-1.0.0-dsh-plugin.tgz",
+          "id": 681593005,
+          "name": "codestack-1.0.0-dsh-plugin.tgz",
+          "sha256": "cb2c345f6c18a917ddbcb4e26e55c4fb107db4b69d8a02f72084f43a51ca75be",
+          "size": 1026631
+        },
+        "entry": {
+          "description": {
+            "en": "Selected coding conventions for the current change or review",
+            "zh": "\u4e3a\u5f53\u524d\u53d8\u66f4\u6216\u5ba1\u67e5\u9009\u62e9\u9002\u7528\u7684\u7f16\u7801\u7ea6\u5b9a"
+          },
+          "engines": {
+            "dsh": "0.2.1-rc.2"
+          },
+          "icon": "assets/codestack-dsh.png",
+          "name": "codestack",
+          "title": {
+            "en": "CodeStack",
+            "zh": "CodeStack"
+          }
+        },
+        "installer_format": "npm-tgz",
+        "package_content_hash": "ff61882739922c6cfdbd5a40814be696f872a0b0937a3ff4776d66729f17f75b"
+      },
+      "zcode": {
+        "asset": {
+          "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.0/codestack-1.0.0-zcode-plugin.zip",
+          "id": 681592999,
+          "name": "codestack-1.0.0-zcode-plugin.zip",
+          "sha256": "ba7869279bdde67f700f82488ce8087304768dd98c0cb12f14e2270640c75290",
+          "size": 968761
+        },
+        "entry": {
+          "description": "CodeStack applies targeted project conventions across supported stacks: Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
+          "displayName": "CodeStack",
+          "icon": "https://raw.githubusercontent.com/Zack-Zz/ai-code/27131993b1b1976244273f842a36e3a8fb7414a6/plugins/ai-code-stack-standards/assets/codestack.png",
+          "name": "codestack",
+          "version": "1.0.0"
+        },
+        "installer_format": "zip",
+        "package_content_hash": "d764da3ffe2f7894e358a570ffcea2094302e466933e7272499af65b2fc06daa"
+      }
+    },
+    "mode": "stable",
+    "product_id": "codestack",
+    "readiness": {
+      "accepted_hosts": [],
+      "limitations": [
+        "This is a local release bundle; no installation, upload, marketplace submission or Git change was performed.",
+        "Host evidence is a source-bound factual record, not user authorization or marketplace acceptance.",
+        "A previous bundle is caller-supplied trusted history with local integrity checks, not proof of a published release.",
+        "Raw host-session artifacts remain local; this bundle contains only their bindings and hashes.",
+        "Real host acceptance is unverified for: claude, codex, dsh, zcode"
+      ],
+      "package_content_hashes": {
+        "claude": "f6729cf378aedd6556dc502daf67560f6e02d7f436439f371068c8e8389ccf68",
+        "codex": "d243989638c73f32c504443fcb85f0af0f5f50ba576abd07d20fe400e836f794",
+        "dsh": "ff61882739922c6cfdbd5a40814be696f872a0b0937a3ff4776d66729f17f75b",
+        "zcode": "d764da3ffe2f7894e358a570ffcea2094302e466933e7272499af65b2fc06daa"
+      },
+      "pending_acceptance": [
+        "claude",
+        "codex",
+        "dsh",
+        "zcode"
+      ],
+      "publication_ready": true
+    },
+    "release_id": 425456009,
+    "release_published_at": "2026-10-27T12:53:07Z",
+    "release_url": "https://github.com/Zack-Zz/ai-code/releases/tag/codestack%2Fv1.0.0",
+    "repository": "https://github.com/Zack-Zz/ai-code",
+    "schema_version": 3,
+    "source_revision": "5458a69579260d0259e35ac0a8ff05e07179a85e",
+    "source_tree_hash": "873a87c58b190a3341d14cd0153e12ffc3ac6c7e8eb92ceb8f5a92cbf9dca3eb",
+    "tag": "codestack/v1.0.0",
+    "version": "1.0.0"
+  },
+  "schema_version": 1
+}
