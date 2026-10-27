@@ -9,10 +9,36 @@ publishing a Release, and updating the stable marketplace. Installation is
 covered by the [installation guide](installation.md); source development by the
 [development guide](../CONTRIBUTING.md).
 
+## Plugin version increments
+
+These rules apply to every plugin in this repository:
+
+- Start a new plugin at stable version `1.0.0`. Existing published `0.x` versions
+  and historical records remain unchanged; continue their existing sequence
+  unless the user explicitly specifies a target version or increment level.
+- By default, advance exactly one patch version: `X.Y.Z → X.Y.(Z+1)`.
+  For example, `1.0.5 → 1.0.6` and `0.1.0 → 0.1.1`.
+- Use the plugin's latest published stable version as the baseline. Keep one
+  candidate version for the same unreleased change; commits, reviews, fixes and
+  repeated checks do not each trigger another increment.
+- Continue the original plugin's version sequence when its ID or name changes.
+  A rename, new host, new feature or incompatible change does not authorize the
+  AI to choose a major/minor increment or skip version numbers.
+- Depart from the default only when the user explicitly specifies a target
+  version or increment level. Implementation, Git delivery and publication
+  authorization do not imply permission to choose a larger increment.
+- Keep preview releases opt-in. When the user requests another preview of the
+  same target version without specifying a sequence, increase `preview.N` by one.
+  Published versions and their history remain immutable.
+
+This is the repository's version-selection convention. The local helper still
+requires an explicit `--version`; the AI resolves that value before calling it.
+
 ## Prepare a version with AI
 
 Ask, for example: “Help me prepare CodeVow 1.0.3: add local version preparation
-and simplify publishing.” Give the target version and changes. The AI drafts the
+and simplify publishing.” Give the plugin and changes; a target version is
+optional and otherwise follows the patch rule above. The AI drafts the
 English and Chinese notes and prepares the source diff for review.
 
 Use the repository skill
@@ -172,8 +198,8 @@ read back consistently. Host installation and runtime acceptance remain separate
 
 ## DSH artifacts and identity replacement
 
-The unreleased source IDs are `codevow` and `codestack`. Their first candidate
-versions are 2.0.0 and 0.2.0. Existing public records keep their old identities
+The unreleased source IDs are `codevow` and `codestack`. Their current candidate
+versions are 1.0.6 and 1.0.0. Existing public records keep their old identities
 until a verified replacement release is synchronized. Do not edit `published/`
 or marketplace manifests to simulate that transition.
 

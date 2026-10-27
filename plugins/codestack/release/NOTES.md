@@ -5,7 +5,7 @@
 Stable releases use the shared `ai-code` marketplace. Versions and availability
 are recorded in the [release index](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json).
 
-## 0.2.0
+## 1.0.0
 
 ### English
 

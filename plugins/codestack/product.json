@@ -2,7 +2,7 @@
   "schema_version": 2,
   "product_id": "codestack",
   "display_name": "CodeStack",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "license": "MIT",
   "publisher": {

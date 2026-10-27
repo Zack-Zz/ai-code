@@ -1,6 +1,6 @@
 ---
 name: workflow-reviewer
-description: Read-only reviewer for final diffs — correctness, authorization, public contracts, concurrency and consistency; reports findings only.
+description: Read-only reviewer for final diffs — correctness, authorization, public contracts and consistency; examines concurrency evidence and protection responsibilities; reports findings only.
 model: inherit
 tools: ["Read", "Grep", "Glob"]
 maxTurns: 12

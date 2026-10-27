@@ -2,8 +2,8 @@
 
 [English](installation.md) | 简体中文
 
-> 当前源码候选：CodeVow 使用 `codevow`（2.0.0），CodeStack 使用
-> `codestack`（0.2.0），新增 `dsh` 适配。本次改动尚未发布，实际可安装版本仍由
+> 当前源码候选：CodeVow 使用 `codevow`（1.0.6），CodeStack 使用
+> `codestack`（1.0.0），新增 `dsh` 适配。本次改动尚未发布，实际可安装版本仍由
 > 冻结的 published 快照决定。以下新 ID 命令须在市场出现新入口后使用。
 > 重新安装步骤见[身份迁移](migrations/2026-10-27-plugin-identities.zh-CN.md)。
 
@@ -143,8 +143,8 @@ node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins list
 
 ```sh
 dsh --profile ai-code-trial --from-default-profile web --dump-config
-dsh plugin --profile ai-code-trial add ./codevow-2.0.0-dsh-plugin.tgz
-dsh plugin --profile ai-code-trial add ./codestack-0.2.0-dsh-plugin.tgz
+dsh plugin --profile ai-code-trial add ./codevow-1.0.6-dsh-plugin.tgz
+dsh plugin --profile ai-code-trial add ./codestack-1.0.0-dsh-plugin.tgz
 dsh --profile ai-code-trial --dump-config
 dsh --profile ai-code-trial
 ```

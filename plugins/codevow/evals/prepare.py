@@ -80,7 +80,9 @@ def prepare(case_id: str, output: Path) -> dict:
 
     prefixes = ["workspace"]
     git_baselines = None
-    if fixture in ("python_labels", "python_auth", "node_status", "state_resume", "devops_entry"):
+    if fixture == "concurrency_review":
+        shutil.copytree(FIXTURES / fixture, output / "workspace")
+    elif fixture in ("python_labels", "python_auth", "node_status", "state_resume", "devops_entry"):
         workspace = output / "workspace"
         _copy_file_fixture(fixture, workspace)
         if fixture == "state_resume":

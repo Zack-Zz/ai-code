@@ -1,0 +1,19 @@
+--- counter_before.py
++++ counter_after.py
+@@ -1 +1,10 @@
+-"""Each accepted request adds one to a shared persistent counter."""
++"""Candidate refactor separates the shared counter read and write."""
++
++
++def read_value(connection, name):
++    return connection.execute("SELECT value FROM counters WHERE name = ?", (name,)).fetchone()[0]
++
++
++def write_value(connection, name, value):
++    with connection:
++        connection.execute("UPDATE counters SET value = ? WHERE name = ?", (value, name))
+@@ -5,2 +14,2 @@
+-    with connection:
+-        connection.execute("UPDATE counters SET value = value + 1 WHERE name = ?", (name,))
++    value = read_value(connection, name)
++    write_value(connection, name, value + 1)

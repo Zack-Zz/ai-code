@@ -52,7 +52,7 @@ translations can be retained.
   "schema_version": 1,
   "product_id": "ai-example",
   "display_name": "AI Example",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "license": "MIT",
   "hosts": ["codex"],
@@ -69,7 +69,9 @@ a second development version in the catalog, root package.json, or marketplace.
 New public versions use only `X.Y.Z` or `X.Y.Z-preview.N`. Numbers must not have
 leading zeros; other suffixes and build metadata are rejected. Preview sequence
 numbers are compared numerically, and a stable version follows all previews with
-the same core version. The release kind is derived from the version.
+the same core version. The release kind is derived from the version. Start a new
+plugin at stable version `1.0.0`, then follow the
+[plugin version increments](publishing.md#plugin-version-increments).
 
 `hosts` is required and must be nonempty. The supported values are currently
 `claude`, `codex`, `zcode`, and `dsh`. Declare native templates at

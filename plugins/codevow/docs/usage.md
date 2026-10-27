@@ -119,6 +119,20 @@ remain read-only rather than claim CodeVow is active.
 - Delivery reports the final code state, actual checks, findings and remaining
   work. Changed code needs fresh verification.
 
+## Design and review reasoning
+
+Concurrency findings should explain the overlapping requests, tasks or instances,
+their shared state, an execution order and the business constraint at risk.
+Code and the execution model can establish a problem without a production
+incident; missing facts remain explicit hypotheses to confirm.
+
+Proposed protections should have concrete responsibilities. The assistant checks
+existing guarantees and explains what additional locks, retries, compensation or
+recovery solve, weighing correctness, reliability and maintenance cost. Necessary
+complexity is valid; duplicate protections and defenses based only on unsupported
+scenarios are also review concerns. These are reasoning instructions whose actual
+application must be checked in host sessions.
+
 ## Working with subagents
 
 CodeVow adds brief coordination guidance to the host's existing agent capabilities.

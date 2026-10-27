@@ -56,6 +56,19 @@ conditions, change type, risk, and applicable authorizations.
   exposure. Independent of depth: a one-line authz fix can be `short` depth
   and `critical` risk.
 
+For concurrency and protection decisions that affect the design:
+
+- Explain the reachable overlap: the requests, tasks or instances involved,
+  their shared state, an execution order and the business constraint at risk.
+  Source and execution-model reasoning can establish this without a production
+  incident. Keep missing facts as explicit hypotheses to confirm, distinct from
+  confirmed defects.
+- Give each proposed protection a concrete responsibility. Check what existing
+  constraints, transactions and conditional updates already cover. Explain the
+  problem addressed by added locks, retries, compensation or recovery, and weigh
+  correctness, reliability and maintenance cost. Necessary complexity is valid;
+  examine duplicate protections and defenses based on unsupported scenarios.
+
 Under the default `collaborative` policy, present the plan and wait for an
 applicable user confirmation before implementation; an already-confirmed
 overall plan is not re-asked. Under `continuous`, still state a short plan,

@@ -8,19 +8,21 @@ build helper uses `codevow-local`. See the
 [installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md).
 The entries below retain their dated release context, including earlier migration plans.
 
-## 2.0.0
+## 1.0.6
 
 ### English
 
 - Unify the plugin identity as `codevow`. Uninstall `ai-code-workflow` through the host's native interface before installing `codevow`; retain project `.ai-workflow/` data and start a new session.
 - Add a DeepSeek Harness bundle targeting `0.2.1-rc.2`, an independent official skill provider, and a native read-only Reviewer preset and spawn tool. Required Web-profile services must be available; host acceptance remains pending.
 - Keep shared authorization and review contracts across hosts, with policy and execution detail in a reachable reference for long sessions. Python tools retain their existing project-data contract.
+- Ground design and review concurrency findings in reachable execution chains, and assess protection responsibilities against existing guarantees, correctness, reliability and maintenance cost.
 
 ### 中文
 
 - 插件身份统一为 `codevow`。先通过宿主原生界面卸载 `ai-code-workflow`，再安装 `codevow`；保留项目 `.ai-workflow/` 数据并开启新会话。
 - 新增目标为 `0.2.1-rc.2` 的 DeepSeek Harness bundle、独立官方技能提供方，以及原生只读 Reviewer preset 和 spawn 工具。Web profile 必须提供所需服务，真实宿主验收仍待完成。
 - 各端共享授权和审查合同；策略和执行细节转入明确可达的引用以支持长会话。Python 工具保持既有项目数据契约。
+- 设计与审查中的并发问题须有可达执行链路；结合现有保障、正确性、可靠性和维护成本，核对各项保护机制的明确职责。
 
 ## 1.0.5
 

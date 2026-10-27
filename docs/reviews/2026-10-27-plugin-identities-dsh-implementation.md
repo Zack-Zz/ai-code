@@ -2,6 +2,11 @@
 
 日期：2026-10-27（Asia/Shanghai）。状态：本地实现、Review 与验证完成；未提交、推送或发布。
 
+后续版本更正：用户明确指定当前未发布候选为 CodeVow `1.0.6`、CodeStack `1.0.0`。
+下方原始候选表与验证数量保留此前记录，`2.0.0` / `0.2.0` 不再是当前目标；
+旧验证结果不作为更正后版本的通过证据，新结果见[用户指定候选版本复验](#用户指定候选版本复验)。
+当前规则见[插件版本升级规范](../publishing.zh-CN.md#插件版本升级规范)。
+
 ## 实施结果
 
 | 插件 | 当前源码 | 候选版本 | 声明宿主 |
@@ -107,6 +112,39 @@ Reviewer 仅有指令层只读限制（policy_only），不是工具层写保护
 16 项检查证明官方 Loader 的完整预设激活、挂载和工具注册；Agent 仍为合成对象，
 未运行模型、真实 spawn 会话、用户 profile 或真实文件工具操作。此结果不提升任何
 宿主 acceptance 槽；后续 Git、发行、安装仍须各自明确授权。
+
+## 用户指定候选版本复验
+
+用户明确指定 CodeVow `1.0.6`、CodeStack `1.0.0`。远端 Release 回读仍只有旧 ID
+下的 CodeVow `1.0.5` 和 CodeStack `0.1.0` 等既有发行，没有发布被更正的候选。
+新插件的初始正式版本为 `1.0.0`，后续默认只增加一个补丁版本；用户明确指定目标
+版本或升级级别时按该要求执行。旧 `0.x` 已发布历史不回写。
+
+本轮更正未发布候选的 `product.json` 与当前说明章节，写入前独立预览四个文件的
+前后哈希。通用版本工具的拒绝降级逻辑未修改；没有有效宿主证据引用或生成摘要
+需要移除，四端 acceptance 继续为 null。当前双语导航、安装包文件名、制作示例、
+迁移表、发布规范、根规则及维护技能同步更新；旧设计和验证数字保留历史语境。
+
+主代理完成元数据与双语 diff 自审；一个 code_implementer 负责独立的文档同步。
+这是元数据与文档更正，不含运行时代码变化，未编写仅检查文案的回归测试。
+
+| 更正后检查 | 结果 |
+| --- | --- |
+| 公共版本与本地版本准备测试 | 24 项通过 |
+| CodeVow 版本、preview 独立包与回执测试 | 6 项通过；使用 Python 3.14 重跑，最初误用系统 Python 3.9 的环境失败不计通过 |
+| 两插件 Node 技能契约组 | 通过，包含 CodeStack 四宿主构建与发行集成测试 |
+| 公共源校验、CodeVow 独立源校验 | 通过，版本为 1.0.6 / 1.0.0 |
+| 全部宿主构建与逐包可信源检查 | 11 包通过，两个插件各四包的版本字段均与用户指定一致 |
+| 两候选 draft prepare/verify 与 historical | 通过，schema 3；CodeVow 331 文件、CodeStack 139 文件，publication_ready=false |
+| 维护技能、ESLint、Markdownlint、相对链接、diff 与 dist 检查 | 通过 |
+| 公开市场快照检查 | 通过，无 pending distribution；公开文件未修改 |
+
+制品与报告：`/private/tmp/ai-code-version-correction-3rf0it9p/report.json`。
+版本预览：`/private/tmp/ai-code-candidate-version-correction-preview.json`。
+测试日志：`/private/tmp/ai-code-version-correction-tests.log` 与
+`/private/tmp/ai-code-version-correction-codevow-tests.log`。本轮未重跑全量 `npm test`、
+远端 CI 或真实宿主验收，先前提交的 CI 通过不作为当前未提交版本的通过证据。
+本轮没有提交、推送、创建标签、发布或安装。
 
 ## 验证边界与后续
 

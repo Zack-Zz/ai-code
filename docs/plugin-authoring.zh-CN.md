@@ -44,7 +44,7 @@ kebab-case，建议目录名与 ID 一致。每个插件自有版本、许可证
   "schema_version": 1,
   "product_id": "ai-example",
   "display_name": "AI Example",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "license": "MIT",
   "hosts": ["codex"],
@@ -59,7 +59,8 @@ kebab-case，建议目录名与 ID 一致。每个插件自有版本、许可证
 身份、版本和白名单只写在该清单。不要在 catalog、根 package.json 或市场
 中维护第二份开发版本。新的公开版本仅使用 `X.Y.Z` 或 `X.Y.Z-preview.N`，
 数字禁止前导零，不接受其他后缀或 build metadata；preview 序号按数字比较，
-同核心正式版在所有 preview 之后。发行种类由版本派生。
+同核心正式版在所有 preview 之后。发行种类由版本派生。新插件的初始正式版本为
+`1.0.0`，后续遵循[插件版本升级规范](publishing.zh-CN.md#插件版本升级规范)。
 
 `hosts` 必填且非空，当前接受 `claude`、`codex`、`zcode`、`dsh`；每个声明
 宿主都必须有真实 `adapters/<host>/plugin.json`。

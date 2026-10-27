@@ -123,14 +123,14 @@ function runTests() {
         'skills/review-results/agents/ must not exist (metadata migrated to interfaces.json)');
     }],
 
-    ['cases.json defines exactly A01..A36 with the fixed shape', () => {
+    ['cases.json defines exactly A01..A39 with the fixed shape', () => {
       const doc = JSON.parse(read('evals/cases.json'));
       assert.strictEqual(doc.schema_version, 1);
       const ids = doc.cases.map((c) => c.case_id);
-      const expected = Array.from({ length: 36 }, (_, i) => `A${String(i + 1).padStart(2, '0')}`);
+      const expected = Array.from({ length: 39 }, (_, i) => `A${String(i + 1).padStart(2, '0')}`);
       assert.deepStrictEqual(ids, expected);
       const fixedFields = ['case_id', 'kind', 'fixture', 'policy_mode', 'turns', 'checks', 'required_evidence', 'critical'];
-      const fixtures = ['python_labels', 'python_auth', 'node_status', 'state_resume', 'git_permissions', 'managed_package', 'devops_entry'];
+      const fixtures = ['python_labels', 'python_auth', 'node_status', 'state_resume', 'git_permissions', 'managed_package', 'devops_entry', 'concurrency_review'];
       const methods = ['file_hash', 'behavior_test', 'process_status', 'trace_order', 'git_state', 'package_check', 'manual_review'];
       const effects = ['blocking', 'unsupported_scope', 'informational'];
       for (const c of doc.cases) {
@@ -158,7 +158,8 @@ function runTests() {
       assert.deepStrictEqual(
         criticalSet,
         ['A02', 'A03', 'A06', 'A09', 'A13', 'A14', 'A15', 'A16', 'A18', 'A19', 'A20', 'A21',
-          'A26', 'A27', 'A28', 'A29', 'A30', 'A31', 'A32', 'A33', 'A34', 'A35', 'A36'],
+          'A26', 'A27', 'A28', 'A29', 'A30', 'A31', 'A32', 'A33', 'A34', 'A35', 'A36',
+          'A37', 'A38', 'A39'],
         'critical flag must mark exactly the acceptance-matrix key set');
     }],
 
@@ -175,7 +176,7 @@ function runTests() {
       assert.match(a25.checks[0].expected, /all declared host packages/i);
     }],
 
-    ['all seven fixtures exist with their required props', () => {
+    ['all eight fixtures exist with their required props', () => {
       assert.ok(exists('evals/fixtures/python_labels/labels.py'));
       assert.ok(exists('evals/fixtures/python_labels/test_baseline.py'));
       assert.ok(exists('evals/fixtures/python_labels/mutations/a04_break_labels.py'));
@@ -195,6 +196,10 @@ function runTests() {
       assert.ok(exists('evals/fixtures/devops_entry/devops.js'));
       assert.ok(exists('evals/fixtures/devops_entry/api.js'));
       assert.ok(exists('evals/fixtures/devops_entry/test_baseline.js'));
+      for (const file of ['README.md', 'README.zh-CN.md', 'schema.sql', 'registry.py',
+        'counter_before.py', 'counter_after.py', 'counter.diff', 'exercise.py', 'proposal.md']) {
+        assert.ok(exists(`evals/fixtures/concurrency_review/${file}`));
+      }
     }],
 
     ['state_resume fixture ships one deliberately stale evidence fingerprint', () => {

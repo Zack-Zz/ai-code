@@ -8,8 +8,8 @@ installation.
 
 | Previous ID | New ID | Candidate version | Display name |
 | --- | --- | --- | --- |
-| `ai-code-workflow` | `codevow` | 2.0.0 | CodeVow |
-| `ai-code-stack-standards` | `codestack` | 0.2.0 | CodeStack |
+| `ai-code-workflow` | `codevow` | 1.0.6 | CodeVow |
+| `ai-code-stack-standards` | `codestack` | 1.0.0 | CodeStack |
 
 1. Use your host's native plugin controls to uninstall the previous IDs.
 2. Refresh the existing `ai-code` marketplace; its name and source do not change.

@@ -7,8 +7,8 @@
 
 | 旧 ID | 新 ID | 候选版本 | 展示名称 |
 | --- | --- | --- | --- |
-| `ai-code-workflow` | `codevow` | 2.0.0 | CodeVow |
-| `ai-code-stack-standards` | `codestack` | 0.2.0 | CodeStack |
+| `ai-code-workflow` | `codevow` | 1.0.6 | CodeVow |
+| `ai-code-stack-standards` | `codestack` | 1.0.0 | CodeStack |
 
 1. 使用宿主原生插件管理卸载旧 ID。
 2. 刷新现有 `ai-code` 市场；市场名称与来源不变。

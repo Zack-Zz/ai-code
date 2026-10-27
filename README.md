@@ -2,8 +2,8 @@
 
 English | [简体中文](README.zh-CN.md)
 
-> Source candidate: CodeVow now uses `codevow` (2.0.0) and CodeStack uses
-> `codestack` (0.2.0), including a `dsh` adapter. This change is not published yet.
+> Source candidate: CodeVow now uses `codevow` (1.0.6) and CodeStack uses
+> `codestack` (1.0.0), including a `dsh` adapter. This change is not published yet.
 > The frozen published snapshot still determines what can be installed today.
 > Use the new-ID commands below after those entries appear in the marketplace.
 > See the [identity migration](docs/migrations/2026-10-27-plugin-identities.md).

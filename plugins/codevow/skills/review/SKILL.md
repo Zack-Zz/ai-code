@@ -23,6 +23,11 @@ contracts, concurrency, consistency — including interfaces between separately
 developed parts. Do not load generic framework tutorial libraries and do not
 review unrelated code.
 
+For concurrency and proposed protection mechanisms, apply the two
+[concurrency and protection design rules](references/reviewer-contract.md#concurrency-and-protection-design).
+Require a reachable failure argument for a confirmed defect and assess each
+protection's responsibility, existing coverage and maintenance cost.
+
 ## Independent review
 
 Attempt an available independent reviewer when risk is `critical` or
