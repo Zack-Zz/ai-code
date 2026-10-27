@@ -9,11 +9,11 @@
       "displayName": "CodeStack",
       "name": "codestack",
       "source": {
-        "sha256": "1cc3a282eeff0342ff7f96851ab9e52e120be88d22a3f4475afa9f13377bc3f3",
+        "sha256": "56ce58a2cc96b08c96f13ba4722a1f85e33fbf75903c93c155e14eb71e95f29f",
         "source": "archive",
-        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.0/codestack-1.0.0-claude-plugin.zip"
+        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.1/codestack-1.0.1-claude-plugin.zip"
       },
-      "version": "1.0.0"
+      "version": "1.0.1"
     },
     {
       "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",

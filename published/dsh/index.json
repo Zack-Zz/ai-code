@@ -6,7 +6,7 @@
         "en": "Selected coding conventions for the current change or review",
         "zh": "\u4e3a\u5f53\u524d\u53d8\u66f4\u6216\u5ba1\u67e5\u9009\u62e9\u9002\u7528\u7684\u7f16\u7801\u7ea6\u5b9a"
       },
-      "icon": "https://raw.githubusercontent.com/Zack-Zz/ai-code/cece9e1c8ba86cb2df05c0f2162de95279da1b3b/published/dsh/codestack/1.0.0/assets/codestack-dsh.png",
+      "icon": "https://raw.githubusercontent.com/Zack-Zz/ai-code/abf4e3187ce46a12c3608158714bfe8c399427f1/published/dsh/codestack/1.0.1/assets/codestack-dsh.png",
       "name": "codestack",
       "title": {
         "en": "CodeStack",
@@ -15,16 +15,16 @@
       "versions": [
         {
           "engines": {
-            "dsh": "0.2.1-rc.2"
+            "dsh": ">=0.2.1-rc.2"
           },
-          "publishTimestamp": 1793105587,
+          "publishTimestamp": 1793118436,
           "source": {
-            "commit": "cece9e1c8ba86cb2df05c0f2162de95279da1b3b",
-            "path": "published/dsh/codestack/1.0.0",
+            "commit": "abf4e3187ce46a12c3608158714bfe8c399427f1",
+            "path": "published/dsh/codestack/1.0.1",
             "type": "git",
             "url": "https://github.com/Zack-Zz/ai-code"
           },
-          "version": "1.0.0"
+          "version": "1.0.1"
         }
       ]
     },

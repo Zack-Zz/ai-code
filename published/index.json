@@ -2,19 +2,19 @@
   "plugins": {
     "codestack": {
       "git_revisions": {
-        "codex": "cece9e1c8ba86cb2df05c0f2162de95279da1b3b",
-        "dsh": "cece9e1c8ba86cb2df05c0f2162de95279da1b3b"
+        "codex": "abf4e3187ce46a12c3608158714bfe8c399427f1",
+        "dsh": "abf4e3187ce46a12c3608158714bfe8c399427f1"
       },
       "installers": {
-        "claude": "1cc3a282eeff0342ff7f96851ab9e52e120be88d22a3f4475afa9f13377bc3f3",
-        "codex": "3d12cd436903d82cc6d6e189abeec1ffa8e29276e51c96ee8bea54061a375707",
-        "dsh": "cb2c345f6c18a917ddbcb4e26e55c4fb107db4b69d8a02f72084f43a51ca75be",
-        "zcode": "ba7869279bdde67f700f82488ce8087304768dd98c0cb12f14e2270640c75290"
+        "claude": "56ce58a2cc96b08c96f13ba4722a1f85e33fbf75903c93c155e14eb71e95f29f",
+        "codex": "3cc2f62802ef5a033f4acb0f56e1afc782ff13785f66774ced7415c542f02372",
+        "dsh": "f2ff592d3973e48bd7d133dfd58f26eebfb4b7d58086b1aefd01d7aa92043810",
+        "zcode": "ff2e73659e96c97d0cbd8a9a7e324cc9f25d181b7965fdc27f7915bf0f659722"
       },
-      "release_id": 425456009,
-      "source_revision": "5458a69579260d0259e35ac0a8ff05e07179a85e",
-      "source_tree_hash": "873a87c58b190a3341d14cd0153e12ffc3ac6c7e8eb92ceb8f5a92cbf9dca3eb",
-      "version": "1.0.0"
+      "release_id": 425712642,
+      "source_revision": "f6b4a19ac8dba2c01374f70b03fa5ba20b95da54",
+      "source_tree_hash": "0c548674018a243cae06ff7397727223c179b75304bf5918430227b3e4b07ca4",
+      "version": "1.0.1"
     },
     "codevow": {
       "git_revisions": {

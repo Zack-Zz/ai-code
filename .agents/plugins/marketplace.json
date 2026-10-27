@@ -9,12 +9,12 @@
         "installation": "AVAILABLE"
       },
       "source": {
-        "path": "./published/codex/codestack/1.0.0",
-        "sha": "cece9e1c8ba86cb2df05c0f2162de95279da1b3b",
+        "path": "./published/codex/codestack/1.0.1",
+        "sha": "abf4e3187ce46a12c3608158714bfe8c399427f1",
         "source": "git-subdir",
         "url": "https://github.com/Zack-Zz/ai-code.git"
       },
-      "version": "1.0.0"
+      "version": "1.0.1"
     },
     {
       "category": "developer-tools",
