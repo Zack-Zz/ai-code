@@ -1,0 +1,37 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "author": {
+    "name": "Zack-Zz",
+    "url": "https://github.com/Zack-Zz"
+  },
+  "description": "CodeStack applies targeted project conventions across supported stacks: Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "brandColor": "#0284C7",
+        "category": "Developer Tools",
+        "composerIcon": "./assets/codestack.png",
+        "defaultPrompt": [
+          "Use $code-standards to apply the relevant CodeStack conventions to this implementation or review."
+        ],
+        "developerName": "Zack-Zz",
+        "displayName": "CodeStack",
+        "logo": "./assets/codestack.png",
+        "longDescription": "One skill selects relevant English references from the current task and actual stack. It covers Java writing conventions, targeted SQL/JPA/MyBatis pitfalls, and centrally maintained language resources for multilingual frontend copy across frameworks such as React and Vue. It adds no general TypeScript, React or Vue style guide. No runtime, hooks, separate agents or project configuration. Native loading, implicit selection and task outcomes require separate host evidence.",
+        "shortDescription": "Targeted coding conventions"
+      }
+    }
+  },
+  "keywords": [
+    "code-standards",
+    "java",
+    "jpa",
+    "mybatis",
+    "frontend",
+    "i18n"
+  ],
+  "license": "MIT",
+  "name": "codestack",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "version": "1.0.1"
+}
