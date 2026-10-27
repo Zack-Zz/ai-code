@@ -62,6 +62,7 @@ class GitHub:
         if not REPO.fullmatch(repository):
             raise io.DataError('GitHub repository must be OWNER/REPO')
         self.repository = repository
+        self._blob_bytes = {}
 
     def get(self, relative, missing=False):
         headers = {'Accept': 'application/vnd.github+json', 'User-Agent': 'ai-code-marketplace'}
@@ -79,7 +80,15 @@ class GitHub:
         except HTTPError as exc:
             if missing and exc.code == 404:
                 return None
-            raise io.DataError(f'GitHub read failed: HTTP {exc.code}') from exc
+            rate = []
+            for header, label in (('x-ratelimit-limit', 'limit'), ('x-ratelimit-remaining', 'remaining'),
+                                  ('x-ratelimit-reset', 'reset'), ('retry-after', 'retry_after')):
+                value = exc.headers.get(header) if exc.headers else None
+                if isinstance(value, str) and re.fullmatch(r'[0-9]+', value):
+                    rate.append(f'{label}={value}')
+            resource = relative.split('?', 1)[0] or 'repository'
+            detail = f'; {", ".join(rate)}' if rate else ''
+            raise io.DataError(f'GitHub read failed: HTTP {exc.code} ({resource}){detail}') from exc
 
     def tag(self, tag):
         obj = self.get('git/ref/tags/' + quote(tag, safe=''))['object']
@@ -141,12 +150,18 @@ class GitHub:
                 continue
             if entry['type'] != 'blob' or entry['mode'] not in ('100644', '100755') or name in files:
                 raise io.DataError('market contains a link, special or duplicate file')
-            blob = self.get('git/blobs/' + entry['sha'])
-            if blob.get('encoding') != 'base64':
-                raise io.DataError('unsupported GitHub blob encoding')
-            raw = base64.b64decode(''.join(blob['content'].split()), validate=True)
+            oid = entry['sha']
+            raw = self._blob_bytes.get(oid)
+            if raw is None:
+                blob = self.get('git/blobs/' + oid)
+                if blob.get('encoding') != 'base64':
+                    raise io.DataError('unsupported GitHub blob encoding')
+                raw = base64.b64decode(''.join(blob['content'].split()), validate=True)
+                if len(raw) != blob['size']:
+                    raise io.DataError('market blob bytes exceed declared limit')
+                self._blob_bytes[oid] = raw
             total += len(raw)
-            if len(raw) != blob['size'] or total > LIMIT:
+            if total > LIMIT:
                 raise io.DataError('market blob bytes exceed declared limit')
             files[name] = raw
         return revision, files

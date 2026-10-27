@@ -1,6 +1,7 @@
 """Deployment safeguards use real archives and local Git, without GitHub writes."""
 
 import importlib.util
+import base64
 import io as bytes_io
 import json
 from pathlib import Path
@@ -11,6 +12,8 @@ import unittest
 import warnings
 import zipfile
 from unittest import mock
+from urllib.error import HTTPError
+from email.message import Message
 
 from plugin_tools import io
 from plugin_tools.release.layout import zip_bytes
@@ -54,6 +57,88 @@ class DeploymentSafeguards(unittest.TestCase):
             module.GitHub('example/repo').get(resource)
         self.assertEqual(request.call_args.args[0].full_url,
                          'https://api.github.com/repos/example/repo/' + resource)
+
+    def test_market_reuses_immutable_blobs_but_rereads_the_current_branch(self):
+        module = self.require_module()
+        api = module.GitHub('example/repo')
+        first, second, shared, changed = ('a' * 40, 'b' * 40, '1' * 40, '2' * 40)
+        readme = 'published/codex/example/1.0.0/README.md'
+        license_path = 'published/codex/example/1.0.0/LICENSE'
+        def blob(raw):
+            return {'encoding': 'base64', 'content': base64.b64encode(raw).decode(), 'size': len(raw)}
+        def tree(entries):
+            return {'truncated': False, 'tree': [
+                {'path': path, 'type': 'blob', 'mode': '100644', 'sha': oid} for path, oid in entries]}
+        responses = {
+            'git/commits/' + first: {'tree': {'sha': 'c' * 40}},
+            'git/commits/' + second: {'tree': {'sha': 'd' * 40}},
+            'git/trees/' + 'c' * 40 + '?recursive=1': tree([(readme, shared), (license_path, shared)]),
+            'git/trees/' + 'd' * 40 + '?recursive=1': tree([(readme, shared), (license_path, changed)]),
+            'git/blobs/' + shared: blob(b'trusted'),
+            'git/blobs/' + changed: blob(b'updated'),
+        }
+        branches, requests = iter([first, second]), []
+        def read(request, timeout):
+            resource = request.full_url.removeprefix('https://api.github.com/repos/example/repo/')
+            requests.append(resource)
+            value = {'object': {'sha': next(branches)}} if resource == 'git/ref/heads/main' else responses[resource]
+            return bytes_io.BytesIO(io.dump_json(value))
+        with mock.patch.object(module, 'urlopen', side_effect=read):
+            self.assertEqual(api.market('main'), (first, {readme: b'trusted', license_path: b'trusted'}))
+            self.assertEqual(api.market('main'), (second, {readme: b'trusted', license_path: b'updated'}))
+            self.assertEqual(api.market(first), (first, {readme: b'trusted', license_path: b'trusted'}))
+        self.assertEqual(requests.count('git/ref/heads/main'), 2, 'mutable branch refs must always be fresh')
+        self.assertEqual(requests.count('git/blobs/' + shared), 1, 'identical immutable bytes need one REST read')
+        self.assertEqual(requests.count('git/blobs/' + changed), 1)
+
+    def test_invalid_blob_response_is_not_retained_for_a_later_market_read(self):
+        module = self.require_module()
+        api = module.GitHub('example/repo')
+        revision, oid = 'a' * 40, '1' * 40
+        commit = {'tree': {'sha': 'c' * 40}}
+        tree = {'truncated': False, 'tree': [{'path': 'published/index.json', 'type': 'blob',
+                                            'mode': '100644', 'sha': oid}]}
+        good = {'encoding': 'base64', 'content': 'e30=', 'size': 2}
+        with mock.patch.object(api, 'get', side_effect=[commit, tree, dict(good, size=3), commit, tree, good]) as read:
+            with self.assertRaisesRegex(io.DataError, 'declared limit'):
+                api.market(revision)
+            self.assertEqual(api.market(revision), (revision, {'published/index.json': b'{}'}))
+        self.assertEqual(read.call_args_list.count(mock.call('git/blobs/' + oid)), 2)
+
+    def test_cached_blob_bytes_still_count_for_each_path_towards_the_market_limit(self):
+        module = self.require_module()
+        api = module.GitHub('example/repo')
+        revision, tree, oid = 'a' * 40, 'c' * 40, '1' * 40
+        responses = {
+            'git/commits/' + revision: {'tree': {'sha': tree}},
+            'git/trees/' + tree + '?recursive=1': {'truncated': False, 'tree': [
+                {'path': path, 'type': 'blob', 'mode': '100644', 'sha': oid}
+                for path in ['published/index.json', 'published/another.json']]},
+            'git/blobs/' + oid: {'encoding': 'base64', 'content': 'e30=', 'size': 2},
+        }
+        with mock.patch.object(api, 'get', side_effect=responses.__getitem__) as read, mock.patch.object(module, 'LIMIT', 3):
+            with self.assertRaisesRegex(io.DataError, 'declared limit'):
+                api.market(revision)
+        self.assertEqual(read.call_args_list.count(mock.call('git/blobs/' + oid)), 1)
+
+    def test_rest_failures_report_numeric_rate_headers_without_query_credentials(self):
+        module = self.require_module()
+        headers = Message()
+        for name, value in [('x-ratelimit-limit', '1000'), ('x-ratelimit-remaining', '0'),
+                            ('x-ratelimit-reset', '1234567890'), ('retry-after', '60')]:
+            headers[name] = value
+        resource = 'git/ref/heads/main?access_token=do-not-log-this'
+        failure = HTTPError('https://api.github.com/repos/example/repo/' + resource,
+                            403, 'Forbidden', headers, bytes_io.BytesIO(b'{}'))
+        self.addCleanup(failure.close)
+        with mock.patch.object(module, 'urlopen', side_effect=failure):
+            with self.assertRaises(io.DataError) as captured:
+                module.GitHub('example/repo').get(resource)
+        message = str(captured.exception)
+        for value in ['HTTP 403', 'git/ref/heads/main', 'limit=1000', 'remaining=0',
+                      'reset=1234567890', 'retry_after=60']:
+            self.assertIn(value, message)
+        self.assertNotIn('do-not-log-this', message)
 
     def test_complete_bundle_extracts_exact_files(self):
         module = self.require_module()
