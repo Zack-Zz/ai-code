@@ -303,8 +303,8 @@ def _record(record, channel, repository, *, staged=False):
                 if any(not isinstance(value, str) or not value.strip() for value in entry[key].values()):
                     raise DataError("DSH locale values must be nonempty text")
             _object(entry["engines"], {"dsh"}, "DSH engines")
-            if not isinstance(entry["engines"]["dsh"], str) or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?", entry["engines"]["dsh"]):
-                raise DataError("DSH engines must use an exact runtime version")
+            if not isinstance(entry["engines"]["dsh"], str) or not re.fullmatch(r"(?:>=)?[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?", entry["engines"]["dsh"]):
+                raise DataError("DSH engines must use an exact runtime version or >= minimum version")
         elif host == "codex":
             if entry["policy"] != {"installation": "AVAILABLE", "authentication": "ON_INSTALL"} or entry["category"] != "developer-tools":
                 raise DataError("invalid Codex native policy/category")

@@ -345,8 +345,15 @@ its native template in `adapters/dsh/package.json`, and register patch, locale
 and other files with `host_resources.dsh` using the same explicit
 `source`/`target`/`include` contract as shared resources.
 
-The DSH manifest declares `type: module`, exact `engines.dsh`, package exports
-and `dsh.bundle.patch`. Name, version and exact packaged `files` are generated
+The DSH manifest declares `type: module`, a minimum `engines.dsh` range of
+`>=0.2.1-rc.2`, package exports and `dsh.bundle.patch`. DSH peer dependencies
+use the same minimum range. DSH's
+[compatibility rules](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/boot/app-boot/README.md#profiles)
+include prereleases in range matching (`includePrerelease`); `engines.dsh`
+takes precedence, with DSH peers used only when it is absent. RC3 and later
+versions therefore pass this version gate. That does not certify future APIs
+or full host behavior. Frozen historical releases retain their original declarations.
+Name, version and exact packaged `files` are generated
 from trusted product inputs. Install lifecycle scripts and private bundles are
 rejected. Use `locale/en.json` and `locale/zh.json` with `meta.title` and
 `meta.description`, plus a packaged icon. Runtime acceptance is independent.

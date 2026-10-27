@@ -715,6 +715,7 @@ class IdentityRetirementTests(unittest.TestCase):
         self.assertEqual({name: final[name] for name in staged if name != path}, {name: raw for name, raw in staged.items() if name != path})
 
 class DshHostedMarketTests(unittest.TestCase):
+    engine_requirement = "0.2.1-rc.3"
     git = HostedMarketTests.git
     info = HostedMarketTests.info
     plan = HostedMarketTests.plan
@@ -727,7 +728,7 @@ class DshHostedMarketTests(unittest.TestCase):
         release_fixtures.write_json(self.case.plugin / "product.json", product)
         release_fixtures.write_json(self.case.plugin / "adapters/dsh/package.json", {
             "name": "ai-one", "version": "1.0.1", "description": "Useful AI skills", "type": "module",
-            "engines": {"dsh": "0.2.1-rc.3"}, "dsh": {"bundle": {"patch": "./cordis.patch.yml"}}, "icon": "./assets/icon.svg"})
+            "engines": {"dsh": self.engine_requirement}, "dsh": {"bundle": {"patch": "./cordis.patch.yml"}}, "icon": "./assets/icon.svg"})
         (self.case.plugin / "adapters/dsh/cordis.patch.yml").write_text("plugins: {}\n")
         config = json.loads((self.case.plugin / "release.json").read_text())
         config["acceptance"] = {host: None for host in product["hosts"]}
@@ -761,7 +762,7 @@ class DshHostedMarketTests(unittest.TestCase):
         self.assertEqual(index["format"], 1)
         entry = index["plugins"][0]
         self.assertEqual(set(entry["title"]), {"en", "zh"})
-        self.assertEqual(entry["versions"], [{"version": "1.0.1", "engines": {"dsh": "0.2.1-rc.3"},
+        self.assertEqual(entry["versions"], [{"version": "1.0.1", "engines": {"dsh": self.engine_requirement},
             "publishTimestamp": 1793059200, "source": {"type": "git", "url": "https://github.com/Example/ai-code",
             "commit": "d" * 40, "path": "published/dsh/ai-one/1.0.1"}}])
         self.assertEqual(entry["icon"], "https://raw.githubusercontent.com/Example/ai-code/" + "d" * 40 + "/published/dsh/ai-one/1.0.1/assets/icon.svg")
@@ -778,3 +779,15 @@ class DshHostedMarketTests(unittest.TestCase):
         record["git_installs"]["codex"]["revision"] = "d" * 40
         with self.assertRaisesRegex(io.DataError, "share one"):
             distribution._record(record, "stable", record["repository"])
+
+
+class DshMinimumHostedMarketTests(DshHostedMarketTests):
+    engine_requirement = ">=0.2.1-rc.2"
+
+    def test_invalid_dsh_engine_requirements_remain_rejected(self):
+        record = self.plan()["record"]
+        for requirement in ("", ">=", ">=not-a-version", ">=0.2", "0.2.1-rc.2 junk", None):
+            with self.subTest(requirement=requirement):
+                record["hosts"]["dsh"]["entry"]["engines"]["dsh"] = requirement
+                with self.assertRaisesRegex(io.DataError, "DSH engines"):
+                    distribution._record(record, "stable", record["repository"])

@@ -2,7 +2,7 @@
 
 English | [简体中文](README_CN.md)
 
-The new `codevow` identity is an unpublished source candidate. Current online entries follow the old-ID snapshots under `published/`; use new installation commands after the new release is available.
+This source prepares the next CodeVow release candidate. Current public versions and installation availability follow the records under `published/`; candidate compatibility changes take effect through public installation routes after publication.
 
 CodeVow helps your AI coding assistant turn a request into a planned, tested
 and reviewed change. It brings plan-first collaboration, TDD, evidence-driven
@@ -155,9 +155,11 @@ the repository's early history derives from Affaan Mustafa's ai-code.
 
 ## DeepSeek Harness
 
-The native DSH bundle targets `0.2.1-rc.2`; native loading, implicit selection,
-long sessions and lifecycle acceptance remain unverified. Use an existing Web
-profile and the official directory or Release `codevow-<version>-dsh-plugin.tgz`
+The native DSH bundle declares minimum `>=0.2.1-rc.2` in `engines.dsh` and DSH
+peer dependencies. RC3 and later versions pass this version gate; a range match
+does not certify future API compatibility. The API baseline remains published
+RC2. Native loading, implicit selection, long sessions and lifecycle acceptance
+remain unverified. Use an existing Web profile and the official directory or Release `codevow-<version>-dsh-plugin.tgz`
 installation flow. Build and package checks do not establish host acceptance.
 Invoke the skill with `/workflow`. Independent
 official filesystem providers expose each plugin's bundled resources.

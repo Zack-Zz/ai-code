@@ -102,9 +102,11 @@ Affaan Mustafa 的 ai-code。
 插件包与[自定义市场索引](https://raw.githubusercontent.com/Zack-Zz/ai-code/main/published/dsh/index.json)均已发布。
 桌面端自带 Node.js 与 pnpm，无需另行安装 npm CLI。桌面端与独立 npm CLI 步骤见
 [Harness 安装指南](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md#deepseek-harness)。
-已发行包的 `engines.dsh` 与 DSH peerDependencies 均精确锁定 `0.2.1-rc.2`；
-桌面端 `0.2.1-rc.3` 尚未被当前声明覆盖。真实桌面端、实际加载、自动选择、长会话和
-生命周期验收仍待完成，构建和包检查不能代替宿主验收。技能使用官方 `/workflow` 显式调用。两个插件通过各自的官方文件系统提供方读取包内资源，启停互不替代。
+已发布的 1.0.6 安装包和索引仍将 `engines.dsh` 与 DSH peers 精确锁定为
+`0.2.1-rc.2`。本地 1.0.7 候选将二者声明为最低 `>=0.2.1-rc.2`，因此 RC3 及
+更高版本可通过候选包的版本门槛；该候选尚未进入公开索引或 Release。范围匹配不代表
+未来 API 已验证。真实桌面端、实际加载、自动选择、长会话和生命周期验收仍待完成，
+构建和包检查不能代替宿主验收。技能使用官方 `/workflow` 显式调用。两个插件通过各自的官方文件系统提供方读取包内资源，启停互不替代。
 
 独立审查使用 `workflow_reviewer` 与 `codevow-reviewer` preset，仅允许 read/grep/glob。
 目标 profile 必须提供 agentPresets、Agent/工具/提示词及 subagents spawn 服务；缺失时原生 Loader

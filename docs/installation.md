@@ -215,18 +215,30 @@ Start a new session and check the Plugin skills group.
 
 ### Version compatibility
 
-The published CodeVow 1.0.6 and CodeStack 1.0.0 bundles and index declare the exact
-DSH version **`0.2.1-rc.2`**. They do **not** declare compatibility with
-**`0.2.1-rc.3`**. Check **About DeepSeek Harness** on desktop or the actual CLI's
-`--version` before installing. An incompatible market entry can have a disabled
-Install button. Installing npm or using a TGZ does not remove the version check.
+Check the plugin version and its declaration before installing:
+
+| Plugin source | DSH requirement | Availability |
+|---|---|---|
+| Published CodeVow 1.0.6 / CodeStack 1.0.0 bundles and index | Exact `0.2.1-rc.2` | Current public installation routes below |
+| Local CodeVow 1.0.7 / CodeStack 1.0.1 candidates | Minimum `>=0.2.1-rc.2` in `engines.dsh` and DSH peers | Source/build candidates; not yet in the public index or Releases |
+
+For the candidates, RC3 and later versions satisfy the minimum version range;
+they are no longer rejected solely by an exact RC2 pin. DSH includes prereleases
+in range matching (`includePrerelease`), and uses `engines.dsh` when present,
+falling back to DSH peer requirements only when it is absent. See the
+[official compatibility rules](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/boot/app-boot/README.md#profiles).
+A range match does not establish future API compatibility or full host acceptance.
+
+Check **About DeepSeek Harness** on desktop or the actual CLI's `--version`
+before installing. An incompatible market entry can have a disabled Install
+button. Installing npm or using a TGZ does not remove the version check. The
+[published index](../published/dsh/index.json) remains authoritative for public
+installation; the local candidate changes do not update its existing releases.
 Do not use a version exemption as evidence of compatibility.
 
 Desktop uses the same underlying application, but full Desktop and Web host
 acceptance is still **pending**. CodeVow requires Agent Preset and the spawn
 backend; minimal/SDK/ACP profiles are outside the declared trial scope.
-This guide documents native installation routes, not a completed rc.3 adaptation.
-The [published index](../published/dsh/index.json) is the current compatibility source.
 
 ### DeepSeek Harness desktop
 
@@ -245,7 +257,8 @@ you do not need a separate npm CLI installation or a Web trial profile.**
 
 4. Select **CodeVow** or **CodeStack**. Review the version, compatibility and fixed
    Git commit/subdirectory, then confirm installation **only for a compatible
-   version**. Current rc.3 users need a compatible plugin release before this step.
+   version**. The current public versions above still require RC2; the local
+   candidates' wider range becomes available through this route only after publication.
 5. Check the **Installed** tab and enabled bundle state. Restart the application
    if needed and create a fresh session to inspect its skills.
 
@@ -258,7 +271,9 @@ and [Discover](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-r
 ### DeepSeek Harness CLI
 
 These steps launch an independent **Web profile**, not the Desktop app's profile.
-Use the official npm launcher pinned to the compatible runtime. Prepare Node.js
+The commands below pin the official npm launcher to RC2 as a reproducible trial
+baseline compatible with the linked public bundles. RC2 is the candidates' minimum,
+not their only supported version. Prepare Node.js
 24+ and `pnpm` on `PATH`; the upstream repository also supports Node 22.19+ in
 its 22.x range. This system-pnpm prerequisite applies to the standalone npm CLI,
 not Desktop's bundled installer.
@@ -385,7 +400,7 @@ must not be used as a reason to delete project `.ai-workflow/` records.
 | Duplicate workflow or standards skills | Remove installed previous IDs, then start a new session. |
 | Claude `archive` unsupported | Check 2.1.224+, correct manifest, and use the CLI install path if the interactive panel still refuses it. |
 | ZCode `archive` unsupported | Replace the market source with the root `marketplace.json` URL above. |
-| Harness Install disabled | Compare actual DSH runtime with the index's exact `engines.dsh`; current rc.3 is not covered. |
+| Harness Install disabled | Compare the runtime with the selected entry's `engines.dsh`. Public CodeVow 1.0.6 / CodeStack 1.0.0 still pin RC2; the local candidates declare `>=0.2.1-rc.2` and are not yet published. |
 | Harness installed but skills absent | Check bundle enablement, restart/new session, required services and profile compatibility; do not infer activation from package installation. |
 | CodeVow optional Python tools | Python 3.11+; optional file staging requires POSIX file operations. Markdown skills do not require Python. |
 | CodeStack | No additional runtime or dependency on another ai-code plugin. |

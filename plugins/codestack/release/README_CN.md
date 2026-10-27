@@ -2,7 +2,7 @@
 
 [English](README.md) | 简体中文
 
-当前新 ID `codestack` 是尚未发布的源码候选。线上入口仍以 `published/` 中旧 ID 的已发布快照为准；本页的新安装命令须在新发行上线后使用。
+当前源码准备下一版 CodeStack 候选。公开版本与安装可用性以 `published/` 中的记录为准；候选的兼容性改动在发布后才会通过公开安装入口生效。
 
 <img src="assets/codestack.png" alt="CodeStack 图标" width="96" />
 
@@ -59,7 +59,9 @@ TypeScript 任务和不涉及文案的改动不因此引入国际化要求；Jav
 
 ## DeepSeek Harness
 
-DSH 原生 bundle 声明目标为 `0.2.1-rc.2`，实际加载、自动选择、长会话和生命周期验收仍待完成。
+DSH 原生 bundle 的 `engines.dsh` 与 DSH peerDependencies 均声明最低
+`>=0.2.1-rc.2`，RC3 及更高版本可通过此版本门槛；范围匹配不代表未来 API 兼容
+已经验证。API 基线仍为已发布的 RC2。实际加载、自动选择、长会话和生命周期验收仍待完成。
 使用现有 Web profile，按官方方式安装构建目录或 Release 的 `codestack-<version>-dsh-plugin.tgz`；
 构建和包检查不能代替宿主验收。技能使用官方 `/code-standards` 显式调用。两个插件通过各自的官方文件系统提供方读取包内资源，启停互不替代。
 

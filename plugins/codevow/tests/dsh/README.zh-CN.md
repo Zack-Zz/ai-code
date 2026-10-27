@@ -17,6 +17,9 @@ DSH_NATIVE_NODE_MODULES=/private/tmp/codevow-native-api/node_modules \
   node plugins/codevow/tests/dsh/native-api.mjs
 ```
 
-本轮使用 Node.js `v24.4.1`；构建需要 Python 3.11+。脚本校验两份 bundle 的真实 peer 版本、实际 patch 的 RC2 配置，
+本轮使用 Node.js `v24.4.1`；构建需要 Python 3.11+。脚本通过 DSH 官方兼容性判定器
+验证两份 bundle 的最低运行版本和 peer 范围：拒绝 RC1 及更早版本，接受 RC2、RC3、
+正式版与后续预发布版本。精确安装的 RC2 包保留为可复现的 API 组合基线；范围匹配
+不代表 RC3 或更高版本的完整运行验收通过。脚本还校验实际 patch 的 RC2 配置，
 加载各插件自身技能，核算官方渲染后的 workflow 长度，并通过真实 Tools 管线验证拒绝。
 不会读写宿主 profile、全局配置或凭据。

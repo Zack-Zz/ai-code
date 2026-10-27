@@ -2,7 +2,10 @@
 
 English | [简体中文](capabilities.zh-CN.md)
 
-The candidate bundle targets the published DeepSeek Harness `0.2.1-rc.2` APIs.
+The candidate bundle declares minimum `>=0.2.1-rc.2` in `engines.dsh` and DSH
+peer dependencies. RC3 and later versions pass this version gate. Its API
+baseline remains the published DeepSeek Harness `0.2.1-rc.2` APIs; range matching
+does not certify future API compatibility or complete host behavior.
 The design started from upstream commit `22ddee3792402c3e70ec5f86a63c3e3e895a2f60`;
 the installed RC2 API uses official `agent-tool-presentation` with `mode: native`
 and `modelSelectionSettings: false` for preset-specific spawning. A Web profile must provide

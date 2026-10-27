@@ -2,7 +2,7 @@
   "schema_version": 2,
   "product_id": "codevow",
   "display_name": "CodeVow",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "license": "MIT",
   "hosts": [

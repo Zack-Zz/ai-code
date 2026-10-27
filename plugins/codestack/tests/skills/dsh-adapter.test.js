@@ -9,7 +9,10 @@ assert.ok(product.hosts.includes('dsh'));
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'adapters/dsh/package.json')));
 assert.equal(manifest.type, 'module');
 assert.deepEqual(manifest.dsh, { bundle: { patch: './cordis.patch.yml' } });
-assert.equal(manifest.engines.dsh, '0.2.1-rc.2');
+assert.equal(manifest.engines.dsh, '>=0.2.1-rc.2');
+for (const requirement of Object.values(manifest.peerDependencies)) {
+  assert.equal(requirement, manifest.engines.dsh, 'DSH peers retain the same minimum as the runtime');
+}
 assert.ok(!manifest.scripts && !manifest.private);
 const patch = fs.readFileSync(path.join(root, 'adapters/dsh/cordis.patch.yml'), 'utf8');
 assert.match(patch, /includeDefaultRoots: false/);

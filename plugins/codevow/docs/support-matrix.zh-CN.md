@@ -3,9 +3,11 @@
 # 当前支持与验证边界
 
 当前源码身份为 `codevow`，声明 Claude Code、Codex、ZCode、DeepSeek Harness 四个制品目标。
-DSH 候选目标是 `0.2.1-rc.2` 的 Web profile，必须提供原生 preset、Agent、工具、提示词与 spawn
-服务；缺依赖由原生 Loader 报告无法激活。Reviewer 的 read/grep/glob 白名单与文件系统隔离
-分别记录，读取权限根复用宿主配置。四端 acceptance 保持 null。
+DSH 候选的 `engines.dsh` 与 DSH peers 均声明最低 `>=0.2.1-rc.2`，RC3 及更高版本
+可通过此版本门槛；API 基线仍为已发布 RC2 的 Web profile。范围匹配不代表未来 API
+兼容已经验证。公开 1.0.6 包/索引在新版本发布前仍保留精确 RC2 声明。
+必须提供原生 preset、Agent、工具、提示词与 spawn 服务；缺依赖由原生 Loader 报告无法激活。
+Reviewer 的 read/grep/glob 白名单与文件系统隔离分别记录，读取权限根复用宿主配置。四端 acceptance 保持 null。
 
 本地结构、单元测试和包检查不证明原生加载、自动调用、权限执行、安装或生命周期验收。
 [英文页中的历史记录](support-matrix.md)保留原有日期、命令和结论，不构成本轮通过。

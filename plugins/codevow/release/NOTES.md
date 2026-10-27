@@ -8,6 +8,18 @@ build helper uses `codevow-local`. See the
 [installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md).
 The entries below retain their dated release context, including earlier migration plans.
 
+## 1.0.7
+
+### English
+
+- Declare DeepSeek Harness `0.2.1-rc.2` as the minimum runtime (`>=0.2.1-rc.2`) and align DSH peer dependency ranges, so RC3 and later runtimes are no longer rejected by an exact RC2 requirement.
+- Carry the minimum range through release validation and marketplace generation, with regression checks using the official DSH compatibility evaluator. Complete Desktop/Web runtime acceptance remains pending.
+
+### 中文
+
+- 将 DeepSeek Harness `0.2.1-rc.2` 声明为最低运行版本（`>=0.2.1-rc.2`），并统一 DSH peer 依赖范围，避免 RC3 及更高运行版本被精确 RC2 要求拒绝。
+- 发行校验与市场生成保留最低版本范围，并使用 DSH 官方兼容性判定器补齐回归检查。完整 Desktop/Web 宿主运行验收仍待完成。
+
 ## 1.0.6
 
 ### English

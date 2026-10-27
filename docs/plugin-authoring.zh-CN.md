@@ -282,7 +282,12 @@ Review。commit、push、tag、merge、PR、安装与发布仍遵守独立授权
 schema 1。将 `dsh` 登记到 hosts，原生模板为 `adapters/dsh/package.json`，
 patch、locale 等在 `host_resources.dsh` 中使用显式 source/target/include 白名单。
 
-DSH 清单声明 `type: module`、精确 engines.dsh、exports 和 dsh.bundle.patch。
+DSH 清单声明 `type: module`、最低 `engines.dsh` 范围 `>=0.2.1-rc.2`、exports
+和 dsh.bundle.patch，DSH peerDependencies 使用相同最低范围。DSH
+[官方兼容性规则](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/boot/app-boot/README.zh.md#profile)
+在范围匹配中包含预发布版本（`includePrerelease`）；`engines.dsh` 优先，只有缺少它时
+才回退到 DSH peers。因此 RC3 及更高版本可通过版本门槛，但不代表未来 API 或完整
+宿主行为已经通过验证。冻结的历史发行保留原有声明。
 name、version、精确 files 清单由可信 product 输入生成。禁止私有 bundle 和
 安装生命周期脚本。展示使用 locale/en.json、locale/zh.json 的 meta.title、
 meta.description 及包内图标；清单校验不能替代真实宿主验收。

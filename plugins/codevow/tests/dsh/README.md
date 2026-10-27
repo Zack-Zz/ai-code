@@ -36,6 +36,10 @@ DSH_NATIVE_NODE_MODULES=/private/tmp/codevow-native-api/node_modules \
 
 Run from the repository root. Node.js `v24.4.1` was used in the local check.
 The script requires Python 3.11+ for the build and validates both bundle templates'
-actual peer versions and the RC2 configuration schema, loads only each plugin's bundled skills, checks the
-actual rendered workflow length, and verifies rejection through the real Tools
+minimum runtime and peer ranges with the official DSH compatibility evaluator:
+RC1 and older are rejected; RC2, RC3, stable and later prerelease versions match.
+The exact installed RC2 packages remain the reproducible API-composition baseline;
+matching a version range does not establish full runtime acceptance on RC3 or later.
+The script also validates the RC2 configuration schema, loads only each plugin's
+bundled skills, checks the actual rendered workflow length, and verifies rejection through the real Tools
 pipeline. No host profile, global configuration or credentials are read or changed.

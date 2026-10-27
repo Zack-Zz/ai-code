@@ -199,16 +199,27 @@ node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins list
 
 ### 版本兼容性
 
-已发布的 CodeVow 1.0.6、CodeStack 1.0.0 安装包与索引精确声明 DSH 版本
-**`0.2.1-rc.2`**，**未声明兼容 `0.2.1-rc.3`**。安装前在桌面应用的
-**About DeepSeek Harness（关于）** 或实际 CLI 的 `--version` 核对版本。
-市场中不兼容条目的安装按钮可能禁用；安装 npm 或改用 TGZ 不会取消版本检查。
-不要把版本豁免当作兼容性证据。
+安装前先区分插件版本及其声明：
+
+| 插件来源 | DSH 要求 | 可用状态 |
+|---|---|---|
+| 已发布的 CodeVow 1.0.6 / CodeStack 1.0.0 安装包与索引 | 精确 `0.2.1-rc.2` | 下文当前公开安装入口 |
+| 本地 CodeVow 1.0.7 / CodeStack 1.0.1 候选 | `engines.dsh` 与 DSH peers 均最低 `>=0.2.1-rc.2` | 源码/构建候选，尚未进入公开索引或 Release |
+
+候选包的最低版本范围接受 RC3 及更高版本，不再仅因精确 RC2 锁定而拒绝。
+DSH 的范围匹配包含预发布版本（`includePrerelease`）；存在 `engines.dsh` 时
+以它为准，只有缺少它时才回退到 DSH peer 要求。见
+[官方兼容性规则](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/boot/app-boot/README.zh.md#profile)。
+范围匹配不代表未来 API 兼容或完整宿主验收已经通过。
+
+安装前在桌面应用的 **About DeepSeek Harness（关于）** 或实际 CLI 的 `--version`
+核对版本。市场中不兼容条目的安装按钮可能禁用；安装 npm 或改用 TGZ 不会取消
+版本检查。公开安装以[正式索引](../published/dsh/index.json)为准，本地候选改动
+尚未更新其中的旧发行。不要把版本豁免当作兼容性证据。
 
 桌面端使用相同的底层应用，但完整桌面端和 Web 宿主验收仍为 **pending**。
 CodeVow 需要 Agent Preset 服务和 spawn 后端；minimal/SDK/ACP profile
-不在声明的试用范围。本指南说明原生安装入口，不代表 rc.3 适配已经完成。
-当前兼容范围见[正式索引](../published/dsh/index.json)。
+不在声明的试用范围。
 
 ### DeepSeek Harness 桌面端
 
@@ -226,7 +237,8 @@ npm CLI，也不需要创建 Web 试用 profile。**
    ```
 
 4. 选择 **CodeVow** 或 **CodeStack**，检查版本、兼容状态及固定 Git 提交/子目录，
-   仅对**兼容版本**确认安装。当前 rc.3 用户需要等待兼容的插件发行版本。
+   仅对**兼容版本**确认安装。上表当前公开版本仍要求 RC2；本地候选的较宽范围
+   需要正式发布后才会通过此入口提供。
 5. 在 **Installed** 页核对安装和 bundle 启用状态，必要时重启应用，再新建会话
    检查技能。
 
@@ -238,8 +250,9 @@ npm CLI，也不需要创建 Web 试用 profile。**
 
 ### DeepSeek Harness CLI
 
-以下步骤启动独立 **Web profile**，与桌面端 profile 分开。使用官方 npm 启动入口，
-固定到兼容运行时。准备 Node.js 24+，并确保 `pnpm` 在 `PATH` 中；上游仓库也
+以下步骤启动独立 **Web profile**，与桌面端 profile 分开。命令将官方 npm 启动入口
+固定在 RC2，作为与链接的公开安装包兼容的可复现试用基线。RC2 是候选包的最低版本，
+并非候选包唯一支持的版本。准备 Node.js 24+，并确保 `pnpm` 在 `PATH` 中；上游仓库也
 支持 22.x 范围内的 Node 22.19+。系统 pnpm 前置条件用于独立 npm CLI，
 不适用于桌面端内置安装器。
 
@@ -355,7 +368,7 @@ Claude Code、Codex 和 ZCode 从插件的公开
 | 重复的工作流或规范技能 | 清理已安装的旧 ID，再开启新会话。 |
 | Claude 不支持 `archive` | 核对 2.1.224+ 和正确清单；交互面板仍拒绝时使用 CLI 安装路径。 |
 | ZCode 不支持 `archive` | 将市场来源改为上文根目录 `marketplace.json` 完整 URL。 |
-| Harness 安装按钮禁用 | 对照实际 DSH 运行时与索引精确的 `engines.dsh`，当前未覆盖 rc.3。 |
+| Harness 安装按钮禁用 | 对照运行时与所选条目的 `engines.dsh`。公开 CodeVow 1.0.6 / CodeStack 1.0.0 仍精确锁定 RC2；本地候选声明 `>=0.2.1-rc.2`，尚未发布。 |
 | Harness 已安装但无技能 | 检查 bundle 启用状态、重启/新会话、所需服务与 profile 兼容性，不从包安装推断激活。 |
 | CodeVow 可选 Python 工具 | Python 3.11+；可选文件暂存需要 POSIX 文件操作。Markdown 技能本身不需要 Python。 |
 | CodeStack | 不需要额外运行时，不依赖其他 ai-code 插件。 |

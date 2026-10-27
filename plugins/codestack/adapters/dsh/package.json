@@ -8,7 +8,7 @@
   },
   "icon": "./assets/codestack-dsh.png",
   "engines": {
-    "dsh": "0.2.1-rc.2"
+    "dsh": ">=0.2.1-rc.2"
   },
   "dsh": {
     "bundle": {
@@ -16,6 +16,6 @@
     }
   },
   "peerDependencies": {
-    "@deepseek-ai/dsh-skill-filesystem": "0.2.1-rc.2"
+    "@deepseek-ai/dsh-skill-filesystem": ">=0.2.1-rc.2"
   }
 }

@@ -24,6 +24,7 @@ for (const dependency of dependencies) assert.equal(version(`@deepseek-ai/dsh-${
 assert.equal(version('@deepseek-ai/cordis'), '4.0.5');
 assert.equal(version('@deepseek-ai/cordis-plugin-loader'), '1.0.6');
 const { Context } = await load('@deepseek-ai/cordis');
+const { evaluatePluginCompatibility } = await load('@deepseek-ai/dsh-app-boot');
 const { createScope, bindScopeParent } = await load('@deepseek-ai/dsh-scope');
 const { default: SystemPrompt } = await load('@deepseek-ai/dsh-system-prompt');
 const { default: Tools, defineContentToolFixture } = await load('@deepseek-ai/dsh-tools');
@@ -67,10 +68,27 @@ try {
   pass('the actual patch uses published RC2 preset selection and native presentation schemas');
   for (const id of ['codevow', 'codestack']) {
     const manifest = JSON.parse(fs.readFileSync(path.join(repository, 'plugins', id, 'adapters/dsh/package.json')));
-    assert.equal(manifest.engines.dsh, expected);
-    for (const [name, pin] of Object.entries(manifest.peerDependencies)) assert.equal(version(name), pin);
+    const product = JSON.parse(fs.readFileSync(path.join(repository, 'plugins', id, 'product.json')));
+    const bundle = { ...manifest, name: id, version: product.version };
+    for (const [name, requirement] of Object.entries(manifest.peerDependencies)) {
+      assert.equal(requirement, manifest.engines.dsh);
+      assert.equal(evaluatePluginCompatibility({ name: id, version: product.version,
+        peerDependencies: { [name]: requirement } }, {}, version(name)), undefined);
+    }
+    const peerOnly = { ...bundle };
+    delete peerOnly.engines;
+    for (const [runtime, supported] of [
+      ['0.2.0', false], ['0.2.1-rc.1', false], ['0.2.1-rc.2', true],
+      ['0.2.1-rc.3', true], ['0.2.1', true], ['0.2.2-rc.1', true], ['0.2.2', true],
+    ]) {
+      for (const declaration of [bundle, peerOnly]) {
+        const issue = evaluatePluginCompatibility(declaration, {}, runtime);
+        assert.equal(issue === undefined, supported, `${id} runtime ${runtime}: ${JSON.stringify(issue)}`);
+      }
+    }
+    assert.equal(manifest.engines.dsh, `>=${expected}`);
   }
-  pass('both bundle templates pin the exact installed published peer versions');
+  pass('both bundles reject runtimes below RC2 and accept RC2, RC3 and later versions through the official matcher');
 
   // Copy the exact source module beneath this isolated dependency tree, without rewriting imports.
   fs.copyFileSync(path.join(pluginRoot, 'adapters/dsh/reviewer-guard.js'), path.join(temporary, 'guard.mjs'));

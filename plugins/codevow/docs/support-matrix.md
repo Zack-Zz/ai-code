@@ -3,7 +3,11 @@ English | [简体中文](support-matrix.zh-CN.md)
 ## Current candidate (2026-10-27)
 
 Current source identity is `codevow`, with Claude Code, Codex, ZCode and DSH
-package targets. DSH targets `0.2.1-rc.2` and the Web profile. The bundle requires
+package targets. The DSH candidate declares minimum `>=0.2.1-rc.2` in
+`engines.dsh` and DSH peers; RC3 and later versions pass this version gate.
+Its API baseline remains published RC2 with the Web profile. A range match does
+not certify future API compatibility. The public 1.0.6 bundle/index retains
+its exact RC2 declaration until a new release is published. The bundle requires
 native preset, Agent, tools, prompt and spawn services; missing dependencies
 prevent activation. Its read/grep/glob reviewer restriction and workspace
 isolation are separate capabilities. All four release acceptance slots remain

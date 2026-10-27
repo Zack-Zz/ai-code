@@ -2,7 +2,9 @@
 
 [English](capabilities.md) | 简体中文
 
-候选 bundle 以已发布的 `0.2.1-rc.2` API 为目标。设计最初参考固定上游提交
+候选 bundle 的 `engines.dsh` 与 DSH peerDependencies 均声明最低 `>=0.2.1-rc.2`，
+RC3 及更高版本可通过此版本门槛。API 基线仍为已发布的 `0.2.1-rc.2`；范围匹配
+不代表未来 API 兼容或完整宿主行为已经通过验证。设计最初参考固定上游提交
 `22ddee3792402c3e70ec5f86a63c3e3e895a2f60`；实际 RC2 使用官方
 `agent-tool-presentation(mode: native)`，spawn 配置使用 `modelSelectionSettings: false`。Web profile 必须提供 agentPresets、agents、tools、
 systemPrompt、subagents spawn 与 sessionProjections。缺依赖由原生 Loader 报告，不降级。
