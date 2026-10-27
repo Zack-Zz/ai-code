@@ -1,0 +1,7 @@
+interface:
+  display_name: "Review"
+  short_description: "Review affected risks; findings do not authorize repairs"
+  brand_color: "#DC2626"
+  default_prompt: "Use $review with workflow's request and authorization context to inspect affected risks and report findings, fixing only within an applicable development grant."
+policy:
+  allow_implicit_invocation: true

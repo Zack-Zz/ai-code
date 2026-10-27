@@ -1,0 +1,78 @@
+{
+  "author": {
+    "name": "Zack-Zz",
+    "url": "https://github.com/Zack-Zz"
+  },
+  "description": "A reviewable workflow from authorization to verification",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "dsh": "0.2.1-rc.2"
+  },
+  "exports": {
+    "./locale/*.json": "./locale/*.json",
+    "./package.json": "./package.json",
+    "./reviewer-guard": "./reviewer-guard.js",
+    "./reviewer-persona.json": "./reviewer-persona.json"
+  },
+  "files": [
+    "LICENSE",
+    "LICENSES/backend-engineering-lite.txt",
+    "NOTICE",
+    "README.md",
+    "README_CN.md",
+    "artifact.json",
+    "assets/codevow.png",
+    "assets/codevow.svg",
+    "cordis.patch.yml",
+    "locale/en.json",
+    "locale/zh.json",
+    "package.json",
+    "policies/collaborative.json",
+    "policies/continuous.json",
+    "reviewer-guard.js",
+    "reviewer-persona.json",
+    "schemas/evidence.schema.json",
+    "schemas/policy.schema.json",
+    "schemas/product.schema.json",
+    "schemas/task.schema.json",
+    "skills/debugging/SKILL.md",
+    "skills/review-results/SKILL.md",
+    "skills/review/SKILL.md",
+    "skills/review/references/reviewer-contract.md",
+    "skills/tdd/SKILL.md",
+    "skills/verification/SKILL.md",
+    "skills/workflow/SKILL.md",
+    "skills/workflow/references/execution.md",
+    "templates/evidence.json",
+    "templates/task.json",
+    "tools/workflow/__init__.py",
+    "tools/workflow/build.py",
+    "tools/workflow/cli.py",
+    "tools/workflow/io.py",
+    "tools/workflow/owned_files.py",
+    "tools/workflow/package_check.py",
+    "tools/workflow/policy.py",
+    "tools/workflow/product.py",
+    "tools/workflow/state.py",
+    "tools/workflow_tool.py"
+  ],
+  "icon": "./assets/codevow.svg",
+  "license": "MIT",
+  "name": "codevow",
+  "peerDependencies": {
+    "@deepseek-ai/dsh-agent-preset": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-agent-tool-presentation": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-persona": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-scope": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-skill-filesystem": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-tool-fs": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-tool-fs-search": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-tool-subagent": "0.2.1-rc.2"
+  },
+  "type": "module",
+  "version": "1.0.6"
+}
