@@ -2,7 +2,7 @@
   "schema_version": 2,
   "product_id": "codevow",
   "display_name": "CodeVow",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "license": "MIT",
   "hosts": [
@@ -167,6 +167,11 @@
       {
         "source": "adapters/dsh/reviewer-guard.js",
         "target": "reviewer-guard.js",
+        "include": []
+      },
+      {
+        "source": "adapters/dsh/reviewer-preset.js",
+        "target": "reviewer-preset.js",
         "include": []
       }
     ]

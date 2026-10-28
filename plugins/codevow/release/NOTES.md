@@ -8,6 +8,16 @@ build helper uses `codevow-local`. See the
 [installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md).
 The entries below retain their dated release context, including earlier migration plans.
 
+## 1.0.8
+
+### English
+
+Fix DeepSeek Harness Reviewer startup when components load in parallel. The delegation tool now depends on native preset registration, and unloading revokes delegation before releasing the preset. Add regression checks for delayed registration, parallel cold startup, disable/re-enable, registration failure and cancellation during registration. Keep the minimum DSH version at 0.2.1-rc.2.
+
+### 中文
+
+修复 DeepSeek Harness 组件并行加载时 Reviewer 委派先于预设注册而失败的问题。委派工具等待原生预设注册完成；卸载时先撤销委派，再释放预设。补充延迟注册、并行冷启动、禁用后重新启用、注册失败和注册中取消的回归检查。DSH 最低版本保持为 0.2.1-rc.2。
+
 ## 1.0.7
 
 ### English

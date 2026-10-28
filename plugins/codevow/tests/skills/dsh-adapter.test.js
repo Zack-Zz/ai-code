@@ -10,7 +10,9 @@ const manifest = JSON.parse(fs.readFileSync(path.join(root, 'adapters/dsh/packag
 assert.equal(manifest.type, 'module');
 assert.deepEqual(manifest.dsh, { bundle: { patch: './cordis.patch.yml' } });
 assert.equal(manifest.engines.dsh, '>=0.2.1-rc.2');
-for (const requirement of Object.values(manifest.peerDependencies)) {
+assert.equal(manifest.peerDependencies['@deepseek-ai/cordis'], '~4.0.5');
+for (const [name, requirement] of Object.entries(manifest.peerDependencies)) {
+  if (name === '@deepseek-ai/cordis') continue;
   assert.equal(requirement, manifest.engines.dsh, 'DSH peers retain the same minimum as the runtime');
 }
 assert.ok(!manifest.scripts && !manifest.private);
@@ -38,3 +40,7 @@ assert.match(reviewPatch, /name: '@deepseek-ai\/dsh-agent-tool-presentation'/);
 assert.match(reviewPatch, /mode: native/);
 assert.match(reviewPatch, /modelSelectionSettings: false/);
 assert.doesNotMatch(reviewPatch, /modelSelection:|modelDiscovery:/);
+assert.match(reviewPatch, /name: codevow\/reviewer-preset/);
+assert.match(reviewPatch, /inject: \[agentPresets[^\n]*codevowReviewerPresetRegistered\]/);
+assert.equal(manifest.exports['./reviewer-preset'], './reviewer-preset.js');
+assert.ok(product.host_resources.dsh.some(row => row.target === 'reviewer-preset.js'));

@@ -13,6 +13,40 @@ isolation are separate capabilities. All four release acceptance slots remain
 null. Local checks and the historical records below do not establish current
 native loading, routing, tool enforcement, installation or lifecycle acceptance.
 
+## Local candidate (CodeVow 1.0.8, 2026-10-28)
+
+The 1.0.8 candidate fixes Reviewer startup ordering in DSH Desktop RC3. With
+1.0.7, parallel loading could start delegation before the preset registered,
+report `Unknown agent preset codevow-reviewer`, and leave delegation failed even
+after the preset appeared. The candidate inherits the official AgentPreset
+lifecycle and makes the official subagent tool wait for the
+`codevowReviewerPresetRegistered` dependency. Unloading the preset revokes
+delegation before releasing its registration. CodeVow adds the Cordis peer
+`~4.0.5`; its DSH minimum and DSH peers remain `>=0.2.1-rc.2`.
+
+The [isolated published-API checks](../tests/dsh/README.md) cover delegation
+loading before its preset, disable/re-enable, parallel cold loading, actual
+`workflow_reviewer` registration and the mounted read/grep/glob tool surface.
+They use the real RC2 Loader and native services with a synthetic spawn provider
+that does not execute a model. These checks do not prove a completed model
+delegation, real filesystem isolation or full host acceptance.
+
+A separate [Desktop probe on 2026-10-28](verification/2026-10-28-dsh-reviewer-startup.md)
+verified this candidate on DSH Desktop `0.2.1-rc.3`: native installation and a
+normal restart left all three plugin components running, and all 41 installed
+files matched the checked package. In a new temporary workspace session, a
+standard parent called `workflow_reviewer` once and spawned a real
+`codevow-reviewer` child with the correct parent-session binding. The child's tool
+surface contained only `glob`, `grep` and `read`; actual read/glob calls succeeded,
+the child identified the fixture defect, and the parent received its completed
+review. Test-file hashes were unchanged.
+
+That result covers this read-only delegation and restart scenario. Disabling an
+active Reviewer, forbidden write-call probes and long-session behavior remain
+unverified. `acceptance.dsh` remains null, and no complete DSH or four-host
+acceptance pass is claimed. This is a local candidate only: the public release
+and marketplace remain 1.0.7.
+
 The following dated record is retained verbatim.
 
 # Support matrix and current verification status

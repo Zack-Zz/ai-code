@@ -8,7 +8,7 @@
         watch: false
         bundledSkillDir: !!js process.getBuiltinModule('node:path').join(process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('codevow/package.json')), 'skills')
     - id: codevow-reviewer-preset
-      name: '@deepseek-ai/dsh-agent-preset'
+      name: codevow/reviewer-preset
       inject: [agentPresets, agents, tools, systemPrompt, subagents]
       config:
         id: codevow-reviewer
@@ -39,7 +39,7 @@
             inject: [agents, tools]
     - id: codevow-reviewer-spawn
       name: '@deepseek-ai/dsh-tool-subagent'
-      inject: [agentPresets, agents, tools, systemPrompt, subagents, sessionProjections]
+      inject: [agentPresets, agents, tools, systemPrompt, subagents, sessionProjections, codevowReviewerPresetRegistered]
       config:
         provider: spawn
         toolName: workflow_reviewer

@@ -71,6 +71,10 @@ try {
     const product = JSON.parse(fs.readFileSync(path.join(repository, 'plugins', id, 'product.json')));
     const bundle = { ...manifest, name: id, version: product.version };
     for (const [name, requirement] of Object.entries(manifest.peerDependencies)) {
+      if (name === '@deepseek-ai/cordis') {
+        assert.equal(requirement, '~4.0.5');
+        continue;
+      }
       assert.equal(requirement, manifest.engines.dsh);
       assert.equal(evaluatePluginCompatibility({ name: id, version: product.version,
         peerDependencies: { [name]: requirement } }, {}, version(name)), undefined);
