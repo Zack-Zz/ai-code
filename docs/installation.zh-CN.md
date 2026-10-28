@@ -2,7 +2,7 @@
 
 [English](installation.md) | 简体中文
 
-CodeVow **1.0.7**（`codevow`）和 CodeStack **1.0.1**（`codestack`）已发布到
+CodeVow **1.0.8**（`codevow`）和 CodeStack **1.0.1**（`codestack`）已发布到
 共享的 **ai-code** 市场。实际可安装版本以[发行记录](../published/index.json)
 和宿主刷新后的列表为准。两个插件分别安装，可以只使用其中一个，也可以同时使用。
 [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md) 尚未发布。
@@ -24,7 +24,7 @@ CodeVow **1.0.7**（`codevow`）和 CodeStack **1.0.1**（`codestack`）已发�
 
 | 卸载旧 ID | 安装已发布 ID | 版本 |
 |---|---|---|
-| `ai-code-workflow` | `codevow` | 1.0.7 |
+| `ai-code-workflow` | `codevow` | 1.0.8 |
 | `ai-code-stack-standards` | `codestack` | 1.0.1 |
 
 1. 刷新 `ai-code`，确认新入口可见且兼容当前宿主。
@@ -46,7 +46,7 @@ CodeVow **1.0.7**（`codevow`）和 CodeStack **1.0.1**（`codestack`）已发�
 3. 在已安装插件管理中卸载仍存在的 `ai-code-workflow`、`ai-code-stack-standards`。
    即使当前市场不再列出旧 ID，也可以使用下文的 CLI 卸载命令。
 4. 分别打开 **CodeVow**、**CodeStack**，安装需要的插件并确认启用。
-5. 核对版本为 **1.0.7**、**1.0.1**，再开启新聊天。
+5. 核对版本为 **1.0.8**、**1.0.1**，再开启新聊天。
 
 ```sh
 codex plugin marketplace add Zack-Zz/ai-code --ref main
@@ -154,7 +154,7 @@ claude plugin list
    https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
    ```
 
-3. 确认“个人”分段的 **ai-code** 市场中 **CodeVow 1.0.7**、**CodeStack 1.0.1**
+3. 确认“个人”分段的 **ai-code** 市场中 **CodeVow 1.0.8**、**CodeStack 1.0.1**
    可用，再到“管理已安装”卸载已安装的旧 ID。
 4. 安装 **CodeVow**、**CodeStack**，确认启用。
 5. 核对已安装版本，再开启新会话。
@@ -203,7 +203,7 @@ node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs plugins list
 
 | 插件来源 | DSH 要求 | 可用状态 |
 |---|---|---|
-| 已发布的 CodeVow 1.0.7 / CodeStack 1.0.1 安装包与索引 | `engines.dsh` 与 DSH peers 均最低 `>=0.2.1-rc.2` | 下文当前公开安装入口 |
+| 已发布的 CodeVow 1.0.8 / CodeStack 1.0.1 安装包与索引 | `engines.dsh` 与 DSH peers 均最低 `>=0.2.1-rc.2` | 下文当前公开安装入口 |
 
 最低版本范围接受 RC3 及更高版本，不再仅因精确 RC2 锁定而拒绝。
 DSH 的范围匹配包含预发布版本（`includePrerelease`）；存在 `engines.dsh` 时
@@ -216,9 +216,10 @@ DSH 的范围匹配包含预发布版本（`includePrerelease`）；存在 `engi
 版本检查。公开安装以[正式索引](../published/dsh/index.json)为准，旧发行保留原有声明。
 不要把版本豁免当作兼容性证据。
 
-桌面端使用相同的底层应用，但完整桌面端和 Web 宿主验收仍为 **pending**。
-CodeVow 需要 Agent Preset 服务和 spawn 后端；minimal/SDK/ACP profile
-不在声明的试用范围。
+[有界 RC3 桌面探针](../plugins/codevow/docs/verification/2026-10-28-dsh-reviewer-startup.md)
+已验证发布前的 1.0.8 候选版原生安装、重启加载和一次只读 Reviewer 委派；完整桌面端和 Web
+宿主验收仍为 **pending**，正式验收槽保持 null。CodeVow 需要 Agent Preset 服务和
+spawn 后端；minimal/SDK/ACP profile 不在声明的试用范围。
 
 ### DeepSeek Harness 桌面端
 
@@ -236,7 +237,7 @@ npm CLI，也不需要创建 Web 试用 profile。**
    ```
 
 4. 选择 **CodeVow** 或 **CodeStack**，检查版本、兼容状态及固定 Git 提交/子目录，
-   仅对**兼容版本**确认安装。刷新来源并选择 CodeVow 1.0.7 或 CodeStack 1.0.1，
+   仅对**兼容版本**确认安装。刷新来源并选择 CodeVow 1.0.8 或 CodeStack 1.0.1，
    即可使用最低 `>=0.2.1-rc.2` 范围。
 5. 在 **Installed** 页核对安装和 bundle 启用状态，必要时重启应用，再新建会话
    检查技能。
@@ -255,7 +256,7 @@ RC3 及更高版本同样满足声明范围。准备 Node.js 24+，并确保 `pn
 支持 22.x 范围内的 Node 22.19+。系统 pnpm 前置条件用于独立 npm CLI，
 不适用于桌面端内置安装器。
 
-下载 [CodeVow TGZ](https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.7/codevow-1.0.7-dsh-plugin.tgz)
+下载 [CodeVow TGZ](https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.8/codevow-1.0.8-dsh-plugin.tgz)
 和 [CodeStack TGZ](https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.1/codestack-1.0.1-dsh-plugin.tgz)，
 以及各自 Release 的 `SHA256SUMS`。对照对应 `installers/` 条目核对 TGZ 哈希。
 下面假设文件在 `$HOME/Downloads`；其他平台改为实际路径。
@@ -276,7 +277,7 @@ npx --yes @deepseek-ai/dsh@0.2.1-rc.2 --profile ai-code-trial --from-default-pro
 将预构建 bundle 安装到该 profile，检查配置后启动：
 
 ```sh
-npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile ai-code-trial add "$HOME/Downloads/codevow-1.0.7-dsh-plugin.tgz"
+npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile ai-code-trial add "$HOME/Downloads/codevow-1.0.8-dsh-plugin.tgz"
 npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile ai-code-trial add "$HOME/Downloads/codestack-1.0.1-dsh-plugin.tgz"
 npx --yes @deepseek-ai/dsh@0.2.1-rc.2 --profile ai-code-trial --dump-config
 npx --yes @deepseek-ai/dsh@0.2.1-rc.2 --profile ai-code-trial
@@ -367,7 +368,7 @@ Claude Code、Codex 和 ZCode 从插件的公开
 | 重复的工作流或规范技能 | 清理已安装的旧 ID，再开启新会话。 |
 | Claude 不支持 `archive` | 核对 2.1.224+ 和正确清单；交互面板仍拒绝时使用 CLI 安装路径。 |
 | ZCode 不支持 `archive` | 将市场来源改为上文根目录 `marketplace.json` 完整 URL。 |
-| Harness 安装按钮禁用 | 对照运行时与所选条目的 `engines.dsh`。当前 CodeVow 1.0.7 / CodeStack 1.0.1 声明 `>=0.2.1-rc.2`；刷新来源并选择这些版本。旧发行保留原有声明。 |
+| Harness 安装按钮禁用 | 对照运行时与所选条目的 `engines.dsh`。当前 CodeVow 1.0.8 / CodeStack 1.0.1 声明 `>=0.2.1-rc.2`；刷新来源并选择这些版本。旧发行保留原有声明。 |
 | Harness 已安装但无技能 | 检查 bundle 启用状态、重启/新会话、所需服务与 profile 兼容性，不从包安装推断激活。 |
 | CodeVow 可选 Python 工具 | Python 3.11+；可选文件暂存需要 POSIX 文件操作。Markdown 技能本身不需要 Python。 |
 | CodeStack | 不需要额外运行时，不依赖其他 ai-code 插件。 |

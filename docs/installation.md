@@ -2,7 +2,7 @@
 
 English | [简体中文](installation.zh-CN.md)
 
-CodeVow **1.0.7** (`codevow`) and CodeStack **1.0.1** (`codestack`) are published
+CodeVow **1.0.8** (`codevow`) and CodeStack **1.0.1** (`codestack`) are published
 in the shared **ai-code** marketplace. The [release index](../published/index.json)
 and each host's refreshed listing are authoritative for available versions.
 Each plugin is installed independently; you can use either or both.
@@ -27,7 +27,7 @@ once and skip its add command when the correct source is already registered.
 
 | Remove the previous ID | Install the published ID | Version |
 |---|---|---|
-| `ai-code-workflow` | `codevow` | 1.0.7 |
+| `ai-code-workflow` | `codevow` | 1.0.8 |
 | `ai-code-stack-standards` | `codestack` | 1.0.1 |
 
 1. Refresh `ai-code` and confirm the new entries are visible and compatible.
@@ -53,7 +53,7 @@ See the [migration guide](migrations/2026-10-27-plugin-identities.md).
    `ai-code-stack-standards` if present. The CLI removal commands also work when
    those retired IDs are no longer offered by the current market.
 4. Open **CodeVow** and **CodeStack**, install each desired plugin and enable it.
-5. Confirm versions **1.0.7** and **1.0.1**, then start a new chat.
+5. Confirm versions **1.0.8** and **1.0.1**, then start a new chat.
 
 ```sh
 codex plugin marketplace add Zack-Zz/ai-code --ref main
@@ -166,7 +166,7 @@ See [installation and scope](https://code.claude.com/docs/en/discover-plugins).
    https://raw.githubusercontent.com/Zack-Zz/ai-code/refs/heads/main/marketplace.json
    ```
 
-3. Confirm **CodeVow 1.0.7** and **CodeStack 1.0.1** are available in the personal
+3. Confirm **CodeVow 1.0.8** and **CodeStack 1.0.1** are available in the personal
    **ai-code** market, then remove installed previous IDs in **Manage installed**.
 4. Install **CodeVow** and **CodeStack** and confirm each is enabled.
 5. Check the installed versions, then start a new session.
@@ -219,7 +219,7 @@ Check the plugin version and its declaration before installing:
 
 | Plugin source | DSH requirement | Availability |
 |---|---|---|
-| Published CodeVow 1.0.7 / CodeStack 1.0.1 bundles and index | Minimum `>=0.2.1-rc.2` in `engines.dsh` and DSH peers | Current public installation routes below |
+| Published CodeVow 1.0.8 / CodeStack 1.0.1 bundles and index | Minimum `>=0.2.1-rc.2` in `engines.dsh` and DSH peers | Current public installation routes below |
 
 RC3 and later versions satisfy the minimum version range; they are no longer
 rejected solely by an exact RC2 pin. DSH includes prereleases
@@ -235,9 +235,11 @@ button. Installing npm or using a TGZ does not remove the version check. The
 installation. Older releases retain their original declarations.
 Do not use a version exemption as evidence of compatibility.
 
-Desktop uses the same underlying application, but full Desktop and Web host
-acceptance is still **pending**. CodeVow requires Agent Preset and the spawn
-backend; minimal/SDK/ACP profiles are outside the declared trial scope.
+A [bounded RC3 Desktop probe](../plugins/codevow/docs/verification/2026-10-28-dsh-reviewer-startup.md)
+verified native installation, restart loading and one read-only Reviewer
+delegation with the pre-publication 1.0.8 candidate. Full Desktop and Web host acceptance remains **pending**;
+formal release acceptance slots remain null. CodeVow requires Agent Preset and
+the spawn backend; minimal/SDK/ACP profiles are outside the declared trial scope.
 
 ### DeepSeek Harness desktop
 
@@ -256,7 +258,7 @@ you do not need a separate npm CLI installation or a Web trial profile.**
 
 4. Select **CodeVow** or **CodeStack**. Review the version, compatibility and fixed
    Git commit/subdirectory, then confirm installation **only for a compatible
-   version**. Refresh the source and select CodeVow 1.0.7 or CodeStack 1.0.1
+   version**. Refresh the source and select CodeVow 1.0.8 or CodeStack 1.0.1
    for the minimum `>=0.2.1-rc.2` range.
 5. Check the **Installed** tab and enabled bundle state. Restart the application
    if needed and create a fresh session to inspect its skills.
@@ -277,7 +279,7 @@ Prepare Node.js 24+ and `pnpm` on `PATH`; the upstream repository also supports 
 its 22.x range. This system-pnpm prerequisite applies to the standalone npm CLI,
 not Desktop's bundled installer.
 
-Download [CodeVow's TGZ](https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.7/codevow-1.0.7-dsh-plugin.tgz)
+Download [CodeVow's TGZ](https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.8/codevow-1.0.8-dsh-plugin.tgz)
 and [CodeStack's TGZ](https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.1/codestack-1.0.1-dsh-plugin.tgz),
 plus each Release's `SHA256SUMS`. Check each TGZ against its corresponding
 `installers/` checksum entry. The commands assume the files are in `$HOME/Downloads`;
@@ -300,7 +302,7 @@ npx --yes @deepseek-ai/dsh@0.2.1-rc.2 --profile ai-code-trial --from-default-pro
 Install the prebuilt bundles into that profile, inspect configuration, and start it:
 
 ```sh
-npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile ai-code-trial add "$HOME/Downloads/codevow-1.0.7-dsh-plugin.tgz"
+npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile ai-code-trial add "$HOME/Downloads/codevow-1.0.8-dsh-plugin.tgz"
 npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile ai-code-trial add "$HOME/Downloads/codestack-1.0.1-dsh-plugin.tgz"
 npx --yes @deepseek-ai/dsh@0.2.1-rc.2 --profile ai-code-trial --dump-config
 npx --yes @deepseek-ai/dsh@0.2.1-rc.2 --profile ai-code-trial
@@ -399,7 +401,7 @@ must not be used as a reason to delete project `.ai-workflow/` records.
 | Duplicate workflow or standards skills | Remove installed previous IDs, then start a new session. |
 | Claude `archive` unsupported | Check 2.1.224+, correct manifest, and use the CLI install path if the interactive panel still refuses it. |
 | ZCode `archive` unsupported | Replace the market source with the root `marketplace.json` URL above. |
-| Harness Install disabled | Compare the runtime with the selected entry's `engines.dsh`. Current CodeVow 1.0.7 / CodeStack 1.0.1 declare `>=0.2.1-rc.2`; refresh the source and select these versions. Older releases retain their original declarations. |
+| Harness Install disabled | Compare the runtime with the selected entry's `engines.dsh`. Current CodeVow 1.0.8 / CodeStack 1.0.1 declare `>=0.2.1-rc.2`; refresh the source and select these versions. Older releases retain their original declarations. |
 | Harness installed but skills absent | Check bundle enablement, restart/new session, required services and profile compatibility; do not infer activation from package installation. |
 | CodeVow optional Python tools | Python 3.11+; optional file staging requires POSIX file operations. Markdown skills do not require Python. |
 | CodeStack | No additional runtime or dependency on another ai-code plugin. |

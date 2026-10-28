@@ -22,12 +22,12 @@ synthetic `spawn` provider 仅用于加载测试：提供注册官方委派工�
 `read`、`grep` 和 `glob`；真实文件访问和工作区隔离需另有宿主证据。
 
 独立的 [2026-10-28 桌面探针](../../docs/verification/2026-10-28-dsh-reviewer-startup.md)
-已验证本地 1.0.8 候选版在 DSH Desktop `0.2.1-rc.3` 原生安装并正常重启后的行为。
+已验证发布前的 1.0.8 候选版在 DSH Desktop `0.2.1-rc.3` 原生安装并正常重启后的行为。
 standard 父 Agent 仅调用一次 `workflow_reviewer`，实际派生 `codevow-reviewer` 子 Agent；
 子 Agent 工具仅有 `glob`、`grep`、`read`，成功读取测试文件并完成 Review，父 Agent 收到结果。
 测试文件哈希前后不变。此结果仅覆盖该只读委派及重启场景；活跃 Reviewer 中途禁用、
-实际越权写调用探针、长会话和四端完整验收仍未验证。正式验收槽保持 null，公开 Release
-与正式市场仍为 1.0.7。
+实际越权写调用探针、长会话和四端完整验收仍未验证。正式验收槽保持 null，CodeVow 1.0.8
+已公开发布 Release 并进入正式市场。
 
 [英文页](README.md)提供精确版本的完整重放命令。依赖只安装到 `/private/tmp` 的一次性工程，
 使用独立 npm cache、`--ignore-scripts`、`--save-exact`，保留生成的 lockfile。测试从仓库根调用：

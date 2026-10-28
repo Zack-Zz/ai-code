@@ -2,7 +2,7 @@
 
 English | [简体中文](README.zh-CN.md)
 
-CodeVow `codevow` 1.0.7 is published. The old plugin ID is retired.
+CodeVow `codevow` 1.0.8 is published. The old plugin ID is retired.
 The [published record](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json)
 is authoritative; released snapshots remain immutable.
 
@@ -114,11 +114,14 @@ The bundle and [custom marketplace index](https://raw.githubusercontent.com/Zack
 are published. The desktop app bundles Node.js and pnpm; a separate npm CLI
 installation is unnecessary. Desktop and standalone npm CLI steps are in the
 [Harness installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md#deepseek-harness).
-The published 1.0.7 bundle and index declare minimum `>=0.2.1-rc.2` in
+The published 1.0.8 bundle and index declare minimum `>=0.2.1-rc.2` in
 `engines.dsh` and DSH peers. RC3 and later versions pass this version gate.
-A range match does not certify future APIs. Real desktop acceptance, native loading,
-implicit selection, long sessions and lifecycle acceptance remain unverified.
-Build and package checks do not establish host acceptance.
+A range match does not certify future APIs. A [bounded RC3 Desktop probe](docs/verification/2026-10-28-dsh-reviewer-startup.md)
+verified native installation, restart loading and one read-only Reviewer delegation
+with the pre-publication 1.0.8 candidate.
+Implicit selection, long sessions and full lifecycle acceptance remain unverified;
+formal release acceptance slots remain null. Build and package checks do not
+establish host acceptance.
 Invoke the skill with `/workflow`. Independent
 official filesystem providers expose each plugin's bundled resources.
 

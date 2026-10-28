@@ -1,8 +1,8 @@
 English | [简体中文](support-matrix.zh-CN.md)
 
-## Current release (CodeVow 1.0.7)
+## Current release (CodeVow 1.0.8)
 
-The current release is `codevow` 1.0.7, with Claude Code, Codex, ZCode and DSH
+The current release is `codevow` 1.0.8, with Claude Code, Codex, ZCode and DSH
 package targets. The public DSH bundle and index declare minimum `>=0.2.1-rc.2`
 in `engines.dsh` and DSH peers; RC3 and later versions pass this version gate.
 Its API baseline remains published RC2 with the Web profile. A range match does
@@ -10,15 +10,15 @@ not certify future API compatibility. The bundle requires
 native preset, Agent, tools, prompt and spawn services; missing dependencies
 prevent activation. Its read/grep/glob reviewer restriction and workspace
 isolation are separate capabilities. All four release acceptance slots remain
-null. Local checks and the historical records below do not establish current
+null. Local checks alone and the historical records below do not establish current
 native loading, routing, tool enforcement, installation or lifecycle acceptance.
 
-## Local candidate (CodeVow 1.0.8, 2026-10-28)
+## Reviewer startup fix (CodeVow 1.0.8, 2026-10-28)
 
-The 1.0.8 candidate fixes Reviewer startup ordering in DSH Desktop RC3. With
+The 1.0.8 release fixes Reviewer startup ordering in DSH Desktop RC3. With
 1.0.7, parallel loading could start delegation before the preset registered,
 report `Unknown agent preset codevow-reviewer`, and leave delegation failed even
-after the preset appeared. The candidate inherits the official AgentPreset
+after the preset appeared. The adapter inherits the official AgentPreset
 lifecycle and makes the official subagent tool wait for the
 `codevowReviewerPresetRegistered` dependency. Unloading the preset revokes
 delegation before releasing its registration. CodeVow adds the Cordis peer
@@ -32,7 +32,7 @@ that does not execute a model. These checks do not prove a completed model
 delegation, real filesystem isolation or full host acceptance.
 
 A separate [Desktop probe on 2026-10-28](verification/2026-10-28-dsh-reviewer-startup.md)
-verified this candidate on DSH Desktop `0.2.1-rc.3`: native installation and a
+verified the pre-publication 1.0.8 candidate on DSH Desktop `0.2.1-rc.3`: native installation and a
 normal restart left all three plugin components running, and all 41 installed
 files matched the checked package. In a new temporary workspace session, a
 standard parent called `workflow_reviewer` once and spawned a real
@@ -44,8 +44,8 @@ review. Test-file hashes were unchanged.
 That result covers this read-only delegation and restart scenario. Disabling an
 active Reviewer, forbidden write-call probes and long-session behavior remain
 unverified. `acceptance.dsh` remains null, and no complete DSH or four-host
-acceptance pass is claimed. This is a local candidate only: the public release
-and marketplace remain 1.0.7.
+acceptance pass is claimed. CodeVow 1.0.8 is published in the public Release
+and the stable marketplace.
 
 The following dated record is retained verbatim.
 

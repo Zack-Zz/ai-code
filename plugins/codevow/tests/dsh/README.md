@@ -30,14 +30,14 @@ the mounted preset exposes only `read`, `grep` and `glob`. Real filesystem acces
 and workspace isolation require separate host evidence.
 
 A separate [Desktop probe on 2026-10-28](../../docs/verification/2026-10-28-dsh-reviewer-startup.md)
-verified the local 1.0.8 candidate on DSH Desktop `0.2.1-rc.3` after native
+verified the pre-publication 1.0.8 candidate on DSH Desktop `0.2.1-rc.3` after native
 installation and a normal restart. A standard parent called `workflow_reviewer`
 once; the spawned `codevow-reviewer` child exposed only `glob`, `grep` and `read`,
 successfully read the fixture and completed its review back to the parent. Fixture
 hashes were unchanged. This covers that read-only delegation and restart scenario;
 active-Reviewer disable, forbidden write-call probes, long sessions and complete
 four-host acceptance remain unverified. The release acceptance slots remain null;
-the public release and marketplace remain 1.0.7.
+CodeVow 1.0.8 is published in the public Release and stable marketplace.
 
 Create a disposable directory outside the checkout. Install these exact packages
 with scripts disabled and an isolated cache, preserving the generated lockfile:
