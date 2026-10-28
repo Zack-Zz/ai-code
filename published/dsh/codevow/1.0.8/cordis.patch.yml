@@ -1,0 +1,47 @@
+# Host-scoped independent provider; does not replace existing roots or presets.
+- insert:
+    - id: codevow-skills
+      name: '@deepseek-ai/dsh-skill-filesystem'
+      config:
+        providerName: codevow
+        includeDefaultRoots: false
+        watch: false
+        bundledSkillDir: !!js process.getBuiltinModule('node:path').join(process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('codevow/package.json')), 'skills')
+    - id: codevow-reviewer-preset
+      name: codevow/reviewer-preset
+      inject: [agentPresets, agents, tools, systemPrompt, subagents]
+      config:
+        id: codevow-reviewer
+        name: CodeVow Reviewer
+        description: Independent read-only review; primary agent verifies findings.
+        plugins:
+          - id: codevow-reviewer-persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: !!js JSON.parse(process.getBuiltinModule('node:fs').readFileSync(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('codevow/reviewer-persona.json'), 'utf8'))
+          - id: codevow-reviewer-executor
+            name: '@deepseek-ai/dsh-agent-tool-presentation'
+            config:
+              mode: native
+          - id: codevow-reviewer-files
+            name: '@deepseek-ai/dsh-tool-fs'
+            config:
+              read: true
+              readImage: false
+              write: false
+              edit: false
+          - id: codevow-reviewer-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              sampleOverCapGlobResults: false
+          - id: codevow-reviewer-guard
+            name: codevow/reviewer-guard
+            inject: [agents, tools]
+    - id: codevow-reviewer-spawn
+      name: '@deepseek-ai/dsh-tool-subagent'
+      inject: [agentPresets, agents, tools, systemPrompt, subagents, sessionProjections, codevowReviewerPresetRegistered]
+      config:
+        provider: spawn
+        toolName: workflow_reviewer
+        agentPreset: codevow-reviewer
+        modelSelectionSettings: false
