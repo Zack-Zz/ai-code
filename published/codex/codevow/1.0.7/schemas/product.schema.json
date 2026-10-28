@@ -1,0 +1,359 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "codevow/product.schema.json",
+  "title": "Product source manifest",
+  "description": "Describes the fixed product contract implemented by scripts/workflow/product.py. The dedicated validator is authoritative; this schema documents the same structure for consumers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "product_id",
+    "display_name",
+    "version",
+    "repository",
+    "license",
+    "core_skills",
+    "shared_skills",
+    "resources"
+  ],
+  "properties": {
+    "schema_version": {
+      "enum": [
+        1,
+        2
+      ]
+    },
+    "product_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-preview\\.(0|[1-9][0-9]*))?(?![\\s\\S])"
+    },
+    "repository": {
+      "type": "string",
+      "minLength": 1
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "core_skills": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "shared_skills": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "target",
+          "include"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "pattern": "^[^/].*$"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^[^/].*$"
+          },
+          "include": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "hosts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "claude",
+          "codex",
+          "zcode",
+          "dsh"
+        ]
+      }
+    },
+    "profiles": {
+      "const": [
+        "collaborative",
+        "continuous"
+      ]
+    },
+    "host_listings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "claude": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {},
+          "description": "An explicit empty object enables the market displayName derived from display_name."
+        },
+        "zcode": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "icon_path",
+            "icon_url"
+          ],
+          "properties": {
+            "icon_path": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Normalized packaged target of an explicitly registered PNG/SVG resource."
+            },
+            "icon_url": {
+              "type": "string",
+              "maxLength": 2048,
+              "pattern": "^https://raw\\.githubusercontent\\.com/[^/]+/[^/]+/[0-9a-fA-F]{40}/plugins/(?:codevow|ai-code-workflow)/.+\\.([pP][nN][gG]|[sS][vV][gG])(?![\\s\\S])",
+              "description": "Immutable raw GitHub URL in this repository, mapping to the registered source rather than its packaged target."
+            }
+          }
+        }
+      }
+    },
+    "generated_agents": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "host",
+          "template",
+          "body",
+          "target"
+        ],
+        "properties": {
+          "host": {
+            "enum": [
+              "claude",
+              "zcode"
+            ]
+          },
+          "template": {
+            "type": "string"
+          },
+          "body": {
+            "const": "skills/review/references/reviewer-contract.md"
+          },
+          "target": {
+            "const": "agents/workflow-reviewer.md"
+          }
+        }
+      }
+    },
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 320
+        }
+      }
+    },
+    "host_resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "claude": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "target",
+              "include"
+            ],
+            "properties": {
+              "source": {
+                "type": "string",
+                "pattern": "^[^/].*$"
+              },
+              "target": {
+                "type": "string",
+                "pattern": "^[^/].*$"
+              },
+              "include": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "codex": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "target",
+              "include"
+            ],
+            "properties": {
+              "source": {
+                "type": "string",
+                "pattern": "^[^/].*$"
+              },
+              "target": {
+                "type": "string",
+                "pattern": "^[^/].*$"
+              },
+              "include": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "zcode": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "target",
+              "include"
+            ],
+            "properties": {
+              "source": {
+                "type": "string",
+                "pattern": "^[^/].*$"
+              },
+              "target": {
+                "type": "string",
+                "pattern": "^[^/].*$"
+              },
+              "include": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "dsh": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "target",
+              "include"
+            ],
+            "properties": {
+              "source": {
+                "type": "string",
+                "pattern": "^[^/].*$"
+              },
+              "target": {
+                "type": "string",
+                "pattern": "^[^/].*$"
+              },
+              "include": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "generated_resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "host",
+          "source",
+          "target",
+          "format"
+        ],
+        "properties": {
+          "host": {
+            "const": "dsh"
+          },
+          "source": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "format": {
+            "const": "json-string"
+          }
+        }
+      }
+    }
+  },
+  "notes": [
+    "core_skills and shared_skills must be disjoint and each must correspond to skills/<name>/SKILL.md.",
+    "A file source requires include == []; a directory source requires an explicit relative file list (no wildcards, no caches); every listed file must exist.",
+    "source and target are normalized relative paths: absolute paths, '..' segments and symlinked components are rejected.",
+    "Each skill contributes exactly skills/<name>/SKILL.md as a packaged component; any extra file under a skill directory must be registered as an explicit resource entry.",
+    "All resolved target paths must be unique (mapping conflicts are rejected).",
+    "host_listings is opt-in and may only name a declared supported listing host. displayName is derived from display_name; icon_path must resolve through the resource whitelist and icon_url must match the source path in this repository at a full Git SHA.",
+    "Optional packaging metadata declares a supported host subset; native Claude/ZCode reviewer templates both use the single shared reviewer contract. Publisher metadata is injected into host output rather than duplicated in adapters."
+  ]
+}
