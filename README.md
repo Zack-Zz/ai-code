@@ -2,7 +2,7 @@
 
 English | [简体中文](README.zh-CN.md)
 
-> Current stable releases: CodeVow `codevow` 1.0.6 and CodeStack `codestack` 1.0.0.
+> Current stable releases: CodeVow `codevow` 1.0.7 and CodeStack `codestack` 1.0.1.
 > The old plugin IDs are retired. The [published record](published/index.json)
 > is authoritative; released snapshots remain immutable. Existing users can follow
 > the [identity migration](docs/migrations/2026-10-27-plugin-identities.md).
@@ -100,9 +100,10 @@ The [DSH custom marketplace index](https://raw.githubusercontent.com/Zack-Zz/ai-
 and both plugin bundles are published. The desktop app bundles Node.js and pnpm;
 it does not require a separate npm CLI installation. See the
 [Harness guide](docs/installation.md#deepseek-harness) for desktop and standalone
-npm CLI paths. Both released bundles pin `engines.dsh` and their DSH peer
-dependencies to `0.2.1-rc.2`. Desktop `0.2.1-rc.3` is outside that declaration,
-and real desktop acceptance remains pending.
+npm CLI paths. CodeVow 1.0.7 and CodeStack 1.0.1 declare minimum
+`>=0.2.1-rc.2` in `engines.dsh` and their DSH peer dependencies. RC3 and later
+versions pass this version gate; a range match does not certify future API
+compatibility. Real desktop acceptance remains pending.
 
 ## Develop and contribute
 

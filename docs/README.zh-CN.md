@@ -7,7 +7,7 @@
 ## 使用插件
 
 - [安装指南](installation.zh-CN.md)：[Codex](installation.zh-CN.md#codex)、[Claude Code](installation.zh-CN.md#claude-code)、[ZCode](installation.zh-CN.md#zcode) 和 [DeepSeek Harness](installation.zh-CN.md#deepseek-harness) 的桌面端与 CLI 安装、更新和卸载。
-- [身份迁移](migrations/2026-10-27-plugin-identities.zh-CN.md)：将已退役的旧插件 ID 重装为已发布的 `codevow` 1.0.6 和 `codestack` 1.0.0。
+- [身份迁移](migrations/2026-10-27-plugin-identities.zh-CN.md)：将已退役的旧插件 ID 重装为 `codevow` 和 `codestack`；带日期的指南保留原迁移版本记录。
 - [CodeVow](../plugins/codevow/README.zh-CN.md)：功能、示例和配置。
 - [CodeVow 详细用法](../plugins/codevow/docs/usage.zh-CN.md)：配置、任务记录和可选文件工具。
 - [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md)：依赖准备、派发、续接和取消。

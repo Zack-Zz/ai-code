@@ -8,7 +8,7 @@ records appear in the reference section at the end.
 ## Use plugins
 
 - [Installation](installation.md): desktop and CLI installation, updates and removal for [Codex](installation.md#codex), [Claude Code](installation.md#claude-code), [ZCode](installation.md#zcode) and [DeepSeek Harness](installation.md#deepseek-harness).
-- [Identity migration](migrations/2026-10-27-plugin-identities.md): reinstall retired plugin IDs as the published `codevow` 1.0.6 and `codestack` 1.0.0 identities.
+- [Identity migration](migrations/2026-10-27-plugin-identities.md): reinstall retired plugin IDs as `codevow` and `codestack`; the dated guide retains the original migration versions.
 - [CodeVow](../plugins/codevow/README.md): features, examples and configuration.
 - [Detailed CodeVow usage](../plugins/codevow/docs/usage.md): configuration, task records and optional file tools.
 - [Agent Delegation](../plugins/ai-agent-delegation/README.md): requirements, handoffs, continuation and cancellation.

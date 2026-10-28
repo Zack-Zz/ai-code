@@ -2,7 +2,7 @@
 
 [English](README.md) | 简体中文
 
-> 当前正式版：CodeVow `codevow` 1.0.6、CodeStack `codestack` 1.0.0。
+> 当前正式版：CodeVow `codevow` 1.0.7、CodeStack `codestack` 1.0.1。
 > 旧插件 ID 已退役。[已发布记录](published/index.json)是可安装版本的权威来源，
 > 已发行快照保持不可变。已有用户的重新安装步骤见
 > [身份迁移](docs/migrations/2026-10-27-plugin-identities.zh-CN.md)。
@@ -93,9 +93,10 @@ claude plugin install codevow@ai-code --scope user
 [DSH 自定义市场索引](https://raw.githubusercontent.com/Zack-Zz/ai-code/main/published/dsh/index.json)
 和两个插件包均已发布。桌面端自带 Node.js 与 pnpm，无需另行安装 npm CLI。
 桌面端与独立 npm CLI 的安装路径见
-[Harness 安装说明](docs/installation.zh-CN.md#deepseek-harness)。两个已发行包的
-`engines.dsh` 与 DSH peerDependencies 均精确锁定 `0.2.1-rc.2`；桌面端
-`0.2.1-rc.3` 尚未被当前声明覆盖，真实桌面端验收仍为 pending。
+[Harness 安装说明](docs/installation.zh-CN.md#deepseek-harness)。CodeVow 1.0.7 和
+CodeStack 1.0.1 的 `engines.dsh` 与 DSH peerDependencies 均声明最低
+`>=0.2.1-rc.2`。RC3 及更高版本可通过此版本门槛；范围匹配不代表未来 API
+兼容已经验证。真实桌面端验收仍为 pending。
 
 ## 开发与贡献
 
