@@ -1,0 +1,214 @@
+{
+  "channel": "stable",
+  "git_installs": {
+    "codex": {
+      "files": {
+        "published/codex/codevow/1.0.8/LICENSE": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
+        "published/codex/codevow/1.0.8/LICENSES/backend-engineering-lite.txt": "adc77fd0db182e6062199b35ff68b0994cbe0dae6ecd8511b4c3d887e6fb8f4b",
+        "published/codex/codevow/1.0.8/NOTICE": "93a6cecdf6dd5827585564db87b0ee49730a1a4f1281c649b9b4ef8a513bcd01",
+        "published/codex/codevow/1.0.8/README.md": "93fe69f7c77a2b293a37d98dbe5af07296553879e25db299eea0c3cb6e5a1fbc",
+        "published/codex/codevow/1.0.8/README_CN.md": "fd037e7d7e063555db8e61625a12e5f698ba1e6bd681e69a40dcaf5154bae1a9",
+        "published/codex/codevow/1.0.8/artifact.json": "06592ff6efa7f24a8a181bf83876400b41cddfcbd6b85f6a10f0da7d6221f7ad",
+        "published/codex/codevow/1.0.8/assets/codevow.png": "cafe13bd54630667774e133a7f42e49331b06437c3e7141f30f08ea8e9789370",
+        "published/codex/codevow/1.0.8/assets/codevow.svg": "96489d4de56ef2d3c0c573dc907ae486c0087ffa739fa436a50131840e5cbd58",
+        "published/codex/codevow/1.0.8/plugin.json": "da994665ccecb4fa342ba1249d19faa0640afcb9b32099a8c00e942f28c3db0f",
+        "published/codex/codevow/1.0.8/policies/collaborative.json": "1ff102c65d36209d09526d20324836e60038042db35a5f648b6fec04b435658a",
+        "published/codex/codevow/1.0.8/policies/continuous.json": "9f617e7d1fa0bb964034b8555309a48c7cdee7a2707cca9c6892f2eec2485743",
+        "published/codex/codevow/1.0.8/schemas/evidence.schema.json": "ed1a917013501c1582c40c328170992d0c8fbbee54c13e1246c4a5dbaca90853",
+        "published/codex/codevow/1.0.8/schemas/policy.schema.json": "51744cee9015fb5ed57d51ae542bf6ce01db89cd8fe632512f4323ee0e10c75f",
+        "published/codex/codevow/1.0.8/schemas/product.schema.json": "04fd472274dfe97e6b0fc0d53d53043188c6eb1703cafb98e070ed3b51b256c8",
+        "published/codex/codevow/1.0.8/schemas/task.schema.json": "04ec6fada716e461fe9d6c476834e5642d6edd0884ef1d636e023a9b31904552",
+        "published/codex/codevow/1.0.8/skills/debugging/SKILL.md": "a54fa28be92eecdef46d31294e41f736e5a1a51a4c61f6ab15caefb717969c7a",
+        "published/codex/codevow/1.0.8/skills/debugging/agents/openai.yaml": "0a8d7b56b8cfc3ca5d7de649da6d4cee504a1ddb2ef87910c9cec6a31c6c4183",
+        "published/codex/codevow/1.0.8/skills/review-results/SKILL.md": "d9d17ea256f0ab637f93929a890d668d356a946738b3773d1a4998505acb7c45",
+        "published/codex/codevow/1.0.8/skills/review-results/agents/openai.yaml": "90cf4cb3f49f215d2d91079dc46f38ec53c4fb2690d583775fff122b12b7bf31",
+        "published/codex/codevow/1.0.8/skills/review/SKILL.md": "66457715f55ed76a46a5194bae945a694bce580897fabeabe3706722072cf01e",
+        "published/codex/codevow/1.0.8/skills/review/agents/openai.yaml": "3fd61f3c9aa58fb812309f6a74580133cf75fd89c3e73d149223fd154960750c",
+        "published/codex/codevow/1.0.8/skills/review/references/reviewer-contract.md": "730c72878f106c174dc36d4a24ec6dd92d8d54b53e6edf1061f2f3af38a107f7",
+        "published/codex/codevow/1.0.8/skills/tdd/SKILL.md": "f36e71d9566c5211b7f7848a70d93772e2e2acfc30d375ca2f4d5e4bf6366832",
+        "published/codex/codevow/1.0.8/skills/tdd/agents/openai.yaml": "82fcef34cc63db516a35052931d951b2ff046c9b3a82c8d317b6a54c68822446",
+        "published/codex/codevow/1.0.8/skills/verification/SKILL.md": "1a5bb90662e3a044c425e6b4a18c6c70e567d235809ec83545adef818f811914",
+        "published/codex/codevow/1.0.8/skills/verification/agents/openai.yaml": "1f9ee380a4012a87b1a2535ed7ab2279489c2209b6d1a5f485625142f1fab607",
+        "published/codex/codevow/1.0.8/skills/workflow/SKILL.md": "6393b7915da3fff168ce4372e8fc22a417b303b1250644c8323d16a9da39f5b9",
+        "published/codex/codevow/1.0.8/skills/workflow/agents/openai.yaml": "a8f39017da68263b285a0ebdc27bf88d69da4b9119fc5edcd0b6f245205a0c9a",
+        "published/codex/codevow/1.0.8/skills/workflow/references/execution.md": "3ccec8e843aa39a2824d725998e715469cc613c255693eef584ba575e1e9ba09",
+        "published/codex/codevow/1.0.8/templates/evidence.json": "07f97ae6150db4fe732ff63411086963e120746d0dc5182cf54f26ab76c4261f",
+        "published/codex/codevow/1.0.8/templates/task.json": "bcc3727ff0851b549bef5aa125b9fb1ba2194d2b47b78f9ac1739e494d03a58b",
+        "published/codex/codevow/1.0.8/tools/workflow/__init__.py": "d05ecf0834df8aa94b1fccb41676af3749e061b420efa42cf7858227c01f6149",
+        "published/codex/codevow/1.0.8/tools/workflow/build.py": "8f0e1f54b026d9c660acd9b5f8bbd41965e303140c9bc316e750789cd42ff667",
+        "published/codex/codevow/1.0.8/tools/workflow/cli.py": "b82e071232603671219b0264c24d90574cef905743da3b5fb631643f594f44a6",
+        "published/codex/codevow/1.0.8/tools/workflow/io.py": "b3b445373c5e52dc59c21ee198b7a600f14069101b4e65c897b714c5e400ba3a",
+        "published/codex/codevow/1.0.8/tools/workflow/owned_files.py": "97ebfcbbaac0918a9249af718c54393108b45b0d16ee97c8b7f24caf1e787279",
+        "published/codex/codevow/1.0.8/tools/workflow/package_check.py": "bed805ae89b0cf7a807d8e03bca40d55d04428a2906504ecd5a492c9dc38485a",
+        "published/codex/codevow/1.0.8/tools/workflow/policy.py": "2db5c1e850566c0f4424fd990b0c97de47a057d78f02ab58b75746e1e0009cf1",
+        "published/codex/codevow/1.0.8/tools/workflow/product.py": "ef4f8b09197a1002473ac32377168ca76ea6beb1c5eb149c71a373c233e8533b",
+        "published/codex/codevow/1.0.8/tools/workflow/state.py": "a6bb4e906a42ad856d18de0a5ba87dd4bdae54370b8d097c1ab6d8b693d19c32",
+        "published/codex/codevow/1.0.8/tools/workflow_tool.py": "952ea5da67c102dc95eb56497f6fda8ba655548d19ae4e0cb4701e099001f9ed"
+      },
+      "revision": "457e1da23aaddf4fb3f3f4760f2aab7d1038f825"
+    },
+    "dsh": {
+      "files": {
+        "published/dsh/codevow/1.0.8/LICENSE": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
+        "published/dsh/codevow/1.0.8/LICENSES/backend-engineering-lite.txt": "adc77fd0db182e6062199b35ff68b0994cbe0dae6ecd8511b4c3d887e6fb8f4b",
+        "published/dsh/codevow/1.0.8/NOTICE": "93a6cecdf6dd5827585564db87b0ee49730a1a4f1281c649b9b4ef8a513bcd01",
+        "published/dsh/codevow/1.0.8/README.md": "93fe69f7c77a2b293a37d98dbe5af07296553879e25db299eea0c3cb6e5a1fbc",
+        "published/dsh/codevow/1.0.8/README_CN.md": "fd037e7d7e063555db8e61625a12e5f698ba1e6bd681e69a40dcaf5154bae1a9",
+        "published/dsh/codevow/1.0.8/artifact.json": "898320bde230db1ec6294a9aa055ec43aedfea782adc93a440065125e563fc68",
+        "published/dsh/codevow/1.0.8/assets/codevow.png": "cafe13bd54630667774e133a7f42e49331b06437c3e7141f30f08ea8e9789370",
+        "published/dsh/codevow/1.0.8/assets/codevow.svg": "96489d4de56ef2d3c0c573dc907ae486c0087ffa739fa436a50131840e5cbd58",
+        "published/dsh/codevow/1.0.8/cordis.patch.yml": "d417b41802c4e66e3a37d6975f1426a2b83e0bcb11fdca86ac99b94adc438085",
+        "published/dsh/codevow/1.0.8/locale/en.json": "9880db9b2e5b94d28c911046f9620df1bc62eff97b3b5833ebb0367b16423ccc",
+        "published/dsh/codevow/1.0.8/locale/zh.json": "7b6bc16f309fab91c590b64b062e51852514ff5e289731f4718b59cee0e28a2f",
+        "published/dsh/codevow/1.0.8/package.json": "3cbeeb0439fe3c9de6303c2f045f73ba489d6cbd107857363a3aeca192f66166",
+        "published/dsh/codevow/1.0.8/policies/collaborative.json": "1ff102c65d36209d09526d20324836e60038042db35a5f648b6fec04b435658a",
+        "published/dsh/codevow/1.0.8/policies/continuous.json": "9f617e7d1fa0bb964034b8555309a48c7cdee7a2707cca9c6892f2eec2485743",
+        "published/dsh/codevow/1.0.8/reviewer-guard.js": "6757908973849b9114d83c65f06da8b8a42d76bc9031b1cf98a466ab53a4a232",
+        "published/dsh/codevow/1.0.8/reviewer-persona.json": "5a72ee88f9adbbd34712423913eb1d502ec3d1e4af4a35ef12500cd1fdddb8d8",
+        "published/dsh/codevow/1.0.8/reviewer-preset.js": "c45c8a541b6a76db4d11141c742b65697f23df01f6ee4f773d057f4d45461ced",
+        "published/dsh/codevow/1.0.8/schemas/evidence.schema.json": "ed1a917013501c1582c40c328170992d0c8fbbee54c13e1246c4a5dbaca90853",
+        "published/dsh/codevow/1.0.8/schemas/policy.schema.json": "51744cee9015fb5ed57d51ae542bf6ce01db89cd8fe632512f4323ee0e10c75f",
+        "published/dsh/codevow/1.0.8/schemas/product.schema.json": "04fd472274dfe97e6b0fc0d53d53043188c6eb1703cafb98e070ed3b51b256c8",
+        "published/dsh/codevow/1.0.8/schemas/task.schema.json": "04ec6fada716e461fe9d6c476834e5642d6edd0884ef1d636e023a9b31904552",
+        "published/dsh/codevow/1.0.8/skills/debugging/SKILL.md": "a54fa28be92eecdef46d31294e41f736e5a1a51a4c61f6ab15caefb717969c7a",
+        "published/dsh/codevow/1.0.8/skills/review-results/SKILL.md": "d9d17ea256f0ab637f93929a890d668d356a946738b3773d1a4998505acb7c45",
+        "published/dsh/codevow/1.0.8/skills/review/SKILL.md": "66457715f55ed76a46a5194bae945a694bce580897fabeabe3706722072cf01e",
+        "published/dsh/codevow/1.0.8/skills/review/references/reviewer-contract.md": "730c72878f106c174dc36d4a24ec6dd92d8d54b53e6edf1061f2f3af38a107f7",
+        "published/dsh/codevow/1.0.8/skills/tdd/SKILL.md": "f36e71d9566c5211b7f7848a70d93772e2e2acfc30d375ca2f4d5e4bf6366832",
+        "published/dsh/codevow/1.0.8/skills/verification/SKILL.md": "1a5bb90662e3a044c425e6b4a18c6c70e567d235809ec83545adef818f811914",
+        "published/dsh/codevow/1.0.8/skills/workflow/SKILL.md": "6393b7915da3fff168ce4372e8fc22a417b303b1250644c8323d16a9da39f5b9",
+        "published/dsh/codevow/1.0.8/skills/workflow/references/execution.md": "3ccec8e843aa39a2824d725998e715469cc613c255693eef584ba575e1e9ba09",
+        "published/dsh/codevow/1.0.8/templates/evidence.json": "07f97ae6150db4fe732ff63411086963e120746d0dc5182cf54f26ab76c4261f",
+        "published/dsh/codevow/1.0.8/templates/task.json": "bcc3727ff0851b549bef5aa125b9fb1ba2194d2b47b78f9ac1739e494d03a58b",
+        "published/dsh/codevow/1.0.8/tools/workflow/__init__.py": "d05ecf0834df8aa94b1fccb41676af3749e061b420efa42cf7858227c01f6149",
+        "published/dsh/codevow/1.0.8/tools/workflow/build.py": "8f0e1f54b026d9c660acd9b5f8bbd41965e303140c9bc316e750789cd42ff667",
+        "published/dsh/codevow/1.0.8/tools/workflow/cli.py": "b82e071232603671219b0264c24d90574cef905743da3b5fb631643f594f44a6",
+        "published/dsh/codevow/1.0.8/tools/workflow/io.py": "b3b445373c5e52dc59c21ee198b7a600f14069101b4e65c897b714c5e400ba3a",
+        "published/dsh/codevow/1.0.8/tools/workflow/owned_files.py": "97ebfcbbaac0918a9249af718c54393108b45b0d16ee97c8b7f24caf1e787279",
+        "published/dsh/codevow/1.0.8/tools/workflow/package_check.py": "bed805ae89b0cf7a807d8e03bca40d55d04428a2906504ecd5a492c9dc38485a",
+        "published/dsh/codevow/1.0.8/tools/workflow/policy.py": "2db5c1e850566c0f4424fd990b0c97de47a057d78f02ab58b75746e1e0009cf1",
+        "published/dsh/codevow/1.0.8/tools/workflow/product.py": "ef4f8b09197a1002473ac32377168ca76ea6beb1c5eb149c71a373c233e8533b",
+        "published/dsh/codevow/1.0.8/tools/workflow/state.py": "a6bb4e906a42ad856d18de0a5ba87dd4bdae54370b8d097c1ab6d8b693d19c32",
+        "published/dsh/codevow/1.0.8/tools/workflow_tool.py": "952ea5da67c102dc95eb56497f6fda8ba655548d19ae4e0cb4701e099001f9ed"
+      },
+      "revision": "457e1da23aaddf4fb3f3f4760f2aab7d1038f825"
+    }
+  },
+  "hosts": {
+    "claude": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.8/codevow-1.0.8-claude-plugin.zip",
+        "id": 683967507,
+        "name": "codevow-1.0.8-claude-plugin.zip",
+        "sha256": "0d5dae225da70219936ba3c18e47191cc8aa11c76839d1672281df61a59c0de7",
+        "size": 891358
+      },
+      "entry": {
+        "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+        "displayName": "CodeVow",
+        "name": "codevow",
+        "version": "1.0.8"
+      },
+      "installer_format": "zip",
+      "package_content_hash": "2c12e81c02c9c5096f298e6bc62f0228cdb0ff653995dfb6994847c99c977df5"
+    },
+    "codex": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.8/codevow-1.0.8-codex-plugin.zip",
+        "id": 683967510,
+        "name": "codevow-1.0.8-codex-plugin.zip",
+        "sha256": "12ad65bc65fad2572f2307c3245f92499edd4e00a211b33bbfb4e6343957919c",
+        "size": 892533
+      },
+      "entry": {
+        "category": "developer-tools",
+        "name": "codevow",
+        "policy": {
+          "authentication": "ON_INSTALL",
+          "installation": "AVAILABLE"
+        },
+        "version": "1.0.8"
+      },
+      "installer_format": "zip",
+      "package_content_hash": "7d770c3b408ea7ad9058ebb143aaa55cc1b8a92d5139510f2d88dfe4ae4151b4"
+    },
+    "dsh": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.8/codevow-1.0.8-dsh-plugin.tgz",
+        "id": 683967517,
+        "name": "codevow-1.0.8-dsh-plugin.tgz",
+        "sha256": "f14b67f75605da68292ed862ec0da39af1f5188b740f6fbdaec379d570020cf7",
+        "size": 880851
+      },
+      "entry": {
+        "description": {
+          "en": "A reviewable workflow from authorization to verification",
+          "zh": "\u4ece\u6388\u6743\u5230\u9a8c\u8bc1\u7684\u53ef\u5ba1\u67e5\u5de5\u4f5c\u6d41"
+        },
+        "engines": {
+          "dsh": ">=0.2.1-rc.2"
+        },
+        "icon": "assets/codevow.svg",
+        "name": "codevow",
+        "title": {
+          "en": "CodeVow",
+          "zh": "CodeVow"
+        }
+      },
+      "installer_format": "npm-tgz",
+      "package_content_hash": "7750e918f526fbba814740196480ca1bdcd8e970b51b02061da65fae2d1ec5c5"
+    },
+    "zcode": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.8/codevow-1.0.8-zcode-plugin.zip",
+        "id": 683967511,
+        "name": "codevow-1.0.8-zcode-plugin.zip",
+        "sha256": "b9a9e4ecb1c9aa4763641fb0fa8c49987a68fc2e3f6b3877858cfb38b4c193d5",
+        "size": 891301
+      },
+      "entry": {
+        "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+        "displayName": "CodeVow",
+        "icon": "https://raw.githubusercontent.com/Zack-Zz/ai-code/91dec3a64731f8de2fb68e49bce9f4228289bbbd/plugins/ai-code-workflow/assets/codevow.png",
+        "name": "codevow",
+        "version": "1.0.8"
+      },
+      "installer_format": "zip",
+      "package_content_hash": "bb010e56634cc01b2b9bb7102ea45ee6396f9b7a8ba5aaddc2b8befd7ca8b848"
+    }
+  },
+  "mode": "stable",
+  "product_id": "codevow",
+  "readiness": {
+    "accepted_hosts": [],
+    "limitations": [
+      "This is a local release bundle; no installation, upload, marketplace submission or Git change was performed.",
+      "Host evidence is a source-bound factual record, not user authorization or marketplace acceptance.",
+      "A previous bundle is caller-supplied trusted history with local integrity checks, not proof of a published release.",
+      "Raw host-session artifacts remain local; this bundle contains only their bindings and hashes.",
+      "Real host acceptance is unverified for: claude, codex, dsh, zcode"
+    ],
+    "package_content_hashes": {
+      "claude": "2c12e81c02c9c5096f298e6bc62f0228cdb0ff653995dfb6994847c99c977df5",
+      "codex": "7d770c3b408ea7ad9058ebb143aaa55cc1b8a92d5139510f2d88dfe4ae4151b4",
+      "dsh": "7750e918f526fbba814740196480ca1bdcd8e970b51b02061da65fae2d1ec5c5",
+      "zcode": "bb010e56634cc01b2b9bb7102ea45ee6396f9b7a8ba5aaddc2b8befd7ca8b848"
+    },
+    "pending_acceptance": [
+      "claude",
+      "codex",
+      "dsh",
+      "zcode"
+    ],
+    "publication_ready": true
+  },
+  "release_id": 426300606,
+  "release_published_at": "2026-10-28T05:41:36Z",
+  "release_url": "https://github.com/Zack-Zz/ai-code/releases/tag/codevow%2Fv1.0.8",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "schema_version": 3,
+  "source_revision": "d5207d1ae4aadba21638a674c8504415d2decf6c",
+  "source_tree_hash": "7bcb407292994a1bb0e7aa17362e6a2dcf49f909400067ac9169acb811f09d55",
+  "tag": "codevow/v1.0.8",
+  "version": "1.0.8"
+}

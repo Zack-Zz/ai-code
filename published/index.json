@@ -18,19 +18,19 @@
     },
     "codevow": {
       "git_revisions": {
-        "codex": "91d1b50226fbb729d1699a1ee7d35d6726050f44",
-        "dsh": "91d1b50226fbb729d1699a1ee7d35d6726050f44"
+        "codex": "457e1da23aaddf4fb3f3f4760f2aab7d1038f825",
+        "dsh": "457e1da23aaddf4fb3f3f4760f2aab7d1038f825"
       },
       "installers": {
-        "claude": "fbd8cf5ae4d9a5a931980fbbe7b83298bddc2fa6553acb6ce53041b609f7c0e9",
-        "codex": "dfeeeba8697806a2fc3a11f69441978b617503bc0510667a37ceb0518a894f90",
-        "dsh": "abc3869081ce6ba0bcef26c96e9fe94fcbbaa3d240a43c36d16b563c40659af9",
-        "zcode": "76742fc564052eba90523662986283817ef42c9664772321d48293a3fc5da111"
+        "claude": "0d5dae225da70219936ba3c18e47191cc8aa11c76839d1672281df61a59c0de7",
+        "codex": "12ad65bc65fad2572f2307c3245f92499edd4e00a211b33bbfb4e6343957919c",
+        "dsh": "f14b67f75605da68292ed862ec0da39af1f5188b740f6fbdaec379d570020cf7",
+        "zcode": "b9a9e4ecb1c9aa4763641fb0fa8c49987a68fc2e3f6b3877858cfb38b4c193d5"
       },
-      "release_id": 425719062,
-      "source_revision": "f6b4a19ac8dba2c01374f70b03fa5ba20b95da54",
-      "source_tree_hash": "69b3b87ecd0b1e7029a36811bbec55ce63ecf11832ad02b28b987cf34ea4b1d7",
-      "version": "1.0.7"
+      "release_id": 426300606,
+      "source_revision": "d5207d1ae4aadba21638a674c8504415d2decf6c",
+      "source_tree_hash": "7bcb407292994a1bb0e7aa17362e6a2dcf49f909400067ac9169acb811f09d55",
+      "version": "1.0.8"
     }
   },
   "retired": {

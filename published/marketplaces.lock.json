@@ -1,10 +1,10 @@
 {
   "files": {
-    ".agents/plugins/marketplace.json": "8cacaa83e5c1ebf3e251b0ca49e05a03035339fb4cf5cfd6fc2519132dfb23a6",
-    ".claude-plugin/marketplace.json": "6daae1d41c388579072b304aa19ee7122288b72d7c9127677d61b2d074612d5f",
-    "marketplace.json": "75f1e38a35d6c70e0f298590e8d91ad232e66f9ffd300edebcaeaa9296bc9809",
-    "published/dsh/index.json": "6b52ddd5db376132cb8c5cce14a0e8711ad24f9a34dce3b4dcc2a4a4afff7e5f"
+    ".agents/plugins/marketplace.json": "08fe03e058a95186522393910881d3fa1593c02804cd521ff7d104c6934ca486",
+    ".claude-plugin/marketplace.json": "9462ec8f67161449a143f05a721042c47105386b0e06eb4ec8cd7b97de093fe7",
+    "marketplace.json": "0ba34650f2f282aed8fdc32c416368a02ad1c390e06550a466a9e75ce8fbc402",
+    "published/dsh/index.json": "f0f444f73d124f6a115f33676867cca3328611d41afdb1f6411e8c00eb45ddad"
   },
-  "published_index_sha256": "1e654f6cca849a5625997daef5f362c9832247b59569b2d32ee8f0abbe5b2193",
+  "published_index_sha256": "db95cdc8c92e655696adb4d09036229bcc71db4e9509b8a5dd69be3dbcebe69a",
   "schema_version": 2
 }

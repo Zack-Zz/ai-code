@@ -20,11 +20,11 @@
       "displayName": "CodeVow",
       "name": "codevow",
       "source": {
-        "sha256": "fbd8cf5ae4d9a5a931980fbbe7b83298bddc2fa6553acb6ce53041b609f7c0e9",
+        "sha256": "0d5dae225da70219936ba3c18e47191cc8aa11c76839d1672281df61a59c0de7",
         "source": "archive",
-        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.7/codevow-1.0.7-claude-plugin.zip"
+        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.8/codevow-1.0.8-claude-plugin.zip"
       },
-      "version": "1.0.7"
+      "version": "1.0.8"
     }
   ]
 }
