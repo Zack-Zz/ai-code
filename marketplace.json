@@ -22,12 +22,12 @@
       "name": "codevow",
       "source": {
         "path": "codevow",
-        "sha256": "53960e06aff2b842ef1dc0c60ac2ddfa79d0a6584d4da6770b10f70e07778c5c",
+        "sha256": "76742fc564052eba90523662986283817ef42c9664772321d48293a3fc5da111",
         "source": "url",
         "type": "zip",
-        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.6/codevow-1.0.6-zcode-plugin.zip"
+        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codevow%2Fv1.0.7/codevow-1.0.7-zcode-plugin.zip"
       },
-      "version": "1.0.6"
+      "version": "1.0.7"
     }
   ]
 }
