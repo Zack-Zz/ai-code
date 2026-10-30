@@ -96,7 +96,7 @@ kind are derived automatically.
 | `X.Y.Z-preview.N` | Public prerelease | No update |
 | `X.Y.Z` | Public stable release | Automatically synchronize after publication |
 
-Use Node.js 22+, Python 3.11+, and POSIX file operations. Local checks and artifact
+Use Node.js 22.12+, Python 3.11+, and POSIX file operations. Local checks and artifact
 preparation are available independently of Actions:
 
 ```sh

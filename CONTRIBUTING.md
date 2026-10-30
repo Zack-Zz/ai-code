@@ -8,7 +8,7 @@ root unless stated otherwise.
 
 ## Environment
 
-- Node.js 22+ and npm for the test runner and static checks.
+- Node.js 22.12+ and npm for the test runner and static checks.
 - Python 3.11+ for plugin tooling and Python tests.
 - A development platform with POSIX file operations for controlled file tools and their tests.
 

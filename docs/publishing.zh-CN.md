@@ -83,7 +83,7 @@ build metadata；preview 序号按数字比较。标签 `ID/vVERSION` 和发行�
 | `X.Y.Z-preview.N` | 公开 Prerelease | 不更新 |
 | `X.Y.Z` | 公开正式 Release | 公开成功后自动同步 |
 
-准备 Node.js 22+、Python 3.11+ 和支持 POSIX 文件操作的环境。本地检查与制品
+准备 Node.js 22.12+、Python 3.11+ 和支持 POSIX 文件操作的环境。本地检查与制品
 准备也可独立于 Actions 执行：
 
 ```sh

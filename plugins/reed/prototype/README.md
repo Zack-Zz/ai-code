@@ -52,9 +52,9 @@ No real Yunxiao API, MCP server, Agent execution, native session navigation, Git
 
 ## Development
 
-Use Node.js 22 or later. Install with `npm ci`; run with `npm run dev -- --host 127.0.0.1 --port 4173 --strictPort`.
+Use Node.js 22.12 or later. Install with `npm ci`; run with `npm run dev -- --port 4173 --strictPort`. The development server binds to `127.0.0.1` by default. Network access requires an explicit host override; the development server stays on this computer.
 
-- `npm test`: workflow state and data integrity tests.
+- `npm test`: workflow state, data integrity and loopback listener tests.
 - `npm run build`: production frontend and the retained optional hosting scaffold.
 - `npm run test:sites`: local scaffold tests after building; this does not publish anything.
 
