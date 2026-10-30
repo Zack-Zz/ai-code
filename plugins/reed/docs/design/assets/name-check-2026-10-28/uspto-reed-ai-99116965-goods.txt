@@ -1,0 +1,15 @@
+Browser tab: 4, Title: "Trademark search", URL: "https://tmsearch.uspto.gov/search/search-results".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
++		1084 container Goods and services for 99116965, ID: goodsServicesModal
++			1085 container
++				1086 heading Goods and services for 99116965, Value: 5, ID: goodsServicesModalLabel
++					1087 text Goods and services for 99116965
++				1088 button Close
++				1089 text Class 009
++				1090 text 023 038 026 021 036.
++				1091 text G & S: IC 009: Downloadable computer software using artificial intelligence (AI) for use in education in communication and language, instruction for individuals with learning and speech disabilities, and alternative communication for users with speech and communication difficulties.
++				1092 text Class 042
++				1093 text 101 100.
++				1094 text G & S: IC 042: Software as a service (SAAS) services featuring software using artificial intelligence (AI) for use in education in communication and language, instruction for individuals with learning and speech disabilities, and alternative communication for users with speech and communication difficulties.
++				1095 button Close
+The focused UI element is 570 container Select for expanded goods and services

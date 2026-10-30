@@ -1,0 +1,27 @@
+# Prototype Instructions
+
+## Reed decisions (2026-10-28)
+
+- The user confirmed the optically balanced R icon and requested the full frontend demo. Use the standalone R for the plugin icon and R + eed for the top-left page identity. Keep the original image assets; do not redraw the mark in CSS/SVG.
+- Visual target: `../docs/design/assets/2026-10-28/04-native-light-balanced-brand.png`. Neutral white, quiet gray navigation, muted blue-gray accents and charcoal primary actions. Preserve system/light/dark theme choices.
+- Complete task, document, native-session association, branch/workspace and workflow interactions using local mock data. No real Agent invocation, Git changes, or Yunxiao writes. Keep simulated external results explicit.
+- Personal board: the user requested 待办 / 进行中 / 评审中 / 完成 as progress columns. Keep 需求 / 设计 / 开发 / 验证 as a separate phase dimension on cards. Progress follows real local workflow operations and explicit acceptance. Archived items stay in the archive view.
+- Cards open a right-side task drawer over the mounted board. Preserve filters, scroll and return focus. Related document/session/workspace previews stay in this context; a full-page action is explicit.
+- Dragging (Pointer Events, with a touch handle and a keyboard Move alternative) requests a workflow transition. Review/completion gates must also run in the reducer, checking current-phase outputs, active/unknown execution, prerequisites, freshness and exact document snapshots. Rework/feedback make old outputs stale; retain their history.
+- Connector configuration and per-entity origin are part of the Demo: distinguish the provider type from a stable named connection instance. Imported tasks bind connector ID + external ID; documents, sessions, branches/workspaces and events retain their own origin rather than inheriting the task connector. Old unrecorded origins stay unknown/legacy. Never collect real tokens in this frontend.
+- Connector setup follows the official `aliyun` + `aliyun-cli-devops` model: central edition uses organization ID, Region uses an HTTPS instance endpoint; multiple named connections remain isolated. Keep identity, staged checks, scope and per-project/type state mapping as a complete mock flow. Use selectable simulated PAT/CLI scenarios, never a real credential input. Mapping does not bypass workflow acceptance; excluded projects/types cannot sync.
+- Clicking the sidebar Connector entry opens an in-context connector catalog. Yunxiao offers custom setup and discovery of existing local configuration. Discovery is simulated here: generate editable, read-only default drafts, show missing fields, and require explicit save/checks; matching identities open existing connections. Keep the full management page behind an explicit action.
+- The user approved the new Yunxiao workbench mark (the first icon in the new official set). Use `public/assets/yunxiao-mark.svg`, which displays original official bitmap pixels; keep its provenance file. Do not substitute a generic cloud for provider identity.
+- Replace native visible dropdowns with the shared `Select` component. Keep the quiet Reed surface, subtle border/shadow and gray-blue selection. Long source lists support search, provider grouping, connection icons and descriptions. Preserve exact values, native form submission/required/disabled behavior, keyboard navigation and modal context; Escape closes the menu first.
+- The user accepted the current visual style as the Reed baseline. Appearance and interface language belong together in the lower-left Settings popover, with an icon entry in compact navigation. Support system/light/dark and Simplified Chinese/English, persist preferences locally, preserve active view/filter/form context, and keep business content and option IDs unchanged. Maintain fixed UI copy centrally in `src/locales/`; do not translate task titles, document bodies, connection names or remote data.
+- Appearance choices use compact, single-line icon-and-label segments (36px on desktop; 44px in compact navigation), rather than large stacked tiles.
+- Keep the sidebar focused on work. The former Interaction preview/local-demo footer is folded into Settings → About Reed, which retains the demo explanation, export and reset. Keep context-specific simulated-operation labels.
+- Main agent owns App/CSS/config/assets/integration. A bounded model worker may own the explicitly assigned model and classifier modules/tests; preserve concurrent edits.
+
+Run the local server yourself and open the preview in the browser available to this environment. Do not give the user server-start instructions when you can run it.
+
+Before making substantial visual changes, use the Product Design plugin's `get-context` skill when the visual source is unclear or no longer matches the current goal. When the user gives durable prototype-specific design feedback, preferences, or decisions, record them in `AGENTS.md`.
+
+When implementing from a selected generated mock, treat that image as the source of truth for layout, component anatomy, density, spacing, color, typography, visible content, and hierarchy.
+
+Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts/prepare-sites-build.mjs`, and `tests/sites-worker.test.mjs` intact so the same local prototype can be handed to Sites. Before a Sites handoff, run `npm run build` and `npm run test:sites`; the build must leave `dist/client/index.html`, `dist/server/index.js`, and `dist/.openai/hosting.json`.

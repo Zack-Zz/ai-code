@@ -1,0 +1,3 @@
+**/node_modules/**
+plugins/reed/prototype/dist/**
+plugins/reed/prototype/.evidence/**

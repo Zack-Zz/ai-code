@@ -3,7 +3,7 @@ const globals = require('globals');
 
 module.exports = [
     {
-        ignores: ['node_modules/**']
+        ignores: ['node_modules/**', 'plugins/reed/prototype/dist/**', 'plugins/reed/prototype/.evidence/**']
     },
     js.configs.recommended,
     {
@@ -27,6 +27,10 @@ module.exports = [
     },
     {
         files: ['plugins/*/adapters/dsh/**/*.js', 'plugins/*/tests/dsh/**/*.mjs', 'published/dsh/**/*.js'],
+        languageOptions: { sourceType: 'module' }
+    },
+    {
+        files: ['plugins/reed/prototype/**/*.js', 'plugins/reed/prototype/**/*.mjs'],
         languageOptions: { sourceType: 'module' }
     }
 ];

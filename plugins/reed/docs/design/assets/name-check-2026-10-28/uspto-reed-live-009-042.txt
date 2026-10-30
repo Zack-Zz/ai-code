@@ -1,0 +1,1086 @@
+Browser tab: 4, Title: "Trademark search", URL: "https://tmsearch.uspto.gov/search/search-results".
+0 AXWebArea Trademark search, URL: tmsearch.uspto.gov/search/search-results
+	1 container
+		2 container global-header
+			3 container Official government website
+				4 image U.S. flag
+				5 text An official website of the United States government
+				6 button (collapsed) Here’s how you know keyboard_arrow_down, Secondary Actions: Expand
+					7 text Here’s how you know
+					8 text keyboard_arrow_down
+			9 container
+				10 link Description: United States Patent and Trademark Office, Help: United States Patent and Trademark Office - An Agency of the Department of Commerce, Value: uspto.gov/
+				11 pop up button (collapsed) Description: Patents, Secondary Actions: Expand
+					12 text Patents 
+				13 pop up button (collapsed) Description: Trademarks, Secondary Actions: Expand
+					14 text Trademarks 
+				15 pop up button (collapsed) Description: Fees and payment, Secondary Actions: Expand
+					16 text Fees and payment 
+				17 pop up button (collapsed) Description: Contact Us, Secondary Actions: Expand
+					18 text Contact Us 
+				19 link Description: MyUSPTO, Value: my.uspto.gov/
+				20 button Sign in
+			21 link Description: Trademark search, Value: tmsearch.uspto.gov/#
+			22 container header sub navigation
+				23 container breadcrumb
+					24 content list
+						80 link Description: Home, Value: tmsearch.uspto.gov/search
+						81 container
+							294 text >  Search results
+				26 button Help
+		83 container
+			84 container Description: Choose the new search experience, ID: experienceLabel
+				85 text Try
+				86 link Description: our new beta feature , Value: uspto.gov/trademarks/search/trademark-search-system-updates
+				87 text to see more info when you open results
+			88 switch (settable, boolean) Description: Toggle new search experience, Value: 1, ID: experience
+			89 container Description: Choose the new search experience, ID: experienceLabel
+				90 text  On
+		27 container
+			28 combo box (collapsed) Description: Search refinment, Value: Wordmark, ID: mat-select-0, Secondary Actions: Expand
+				29 container
+					30 text Wordmark
+			31 combo box (collapsed, settable) Description: Search trademarks, Value: REED, ID: searchbar, Secondary Actions: Expand
+			91 text clear
+			32 button search
+				33 text search
+		92 container sidebarAccordion
+			93 heading Status filter, Value: 2, ID: headingStatusFilter
+				94 button (expanded) Status filter, Secondary Actions: Collapse
+			95 container Description: Status filter, ID: collapseStatusFilter
+				96 content list
+					97 container
+						98 checkbox (settable, integer) Description: Live, Value: 1, ID: statusLive
+						99 text Live A live trademark filing is active
+						100 container Live count
+							101 text 38
+					102 content list
+						103 container
+							104 checkbox (settable, integer) Description: Registered, Value: 1, ID: statusRegistered
+							105 text Registered A trademark is registered when it has received approval from the USPTO
+						106 container
+							107 checkbox (settable, integer) Description: Pending, Value: 1, ID: statusPending
+							108 text Pending A trademark is pending when its application for trademark protection is in review with the USPTO
+					109 container
+						110 checkbox (settable, integer) Description: Dead, Value: 0, ID: statusDead
+						111 text Dead A trademark filing dies when it becomes abandoned, cancelled, or expired
+						112 container Dead count
+							113 text 0
+					114 content list
+						115 container
+							116 checkbox (disabled, settable, integer) Description: Cancelled, Value: 0, ID: statusCancelled
+							117 text Cancelled A trademark is cancelled when the owner fails to submit renewal documents required by the USPTO
+						118 container
+							119 checkbox (disabled, settable, integer) Description: Abandoned, Value: 0, ID: statusAbandoned
+							120 text Abandoned A trademark is abandoned if it’s no longer used for the advertising and sale of goods or services
+			121 heading Class filter, Value: 2, ID: headingClassFilter
+				122 button (expanded) Class filter, Secondary Actions: Collapse
+			123 container Description: Class filter, ID: collapseClassFilter
+				124 container
+					125 checkbox (settable, integer) Description: Coordinated, Value: 0, ID: coordinatedClasses
+					126 text Coordinated
+				127 container
+					128 checkbox (settable, integer) Description: Chemicals(001), Value: 0, ID: internationalClass001
+					129 text 001
+				130 container
+					131 checkbox (settable, integer) Description: Paints(002), Value: 0, ID: internationalClass002
+					132 text 002
+				133 container
+					134 checkbox (settable, integer) Description: Cosmetics and cleaning preparations(003), Value: 0, ID: internationalClass003
+					135 text 003
+				136 container
+					137 checkbox (settable, integer) Description: Lubricants and fuels(004), Value: 0, ID: internationalClass004
+					138 text 004
+				139 container
+					140 checkbox (settable, integer) Description: Pharmaceuticals(005), Value: 0, ID: internationalClass005
+					141 text 005
+				142 container
+					143 checkbox (settable, integer) Description: Metal goods(006), Value: 0, ID: internationalClass006
+					144 text 006
+				145 container
+					146 checkbox (settable, integer) Description: Machinery(007), Value: 0, ID: internationalClass007
+					147 text 007
+				148 container
+					149 checkbox (settable, integer) Description: Hand tools(008), Value: 0, ID: internationalClass008
+					150 text 008
+				151 container
+					152 checkbox (settable, integer) Description: Electrical and scientific apparatus(009), Value: 1, ID: internationalClass009
+					153 text 009
+				154 container
+					155 checkbox (settable, integer) Description: Medical apparatus(010), Value: 0, ID: internationalClass010
+					156 text 010
+				157 container
+					158 checkbox (settable, integer) Description: Environmental control apparatus(011), Value: 0, ID: internationalClass011
+					159 text 011
+				160 container
+					161 checkbox (settable, integer) Description: Vehicles(012), Value: 0, ID: internationalClass012
+					162 text 012
+				163 container
+					164 checkbox (settable, integer) Description: Firearms(013), Value: 0, ID: internationalClass013
+					165 text 013
+				166 container
+					167 checkbox (settable, integer) Description: Jewelry(014), Value: 0, ID: internationalClass014
+					168 text 014
+				169 container
+					170 checkbox (settable, integer) Description: Musical instruments(015), Value: 0, ID: internationalClass015
+					171 text 015
+				172 container
+					173 checkbox (settable, integer) Description: Paper goods and printed matter(016), Value: 0, ID: internationalClass016
+					174 text 016
+				175 container
+					176 checkbox (settable, integer) Description: Rubber goods(017), Value: 0, ID: internationalClass017
+					177 text 017
+				178 container
+					179 checkbox (settable, integer) Description: Leather goods(018), Value: 0, ID: internationalClass018
+					180 text 018
+				181 container
+					182 checkbox (settable, integer) Description: Non-metallic building materials(019), Value: 0, ID: internationalClass019
+					183 text 019
+				184 container
+					185 checkbox (settable, integer) Description: Furniture and articles not otherwise classified(020), Value: 0, ID: internationalClass020
+					186 text 020
+				187 container
+					188 checkbox (settable, integer) Description: Housewares and glass(021), Value: 0, ID: internationalClass021
+					189 text 021
+				190 container
+					191 checkbox (settable, integer) Description: Cordage and fibers(022), Value: 0, ID: internationalClass022
+					192 text 022
+				193 container
+					194 checkbox (settable, integer) Description: Yarns and threads(023), Value: 0, ID: internationalClass023
+					195 text 023
+				196 container
+					197 checkbox (settable, integer) Description: Fabrics(024), Value: 0, ID: internationalClass024
+					198 text 024
+				199 container
+					200 checkbox (settable, integer) Description: Clothing(025), Value: 0, ID: internationalClass025
+					201 text 025
+				202 container
+					203 checkbox (settable, integer) Description: Fancy goods(026), Value: 0, ID: internationalClass026
+					204 text 026
+				205 container
+					206 checkbox (settable, integer) Description: Floor coverings(027), Value: 0, ID: internationalClass027
+					207 text 027
+				208 container
+					209 checkbox (settable, integer) Description: Toys and sporting goods(028), Value: 0, ID: internationalClass028
+					210 text 028
+				211 container
+					212 checkbox (settable, integer) Description: Meats and processed foods(029), Value: 0, ID: internationalClass029
+					213 text 029
+				214 container
+					215 checkbox (settable, integer) Description: Staple foods(030), Value: 0, ID: internationalClass030
+					216 text 030
+				217 container
+					218 checkbox (settable, integer) Description: Natural agricultural products(031), Value: 0, ID: internationalClass031
+					219 text 031
+				220 container
+					221 checkbox (settable, integer) Description: Light beverages(032), Value: 0, ID: internationalClass032
+					222 text 032
+				223 container
+					224 checkbox (settable, integer) Description: Wines and spirits(033), Value: 0, ID: internationalClass033
+					225 text 033
+				226 container
+					227 checkbox (settable, integer) Description: Smokers' articles(034), Value: 0, ID: internationalClass034
+					228 text 034
+				229 container
+					230 checkbox (settable, integer) Description: Advertising and business(035), Value: 0, ID: internationalClass035
+					231 text 035
+				232 container
+					233 checkbox (settable, integer) Description: Insurance and financial(036), Value: 0, ID: internationalClass036
+					234 text 036
+				235 container
+					236 checkbox (settable, integer) Description: Building construction and repair(037), Value: 0, ID: internationalClass037
+					237 text 037
+				238 container
+					239 checkbox (settable, integer) Description: Telecommunication(038), Value: 0, ID: internationalClass038
+					240 text 038
+				241 container
+					242 checkbox (settable, integer) Description: Transportation and storage(039), Value: 0, ID: internationalClass039
+					243 text 039
+				244 container
+					245 checkbox (settable, integer) Description: Treatment of materials(040), Value: 0, ID: internationalClass040
+					246 text 040
+				247 container
+					248 checkbox (settable, integer) Description: Education and entertainment(041), Value: 0, ID: internationalClass041
+					249 text 041
+				250 container
+					251 checkbox (settable, integer) Description: Computer and scientific(042), Value: 1, ID: internationalClass042
+					252 text 042
+				253 container
+					254 checkbox (settable, integer) Description: Hotels and restaurants(043), Value: 0, ID: internationalClass043
+					255 text 043
+				256 container
+					257 checkbox (settable, integer) Description: Medical, beauty and agricultural(044), Value: 0, ID: internationalClass044
+					258 text 044
+				259 container
+					260 checkbox (settable, integer) Description: Personal and legal(045), Value: 0, ID: internationalClass045
+					261 text 045
+				262 container
+					263 checkbox (settable, integer) Description: Certification mark for goods(A), Value: 0, ID: internationalClassA
+					264 text A
+				265 container
+					266 checkbox (settable, integer) Description: Certification mark for services(B), Value: 0, ID: internationalClassB
+					267 text B
+				268 container
+					269 checkbox (settable, integer) Description: Collective membership(200), Value: 0, ID: internationalClass200
+					270 text 200
+			271 heading Sort, Value: 2, ID: headingSort
+				272 button (collapsed) Sort, Secondary Actions: Expand
+			273 heading Configure, Value: 2, ID: headingConfigure
+				274 button (expanded) Configure, Secondary Actions: Collapse
+			275 container Description: Configure, ID: collapseConfigure
+				276 content list
+					277 container
+						278 checkbox (settable, integer) Description: Show image, Value: 1, ID: showImage
+						279 text Show image
+					280 button Reset
+		295 container
+			296 text 38 results  for REED
+		281 container
+			282 button View grid
+			283 button View list
+			284 button View compact list
+			285 container
+				286 combo box (collapsed) Export, ID: mat-select-1, Secondary Actions: Expand
+					287 container
+						288 text Export
+		297 container resultsRow
+			298 container
+				299 checkbox (settable, integer) Description: Check to tag for 97667309, Value: 0, ID: tag-0
+				300 image Description: Trademark image for 97667309, ID: tm-grid-result__image
+				301 text Wordmark
+				302 container tm-grid-result__wordmark
+					303 text wordmark
+					304 text REED & WATER
+				305 text Status
+				306 container tm-grid-result__status
+					307 text LIVE
+					308 text REGISTERED
+				309 text Goods & services
+				310 text IC 020: Furniture; pet furniture.; IC 035: Business project management...
+				311 container Select for expanded goods and services
+					312 text outbound
+				313 text Class
+				314 text 020, 035, 042
+				315 text Serial
+				316 text 97667309
+				317 text Owners
+				318 text REED & WATER LLC (LIMITED LIABILITY COMPANY; DELAWARE, USA)
+			319 container
+				320 checkbox (settable, integer) Description: Check to tag for 76698915, Value: 0, ID: tag-1
+				321 image Description: Trademark image for 76698915, ID: tm-grid-result__image
+				322 text Wordmark
+				323 container tm-grid-result__wordmark
+					324 text wordmark
+					325 text REED FR
+				326 text Status
+				327 container tm-grid-result__status
+					328 text LIVE
+					329 text REGISTERED
+				330 text Goods & services
+				331 text IC 009: flame retardant work clothing, namely, shirts, pants,...
+				332 container Select for expanded goods and services
+					333 text outbound
+				334 text Class
+				335 text 009
+				336 text Serial
+				337 text 76698915
+				338 text Owners
+				339 text Reed Manufacturing Co., Inc. (CORPORATION; MISSISSIPPI, USA)
+			340 container
+				341 checkbox (settable, integer) Description: Check to tag for 76227894, Value: 0, ID: tag-2
+				342 image Description: Trademark image for 76227894, ID: tm-grid-result__image
+				343 text Wordmark
+				344 container tm-grid-result__wordmark
+					345 text wordmark
+					346 text REED
+				347 text Status
+				348 container tm-grid-result__status
+					349 text LIVE
+					350 text REGISTERED
+				351 text Goods & services
+				352 text IC 009: [ Computer disks, DVDs, videotapes and CD-ROMs featuring...
+				353 container Select for expanded goods and services
+					354 text outbound
+				355 text Class
+				356 text 009, 016, 035, 041, 042
+				357 text Serial
+				358 text 76227894
+				359 text Owners
+				360 text RELX INC. (CORPORATION; MASSACHUSETTS, USA)
+			361 container
+				362 checkbox (settable, integer) Description: Check to tag for 88584272, Value: 0, ID: tag-3
+				363 image Description: Trademark image for 88584272, ID: tm-grid-result__image
+				364 text Wordmark
+				365 container tm-grid-result__wordmark
+					366 text wordmark
+					367 text RJ. REED
+				368 text Status
+				369 container tm-grid-result__status
+					370 text LIVE
+					371 text REGISTERED
+				372 text Goods & services
+				373 text IC 009: Audio and video recordings featuring musical artist; Musical...
+				374 container Select for expanded goods and services
+					375 text outbound
+				376 text Class
+				377 text 009
+				378 text Serial
+				379 text 88584272
+				380 text Owners
+				381 text Reed, Rodney (INDIVIDUAL; USA)
+			382 container
+				383 checkbox (settable, integer) Description: Check to tag for 97337716, Value: 0, ID: tag-4
+				384 image Description: Trademark image for 97337716, ID: tm-grid-result__image
+				385 text Wordmark
+				386 container tm-grid-result__wordmark
+					387 text wordmark
+					388 text AUSTIN REED
+				389 text Status
+				390 container tm-grid-result__status
+					391 text LIVE
+					392 text PENDING
+				393 text Goods & services
+				394 text IC 009: Eyewear, sunglasses; spectacles, spectacle frames and eye...
+				395 container Select for expanded goods and services
+					396 text outbound
+				397 text Class
+				398 text 009, 014, 018, 025
+				399 text Serial
+				400 text 97337716
+				401 text Owners
+				402 text PRIMARP DMCC (LIMITED LIABILITY COMPANY; UNITED ARAB EMIRATES)
+			403 container
+				404 checkbox (settable, integer) Description: Check to tag for 50065011, Value: 0, ID: tag-5
+				405 image Description: Trademark image for 50065011, ID: tm-grid-result__image
+				406 text Wordmark
+				407 container tm-grid-result__wordmark
+					408 text wordmark
+					409 text GARRISON REED
+				410 text Status
+				411 container tm-grid-result__status
+					412 text LIVE
+					413 text PENDING
+				414 text Goods & services
+				415 text IC 009: Audio recordings featuring music.
+				416 text Class
+				417 text 009
+				418 text Serial
+				419 text 50065011
+				420 text Owners
+				421 text Gary Michael Reed (INDIVIDUAL; USA)
+			422 container
+				423 checkbox (settable, integer) Description: Check to tag for 77840081, Value: 0, ID: tag-6
+				424 image Description: Trademark image for 77840081, ID: tm-grid-result__image
+				425 text Wordmark
+				426 container tm-grid-result__wordmark
+					427 text wordmark
+					428 text REED GROUP
+				429 text Status
+				430 container tm-grid-result__status
+					431 text LIVE
+					432 text REGISTERED
+				433 text Goods & services
+				434 text IC 035: Employee administration services, namely, administration and...
+				435 container Select for expanded goods and services
+					436 text outbound
+				437 text Class
+				438 text 035, 042, 044
+				439 text Serial
+				440 text 77840081
+				441 text Owners
+				442 text Reed Group, Ltd. (CORPORATION; COLORADO, USA)
+			443 container
+				444 checkbox (settable, integer) Description: Check to tag for 73009818, Value: 0, ID: tag-7
+				445 image Description: Trademark image for 73009818, ID: tm-grid-result__image
+				446 text Wordmark
+				447 container tm-grid-result__wordmark
+					448 text wordmark
+					449 text SILVER-REED
+				450 text Status
+				451 container tm-grid-result__status
+					452 text LIVE
+					453 text REGISTERED
+				454 text Goods & services
+				455 text IC 007: KNITTING MACHINES.; IC 009: [ [ CALCULATORS ] ].; IC 016: [ [...
+				456 container Select for expanded goods and services
+					457 text outbound
+				458 text Class
+				459 text 007, 009, 016
+				460 text Serial
+				461 text 73009818
+				462 text Owners
+				463 text DONCREVE CO., LTD. (KABUSHIKI KAISHA (K.K.); JAPAN)
+			464 container
+				465 checkbox (settable, integer) Description: Check to tag for 79221210, Value: 0, ID: tag-8
+				466 image Description: Trademark image for 79221210, ID: tm-grid-result__image
+				467 text Wordmark
+				468 container tm-grid-result__wordmark
+					469 text wordmark
+					470 text JOHN REED
+				471 text Status
+				472 container tm-grid-result__status
+					473 text LIVE
+					474 text REGISTERED
+				475 text Goods & services
+				476 text IC 009: Computer programs for use in streaming or downloading music,...
+				477 container Select for expanded goods and services
+					478 text outbound
+				479 text Class
+				480 text 009, 025, 038, 039, 041, 044
+				481 text Serial
+				482 text 79221210
+				483 text Owners
+				484 text RSG Group GmbH (GmbH (private limited company); GERMANY)
+			485 container
+				486 checkbox (settable, integer) Description: Check to tag for 90465461, Value: 0, ID: tag-9
+				487 image Description: Trademark image for 90465461, ID: tm-grid-result__image
+				488 text Wordmark
+				489 container tm-grid-result__wordmark
+					490 text wordmark
+					491 text HUNTER REED
+				492 text Status
+				493 container tm-grid-result__status
+					494 text LIVE
+					495 text REGISTERED
+				496 text Goods & services
+				497 text IC 009: Audio and video recordings featuring music and artistic...
+				498 container Select for expanded goods and services
+					499 text outbound
+				500 text Class
+				501 text 009, 041
+				502 text Serial
+				503 text 90465461
+				504 text Owners
+				505 text Reed, Hunter J. (INDIVIDUAL; USA)
+			506 container
+				507 checkbox (settable, integer) Description: Check to tag for 88009513, Value: 0, ID: tag-10
+				508 image Description: Trademark image for 88009513, ID: tm-grid-result__image
+				509 text Wordmark
+				510 container tm-grid-result__wordmark
+					511 text wordmark
+					512 text WILLIAM REED
+				513 text Status
+				514 container tm-grid-result__status
+					515 text LIVE
+					516 text REGISTERED
+				517 text Goods & services
+				518 text IC 009: Electronic publications in electronically readable form,...
+				519 container Select for expanded goods and services
+					520 text outbound
+				521 text Class
+				522 text 009, 016, 035, 041, 042
+				523 text Serial
+				524 text 88009513
+				525 text Owners
+				526 text WILLIAM REED LTD (PRIVATE LIMITED COMPANY; UNITED KINGDOM)
+			527 container
+				528 checkbox (settable, integer) Description: Check to tag for 85089669, Value: 0, ID: tag-11
+				529 image Description: Trademark image for 85089669, ID: tm-grid-result__image
+				530 text Wordmark
+				531 container tm-grid-result__wordmark
+					532 text wordmark
+					533 text WALTER REED
+				534 text Status
+				535 container tm-grid-result__status
+					536 text LIVE
+					537 text REGISTERED
+				538 text Goods & services
+				539 text IC 041: Education services, namely, providing courses of instruction...
+				540 container Select for expanded goods and services
+					541 text outbound
+				542 text Class
+				543 text 041, 042, 044
+				544 text Serial
+				545 text 85089669
+				546 text Owners
+				547 text DEPARTMENT OF DEFENSE, DEFENSE HEALTH AG (FEDERAL AGENCY; USA)
+			548 container
+				549 checkbox (settable, integer) Description: Check to tag for 78748363, Value: 0, ID: tag-12
+				550 image Description: Trademark image for 78748363, ID: tm-grid-result__image
+				551 text Wordmark
+				552 container tm-grid-result__wordmark
+					553 text wordmark
+					554 text ACOUSTA-REED
+				555 text Status
+				556 container tm-grid-result__status
+					557 text LIVE
+					558 text REGISTERED
+				559 text Goods & services
+				560 text IC 009: Acoustical speaker parts, namely, reed baffles for controlling...
+				561 container Select for expanded goods and services
+					562 text outbound
+				563 text Class
+				564 text 009
+				565 text Serial
+				566 text 78748363
+				567 text Owners
+				568 text Powell, Daryl G. (INDIVIDUAL; USA)
+			569 container
+				570 checkbox (settable, integer) Description: Check to tag for 90073934, Value: 0, ID: tag-13
+				571 image Description: Trademark image for 90073934, ID: tm-grid-result__image
+				572 text Wordmark
+				573 container tm-grid-result__wordmark
+					574 text wordmark
+					575 text REED MAPPER
+				576 text Status
+				577 container tm-grid-result__status
+					578 text LIVE
+					579 text REGISTERED
+				580 text Goods & services
+				581 text IC 009: Micrometers.
+				582 text Class
+				583 text 009
+				584 text Serial
+				585 text 90073934
+				586 text Owners
+				587 text Groom, Natalie E. (INDIVIDUAL; USA)
+			588 container
+				589 checkbox (settable, integer) Description: Check to tag for 50167690, Value: 0, ID: tag-14
+				590 image Description: Trademark image for 50167690, ID: tm-grid-result__image
+				591 text Wordmark
+				592 container tm-grid-result__wordmark
+					593 text wordmark
+					594 text GOLDEN REED
+				595 text Status
+				596 container tm-grid-result__status
+					597 text LIVE
+					598 text PENDING
+				599 text Goods & services
+				600 text IC 009: Downloadable mobile applications for downloading and reading...
+				601 container Select for expanded goods and services
+					602 text outbound
+				603 text Class
+				604 text 009, 042
+				605 text Serial
+				606 text 50167690
+				607 text Owners
+				608 text Christ Herald Ministry (NON-PROFIT CORPORATION; Texas, USA)
+			609 container
+				610 checkbox (settable, integer) Description: Check to tag for 99116965, Value: 0, ID: tag-15
+				611 image Description: Trademark image for 99116965, ID: tm-grid-result__image
+				612 text Wordmark
+				613 container tm-grid-result__wordmark
+					614 text wordmark
+					615 text REED AI
+				616 text Status
+				617 container tm-grid-result__status
+					618 text LIVE
+					619 text REGISTERED
+				620 text Goods & services
+				621 text IC 009: Downloadable computer software using artificial intelligence...
+				622 container Select for expanded goods and services
+					623 text outbound
+				624 text Class
+				625 text 009, 042
+				626 text Serial
+				627 text 99116965
+				628 text Owners
+				629 text Reed AI Ventures Inc. (CORPORATION; Delaware, USA)
+			630 container
+				631 checkbox (settable, integer) Description: Check to tag for 79437998, Value: 0, ID: tag-16
+				632 image Description: Trademark image for 79437998, ID: tm-grid-result__image
+				633 text Wordmark
+				634 container tm-grid-result__wordmark
+					635 text wordmark
+					636 text REED DENTAL
+				637 text Status
+				638 container tm-grid-result__status
+					639 text LIVE
+					640 text REGISTERED
+				641 text Goods & services
+				642 text IC 010: Dental apparatus and instruments, namely, flexible drive...
+				643 container Select for expanded goods and services
+					644 text outbound
+				645 text Class
+				646 text 010, 035, 042
+				647 text Serial
+				648 text 79437998
+				649 text Owners
+				650 text Reed Dental Technologies Sàrl (Sàrl; Switzerland, Switzerland)
+			651 container
+				652 checkbox (settable, integer) Description: Check to tag for 99684319, Value: 0, ID: tag-17
+				653 image Description: Trademark image for 99684319, ID: tm-grid-result__image
+				654 text Wordmark
+				655 container tm-grid-result__wordmark
+					656 text wordmark
+					657 text REED SEMICONDUCTOR
+				658 text Status
+				659 container tm-grid-result__status
+					660 text LIVE
+					661 text PENDING
+				662 text Goods & services
+				663 text IC 009: Semiconductor devices.
+				664 text Class
+				665 text 009
+				666 text Serial
+				667 text 99684319
+				668 text Owners
+				669 text Reed Semiconductor Corp. (CORPORATION; Rhode Island, USA)
+			670 container
+				671 checkbox (settable, integer) Description: Check to tag for 99684456, Value: 0, ID: tag-18
+				672 image Description: Trademark image for 99684456, ID: tm-grid-result__image
+				673 text Wordmark
+				674 container tm-grid-result__wordmark
+					675 text wordmark
+					676 text REED SEMICONDUCTOR
+				677 text Status
+				678 container tm-grid-result__status
+					679 text LIVE
+					680 text REGISTERED
+				681 text Goods & services
+				682 text IC 009: Semiconductor devices.
+				683 text Class
+				684 text 009
+				685 text Serial
+				686 text 99684456
+				687 text Owners
+				688 text Reed Semiconductor Corp. (CORPORATION; Delaware, USA)
+			689 container
+				690 checkbox (settable, integer) Description: Check to tag for 75532495, Value: 0, ID: tag-19
+				691 image Description: Trademark image for 75532495, ID: tm-grid-result__image
+				692 text Wordmark
+				693 container tm-grid-result__wordmark
+					694 text wordmark
+					695 text PRS PAUL REED SMITH
+				696 text Status
+				697 container tm-grid-result__status
+					698 text LIVE
+					699 text REGISTERED
+				700 text Goods & services
+				701 text IC 009: Pickups for electrical musical instruments.; IC 015: Musical...
+				702 container Select for expanded goods and services
+					703 text outbound
+				704 text Class
+				705 text 009, 015
+				706 text Serial
+				707 text 75532495
+				708 text Owners
+				709 text Paul Reed Smith Guitars, Limited Partnership (LIMITED PARTNERSHIP; MARYLAND, USA)
+			710 container
+				711 checkbox (settable, integer) Description: Check to tag for 77819769, Value: 0, ID: tag-20
+				712 image Description: Trademark image for 77819769, ID: tm-grid-result__image
+				713 text Wordmark
+				714 container tm-grid-result__wordmark
+					715 text wordmark
+					716 text PAUL REED SMITH
+				717 text Status
+				718 container tm-grid-result__status
+					719 text LIVE
+					720 text REGISTERED
+				721 text Goods & services
+				722 text IC 009: Guitar amplifiers.; IC 015: Acoustic guitars.
+				723 text Class
+				724 text 009, 015
+				725 text Serial
+				726 text 77819769
+				727 text Owners
+				728 text Paul Reed Smith Guitars, Limited Partnership (LIMITED PARTNERSHIP; MARYLAND, USA)
+			729 container
+				730 checkbox (settable, integer) Description: Check to tag for 50074020, Value: 0, ID: tag-21
+				731 image Description: Trademark image for 50074020, ID: tm-grid-result__image
+				732 text Wordmark
+				733 container tm-grid-result__wordmark
+					734 text wordmark
+					735 text REED LAUNCH SOLUTIONS
+				736 text Status
+				737 container tm-grid-result__status
+					738 text LIVE
+					739 text PENDING
+				740 text Goods & services
+				741 text IC 042: Providing online non-downloadable computer software platforms...
+				742 container Select for expanded goods and services
+					743 text outbound
+				744 text Class
+				745 text 042
+				746 text Serial
+				747 text 50074020
+				748 text Owners
+				749 text Reed-2 & Associates, LLC d/b/a Reed Launch Solutions (LIMITED LIABILITY COMPANY; Indiana, USA)
+			750 container
+				751 checkbox (settable, integer) Description: Check to tag for 99797058, Value: 0, ID: tag-22
+				752 image Description: Trademark image for 99797058, ID: tm-grid-result__image
+				753 text Wordmark
+				754 container tm-grid-result__wordmark
+					755 text wordmark
+					756 text REED CHARITABLE FOUNDATION
+				757 text Status
+				758 container tm-grid-result__status
+					759 text LIVE
+					760 text PENDING
+				761 text Goods & services
+				762 text IC 035: Charitable services, namely, promoting public awareness of...
+				763 container Select for expanded goods and services
+					764 text outbound
+				765 text Class
+				766 text 035, 036, 041, 042
+				767 text Serial
+				768 text 99797058
+				769 text Owners
+				770 text REED CHARITABLE FOUNDATION, INC. (NON-PROFIT CORPORATION; Florida, USA)
+			771 container
+				772 checkbox (settable, integer) Description: Check to tag for 76307977, Value: 0, ID: tag-23
+				773 image Description: Trademark image for 76307977, ID: tm-grid-result__image
+				774 text Wordmark
+				775 container tm-grid-result__wordmark
+					776 text wordmark
+					777 text HUGHES HUBBARD & REED
+				778 text Status
+				779 container tm-grid-result__status
+					780 text LIVE
+					781 text REGISTERED
+				782 text Goods & services
+				783 text IC 042: Legal services.
+				784 text Class
+				785 text 042
+				786 text Serial
+				787 text 76307977
+				788 text Owners
+				789 text Hughes Hubbard & Reed LLP (LIMITED LIABILITY PARTNERSHIP; NEW YORK, USA)
+			790 container
+				791 checkbox (settable, integer) Description: Check to tag for 99000983, Value: 0, ID: tag-24
+				792 image Description: Trademark image for 99000983, ID: tm-grid-result__image
+				793 text Wordmark
+				794 container tm-grid-result__wordmark
+					795 text wordmark
+					796 text PAUL REED SMITH
+				797 text Status
+				798 container tm-grid-result__status
+					799 text LIVE
+					800 text REGISTERED
+				801 text Goods & services
+				802 text IC 009: Amplifiers; Electronic sound pickups for guitars and basses;...
+				803 container Select for expanded goods and services
+					804 text outbound
+				805 text Class
+				806 text 009
+				807 text Serial
+				808 text 99000983
+				809 text Owners
+				810 text Paul Reed Smith Guitars, Limited Partnership (LIMITED PARTNERSHIP; Maryland, USA)
+			811 container
+				812 checkbox (settable, integer) Description: Check to tag for 88650197, Value: 0, ID: tag-25
+				813 image Description: Trademark image for 88650197, ID: tm-grid-result__image
+				814 text Wordmark
+				815 container tm-grid-result__wordmark
+					816 text wordmark
+					817 text BISHOP JEREMIAH REED
+				818 text Status
+				819 container tm-grid-result__status
+					820 text LIVE
+					821 text REGISTERED
+				822 text Goods & services
+				823 text IC 009: Pre-recorded CDs featuring religious talks, teachings, and...
+				824 container Select for expanded goods and services
+					825 text outbound
+				826 text Class
+				827 text 009, 016, 041
+				828 text Serial
+				829 text 88650197
+				830 text Owners
+				831 text Reed, Dwight A. (INDIVIDUAL; USA)
+			832 container
+				833 checkbox (settable, integer) Description: Check to tag for 76976713, Value: 0, ID: tag-26
+				834 image Description: Trademark image for 76976713, ID: tm-grid-result__image
+				835 text Wordmark
+				836 container tm-grid-result__wordmark
+					837 text wordmark
+					838 text REED BUSINESS INFORMATION
+				839 text Status
+				840 container tm-grid-result__status
+					841 text LIVE
+					842 text REGISTERED
+				843 text Goods & services
+				844 text IC 009: computer software for accessing databases of information on a...
+				845 container Select for expanded goods and services
+					846 text outbound
+				847 text Class
+				848 text 009
+				849 text Serial
+				850 text 76976713
+				851 text Owners
+				852 text RELX INC. (CORPORATION; MASSACHUSETTS, USA)
+			853 container
+				854 checkbox (settable, integer) Description: Check to tag for 98184878, Value: 0, ID: tag-27
+				855 image Description: Trademark image for 98184878, ID: tm-grid-result__image
+				856 text Wordmark
+				857 container tm-grid-result__wordmark
+					858 text wordmark
+					859 text ROSSEAU
+				860 text Status
+				861 container tm-grid-result__status
+					862 text LIVE
+					863 text PENDING
+				864 text Goods & services
+				865 text IC 001: Dielectric liquids in the nature of coolants, used as part of...
+				866 container Select for expanded goods and services
+					867 text outbound
+				868 text Class
+				869 text 001, 009, 011, 040, 042
+				870 text Serial
+				871 text 98184878
+				872 text Owners
+				873 text ROSSEAU GROUP INTERNATIONAL INC. (CORPORATION; CANADA)
+			874 container
+				875 checkbox (settable, integer) Description: Check to tag for 79406265, Value: 0, ID: tag-28
+				876 image Description: Trademark image for 79406265, ID: tm-grid-result__image
+				877 text Wordmark
+				878 container tm-grid-result__wordmark
+					879 text wordmark
+					880 text VASS
+				881 text Status
+				882 container tm-grid-result__status
+					883 text LIVE
+					884 text PENDING
+				885 text Goods & services
+				886 text IC 009: recorded computer software for graphic design; downloadable...
+				887 container Select for expanded goods and services
+					888 text outbound
+				889 text Class
+				890 text 009, 035, 042
+				891 text Serial
+				892 text 79406265
+				893 text Owners
+				894 text VASS CONSULTORIA DE SISTEMAS S.L. (S.L.; SPAIN)
+			895 container
+				896 checkbox (settable, integer) Description: Check to tag for 79380208, Value: 0, ID: tag-29
+				897 image Description: Trademark image for 79380208, ID: tm-grid-result__image
+				898 text Wordmark
+				899 container tm-grid-result__wordmark
+					900 text wordmark
+					901 text VASS
+				902 text Status
+				903 container tm-grid-result__status
+					904 text LIVE
+					905 text PENDING
+				906 text Goods & services
+				907 text IC 009: Downloadable computer software for application development,...
+				908 container Select for expanded goods and services
+					909 text outbound
+				910 text Class
+				911 text 009, 042
+				912 text Serial
+				913 text 79380208
+				914 text Owners
+				915 text VASS CONSULTORIA DE SISTEMAS S.L. (LIMITED LIABILITY COMPANY; SPAIN)
+			916 container
+				917 checkbox (settable, integer) Description: Check to tag for 97664787, Value: 0, ID: tag-30
+				918 image Description: Trademark image for 97664787, ID: tm-grid-result__image
+				919 text Wordmark
+				920 container tm-grid-result__wordmark
+					921 text wordmark
+					922 text ALANREED
+				923 text Status
+				924 container tm-grid-result__status
+					925 text LIVE
+					926 text REGISTERED
+				927 text Goods & services
+				928 text IC 042: Internet-based application service provider, namely, hosting,...
+				929 container Select for expanded goods and services
+					930 text outbound
+				931 text Class
+				932 text 042
+				933 text Serial
+				934 text 97664787
+				935 text Owners
+				936 text Reed, Alan W (INDIVIDUAL; USA)
+			937 container
+				938 checkbox (settable, integer) Description: Check to tag for 79156902, Value: 0, ID: tag-31
+				939 image Description: Trademark image for 79156902, ID: tm-grid-result__image
+				940 text Wordmark
+				941 container tm-grid-result__wordmark
+					942 text wordmark
+					943 text ER
+				944 text Status
+				945 container tm-grid-result__status
+					946 text LIVE
+					947 text REGISTERED
+				948 text Goods & services
+				949 text IC 009: Software and computer programs for searching databases; word...
+				950 container Select for expanded goods and services
+					951 text outbound
+				952 text Class
+				953 text 009, 016, 035, 036, 041, 042, 044, 045
+				954 text Serial
+				955 text 79156902
+				956 text Owners
+				957 text RELX Group PLC (UNKNOWN; UNITED KINGDOM)
+			958 container
+				959 checkbox (settable, integer) Description: Check to tag for 97817144, Value: 0, ID: tag-32
+				960 image Description: Trademark image for 97817144, ID: tm-grid-result__image
+				961 text Wordmark
+				962 container tm-grid-result__wordmark
+					963 text wordmark
+					964 text REEDPURE
+				965 text Status
+				966 container tm-grid-result__status
+					967 text LIVE
+					968 text PENDING
+				969 text Goods & services
+				970 text IC 007: Fluid dispensing machines for industrial use.; IC 009: Dosage...
+				971 container Select for expanded goods and services
+					972 text outbound
+				973 text Class
+				974 text 007, 009, 011, 017, 021
+				975 text Serial
+				976 text 97817144
+				977 text Owners
+				978 text Reed City Group, LLC (LIMITED LIABILITY COMPANY; MICHIGAN, USA)
+			979 container
+				980 checkbox (settable, integer) Description: Check to tag for 97208468, Value: 0, ID: tag-33
+				981 image Description: Trademark image for 97208468, ID: tm-grid-result__image
+				982 text Wordmark
+				983 container tm-grid-result__wordmark
+					984 text wordmark
+					985 text REEDTOCK
+				986 text Status
+				987 container tm-grid-result__status
+					988 text LIVE
+					989 text REGISTERED
+				990 text Goods & services
+				991 text IC 009: Webcams; Baby monitors; Battery chargers; Computer peripheral...
+				992 container Select for expanded goods and services
+					993 text outbound
+				994 text Class
+				995 text 009
+				996 text Serial
+				997 text 97208468
+				998 text Owners
+				999 text Liu, Qishuai (INDIVIDUAL; CHINA)
+			1000 container
+				1001 checkbox (settable, integer) Description: Check to tag for 85002338, Value: 0, ID: tag-34
+				1002 image Description: Trademark image for 85002338, ID: tm-grid-result__image
+				1003 text Wordmark
+				1004 container tm-grid-result__wordmark
+					1005 text wordmark
+					1006 text REEDPOP
+				1007 text Status
+				1008 container tm-grid-result__status
+					1009 text LIVE
+					1010 text REGISTERED
+				1011 text Goods & services
+				1012 text IC 009: [ [ Video and audio recordings targeted to professionals in...
+				1013 container Select for expanded goods and services
+					1014 text outbound
+				1015 text Class
+				1016 text 009, 016, 035, 041
+				1017 text Serial
+				1018 text 85002338
+				1019 text Owners
+				1020 text REED EXHIBITIONS LIMITED (COMPANY; UNITED KINGDOM)
+			1021 container
+				1022 checkbox (settable, integer) Description: Check to tag for 85696331, Value: 0, ID: tag-35
+				1023 image Description: Trademark image for 85696331, ID: tm-grid-result__image
+				1024 text Wordmark
+				1025 container tm-grid-result__wordmark
+					1026 text wordmark
+					1027 text PRS
+				1028 text Status
+				1029 container tm-grid-result__status
+					1030 text LIVE
+					1031 text REGISTERED
+				1032 text Goods & services
+				1033 text IC 009: amplifiers; [ bass amplifiers; ]guitar amplifiers; [ acoustic...
+				1034 container Select for expanded goods and services
+					1035 text outbound
+				1036 text Class
+				1037 text 009
+				1038 text Serial
+				1039 text 85696331
+				1040 text Owners
+				1041 text Paul Reed Smith Guitars, Limited Partnership (LIMITED PARTNERSHIP; MARYLAND, USA)
+			1042 container
+				1043 checkbox (settable, integer) Description: Check to tag for 99008365, Value: 0, ID: tag-36
+				1044 image Description: Trademark image for 99008365, ID: tm-grid-result__image
+				1045 text Wordmark
+				1046 container tm-grid-result__wordmark
+					1047 text wordmark
+					1048 text REEDLAB
+				1049 text Status
+				1050 container tm-grid-result__status
+					1051 text LIVE
+					1052 text REGISTERED
+				1053 text Goods & services
+				1054 text IC 042: Computer technology consultancy; Consulting services in the...
+				1055 container Select for expanded goods and services
+					1056 text outbound
+				1057 text Class
+				1058 text 042
+				1059 text Serial
+				1060 text 99008365
+				1061 text Owners
+				1062 text REEDLAB, INC (CORPORATION; DELAWARE, USA)
+			1063 container
+				1064 checkbox (settable, integer) Description: Check to tag for 75532497, Value: 0, ID: tag-37
+				1065 image Description: Trademark image for 75532497, ID: tm-grid-result__image
+				1066 text Wordmark
+				1067 container tm-grid-result__wordmark
+					1068 text wordmark
+					1069 text PRS
+				1070 text Status
+				1071 container tm-grid-result__status
+					1072 text LIVE
+					1073 text REGISTERED
+				1074 text Goods & services
+				1075 text IC 009: Pickups for electrical musical instruments.; IC 015: Musical...
+				1076 container Select for expanded goods and services
+					1077 text outbound
+				1078 text Class
+				1079 text 009, 015
+				1080 text Serial
+				1081 text 75532497
+				1082 text Owners
+				1083 text Paul Reed Smith Guitars, Limited Partnership (LIMITED PARTNERSHIP; MARYLAND, USA)
+		1084 container Page navigation
+			1085 content list
+				1086 button (collapsed) 50 per page, ID: pageSizeButton, Secondary Actions: Expand
+					1087 text 50 per page
+			1088 content list
+				1089 link Description: first_page, Value: tmsearch.uspto.gov/#
+				1090 link Description: navigate_before, Value: tmsearch.uspto.gov/#
+				1091 text Page 1 of 1
+				1092 link Description: navigate_next, Value: tmsearch.uspto.gov/#
+				1093 link Description: last_page, Value: tmsearch.uspto.gov/#
+			1094 content list
+				1095 link Description: arrow_upward, Value: tmsearch.uspto.gov/#
+		42 container modern-footer
+			43 container modern-footer-top
+				44 container
+					45 text Receive updates from the USPTO
+					46 text Enter your email to subscribe or update your preferences
+					47 container
+						48 text field (settable) Enter your email to subscribe or update your preferences
+						49 button Subscribe
+				50 container
+					51 link Description: About the USPTO, Value: uspto.gov/about-us
+					1096 text  •
+					53 link Description: Search for patents, Value: uspto.gov/patents/search
+					1097 text  •
+					55 link Description: Search for trademarks, Value: uspto.gov/trademarks/search
+					56 link Description: US Department of Commerce, Value: commerce.gov/
+					57 link Description: Accessibility, Value: uspto.gov/using-usptogov/accessibility-uspto-website
+					58 link Description: Privacy Policy, Value: uspto.gov/privacy-policy
+					59 link Description: Terms of Use, Value: uspto.gov/terms-use-uspto-websites
+					60 link Description: Financial and Performance Data, Value: uspto.gov/about-us/financial-and-performance
+					61 link Description: Freedom of Information Act, Value: uspto.gov/learning-and-resources/ip-policy/electronic-freedom-information-act-e-foia
+					62 link Description: Inspector General, Value: oig.doc.gov/Pages/U.S.-Patent-and-Trademark-Office.aspx
+					63 link Description: NoFEAR Act, Value: uspto.gov/about-us/organizational-offices/office-equal-employment-opportunity-and-diversity/nofear-act
+					64 link Description: USA.gov, Value: usa.gov/
+			65 container modern-footer-bottom
+				66 link Value: uspto.gov/, Description: United States Patent and Trademark Office - An Agency of the Department of Commerce USPTO - United States Patent and Trademark Office
+				67 container
+					68 text Follow us
+					69 link Description: Facebook USPTO Facebook page, Value: facebook.com/uspto.gov
+					70 link Description: Instagram USPTO Instagram page, Value: instagram.com/uspto
+					71 link Description: Linkedin USPTO Linkedin page, Value: linkedin.com/company/uspto
+					72 link Description: X USPTO X page, Value: twitter.com/uspto
+					73 link Description: Youtube USPTO Youtube page, Value: youtube.com/user/USPTOvideo
+		74 button Virtual Assistant avatar Need help? Ask the USPTO Virtual Assistant!, ID: chatButtonDesktop
+			75 container
+				76 image Virtual Assistant avatar
+				77 container
+					78 text Need help? Ask the
+					79 text USPTO  Virtual Assistant!
+		292 button Feedback, ID: QSIFeedbackButton-btn
+			293 text Feedback
+
+The focused UI element is 0 AXWebArea Trademark search, URL: tmsearch.uspto.gov/search/search-results
