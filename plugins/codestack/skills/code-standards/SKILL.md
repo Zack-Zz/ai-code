@@ -1,25 +1,36 @@
 ---
 name: code-standards
-description: Use when implementing, changing, or reviewing Java code, SQL/JPA/MyBatis persistence, or user-visible frontend copy in a product with existing or explicitly requested multilingual support; apply only CodeStack's relevant conventions.
+description: Use when implementing or reviewing helpers or shared logic in any language, or when implementing, changing, or reviewing Java code, SQL/JPA/MyBatis persistence, or user-visible frontend copy in a product with existing or explicitly requested multilingual support. Apply only the relevant conventions.
 origin: codestack
 ---
 
 # CodeStack
 
-Apply the explicit writing requirements and targeted mistake prevention below.
-Use the current task's authorization and workflow. A review request permits
-inspection and findings, not repairs. Do not introduce a second planning,
-approval, testing or review process.
+Use the task's existing workflow and authorization. A review request permits
+inspection and findings. Repairs require an applicable grant.
+
+## Reuse or extract shared implementations
+
+1. Before adding a helper in any language, inspect similar call sites in the
+   current module, then related modules. Trace imports or references to the actual
+   implementation. Reuse it directly if it is available and its inputs, results,
+   validation, errors, side effects and boundaries fit.
+2. If no suitable implementation exists, extract behavior needed by multiple
+   callers to the narrowest shared owner. Put general operations in a shared
+   utility and business rules with their domain owner. Preserve contracts and
+   verify affected callers.
+3. Keep class- or module-specific orchestration local and call shared operations
+   from it. Keep independently evolving rules separate. Extract for actual
+   callers within the task's scope.
 
 ## Select rules before the affected work
 
-Before writing relevant code, or forming a review finding, identify the current
-files, module, kind of change and necessary call paths. Read only the references
-that apply:
+Identify the affected files, modules and call paths before editing or reviewing.
+Read only the references that apply:
 
 | Reference | Read when | Apply to |
 | --- | --- | --- |
-| [Java](references/java.md) and its [construction/reuse companion](references/java-design.md) | Writing, changing or reviewing handwritten Java declarations, implementations or tests | Comment language, complete multiline Javadoc, inline comments, test construction, existing-code reuse, appropriate extraction and necessary-only nested types |
+| [Java](references/java.md) and its [construction and type placement companion](references/java-design.md) | Writing, changing or reviewing handwritten Java declarations, implementations or tests | Type imports and references, comment language, complete multiline Javadoc, inline comments, test construction and necessary-only nested types |
 | [Data access](references/data-access.md) | Implementing, changing or reviewing confirmed relational/SQL access or its cost | Hidden per-item queries, bounded loading, result contracts and actual database work |
 | [JPA](references/jpa.md) | The change affects JPA mapping, entity construction, lifecycle, queries or persistence calls | Implicit loading/writes, delete propagation, pagination and provider-specific batching |
 | [MyBatis](references/mybatis.md) | The change affects actual MyBatis Mapper, XML, SqlSession or related calls | Binding, dynamic SQL, nested selects and actual pagination/batch execution |

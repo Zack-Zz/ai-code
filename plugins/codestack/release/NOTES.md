@@ -5,6 +5,18 @@
 Stable releases use the shared `ai-code` marketplace. Versions and availability
 are recorded in the [release index](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json).
 
+## 1.0.2
+
+### English
+
+- Require explicit single-type imports when needed and simple names in Java code. Qualify a type at the point of use only to resolve a name collision.
+- Apply shared implementation reuse across languages. Check existing call sites before writing a helper, reuse a compatible implementation directly, and extract genuinely shared behavior to the appropriate common owner. The Java rules link to the shared guidance.
+
+### 中文
+
+- Java 代码需要导入类型时使用显式单类型导入，代码中使用简单类型名，仅在发生同名冲突的引用处保留全限定名。
+- 将公共实现的复用和抽取扩展为跨语言规则。编写辅助方法前先查现有调用点，直接复用契约匹配的实现，将确有共享需求的逻辑抽到合适的公共归属。Java 规范引用同一条规则。
+
 ## 1.0.1
 
 ### English

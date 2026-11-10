@@ -1,4 +1,4 @@
-# Java construction, reuse and type placement
+# Java construction and type placement
 
 Required companion to [Java writing requirements](java.md) for affected Java work.
 
@@ -35,26 +35,12 @@ private OrderAmount createAmount(long cents) {
 An actual JPA/framework construction requirement is a production purpose, not
 a test-only exemption. Use [JPA rules](jpa.md) only when the task involves that mechanism.
 
-## Reuse existing implementations and consolidate the same rule
+## Apply the shared reuse rule in Java
 
-- Before adding an implementation, inspect relevant existing code in the current
-  module and established shared components. Read its actual contract and callers;
-  do not create another implementation merely because its name or location differs.
-- Reuse an existing implementation when its business meaning, validation, tenant
-  and permission boundaries, transaction behavior, exceptions and side effects fit.
-  A similar signature is not enough. Do not bypass a boundary to force reuse.
-- When affected paths express the same business rule and must change together,
-  keep that rule in one appropriate place. Do not copy a method and adjust names
-  or constants instead of using the shared rule. Verify all affected callers.
-- Choose the smallest useful boundary: a private helper for repetition within a
-  class, or an existing business owner/shared component when genuinely needed
-  across classes. Preserve behavior and public contracts while extracting.
-- Similar-looking code may represent different rules that evolve independently.
-  Keep those implementations separate; do not merge them by adding boolean
-  switches, callbacks or type checks solely to eliminate visual duplication.
-- Build abstractions for actual uses. Do not add a generic executor, base class,
-  strategy hierarchy or new dependency for hypothetical reuse. Limit cleanup to
-  the authorized change; avoid unrelated repository-wide deduplication.
+Follow the [cross-language reuse rule](../SKILL.md#reuse-or-extract-shared-implementations)
+before writing a private method or adding to a utility class. Check the actual
+call boundary when invoking a shared component, including tenant isolation,
+authorization and transaction behavior where relevant.
 
 In an existing checkout component, delegate to the already established delivery
 fee policy instead of copying its calculation. The component below already owns

@@ -22,6 +22,12 @@ assert.match(patch, /providerName: codestack/);
 assert.ok(!('version' in manifest) && !('name' in manifest), 'product owns generated identity');
 assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'release.json'))).acceptance.dsh, null);
 console.log('DSH bundle identity and native provider contracts passed');
+const skill = fs.readFileSync(path.join(root, 'skills/code-standards/SKILL.md'), 'utf8');
+const instructions = skill.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '').trim();
+// Mirror DSH renderSkillContent framing with the repository's 300-character path budget.
+const rendered = `<skill_content name="code-standards">\n<skill_resources>\nBase directory for this skill: ${'x'.repeat(300)}\nResolve relative paths mentioned by this skill against the base directory before using them. Load referenced resources only as needed.\n</skill_resources>\n\n<skill_instructions>\n${instructions}\n</skill_instructions>\n</skill_content>`;
+const renderedLength = [...rendered].length;
+assert.ok(renderedLength < 8192, `CodeStack DSH skill length ${renderedLength} must fit the 8192-point pressure-pruning budget`);
 for (const resource of ['java.md', 'java-design.md']) {
   const body = fs.readFileSync(path.join(root, 'skills/code-standards/references', resource), 'utf8');
   assert.ok([...body].length < 7000, `${resource}: reserve room for read framing`);

@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "description": "CodeStack applies targeted project conventions across supported stacks: Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
+  "description": "CodeStack covers shared implementation reuse across languages, Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
   "license": "MIT",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "keywords": ["code-standards", "java", "jpa", "mybatis", "frontend", "i18n"],
@@ -12,7 +12,7 @@
         "category": "Developer Tools",
         "defaultPrompt": ["Use $code-standards to apply the relevant CodeStack conventions to this implementation or review."],
         "brandColor": "#0284C7",
-        "longDescription": "One skill selects relevant English references from the current task and actual stack. It covers Java writing conventions, targeted SQL/JPA/MyBatis pitfalls, and centrally maintained language resources for multilingual frontend copy across frameworks such as React and Vue. It adds no general TypeScript, React or Vue style guide. No runtime, hooks, separate agents or project configuration. Native loading, implicit selection and task outcomes require separate host evidence.",
+        "longDescription": "One skill selects relevant English references from the current task and actual stack. It covers reuse and extraction of shared implementations across languages, Java writing conventions, targeted SQL/JPA/MyBatis pitfalls, and centrally maintained language resources for multilingual frontend copy across frameworks such as React and Vue. It adds no general TypeScript, React or Vue style guide. No runtime, hooks, separate agents or project configuration. Native loading, implicit selection and task outcomes require separate host evidence.",
         "logo": "./assets/codestack.png",
         "composerIcon": "./assets/codestack.png"
       }

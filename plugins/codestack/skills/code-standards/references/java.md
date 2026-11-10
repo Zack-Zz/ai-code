@@ -6,6 +6,24 @@ declaration to be documented. Do not expand into unrelated files or a general
 Java style tutorial. Code indentation, line wrapping, line width, blank lines
 and import ordering are outside these conventions.
 
+## Import types and use their simple names
+
+Use explicit single-type imports for types that need an import. In handwritten
+Java declarations and expressions, use simple type names for all types,
+including classes, interfaces, enums and annotations. Apply this to signatures,
+generic arguments, constructor calls, class literals and static member access.
+Use a package-qualified type name only where a simple type name collision
+requires it. For example, when both `java.util.Date` and `java.sql.Date` are
+used in the same scope, import one and qualify the other where needed.
+
+```java
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
+// Inside a method
+Duration delay = Duration.of(5, ChronoUnit.SECONDS);
+```
+
 ## Choose the comment language
 
 Use, in order: the user's explicit requirement; the current project/module's
@@ -80,7 +98,7 @@ explanations and commented-out obsolete code rather than copying them forward.
 
 ## Construction, reuse and type placement
 
-Read [Java construction, reuse and type placement](java-design.md) in full for
+Read [Java construction and type placement](java-design.md) in full for
 Java implementation and test changes, and before forming a related review finding.
 It continues these rules: keep test construction inside the test class; reuse
 existing implementations and consolidate the same rule; avoid nested types unless

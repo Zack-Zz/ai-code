@@ -69,6 +69,11 @@ test('trusted tooling builds and independently checks all four host packages', (
       for (const relative of [skillPath, ...references.map((name) => `${referenceDirectory}/${name}`)]) {
         assert.deepEqual(fs.readFileSync(path.join(packageRoot, relative)), fs.readFileSync(path.join(plugin, relative)));
       }
+      const packagedSkill = fs.readFileSync(path.join(packageRoot, skillPath), 'utf8');
+      const javaDesign = fs.readFileSync(path.join(packageRoot, referenceDirectory, 'java-design.md'), 'utf8');
+      assert.match(packagedSkill, /^description: .*shared logic in any language/m, `${host} skill advertises the cross-language reuse scope`);
+      assert.match(packagedSkill, /^## Reuse or extract shared implementations$/m);
+      assert.ok(javaDesign.includes('(../SKILL.md#reuse-or-extract-shared-implementations)'));
       assert.ok(fs.existsSync(path.join(packageRoot, iconPath)), 'The CodeStack PNG must be packaged for every host.');
       assert.deepEqual(fs.readFileSync(path.join(packageRoot, iconPath)), fs.readFileSync(path.join(plugin, iconPath)));
       assert.ok(listFiles(packageRoot).every((relative) =>

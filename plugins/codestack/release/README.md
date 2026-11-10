@@ -6,9 +6,9 @@ This source prepares the next CodeStack release candidate. Current public versio
 
 <img src="assets/codestack.png" alt="CodeStack icon" width="96" />
 
-CodeStack supplies a coding assistant with selected project conventions across
-supported languages and stacks. It currently covers Java writing, targeted
-SQL/JPA/MyBatis pitfalls, and shared multilingual frontend copy organization.
+CodeStack supplies a coding assistant with selected project conventions for
+code reuse across languages, Java writing, targeted SQL/JPA/MyBatis pitfalls,
+and shared multilingual frontend copy organization.
 Its plugin ID is `codestack`.
 Stable releases are distributed through the shared `ai-code` marketplace. Check the
 [current release record](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json) for availability.
@@ -41,8 +41,9 @@ Delegation; it introduces no dependency on either plugin.
   concise inline comments only for core logic.
 - Test-specific construction stays inside the test class, without production-only
   test constructors or disguised entry points.
-- Reuse suitable existing implementations and give one business rule a suitable
-  owner. Preserve independent implementations when their semantics differ.
+- In any language, reuse suitable existing implementations before writing a
+  helper. When multiple callers need the same missing behavior, extract it to
+  a shared utility or the appropriate domain owner.
 - Prefer top-level business types and Spring components; retain nested types only
   for a concrete need, without migrating unrelated historical code.
 - SQL access stays bounded and avoids per-item queries, including hidden lazy,

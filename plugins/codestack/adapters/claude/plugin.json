@@ -1,5 +1,5 @@
 {
-  "description": "CodeStack applies targeted project conventions across supported stacks: Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
+  "description": "CodeStack covers shared implementation reuse across languages, Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
   "license": "MIT",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "keywords": ["code-standards", "java", "jpa", "mybatis", "frontend", "i18n"]
