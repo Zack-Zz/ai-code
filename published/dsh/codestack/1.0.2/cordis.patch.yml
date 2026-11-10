@@ -1,0 +1,9 @@
+# Host-scoped independent provider; does not replace existing roots or presets.
+- insert:
+    - id: codestack-skills
+      name: '@deepseek-ai/dsh-skill-filesystem'
+      config:
+        providerName: codestack
+        includeDefaultRoots: false
+        watch: false
+        bundledSkillDir: !!js process.getBuiltinModule('node:path').join(process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('codestack/package.json')), 'skills')

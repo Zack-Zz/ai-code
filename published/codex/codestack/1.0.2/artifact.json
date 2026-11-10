@@ -1,0 +1,65 @@
+{
+  "content_hash": "3f6c5ee1c98b63ee74c305f2cfd44ddf332c63eed20c7b9da249c7b66acca517",
+  "files": [
+    [
+      "LICENSE",
+      "9dd7243a184fe5bf71f8ab9589d4ee5b39eca61babbc9cab86fb3409d9e345e1"
+    ],
+    [
+      "README.md",
+      "c601c22b95ce325661396243ed350348edf1bae9bf5f13baaa88ba5aba7dc62f"
+    ],
+    [
+      "README_CN.md",
+      "0d6dbdf5c0d122c1e6a5665a6921c98d60dbea439b84ffe4c632e8bed4d22970"
+    ],
+    [
+      "assets/codestack.png",
+      "620d80de95511cb2efb62334349aa9f9e5b59eba24aa3ce45b90104cdb37c694"
+    ],
+    [
+      "plugin.json",
+      "269597eac0a8d7b8170156c6fea3cb0eb42ee18b96b11be0547cc1040f1061b9"
+    ],
+    [
+      "skills/code-standards/SKILL.md",
+      "a35675732671e3bc220bf0f5ee0ce3baef858d64d27d35de46319805895d28fe"
+    ],
+    [
+      "skills/code-standards/agents/openai.yaml",
+      "06a1cad26a9b06881297faedd9cff324b17731ed234b1a608e2596008d407473"
+    ],
+    [
+      "skills/code-standards/references/data-access.md",
+      "7a2f03e90fbbf80ee147ca10c90947849322f0fda451e86092e688cd7866bafe"
+    ],
+    [
+      "skills/code-standards/references/frontend.md",
+      "74d5d3e19c50edc1404e3a27f2cc2540e06b8b924595798f966aa4f4775a618e"
+    ],
+    [
+      "skills/code-standards/references/java-design.md",
+      "6a01729ab6e8b1fda61179e64237647fcfa6d80dae5df43d08df824d43d0fee6"
+    ],
+    [
+      "skills/code-standards/references/java.md",
+      "9c26931b6af97575515a1136536322ac6f0365300622171ff41eb14e09c444a6"
+    ],
+    [
+      "skills/code-standards/references/jpa.md",
+      "0afafd0858f5bfa37a63eea9fe0491bbd5bee798d18e2f1777c0411a49663d24"
+    ],
+    [
+      "skills/code-standards/references/mybatis.md",
+      "e0ba6f182bc2202e23a170b66e857f5abe6aed6d650bb14f8b1acb90eff7594b"
+    ]
+  ],
+  "host": "codex",
+  "product_id": "codestack",
+  "profiles": [],
+  "schema_version": 1,
+  "source_revision": "7bc52108e46ea0ab02d16d3dd7f94eab4f8879f1",
+  "source_tree_hash": "09c25f2484df7d9b42c18bf8519ea84442acded70b46c87af17c1687fe185b24",
+  "version": "1.0.2",
+  "working_tree_dirty": false
+}

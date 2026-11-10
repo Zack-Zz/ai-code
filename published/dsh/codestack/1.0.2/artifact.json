@@ -1,0 +1,77 @@
+{
+  "content_hash": "43dc4eb38ac412dd6f075759f87b1cd12f983c87bf5927843f713bdc9df4491b",
+  "files": [
+    [
+      "LICENSE",
+      "9dd7243a184fe5bf71f8ab9589d4ee5b39eca61babbc9cab86fb3409d9e345e1"
+    ],
+    [
+      "README.md",
+      "c601c22b95ce325661396243ed350348edf1bae9bf5f13baaa88ba5aba7dc62f"
+    ],
+    [
+      "README_CN.md",
+      "0d6dbdf5c0d122c1e6a5665a6921c98d60dbea439b84ffe4c632e8bed4d22970"
+    ],
+    [
+      "assets/codestack-dsh.png",
+      "a9ebc0bac58a7e9aacd07b45f1f4acf24cea7372f92cbdd15fe6e07a3518439f"
+    ],
+    [
+      "assets/codestack.png",
+      "620d80de95511cb2efb62334349aa9f9e5b59eba24aa3ce45b90104cdb37c694"
+    ],
+    [
+      "cordis.patch.yml",
+      "cc17abe2f0698d85d87a33ba84091f30fbf4bb095a1f899dbfa15d24ce420de4"
+    ],
+    [
+      "locale/en.json",
+      "12722fd6f55f0f98051f07c6e3f6cfd17dde11e1e3781f0d8691ab559c2cf992"
+    ],
+    [
+      "locale/zh.json",
+      "5b502896117ad18637513d2e1a2bd48a5afd6369f3de7585affbc44aa5f26e01"
+    ],
+    [
+      "package.json",
+      "3442310f7448f3f9e21cef677ae0de6c0aaa0d843d7df2c924598a8fc9923245"
+    ],
+    [
+      "skills/code-standards/SKILL.md",
+      "a35675732671e3bc220bf0f5ee0ce3baef858d64d27d35de46319805895d28fe"
+    ],
+    [
+      "skills/code-standards/references/data-access.md",
+      "7a2f03e90fbbf80ee147ca10c90947849322f0fda451e86092e688cd7866bafe"
+    ],
+    [
+      "skills/code-standards/references/frontend.md",
+      "74d5d3e19c50edc1404e3a27f2cc2540e06b8b924595798f966aa4f4775a618e"
+    ],
+    [
+      "skills/code-standards/references/java-design.md",
+      "6a01729ab6e8b1fda61179e64237647fcfa6d80dae5df43d08df824d43d0fee6"
+    ],
+    [
+      "skills/code-standards/references/java.md",
+      "9c26931b6af97575515a1136536322ac6f0365300622171ff41eb14e09c444a6"
+    ],
+    [
+      "skills/code-standards/references/jpa.md",
+      "0afafd0858f5bfa37a63eea9fe0491bbd5bee798d18e2f1777c0411a49663d24"
+    ],
+    [
+      "skills/code-standards/references/mybatis.md",
+      "e0ba6f182bc2202e23a170b66e857f5abe6aed6d650bb14f8b1acb90eff7594b"
+    ]
+  ],
+  "host": "dsh",
+  "product_id": "codestack",
+  "profiles": [],
+  "schema_version": 1,
+  "source_revision": "7bc52108e46ea0ab02d16d3dd7f94eab4f8879f1",
+  "source_tree_hash": "09c25f2484df7d9b42c18bf8519ea84442acded70b46c87af17c1687fe185b24",
+  "version": "1.0.2",
+  "working_tree_dirty": false
+}
