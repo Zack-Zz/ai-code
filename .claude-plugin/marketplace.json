@@ -5,15 +5,15 @@
   },
   "plugins": [
     {
-      "description": "CodeStack applies targeted project conventions across supported stacks: Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
+      "description": "CodeStack covers shared implementation reuse across languages, Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
       "displayName": "CodeStack",
       "name": "codestack",
       "source": {
-        "sha256": "56ce58a2cc96b08c96f13ba4722a1f85e33fbf75903c93c155e14eb71e95f29f",
+        "sha256": "faff2cb7aeb73795dd5aa54bb6bee0dc61f311da19f95bb98e04ebcb3d323425",
         "source": "archive",
-        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.1/codestack-1.0.1-claude-plugin.zip"
+        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.2/codestack-1.0.2-claude-plugin.zip"
       },
-      "version": "1.0.1"
+      "version": "1.0.2"
     },
     {
       "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",

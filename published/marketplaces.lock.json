@@ -1,10 +1,10 @@
 {
   "files": {
-    ".agents/plugins/marketplace.json": "08fe03e058a95186522393910881d3fa1593c02804cd521ff7d104c6934ca486",
-    ".claude-plugin/marketplace.json": "9462ec8f67161449a143f05a721042c47105386b0e06eb4ec8cd7b97de093fe7",
-    "marketplace.json": "0ba34650f2f282aed8fdc32c416368a02ad1c390e06550a466a9e75ce8fbc402",
-    "published/dsh/index.json": "f0f444f73d124f6a115f33676867cca3328611d41afdb1f6411e8c00eb45ddad"
+    ".agents/plugins/marketplace.json": "3f1cca0557538a96d3df27e65b86cab88d6b14441ec494270d3134686e0f1fd4",
+    ".claude-plugin/marketplace.json": "74d01a8cb2361e7cae74c3eb9226638465a86e17c4b7ec17c57cbff8fedba14f",
+    "marketplace.json": "8074c9a589c0634b9b09c487d2f1a120625ec86413de9797b772cc21d3abef16",
+    "published/dsh/index.json": "f4842b30c616e4ffe565688e0744e9d17d37292007b15946928a05e949b72e77"
   },
-  "published_index_sha256": "db95cdc8c92e655696adb4d09036229bcc71db4e9509b8a5dd69be3dbcebe69a",
+  "published_index_sha256": "efa695c018ffc1055feb2e68bc2da5fa12f236ac28c1204c8bb14677ac1c5565",
   "schema_version": 2
 }
