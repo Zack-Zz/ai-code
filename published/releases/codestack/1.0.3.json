@@ -1,0 +1,195 @@
+{
+  "channel": "stable",
+  "git_installs": {
+    "antigravity": {
+      "files": {
+        "published/antigravity/codestack/1.0.3/LICENSE": "9dd7243a184fe5bf71f8ab9589d4ee5b39eca61babbc9cab86fb3409d9e345e1",
+        "published/antigravity/codestack/1.0.3/README.md": "4b5b4f2b376cf7082e1e67a404bd93e0e53b1d0940ab05c5ac46d4c85e8aeb0e",
+        "published/antigravity/codestack/1.0.3/README_CN.md": "4974622d400a7fd95df002e51ba342d1a045a1e52784fee7cb4032b7f87bcf1e",
+        "published/antigravity/codestack/1.0.3/artifact.json": "f57d550fac7f8fc33a4bb7d786027ae0d481dbf87f3b18d56620a49815f1e063",
+        "published/antigravity/codestack/1.0.3/assets/codestack.png": "620d80de95511cb2efb62334349aa9f9e5b59eba24aa3ce45b90104cdb37c694",
+        "published/antigravity/codestack/1.0.3/plugin.json": "afc2a3c899b187584880effaad61242663580509ce4ec23a53cdb78956293124",
+        "published/antigravity/codestack/1.0.3/skills/code-standards/SKILL.md": "a35675732671e3bc220bf0f5ee0ce3baef858d64d27d35de46319805895d28fe",
+        "published/antigravity/codestack/1.0.3/skills/code-standards/references/data-access.md": "7a2f03e90fbbf80ee147ca10c90947849322f0fda451e86092e688cd7866bafe",
+        "published/antigravity/codestack/1.0.3/skills/code-standards/references/frontend.md": "74d5d3e19c50edc1404e3a27f2cc2540e06b8b924595798f966aa4f4775a618e",
+        "published/antigravity/codestack/1.0.3/skills/code-standards/references/java-design.md": "6a01729ab6e8b1fda61179e64237647fcfa6d80dae5df43d08df824d43d0fee6",
+        "published/antigravity/codestack/1.0.3/skills/code-standards/references/java.md": "9c26931b6af97575515a1136536322ac6f0365300622171ff41eb14e09c444a6",
+        "published/antigravity/codestack/1.0.3/skills/code-standards/references/jpa.md": "0afafd0858f5bfa37a63eea9fe0491bbd5bee798d18e2f1777c0411a49663d24",
+        "published/antigravity/codestack/1.0.3/skills/code-standards/references/mybatis.md": "e0ba6f182bc2202e23a170b66e857f5abe6aed6d650bb14f8b1acb90eff7594b"
+      },
+      "revision": "5e91ffa70a57de070d2b3488f3ef246ef14a36e6"
+    },
+    "codex": {
+      "files": {
+        "published/codex/codestack/1.0.3/LICENSE": "9dd7243a184fe5bf71f8ab9589d4ee5b39eca61babbc9cab86fb3409d9e345e1",
+        "published/codex/codestack/1.0.3/README.md": "4b5b4f2b376cf7082e1e67a404bd93e0e53b1d0940ab05c5ac46d4c85e8aeb0e",
+        "published/codex/codestack/1.0.3/README_CN.md": "4974622d400a7fd95df002e51ba342d1a045a1e52784fee7cb4032b7f87bcf1e",
+        "published/codex/codestack/1.0.3/artifact.json": "3e79f4167727c40f4f50bc8a31ff9f3a051e7380841b8dc5b12b85492bbae5eb",
+        "published/codex/codestack/1.0.3/assets/codestack.png": "620d80de95511cb2efb62334349aa9f9e5b59eba24aa3ce45b90104cdb37c694",
+        "published/codex/codestack/1.0.3/plugin.json": "21a2ea3f928341e2ac71cf5d34fd9823c1ca2b392fb55a68172ff0c49661fb6b",
+        "published/codex/codestack/1.0.3/skills/code-standards/SKILL.md": "a35675732671e3bc220bf0f5ee0ce3baef858d64d27d35de46319805895d28fe",
+        "published/codex/codestack/1.0.3/skills/code-standards/agents/openai.yaml": "06a1cad26a9b06881297faedd9cff324b17731ed234b1a608e2596008d407473",
+        "published/codex/codestack/1.0.3/skills/code-standards/references/data-access.md": "7a2f03e90fbbf80ee147ca10c90947849322f0fda451e86092e688cd7866bafe",
+        "published/codex/codestack/1.0.3/skills/code-standards/references/frontend.md": "74d5d3e19c50edc1404e3a27f2cc2540e06b8b924595798f966aa4f4775a618e",
+        "published/codex/codestack/1.0.3/skills/code-standards/references/java-design.md": "6a01729ab6e8b1fda61179e64237647fcfa6d80dae5df43d08df824d43d0fee6",
+        "published/codex/codestack/1.0.3/skills/code-standards/references/java.md": "9c26931b6af97575515a1136536322ac6f0365300622171ff41eb14e09c444a6",
+        "published/codex/codestack/1.0.3/skills/code-standards/references/jpa.md": "0afafd0858f5bfa37a63eea9fe0491bbd5bee798d18e2f1777c0411a49663d24",
+        "published/codex/codestack/1.0.3/skills/code-standards/references/mybatis.md": "e0ba6f182bc2202e23a170b66e857f5abe6aed6d650bb14f8b1acb90eff7594b"
+      },
+      "revision": "5e91ffa70a57de070d2b3488f3ef246ef14a36e6"
+    },
+    "dsh": {
+      "files": {
+        "published/dsh/codestack/1.0.3/LICENSE": "9dd7243a184fe5bf71f8ab9589d4ee5b39eca61babbc9cab86fb3409d9e345e1",
+        "published/dsh/codestack/1.0.3/README.md": "4b5b4f2b376cf7082e1e67a404bd93e0e53b1d0940ab05c5ac46d4c85e8aeb0e",
+        "published/dsh/codestack/1.0.3/README_CN.md": "4974622d400a7fd95df002e51ba342d1a045a1e52784fee7cb4032b7f87bcf1e",
+        "published/dsh/codestack/1.0.3/artifact.json": "c6cde388fde38b840d3a1a07f70419e0a524bfe6547d151b190ed364773f0608",
+        "published/dsh/codestack/1.0.3/assets/codestack-dsh.png": "a9ebc0bac58a7e9aacd07b45f1f4acf24cea7372f92cbdd15fe6e07a3518439f",
+        "published/dsh/codestack/1.0.3/assets/codestack.png": "620d80de95511cb2efb62334349aa9f9e5b59eba24aa3ce45b90104cdb37c694",
+        "published/dsh/codestack/1.0.3/cordis.patch.yml": "cc17abe2f0698d85d87a33ba84091f30fbf4bb095a1f899dbfa15d24ce420de4",
+        "published/dsh/codestack/1.0.3/locale/en.json": "12722fd6f55f0f98051f07c6e3f6cfd17dde11e1e3781f0d8691ab559c2cf992",
+        "published/dsh/codestack/1.0.3/locale/zh.json": "5b502896117ad18637513d2e1a2bd48a5afd6369f3de7585affbc44aa5f26e01",
+        "published/dsh/codestack/1.0.3/package.json": "57307571649272731e1f793e1325ff916cb7c40f30c68f1a94dd504ee8c70edc",
+        "published/dsh/codestack/1.0.3/skills/code-standards/SKILL.md": "a35675732671e3bc220bf0f5ee0ce3baef858d64d27d35de46319805895d28fe",
+        "published/dsh/codestack/1.0.3/skills/code-standards/references/data-access.md": "7a2f03e90fbbf80ee147ca10c90947849322f0fda451e86092e688cd7866bafe",
+        "published/dsh/codestack/1.0.3/skills/code-standards/references/frontend.md": "74d5d3e19c50edc1404e3a27f2cc2540e06b8b924595798f966aa4f4775a618e",
+        "published/dsh/codestack/1.0.3/skills/code-standards/references/java-design.md": "6a01729ab6e8b1fda61179e64237647fcfa6d80dae5df43d08df824d43d0fee6",
+        "published/dsh/codestack/1.0.3/skills/code-standards/references/java.md": "9c26931b6af97575515a1136536322ac6f0365300622171ff41eb14e09c444a6",
+        "published/dsh/codestack/1.0.3/skills/code-standards/references/jpa.md": "0afafd0858f5bfa37a63eea9fe0491bbd5bee798d18e2f1777c0411a49663d24",
+        "published/dsh/codestack/1.0.3/skills/code-standards/references/mybatis.md": "e0ba6f182bc2202e23a170b66e857f5abe6aed6d650bb14f8b1acb90eff7594b"
+      },
+      "revision": "5e91ffa70a57de070d2b3488f3ef246ef14a36e6"
+    }
+  },
+  "hosts": {
+    "antigravity": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.3/codestack-1.0.3-antigravity-plugin.zip",
+        "id": 771389277,
+        "name": "codestack-1.0.3-antigravity-plugin.zip",
+        "sha256": "7fae0403993f1fc763da03f45a7e20856bb0ffe52791a35f41cfc787a7835aef",
+        "size": 969549
+      },
+      "entry": null,
+      "installer_format": "zip",
+      "package_content_hash": "bea719ddfb22aecdd0d14722d7a55ef3486ffc69d307104a7ec9c1c76f5c6b5e"
+    },
+    "claude": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.3/codestack-1.0.3-claude-plugin.zip",
+        "id": 771389234,
+        "name": "codestack-1.0.3-claude-plugin.zip",
+        "sha256": "535e6e6eee0ba982e7b9acfa49995d75646163d7eb5d86e243f77a0cee788cb1",
+        "size": 969507
+      },
+      "entry": {
+        "description": "CodeStack covers shared implementation reuse across languages, Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
+        "displayName": "CodeStack",
+        "name": "codestack",
+        "version": "1.0.3"
+      },
+      "installer_format": "zip",
+      "package_content_hash": "c1cadadc312bcf6aa09646ddaacafa1faaf2febd6e1da815bbba6112eb3c2cad"
+    },
+    "codex": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.3/codestack-1.0.3-codex-plugin.zip",
+        "id": 771389242,
+        "name": "codestack-1.0.3-codex-plugin.zip",
+        "sha256": "fdd07c72345fd5a5f64b1744ff001ad980239c9df7278b8fa0405a1a47804a3d",
+        "size": 970387
+      },
+      "entry": {
+        "category": "developer-tools",
+        "name": "codestack",
+        "policy": {
+          "authentication": "ON_INSTALL",
+          "installation": "AVAILABLE"
+        },
+        "version": "1.0.3"
+      },
+      "installer_format": "zip",
+      "package_content_hash": "c71025a7e26493914e2f5fac2c859ea2052417d383f284f11b3e6145c8680a98"
+    },
+    "dsh": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.3/codestack-1.0.3-dsh-plugin.tgz",
+        "id": 771389260,
+        "name": "codestack-1.0.3-dsh-plugin.tgz",
+        "sha256": "4cdfb70bde60bd5d6423db224613c7ceefeaaec63dbcaae7c3c651931b77d7a8",
+        "size": 1027292
+      },
+      "entry": {
+        "description": {
+          "en": "Selected coding conventions for the current change or review",
+          "zh": "\u4e3a\u5f53\u524d\u53d8\u66f4\u6216\u5ba1\u67e5\u9009\u62e9\u9002\u7528\u7684\u7f16\u7801\u7ea6\u5b9a"
+        },
+        "engines": {
+          "dsh": ">=0.2.1-rc.2"
+        },
+        "icon": "assets/codestack-dsh.png",
+        "name": "codestack",
+        "title": {
+          "en": "CodeStack",
+          "zh": "CodeStack"
+        }
+      },
+      "installer_format": "npm-tgz",
+      "package_content_hash": "19d174abd02c550df42c2c1fef1cdf8482496afd3307d64b7dffaff7857a82e6"
+    },
+    "zcode": {
+      "asset": {
+        "browser_download_url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.3/codestack-1.0.3-zcode-plugin.zip",
+        "id": 771389254,
+        "name": "codestack-1.0.3-zcode-plugin.zip",
+        "sha256": "b3cd8bcd3a5b03ce7a9c57e45b52c2450ee6512915ca98f8759e439aaea61166",
+        "size": 969434
+      },
+      "entry": {
+        "description": "CodeStack covers shared implementation reuse across languages, Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
+        "displayName": "CodeStack",
+        "icon": "https://raw.githubusercontent.com/Zack-Zz/ai-code/27131993b1b1976244273f842a36e3a8fb7414a6/plugins/ai-code-stack-standards/assets/codestack.png",
+        "name": "codestack",
+        "version": "1.0.3"
+      },
+      "installer_format": "zip",
+      "package_content_hash": "d00fb44bcad3ba774a2a06a8abe157f87a833bd653fe263d5988292f3c7b5235"
+    }
+  },
+  "mode": "stable",
+  "product_id": "codestack",
+  "readiness": {
+    "accepted_hosts": [],
+    "limitations": [
+      "This is a local release bundle; no installation, upload, marketplace submission or Git change was performed.",
+      "Host evidence is a source-bound factual record, not user authorization or marketplace acceptance.",
+      "A previous bundle is caller-supplied trusted history with local integrity checks, not proof of a published release.",
+      "Raw host-session artifacts remain local; this bundle contains only their bindings and hashes.",
+      "Real host acceptance is unverified for: antigravity, claude, codex, dsh, zcode"
+    ],
+    "package_content_hashes": {
+      "antigravity": "bea719ddfb22aecdd0d14722d7a55ef3486ffc69d307104a7ec9c1c76f5c6b5e",
+      "claude": "c1cadadc312bcf6aa09646ddaacafa1faaf2febd6e1da815bbba6112eb3c2cad",
+      "codex": "c71025a7e26493914e2f5fac2c859ea2052417d383f284f11b3e6145c8680a98",
+      "dsh": "19d174abd02c550df42c2c1fef1cdf8482496afd3307d64b7dffaff7857a82e6",
+      "zcode": "d00fb44bcad3ba774a2a06a8abe157f87a833bd653fe263d5988292f3c7b5235"
+    },
+    "pending_acceptance": [
+      "antigravity",
+      "claude",
+      "codex",
+      "dsh",
+      "zcode"
+    ],
+    "publication_ready": true
+  },
+  "release_id": 452550291,
+  "release_published_at": "2026-11-20T10:26:46Z",
+  "release_url": "https://github.com/Zack-Zz/ai-code/releases/tag/codestack%2Fv1.0.3",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "schema_version": 4,
+  "source_revision": "9251a3587263e7cebdca53bdfb16b6694a3e97d1",
+  "source_tree_hash": "7227a891d64f0179d6a1b2d9ca822ea51db624f64c335422f443ec349f8e3e70",
+  "tag": "codestack/v1.0.3",
+  "version": "1.0.3"
+}

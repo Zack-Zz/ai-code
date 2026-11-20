@@ -8,12 +8,12 @@
       "name": "codestack",
       "source": {
         "path": "codestack",
-        "sha256": "842f19c8fb3f5b402d321f8fe0f5819a9f196d40f8c7bf101bbe0034c744b722",
+        "sha256": "b3cd8bcd3a5b03ce7a9c57e45b52c2450ee6512915ca98f8759e439aaea61166",
         "source": "url",
         "type": "zip",
-        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.2/codestack-1.0.2-zcode-plugin.zip"
+        "url": "https://github.com/Zack-Zz/ai-code/releases/download/codestack%2Fv1.0.3/codestack-1.0.3-zcode-plugin.zip"
       },
-      "version": "1.0.2"
+      "version": "1.0.3"
     },
     {
       "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
