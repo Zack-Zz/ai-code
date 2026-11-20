@@ -1,0 +1,19 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "author": {
+    "name": "Zack-Zz",
+    "url": "https://github.com/Zack-Zz"
+  },
+  "description": "CodeVow \u2014 plan-first collaboration, TDD, evidence-driven debugging, review and verification",
+  "displayName": "CodeVow",
+  "license": "MIT",
+  "logo": "assets/codevow.png",
+  "name": "codevow",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "suggestedPrompts": [
+    "Plan this change with CodeVow before implementation.",
+    "Review this diff with CodeVow.",
+    "Diagnose this failure with CodeVow."
+  ],
+  "version": "1.0.9"
+}

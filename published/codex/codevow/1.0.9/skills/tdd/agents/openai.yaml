@@ -1,0 +1,7 @@
+interface:
+  display_name: "TDD"
+  short_description: "Valid RED/GREEN within an authorized and confirmed change scope"
+  brand_color: "#16A34A"
+  default_prompt: "Use $tdd after checking workflow's authorization and plan context; write the permitted failing test and proceed to GREEN only when implementation is authorized."
+policy:
+  allow_implicit_invocation: true

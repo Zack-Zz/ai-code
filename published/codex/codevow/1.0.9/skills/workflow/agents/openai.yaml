@@ -1,0 +1,7 @@
+interface:
+  display_name: "CodeVow"
+  short_description: "Route coding questions, diagnosis, review and authorized changes"
+  brand_color: "#2563EB"
+  default_prompt: "Use $workflow to check intent and authorization, confirm the plan when required, and load only the next needed skill."
+policy:
+  allow_implicit_invocation: true
