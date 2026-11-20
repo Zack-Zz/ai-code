@@ -1,0 +1,65 @@
+{
+  "content_hash": "c71025a7e26493914e2f5fac2c859ea2052417d383f284f11b3e6145c8680a98",
+  "files": [
+    [
+      "LICENSE",
+      "9dd7243a184fe5bf71f8ab9589d4ee5b39eca61babbc9cab86fb3409d9e345e1"
+    ],
+    [
+      "README.md",
+      "4b5b4f2b376cf7082e1e67a404bd93e0e53b1d0940ab05c5ac46d4c85e8aeb0e"
+    ],
+    [
+      "README_CN.md",
+      "4974622d400a7fd95df002e51ba342d1a045a1e52784fee7cb4032b7f87bcf1e"
+    ],
+    [
+      "assets/codestack.png",
+      "620d80de95511cb2efb62334349aa9f9e5b59eba24aa3ce45b90104cdb37c694"
+    ],
+    [
+      "plugin.json",
+      "21a2ea3f928341e2ac71cf5d34fd9823c1ca2b392fb55a68172ff0c49661fb6b"
+    ],
+    [
+      "skills/code-standards/SKILL.md",
+      "a35675732671e3bc220bf0f5ee0ce3baef858d64d27d35de46319805895d28fe"
+    ],
+    [
+      "skills/code-standards/agents/openai.yaml",
+      "06a1cad26a9b06881297faedd9cff324b17731ed234b1a608e2596008d407473"
+    ],
+    [
+      "skills/code-standards/references/data-access.md",
+      "7a2f03e90fbbf80ee147ca10c90947849322f0fda451e86092e688cd7866bafe"
+    ],
+    [
+      "skills/code-standards/references/frontend.md",
+      "74d5d3e19c50edc1404e3a27f2cc2540e06b8b924595798f966aa4f4775a618e"
+    ],
+    [
+      "skills/code-standards/references/java-design.md",
+      "6a01729ab6e8b1fda61179e64237647fcfa6d80dae5df43d08df824d43d0fee6"
+    ],
+    [
+      "skills/code-standards/references/java.md",
+      "9c26931b6af97575515a1136536322ac6f0365300622171ff41eb14e09c444a6"
+    ],
+    [
+      "skills/code-standards/references/jpa.md",
+      "0afafd0858f5bfa37a63eea9fe0491bbd5bee798d18e2f1777c0411a49663d24"
+    ],
+    [
+      "skills/code-standards/references/mybatis.md",
+      "e0ba6f182bc2202e23a170b66e857f5abe6aed6d650bb14f8b1acb90eff7594b"
+    ]
+  ],
+  "host": "codex",
+  "product_id": "codestack",
+  "profiles": [],
+  "schema_version": 1,
+  "source_revision": "9251a3587263e7cebdca53bdfb16b6694a3e97d1",
+  "source_tree_hash": "7227a891d64f0179d6a1b2d9ca822ea51db624f64c335422f443ec349f8e3e70",
+  "version": "1.0.3",
+  "working_tree_dirty": false
+}

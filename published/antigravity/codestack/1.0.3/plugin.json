@@ -1,0 +1,18 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "author": {
+    "name": "Zack-Zz",
+    "url": "https://github.com/Zack-Zz"
+  },
+  "description": "CodeStack covers shared implementation reuse across languages, Java writing, SQL/JPA/MyBatis access, and centralized copy resources for multilingual frontends.",
+  "displayName": "CodeStack",
+  "license": "MIT",
+  "logo": "assets/codestack.png",
+  "name": "codestack",
+  "repository": "https://github.com/Zack-Zz/ai-code",
+  "suggestedPrompts": [
+    "Apply CodeStack conventions to this implementation.",
+    "Review this code using the relevant CodeStack rules."
+  ],
+  "version": "1.0.3"
+}
