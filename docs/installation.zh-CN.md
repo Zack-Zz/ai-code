@@ -2,7 +2,7 @@
 
 [English](installation.md) | 简体中文
 
-CodeVow **1.0.8**（`codevow`）和 CodeStack **1.0.1**（`codestack`）已发布到
+CodeVow（`codevow`）和 CodeStack（`codestack`）已发布到
 共享的 **ai-code** 市场。实际可安装版本以[发行记录](../published/index.json)
 和宿主刷新后的列表为准。两个插件分别安装，可以只使用其中一个，也可以同时使用。
 [Agent Delegation](../plugins/ai-agent-delegation/README.zh-CN.md) 尚未发布。
@@ -44,19 +44,17 @@ CodeVow **1.0.8**（`codevow`）和 CodeStack **1.0.1**（`codestack`）已发�
 
 ### Antigravity CLI
 
-将各地址中的 `VERSION` 换成对应插件的已发布版本，
-再用 Google [Antigravity CLI](https://antigravity.google/docs/getting-started?tab=cli)
-执行对应的命令。
+用 Google [Antigravity CLI](https://antigravity.google/docs/getting-started?tab=cli)
+安装当前支持 Antigravity 的最新正式版，CodeVow **1.0.9** 和 CodeStack **1.0.3**。
+复制所需插件对应的安装命令即可。
 
 ```sh
-agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codevow/VERSION
-agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codestack/VERSION
+agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codevow/1.0.9
+agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codestack/1.0.3
 agy plugin list
 ```
 
-安装地址指向 `main` 上的正式版本目录。更新时用同一命令安装新发布的版本。
-卸载使用 `agy plugin uninstall codevow`
-或 `agy plugin uninstall codestack`。
+卸载使用 `agy plugin uninstall codevow` 或 `agy plugin uninstall codestack`。
 
 ### Antigravity App
 

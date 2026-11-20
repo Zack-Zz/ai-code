@@ -2,7 +2,7 @@
 
 English | [简体中文](installation.zh-CN.md)
 
-CodeVow **1.0.8** (`codevow`) and CodeStack **1.0.1** (`codestack`) are published
+CodeVow (`codevow`) and CodeStack (`codestack`) are published
 in the shared **ai-code** marketplace. The [release index](../published/index.json)
 and each host's refreshed listing are authoritative for available versions.
 Each plugin is installed independently; you can use either or both.
@@ -50,19 +50,18 @@ Availability starts with the first stable release that lists this host.
 
 ### Antigravity CLI
 
-Replace `VERSION` in each URL with the listed version for that plugin,
-then run the corresponding command with Google's
-[Antigravity CLI](https://antigravity.google/docs/getting-started?tab=cli).
+Use Google's [Antigravity CLI](https://antigravity.google/docs/getting-started?tab=cli)
+to install the latest stable releases for Antigravity, CodeVow **1.0.9**
+and CodeStack **1.0.3**. Run the install command for each plugin you want.
 
 ```sh
-agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codevow/VERSION
-agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codestack/VERSION
+agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codevow/1.0.9
+agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codestack/1.0.3
 agy plugin list
 ```
 
-The URL selects the published version directory on `main`. To update, install
-the new published version using the same command. To remove a plugin, run
-`agy plugin uninstall codevow` or `agy plugin uninstall codestack`.
+To remove a plugin, run `agy plugin uninstall codevow` or
+`agy plugin uninstall codestack`.
 
 ### Antigravity App
 
