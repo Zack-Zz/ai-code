@@ -24,12 +24,12 @@
         "installation": "AVAILABLE"
       },
       "source": {
-        "path": "./published/codex/codevow/1.0.8",
-        "sha": "457e1da23aaddf4fb3f3f4760f2aab7d1038f825",
+        "path": "./published/codex/codevow/1.0.9",
+        "sha": "c449e515dce38383844923ca69aa109219b03a5a",
         "source": "git-subdir",
         "url": "https://github.com/Zack-Zz/ai-code.git"
       },
-      "version": "1.0.8"
+      "version": "1.0.9"
     }
   ]
 }
