@@ -12,7 +12,7 @@ from . import product as wproduct
 from .io import DataError
 
 PRODUCT_ID = "codevow"
-MANIFEST_PATHS = {"claude": ".claude-plugin/plugin.json", "codex": "plugin.json", "zcode": ".zcode-plugin/plugin.json", "dsh": "package.json"}
+MANIFEST_PATHS = {"claude": ".claude-plugin/plugin.json", "codex": "plugin.json", "zcode": ".zcode-plugin/plugin.json", "dsh": "package.json", "antigravity": "plugin.json"}
 MARKETPLACE_PATHS = {"claude": ".claude-plugin/marketplace.json", "codex": ".agents/plugins/marketplace.json", "zcode": "marketplace.json"}
 SKILLS = ("workflow", "tdd", "debugging", "review", "verification", "review-results")
 REQUIRED_SHARED = {
@@ -207,6 +207,16 @@ def check_package(package_root: Path, host: str) -> dict:
                 problems.append("DSH bundle declaration is invalid")
             if manifest.get("files") != sorted(set(registered) | {"artifact.json"}):
                 problems.append("DSH manifest files do not equal package closure")
+        return {"ok": not problems, "product_id": artifact["product_id"], "version": artifact["version"],
+                "content_hash": artifact["content_hash"], "files_checked": len(registered),
+                "problems": problems, "caches": caches,
+                "verification_scope": "installed artifact integrity; use shared package check with trusted source for provenance"}
+
+    if host == "antigravity":
+        if manifest_rel in safe_files:
+            manifest = wio.load_json(manifest_path)
+            if manifest.get("$schema") != "https://antigravity.google/schemas/v1/plugin.json":
+                problems.append("Antigravity manifest schema is invalid")
         return {"ok": not problems, "product_id": artifact["product_id"], "version": artifact["version"],
                 "content_hash": artifact["content_hash"], "files_checked": len(registered),
                 "problems": problems, "caches": caches,

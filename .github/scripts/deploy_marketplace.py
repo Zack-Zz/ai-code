@@ -207,7 +207,7 @@ class GitWriter:
             if '.git' in name.split('/'):
                 return False
             return name in native or name in {'published/index.json', 'published/marketplaces.lock.json'} or bool(
-                re.fullmatch(r'published/(?:(?:releases|staged)/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+\.json|(?:codex|dsh)/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+/.+)', name))
+                re.fullmatch(r'published/(?:(?:releases|staged)/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+\.json|(?:codex|dsh|antigravity)/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+/.+)', name))
         if not isinstance(files, dict) or any(not allowed(name) or not isinstance(raw, bytes) for name, raw in files.items()):
             raise io.DataError('publication may write only declared main market paths; source and dist are forbidden')
         if any(name not in native and not re.fullmatch(r'published/staged/[a-z0-9][a-z0-9-]{0,63}/[0-9]+\.[0-9]+\.[0-9]+\.json', name) for name in removals) or len(set(removals)) != len(removals) or set(removals) & set(files):

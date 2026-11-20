@@ -502,6 +502,15 @@ class MainGitWriterTests(unittest.TestCase):
         with self.assertRaises(io.DataError):
             self.writer.publish('main', committed, {}, 'remove frozen installation', removals=['published/dsh/ai-one/1.0.0/package.json'])
 
+    def test_writer_preserves_antigravity_git_package_and_forbids_removing_it(self):
+        manifest = 'published/antigravity/ai-one/1.0.0/plugin.json'
+        revision = self.writer.publish('main', self.head, {manifest: b'{"name":"ai-one"}'}, 'stage Antigravity')
+        self.assertEqual(self.git('--git-dir', str(self.bare), 'show', revision + ':' + manifest), '{"name":"ai-one"}')
+        with self.assertRaises(io.DataError):
+            self.writer.publish('main', revision, {}, 'remove frozen package', removals=[manifest])
+        with self.assertRaises(io.DataError):
+            self.writer.publish('main', revision, {'published/antigravity/index.json': b'{}'}, 'invent marketplace')
+
     def test_writer_rejects_source_dist_old_branches_and_absent_main(self):
         for files in ({'README.md': b'overwrite'}, {'dist/package.zip': b'bytes'},
                       {'published/../README.md': b'escape'}, {'.git/config': b'bad'}):
@@ -542,7 +551,14 @@ if __name__ == '__main__':
 class DshDeploymentTests(unittest.TestCase):
     def test_four_host_bundle_stages_one_D_and_recovery_consumes_exact_receipt(self):
         from tests.tooling.test_distribution import DshHostedMarketTests
-        case = DshHostedMarketTests()
+        self.exercise_git_bundle_recovery(DshHostedMarketTests)
+
+    def test_antigravity_git_bundle_recovers_without_publishing_a_listing(self):
+        from tests.tooling.test_distribution import AntigravityHostedMarketTests
+        self.exercise_git_bundle_recovery(AntigravityHostedMarketTests)
+
+    def exercise_git_bundle_recovery(self, fixture):
+        case = fixture()
         case.setUp()
         self.addCleanup(case.doCleanups)
         module = implementation()
@@ -601,4 +617,10 @@ class DshDeploymentTests(unittest.TestCase):
         self.assertNotIn(receipt, api.files)
         record = json.loads(api.files['published/releases/ai-one/1.0.1.json'])
         self.assertEqual({item['revision'] for item in record['git_installs'].values()}, {'1' * 40})
-        self.assertEqual(json.loads(api.files['published/dsh/index.json'])['plugins'][0]['versions'][0]['source']['commit'], '1' * 40)
+        if 'dsh' in record['hosts']:
+            self.assertEqual(json.loads(api.files['published/dsh/index.json'])['plugins'][0]['versions'][0]['source']['commit'], '1' * 40)
+        else:
+            self.assertIsNone(record['hosts']['antigravity']['entry'])
+            self.assertEqual(record['git_installs']['antigravity']['revision'], '1' * 40)
+            self.assertIn('published/antigravity/ai-one/1.0.1/plugin.json', api.files)
+            self.assertNotIn('published/antigravity/index.json', api.files)

@@ -134,3 +134,14 @@ report unavailable checks. The tool allowlist is separate from filesystem isolat
 read roots continue to use the host's permissions.
 
 See the [identity migration guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/migrations/2026-10-27-plugin-identities.md) for uninstall and reinstall steps.
+
+## Google Antigravity
+
+The native `antigravity` package includes skills, reference files and `plugin.json`.
+Check the [release index](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json) for available versions.
+The CLI installs from a versioned GitHub directory. The desktop app can use the
+same installation or the GitHub Release ZIP. See the
+[desktop and CLI installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md#google-antigravity).
+
+CodeVow includes optional Python workflow tools. The Antigravity package does
+not register a dedicated Reviewer agent.

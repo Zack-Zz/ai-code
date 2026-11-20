@@ -5,7 +5,7 @@ import stat
 import zipfile
 
 from .. import io
-from ..archives import download_name, download_bytes, download_index, installer_bytes, installer_name
+from ..archives import download_name, download_bytes, download_index, installer_bytes, installer_name, package_index_schema
 from ..io import DataError
 from ..registry import HOSTS
 from ..rendering import file_hashes, marketplace, marketplace_path, package_files
@@ -27,7 +27,7 @@ def zip_bytes(files):
 
 def package_outputs(spec, provenance):
     files = {}
-    index = {"schema_version": 3 if "dsh" in spec.hosts else 2, "plugins": {}, "hosts": {},
+    index = {"schema_version": package_index_schema(spec.hosts), "plugins": {}, "hosts": {},
              "source_revision": provenance["source_revision"], "working_tree_dirty": provenance["working_tree_dirty"]}
     plugin = {"version": spec.version, "source_tree_hash": spec.source_tree_hash, "hosts": {}}
     index["plugins"][spec.product_id] = plugin
@@ -42,16 +42,18 @@ def package_outputs(spec, provenance):
             "working_tree_dirty": provenance["working_tree_dirty"], "source_tree_hash": spec.source_tree_hash,
             "files": pairs, "content_hash": content_hash}
         contents["artifact.json"] = io.dump_json(artifact)
-        market = io.dump_json(marketplace([spec], host))
         market_relative = marketplace_path(host)
-        files[f"{host}/{market_relative}"] = market
+        market = None
+        index["hosts"][host] = {}
+        if market_relative is not None:
+            market = marketplace([spec], host)
+            market_bytes = io.dump_json(market)
+            files[f"{host}/{market_relative}"] = market_bytes
+            index["hosts"][host] = {"marketplace": f"{host}/{market_relative}", "marketplace_sha256": io.sha256(market_bytes)}
         files.update({f"{host}/{spec.product_id}/{name}": payload for name, payload in contents.items()})
-        download = {f"{spec.product_id}/{name}": payload for name, payload in contents.items()}
-        download[market_relative] = market
         archive_relative = f"{host}/{download_name(spec.product_id, spec.version, host)}"
-        raw = download_bytes(contents, spec.product_id, host, marketplace([spec], host))
+        raw = download_bytes(contents, spec.product_id, host, market)
         files[archive_relative] = raw
-        index["hosts"][host] = {"marketplace": f"{host}/{market_relative}", "marketplace_sha256": io.sha256(market)}
         plugin["hosts"][host] = {"package_dir": f"{host}/{spec.product_id}", "package_content_hash": content_hash,
             **download_index(archive_relative, raw, host), "files_count": len(pairs)}
     files["index.json"] = io.dump_json(index)
@@ -59,14 +61,16 @@ def package_outputs(spec, provenance):
 
 
 def _schema(schema_version, hosts):
-    if type(schema_version) is not int or schema_version not in (1, 2, 3):
-        raise DataError("release manifest schema must be 1, 2 or 3")
-    if "dsh" in hosts and schema_version != 3:
+    if type(schema_version) is not int or schema_version not in (1, 2, 3, 4):
+        raise DataError("release manifest schema must be 1, 2, 3 or 4")
+    if ("antigravity" in hosts) != (schema_version == 4):
+        raise DataError("release manifest schema 4 is required exactly for Antigravity")
+    if "dsh" in hosts and schema_version < 3:
         raise DataError("DSH release manifest requires schema 3")
 
 
 def payload(spec, capture, provenance, report, schema_version=_DEFAULT_SCHEMA):
-    schema_version = (3 if "dsh" in spec.hosts else 2) if schema_version is _DEFAULT_SCHEMA else schema_version
+    schema_version = package_index_schema(spec.hosts) if schema_version is _DEFAULT_SCHEMA else schema_version
     _schema(schema_version, spec.hosts)
     packages = package_outputs(spec, provenance)
     files = {f"packages/{relative}": data for relative, data in packages.items()}
@@ -85,14 +89,13 @@ def payload(spec, capture, provenance, report, schema_version=_DEFAULT_SCHEMA):
         base = f"submissions/{channel}"
         files.update({f"{base}/plugins/{spec.product_id}/{name}": data for name, data in source.items()})
         files[f"{base}/{spec.product_id}-{spec.version}.zip"] = zip_bytes({f"{spec.product_id}/{name}": data for name, data in source.items()})
-        market = marketplace([spec], host)
-        if host == "dsh":
-            pass  # Its official Git index is a structural preview, not a local path source.
-        elif host == "codex":
-            market["plugins"][0]["source"] = {"source": "local", "path": f"./plugins/{spec.product_id}"}
-        else:
-            market["plugins"][0]["source"] = f"./plugins/{spec.product_id}"
-        files[f"{base}/{marketplace_path(host)}"] = io.dump_json(market)
+        if market_relative := marketplace_path(host):
+            market = marketplace([spec], host)
+            if host == "codex":
+                market["plugins"][0]["source"] = {"source": "local", "path": f"./plugins/{spec.product_id}"}
+            elif host != "dsh":
+                market["plugins"][0]["source"] = f"./plugins/{spec.product_id}"
+            files[f"{base}/{market_relative}"] = io.dump_json(market)
     inputs = {"schema_version": 1, "product_id": spec.product_id, "version": spec.version,
         "source_tree_hash": spec.source_tree_hash, "product": spec.manifest, "release_config": capture.config,
         "source_files": [[name, io.sha256(data)] for name, data in sorted(spec.inputs.items())],
@@ -113,7 +116,7 @@ def payload(spec, capture, provenance, report, schema_version=_DEFAULT_SCHEMA):
 
 
 def record(spec, provenance, report, files, schema_version=_DEFAULT_SCHEMA):
-    schema_version = (3 if "dsh" in spec.hosts else 2) if schema_version is _DEFAULT_SCHEMA else schema_version
+    schema_version = package_index_schema(spec.hosts) if schema_version is _DEFAULT_SCHEMA else schema_version
     _schema(schema_version, spec.hosts)
     pairs = file_hashes(files)
     return {"schema_version": schema_version, "product_id": spec.product_id, "version": spec.version,

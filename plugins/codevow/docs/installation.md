@@ -18,3 +18,10 @@ The desktop app bundles Node.js and pnpm and needs no separate npm CLI installat
 
 For configuration, task records and optional project file staging, see
 [Using CodeVow](usage.md).
+
+## Google Antigravity
+
+The current source candidate adds this native target. After publication, use the
+[Antigravity guide](../../../docs/installation.md#google-antigravity) and its
+immutable GitHub version path. Existing released packages do not include this
+adapter. Native installation, loading and skill behavior remain unverified.

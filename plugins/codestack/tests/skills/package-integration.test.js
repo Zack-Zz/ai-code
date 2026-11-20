@@ -53,13 +53,13 @@ function listFiles(directory, prefix = '') {
   });
 }
 
-test('trusted tooling builds and independently checks all four host packages', () => {
+test('trusted tooling builds and independently checks all declared host packages', () => {
   withSourceFixture(({ root, plugin, temporary }) => {
     const output = path.join(temporary, 'packages');
     succeeds(runTool(root, 'build', '--plugin', identity, '--host', 'all', '--output', output));
     const index = JSON.parse(fs.readFileSync(path.join(output, 'index.json'), 'utf8'));
     const packages = index.plugins[identity].hosts;
-    assert.deepEqual(Object.keys(packages).sort(), ['claude', 'codex', 'dsh', 'zcode']);
+    assert.deepEqual(Object.keys(packages).sort(), ['antigravity', 'claude', 'codex', 'dsh', 'zcode']);
 
     for (const [host, entry] of Object.entries(packages)) {
       const packageRoot = path.join(output, entry.package_dir);
@@ -80,6 +80,19 @@ test('trusted tooling builds and independently checks all four host packages', (
         !relative.split('/').some((part) => ['tests', 'evals', 'AGENTS.md'].includes(part))),
       'Development instructions, tests and evaluation fixtures must not enter a host package.');
     }
+
+    const antigravityPackage = path.join(output, packages.antigravity.package_dir);
+    const antigravityManifest = JSON.parse(fs.readFileSync(path.join(antigravityPackage, 'plugin.json'), 'utf8'));
+    assert.equal(antigravityManifest.$schema, 'https://antigravity.google/schemas/v1/plugin.json');
+    assert.equal(antigravityManifest.name, identity);
+    assert.equal(antigravityManifest.displayName, 'CodeStack');
+    assert.equal(antigravityManifest.logo, iconPath);
+    assert.ok(antigravityManifest.suggestedPrompts.length <= 3);
+    assert.ok(!fs.existsSync(path.join(output, 'antigravity/marketplace.json')));
+    const nativeFiles = listFiles(antigravityPackage);
+    assert.ok(!nativeFiles.some(relative => relative.startsWith('agents/') ||
+      relative.endsWith('openai.yaml') || relative.endsWith('.js') ||
+      relative === 'package.json' || relative === 'cordis.patch.yml'));
 
     const codexPackage = path.join(output, packages.codex.package_dir);
     const codexManifest = JSON.parse(fs.readFileSync(path.join(codexPackage, 'plugin.json'), 'utf8'));
@@ -102,14 +115,14 @@ test('trusted release tools prepare and independently verify CodeStack for all d
     const checked = succeeds(runTool(root, 'release', 'check', '--plugin', identity, '--mode', 'draft'));
     const report = JSON.parse(checked.stdout);
     assert.equal(report.ok, true);
-    assert.deepEqual(report.pending_acceptance, ['claude', 'codex', 'dsh', 'zcode']);
+    assert.deepEqual(report.pending_acceptance, ['antigravity', 'claude', 'codex', 'dsh', 'zcode']);
     assert.equal(report.publication_ready, false, 'Local checks must not claim frozen-source publication readiness.');
     const output = path.join(temporary, 'release-bundle');
     succeeds(runTool(root, 'release', 'prepare', '--plugin', identity, '--mode', 'draft', '--output', output));
     const verified = succeeds(runTool(root, 'release', 'verify', '--plugin', identity, '--path', output));
     assert.equal(JSON.parse(verified.stdout).ok, true);
     const record = JSON.parse(fs.readFileSync(path.join(output, 'release.json'), 'utf8'));
-    for (const host of ['claude', 'codex', 'dsh', 'zcode']) {
+    for (const host of ['antigravity', 'claude', 'codex', 'dsh', 'zcode']) {
       assert.ok(fs.existsSync(path.join(output, 'installers', `${identity}-${record.version}-${host}-plugin.${host === 'dsh' ? 'tgz' : 'zip'}`)));
       const packageRoot = path.join(output, 'packages', host, identity);
       for (const name of ['README.md', 'README_CN.md']) {

@@ -51,6 +51,7 @@ Choose the desktop or CLI instructions for your host:
 | Claude Code | [Desktop app and CLI](docs/installation.md#claude-code) |
 | ZCode | [Desktop app and macOS bundled CLI](docs/installation.md#zcode) |
 | DeepSeek Harness | [Desktop app and standalone npm CLI](docs/installation.md#deepseek-harness) |
+| Google Antigravity | [Desktop app and CLI via GitHub](docs/installation.md#google-antigravity) |
 
 Run the following CLI commands in your system terminal, one at a time after
 each succeeds. If you have already added `ai-code` with the correct source,
@@ -87,7 +88,8 @@ and the CLI bundled with the macOS app.
 
 For detailed installation steps and plugin usage:
 
-- [Installation guide](docs/installation.md): full marketplace registration and installation steps, downloaded packages, updates, removal and troubleshooting for Claude Code, Codex, ZCode and DeepSeek Harness.
+- [Installation guide](docs/installation.md): marketplace and GitHub installation,
+  updates, removal and troubleshooting across supported hosts.
 - [CodeVow guide](plugins/codevow/README.md): task examples, collaboration modes and project configuration.
 - [Agent Delegation guide](plugins/ai-agent-delegation/README.md): requirements, handoffs, continuation and cancellation.
 - [CodeStack guide](plugins/codestack/README.md): supported rule scope, automatic selection and marketplace availability.

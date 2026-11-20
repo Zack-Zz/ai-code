@@ -23,8 +23,9 @@ from .listings import validate_icon_url
 HASH = re.compile(r"[0-9a-f]{64}")
 REVISION = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 LEGACY_TRANSPORTS = {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip"}
-TRANSPORTS = dict(LEGACY_TRANSPORTS, dsh="git-subdir")
-GIT_HOSTS = {"codex", "dsh"}
+SCHEMA3_TRANSPORTS = dict(LEGACY_TRANSPORTS, dsh="git-subdir")
+TRANSPORTS = dict(SCHEMA3_TRANSPORTS, antigravity="git-subdir")
+GIT_HOSTS = {"codex", "dsh", "antigravity"}
 MARKETPLACE = {"branch": "main", "name": "ai-code", "version_policy": "latest-stable"}
 INDEX_PATH = "published/index.json"
 LOCK_PATH = "published/marketplaces.lock.json"
@@ -83,12 +84,12 @@ def repository_url(value):
 def validate_config(config):
     version = config.get("schema_version") if isinstance(config, dict) else None
     fields = {"schema_version", "source_branch", "marketplace", "transports"}
-    if version == 3:
+    if version in (3, 4):
         fields.add("identity_replacements")
     _object(config, fields, "distribution config")
-    if type(version) is not int or version not in (2, 3):
-        raise DataError("distribution config requires schema 2 or 3")
-    if config["transports"] != (TRANSPORTS if version == 3 else LEGACY_TRANSPORTS):
+    if type(version) is not int or version not in (2, 3, 4):
+        raise DataError("distribution config requires schema 2, 3 or 4")
+    if config["transports"] != {2: LEGACY_TRANSPORTS, 3: SCHEMA3_TRANSPORTS, 4: TRANSPORTS}[version]:
         raise DataError("unsupported distribution transports")
     if config["source_branch"] != "main" or config["marketplace"] != MARKETPLACE:
         raise DataError("distribution requires main and one latest-stable marketplace")
@@ -232,6 +233,8 @@ def _entry(record, host):
 def _markets(channel, records, pointers, *, legacy=False):
     result = {}
     for host in (tuple(LEGACY_TRANSPORTS) if legacy else tuple(TRANSPORTS)):
+        if marketplace_path(host) is None:
+            continue
         entries = []
         for identity, pointer in sorted(pointers.items()):
             record = records[_record_path(identity, pointer["version"])]
@@ -245,10 +248,10 @@ def _markets(channel, records, pointers, *, legacy=False):
 
 
 def _record(record, channel, repository, *, staged=False):
-    _object(record, RECORD_FIELDS if isinstance(record, dict) and record.get("schema_version") == 3 else LEGACY_RECORD_FIELDS, "distribution record")
-    if type(record["schema_version"]) is not int or record["schema_version"] not in (2, 3):
-        raise DataError("distribution record requires schema 2 or 3")
-    if record["schema_version"] == 3:
+    _object(record, RECORD_FIELDS if isinstance(record, dict) and record.get("schema_version") in (3, 4) else LEGACY_RECORD_FIELDS, "distribution record")
+    if type(record["schema_version"]) is not int or record["schema_version"] not in (2, 3, 4):
+        raise DataError("distribution record requires schema 2, 3 or 4")
+    if record["schema_version"] >= 3:
         _timestamp(record["release_published_at"])
     identity, version = record["product_id"], record["version"]
     if not isinstance(identity, str) or not ID_PATTERN.fullmatch(identity) or not isinstance(version, str) or not VERSION_PATTERN.fullmatch(version):
@@ -267,6 +270,9 @@ def _record(record, channel, repository, *, staged=False):
     hosts = record["hosts"]
     if not isinstance(hosts, dict) or not hosts or not set(hosts) <= set(HOSTS):
         raise DataError("record hosts must be a nonempty supported subset")
+    supported = {2: LEGACY_TRANSPORTS, 3: SCHEMA3_TRANSPORTS, 4: TRANSPORTS}[record["schema_version"]]
+    if not set(hosts) <= set(supported):
+        raise DataError("record hosts differ from its frozen schema")
     for field in ("pending_acceptance", "accepted_hosts"):
         value = readiness[field]
         if not isinstance(value, list) or len(value) != len(set(value)) or not set(value) <= set(hosts):
@@ -278,14 +284,18 @@ def _record(record, channel, repository, *, staged=False):
     if not isinstance(readiness["package_content_hashes"], dict) or set(readiness["package_content_hashes"]) != set(hosts):
         raise DataError("readiness package inventory differs from hosts")
     for host, item in hosts.items():
-        _object(item, HOST_FIELDS | ({"installer_format"} if record["schema_version"] == 3 else set()), "record host")
-        if record["schema_version"] == 3 and item["installer_format"] != ("npm-tgz" if host == "dsh" else "zip"):
+        _object(item, HOST_FIELDS | ({"installer_format"} if record["schema_version"] >= 3 else set()), "record host")
+        if record["schema_version"] >= 3 and item["installer_format"] != ("npm-tgz" if host == "dsh" else "zip"):
             raise DataError("record installer format differs from native host")
         _asset(item["asset"], repository, tag, f"{identity}-{version}-{host}-plugin.{'tgz' if host == 'dsh' else 'zip'}")
         _hash(item["package_content_hash"], "package content hash")
         if readiness["package_content_hashes"][host] != item["package_content_hash"]:
             raise DataError("record readiness/package hashes differ")
         entry = item["entry"]
+        if host == "antigravity":
+            if entry is not None:
+                raise DataError("Antigravity has no marketplace entry; entry must be null")
+            continue
         fields = {"name", "title", "description", "engines"} | ({"icon"} if isinstance(entry, dict) and "icon" in entry else set()) if host == "dsh" else ({"name", "version", "policy", "category"} if host == "codex" else {"name", "version", "description"})
         if isinstance(entry, dict):
             if host == "claude" and "displayName" in entry:
@@ -399,7 +409,7 @@ def _receipt(receipt, path, repository, files):
     _schema(receipt["schema_version"], "staged receipt")
     record = receipt["record"]
     _record(record, "stable", repository, staged=True)
-    if record["schema_version"] != 3 or any(item["revision"] is not None for item in git_installs(record).values()):
+    if record["schema_version"] not in (3, 4) or any(item["revision"] is not None for item in git_installs(record).values()):
         raise DataError("staged receipt must not contain a self-referencing distribution revision")
     if path != _stage_path(record["product_id"], record["version"]):
         raise DataError("staged receipt identity/path differs")
@@ -532,6 +542,8 @@ def check_plan(plan, expected_hash=None, expected_commit=None):
     repository = _repository(plan["repository"])
     record = plan["record"]
     _record(record, channel, repository, staged=True)
+    if not set(record["hosts"]) <= set(config["transports"]):
+        raise DataError("distribution config transports do not cover the planned hosts")
     for key in ("product_id", "version", "source_revision", "release_id"):
         if plan[key] != record[key]:
             raise DataError(f"plan {key} differs from its record")
@@ -554,6 +566,8 @@ def check_plan(plan, expected_hash=None, expected_commit=None):
 
 
 def _source_entry(spec, host):
+    if marketplace_path(host) is None:
+        return None
     entry = copy.deepcopy(marketplace_entry(spec, host))
     if host == "dsh":
         version = entry.pop("versions")[0]
@@ -614,9 +628,9 @@ def plan_distribution(root, spec, bundle, release_info, channel, market_files=No
         ids.add(asset["id"])
     contents = integrity.read_tree(bundle)
     manifest = integrity.record(contents)
-    if manifest["schema_version"] not in (2, 3):
-        raise DataError("hosted distribution requires release schema 2 or 3 installers")
-    record = {"schema_version": 3, "channel": channel, "product_id": spec.product_id, "version": spec.version,
+    if manifest["schema_version"] not in (2, 3, 4):
+        raise DataError("hosted distribution requires release schema 2, 3 or 4 installers")
+    record = {"schema_version": 4 if "antigravity" in spec.hosts else 3, "channel": channel, "product_id": spec.product_id, "version": spec.version,
               "repository": repository, "source_revision": provenance["source_revision"], "source_tree_hash": spec.source_tree_hash,
               "tag": canonical, "release_id": release_info["id"], "release_url": release_info["html_url"],
               "mode": channel_config["release_mode"], "readiness": copy.deepcopy(manifest["readiness"]),
@@ -701,7 +715,7 @@ def finalize_files(plan, distribution_revision=None):
             if install["revision"] is not None and install["revision"] != distribution_revision:
                 raise ConflictError("already deployed Git commit differs")
             install["revision"] = distribution_revision
-        if record["schema_version"] == 3:
+        if record["schema_version"] >= 3:
             record["git_installs"] = installs
         else:
             record["codex_revision"] = distribution_revision

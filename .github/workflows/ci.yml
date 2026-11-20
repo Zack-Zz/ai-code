@@ -59,7 +59,7 @@ jobs:
           source = json.loads(subprocess.check_output(tool + ["list"], text=True))["plugins"]
           output = Path(os.environ["RUNNER_TEMP"]) / "packages"
           index = json.loads((output / "index.json").read_text())
-          if index["schema_version"] != 3 or set(index["plugins"]) != {item["product_id"] for item in source}:
+          if index["schema_version"] != 4 or set(index["plugins"]) != {item["product_id"] for item in source}:
               raise SystemExit("build index differs from registered plugin inventory")
           for plugin in source:
               identity = plugin["product_id"]

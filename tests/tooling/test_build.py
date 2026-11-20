@@ -95,6 +95,33 @@ class BuildTests(unittest.TestCase):
                 result = self.check(extracted / name, host=host)
                 self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
 
+    def test_antigravity_build_contains_native_plugin_without_a_marketplace(self):
+        manifest_path = self.first / "product.json"
+        product = json.loads(manifest_path.read_text())
+        write_json(manifest_path, dict(product, hosts=["codex", "antigravity"]))
+        path = self.first / "adapters/antigravity/plugin.json"
+        write_json(path, {
+            "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+            "description": "AI capability ai-one",
+            "suggestedPrompts": ["Run the ask skill."],
+        })
+        index = self.build(host="antigravity")
+        self.assertEqual(index["hosts"], {"antigravity": {}})
+        package = self.output / "antigravity/ai-one"
+        manifest = json.loads((package / "plugin.json").read_text())
+        self.assertEqual(
+            {key: manifest[key] for key in ("name", "displayName", "version")},
+            {"name": "ai-one", "displayName": "ai-one", "version": "1.0.0"},
+        )
+        self.assertTrue((package / "skills/ask/SKILL.md").is_file())
+        self.assertFalse((package / "skills/ask/agents").exists())
+        self.assertEqual(self.check(package, host="antigravity").returncode, 0)
+        with zipfile.ZipFile(self.output / "antigravity/ai-one-1.0.0.zip") as archive:
+            self.assertEqual(
+                {name: archive.read(name) for name in archive.namelist()},
+                {f"ai-one/{name}": raw for name, raw in tree_bytes(package).items()},
+            )
+
     def test_selected_build_excludes_sibling_and_reproduces_identical_bytes(self):
         index = self.build("--plugin", "ai-two")
         self.assertEqual(set(index["plugins"]), {"ai-two"})

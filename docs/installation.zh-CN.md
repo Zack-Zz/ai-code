@@ -9,12 +9,13 @@ CodeVow **1.0.8**（`codevow`）和 CodeStack **1.0.1**（`codestack`）已发�
 
 ## 选择你使用的应用
 
-| 宿主 | 桌面端操作 | 终端操作 | 市场来源 |
+| 宿主 | 桌面端操作 | 终端操作 | 安装来源 |
 |---|---|---|---|
 | Codex | [桌面端](#codex-桌面端) | [CLI](#codex-cli) | `Zack-Zz/ai-code`，`main` 分支 |
 | Claude Code | [桌面端 Code 页](#claude-code-桌面端) | [CLI](#claude-code-cli) | Claude 专用清单或 `Zack-Zz/ai-code#main` |
 | ZCode | [桌面端](#zcode-桌面端) | [macOS 内置 CLI](#zcode-cli) | 根目录 `marketplace.json` 完整 URL |
 | DeepSeek Harness | [桌面端](#deepseek-harness-桌面端) | [独立 CLI / Web](#deepseek-harness-cli) | DSH 原生索引或 Release TGZ |
+| Google Antigravity | [桌面端](#antigravity-app) | [CLI](#antigravity-cli) | GitHub 版本目录或 Release ZIP |
 
 用户无需克隆本仓库或构建插件。桌面端使用各应用的原生插件管理。
 `sh` 命令块在系统终端执行，斜杠命令在编码助手会话内执行。每条命令成功后再执行下一条。
@@ -35,6 +36,40 @@ CodeVow **1.0.8**（`codevow`）和 CodeStack **1.0.1**（`codestack`）已发�
 如果新版本已经安装，只需清理仍存在的旧 ID。旧入口从市场退役后，本机的旧安装
 仍可能保留。不要手动修改插件缓存或全局配置。
 详见[身份迁移指南](migrations/2026-10-27-plugin-identities.zh-CN.md)。
+
+## Google Antigravity
+
+在[发行索引](../published/index.json)中查看每个插件的 `version`，并确认
+`installers` 含有 `antigravity`。从该宿主首次出现在正式发行记录时起可安装。
+
+### Antigravity CLI
+
+将各地址中的 `VERSION` 换成对应插件的已发布版本，
+再用 Google [Antigravity CLI](https://antigravity.google/docs/getting-started?tab=cli)
+执行对应的命令。
+
+```sh
+agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codevow/VERSION
+agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codestack/VERSION
+agy plugin list
+```
+
+安装地址指向 `main` 上的正式版本目录。更新时用同一命令安装新发布的版本。
+卸载使用 `agy plugin uninstall codevow`
+或 `agy plugin uninstall codestack`。
+
+### Antigravity App
+
+桌面端会读取通过 CLI 安装的插件。也可以从
+[GitHub Releases](https://github.com/Zack-Zz/ai-code/releases) 下载对应版本的
+`*-antigravity-plugin.zip`，把其中的 `codevow` 或 `codestack` 目录解压到
+`~/.gemini/config/plugins/`。各插件的 `plugin.json` 位于对应插件目录的根部。
+具体目录规则见 [Google 手动安装文档](https://antigravity.google/docs/plugins#manual-plugin-installation)。
+
+打开 **Customizations → Installed** 确认插件可见。桌面端和 CLI 的新会话都可用
+`/workflow` 调用 CodeVow，或用 `/code-standards` 调用 CodeStack。CodeVow
+提供工作流技能和可选的 Python 工具。Antigravity 包未注册专用 Reviewer
+智能体，也未配置由宿主强制执行的 Reviewer 工具权限。
 
 ## Codex
 

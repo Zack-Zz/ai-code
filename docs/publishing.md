@@ -174,6 +174,15 @@ the actual distribution commit under `published/codex/ID/VERSION/`.
 `published/marketplaces.lock.json` retain the public records and ownership hashes.
 The development version in `product.json` can differ from the published version.
 
+For Google Antigravity, schema 4 bundles contain a single-plugin ZIP with the
+native manifest, skills, and other registered resources. For a stable release,
+the existing Git distribution flow also stages the same bytes under
+`published/antigravity/ID/VERSION/`. The finalized release record binds that
+directory to the distribution commit and hashes. The CLI reads the versioned
+directory on `main`, and the desktop app can also use the GitHub Release ZIP.
+Antigravity adds no marketplace listing to this repository. See the
+[installation guide](installation.md#google-antigravity).
+
 Public manifests are generated, not edited manually. To check them read-only:
 
 ```sh

@@ -32,7 +32,7 @@ def package_files(spec, host):
     files.update({target: spec.inputs[source] for target, source in spec.host_files.get(host, {}).items()})
     manifest = copy.deepcopy(spec.adapters[host])
     manifest.update(name=spec.product_id, version=spec.version)
-    if host == "claude":
+    if host in ("claude", "antigravity"):
         manifest["displayName"] = spec.manifest["display_name"]
     if "publisher" in spec.manifest:
         manifest["author"] = copy.deepcopy(spec.manifest["publisher"])
@@ -63,14 +63,16 @@ def file_hashes(files):
 
 
 def manifest_path(host):
-    paths = {"claude": ".claude-plugin/plugin.json", "codex": "plugin.json", "zcode": ".zcode-plugin/plugin.json", "dsh": "package.json"}
+    paths = {"claude": ".claude-plugin/plugin.json", "codex": "plugin.json",
+             "zcode": ".zcode-plugin/plugin.json", "dsh": "package.json", "antigravity": "plugin.json"}
     if host not in paths:
         raise DataError(f"unknown host: {host}")
     return paths[host]
 
 
 def marketplace_path(host):
-    paths = {"claude": ".claude-plugin/marketplace.json", "codex": ".agents/plugins/marketplace.json", "zcode": "marketplace.json", "dsh": "published/dsh/index.json"}
+    paths = {"claude": ".claude-plugin/marketplace.json", "codex": ".agents/plugins/marketplace.json",
+             "zcode": "marketplace.json", "dsh": "published/dsh/index.json", "antigravity": None}
     if host not in paths:
         raise DataError(f"unknown host: {host}")
     return paths[host]
@@ -114,6 +116,8 @@ def marketplace_entry(spec, host):
 
 
 def marketplace(specs, host):
+    if marketplace_path(host) is None:
+        raise DataError(f"host {host} uses direct plugin installation")
     if host == "dsh":
         return {"format": 1, "title": {"en": "ai-code-local", "zh": "ai-code 本地开发"},
                 "plugins": [marketplace_entry(spec, host) for spec in sorted(specs, key=lambda item: item.product_id)]}

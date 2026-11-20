@@ -139,7 +139,7 @@ def _checked_package(package_root) -> tuple[Path, dict, dict]:
         raise DataError("this action requires --package")
     package_root = Path(package_root).resolve()
     report = wpc.check_package(package_root, package_root.parent.name
-                               if package_root.parent.name in ("claude", "zcode", "codex")
+                               if package_root.parent.name in wproduct.HOSTS
                                else _host_of(package_root))
     if not report["ok"]:
         raise ToolError(f"package check failed: {report['problems']}")
@@ -158,6 +158,10 @@ def _host_of(package_root: Path) -> str:
     if (package_root / ".zcode-plugin" / "plugin.json").is_file():
         return "zcode"
     if (package_root / "plugin.json").is_file():
+        manifest = wio.load_json(package_root / "plugin.json", root=package_root)
+        if isinstance(manifest, dict) and manifest.get("$schema") == \
+                "https://antigravity.google/schemas/v1/plugin.json":
+            return "antigravity"
         return "codex"
     if (Path(package_root) / "package.json").is_file():
         return "dsh"

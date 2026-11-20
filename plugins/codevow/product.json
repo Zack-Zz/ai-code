@@ -2,14 +2,15 @@
   "schema_version": 2,
   "product_id": "codevow",
   "display_name": "CodeVow",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "license": "MIT",
   "hosts": [
     "claude",
     "codex",
     "zcode",
-    "dsh"
+    "dsh",
+    "antigravity"
   ],
   "host_listings": {
     "claude": {},

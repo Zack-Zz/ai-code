@@ -8,6 +8,18 @@ build helper uses `codevow-local`. See the
 [installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md).
 The entries below retain their dated release context, including earlier migration plans.
 
+## 1.0.9
+
+### English
+
+- Add a native Google Antigravity package with six workflow skills, linked references, and optional Python workflow tools.
+- Install from the versioned GitHub directory with the Antigravity CLI, or use the GitHub Release ZIP in the desktop app.
+
+### 中文
+
+- 新增 Google Antigravity 原生包，包含六个工作流技能、引用文件和可选的 Python 工作流工具。
+- Antigravity CLI 可从 GitHub 版本目录安装，桌面端可使用 GitHub Release ZIP。
+
 ## 1.0.8
 
 ### English

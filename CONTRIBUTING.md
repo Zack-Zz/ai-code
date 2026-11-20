@@ -71,7 +71,7 @@ python3 tooling/plugin_tool.py build --all --host all --output /tmp/ai-code-dev-
 
 The output must be absent or empty; use a new empty directory for another build.
 To work on one plugin, replace `--all` with `--plugin codevow`. Select
-`claude`, `codex`, `zcode`, `dsh` or `all` with `--host`.
+`claude`, `codex`, `zcode`, `dsh`, `antigravity` or `all` with `--host`.
 
 Check each generated package against trusted source. For CodeVow on Codex:
 
@@ -86,14 +86,16 @@ test group fails the suite.
 
 ## Try locally
 
-Each host subdirectory in the build contains the `ai-code-local` development
-marketplace. Register the directory for your coding assistant. For CodeVow on
-Codex:
+A build supplies development markets for hosts that use them. For CodeVow on
+Codex, register the `ai-code-local` marketplace:
 
 ```sh
 codex plugin marketplace add /tmp/ai-code-dev-packages/codex
 codex plugin add codevow@ai-code-local
 ```
+
+Antigravity uses a standalone package. Validate the generated directory with
+`agy plugin validate --strict /tmp/ai-code-dev-packages/antigravity/codevow`.
 
 For Claude Code and ZCode, follow the local-market steps in
 [downloaded package installation](docs/installation.md#downloaded-package-installation).

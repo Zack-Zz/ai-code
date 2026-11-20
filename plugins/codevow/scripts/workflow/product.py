@@ -27,7 +27,7 @@ _PRODUCT_KEYS = {
     "license", "core_skills", "shared_skills", "resources",
 }
 _PACKAGING_KEYS = {"hosts", "profiles", "generated_agents", "publisher", "host_listings", "host_resources", "generated_resources"}
-HOSTS = ("claude", "codex", "zcode", "dsh")
+HOSTS = ("claude", "codex", "zcode", "dsh", "antigravity")
 _CACHE_PARTS = {"__pycache__"}
 _INTERFACE_FIELDS = {"display_name", "short_description", "brand_color", "default_prompt",
                      "allow_implicit_invocation"}

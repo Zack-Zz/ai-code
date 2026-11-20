@@ -65,7 +65,7 @@ def _json(files, relative):
 
 def record(files):
     manifest = _json(files, "release.json")
-    if not isinstance(manifest, dict) or set(manifest) != FIELDS or type(manifest["schema_version"]) is not int or manifest["schema_version"] not in (1, 2, 3):
+    if not isinstance(manifest, dict) or set(manifest) != FIELDS or type(manifest["schema_version"]) is not int or manifest["schema_version"] not in (1, 2, 3, 4):
         raise DataError("release manifest fields/schema are invalid")
     for key, pattern in (("product_id", ID_PATTERN), ("version", VERSION_PATTERN), ("source_tree_hash", HASH), ("content_hash", HASH)):
         if not isinstance(manifest[key], str) or not pattern.fullmatch(manifest[key]):
@@ -127,17 +127,21 @@ def historical(previous):
     hosts = product.get("hosts")
     if not isinstance(hosts, list) or not hosts or len(set(hosts)) != len(hosts) or set(hosts) - set(HOSTS):
         raise DataError("previous release hosts are invalid")
-    if "dsh" in hosts and release["schema_version"] != 3:
+    if ("antigravity" in hosts) != (release["schema_version"] == 4):
+        raise DataError("release manifest schema 4 is required exactly for Antigravity")
+    if "dsh" in hosts and release["schema_version"] < 3:
         raise DataError("DSH release manifest requires schema 3")
     source_pairs = pairs(source.get("source_files"), "previous source inputs")
     release_pairs = pairs(source.get("release_files"), "previous release inputs")
     if "product.json" not in source_pairs or "release.json" not in release_pairs:
         raise DataError("previous input snapshot is incomplete")
     index = _json(files, "packages/index.json")
-    if not isinstance(index, dict) or type(index.get("schema_version")) is not int or index["schema_version"] not in (2, 3) or \
+    if not isinstance(index, dict) or type(index.get("schema_version")) is not int or index["schema_version"] not in (2, 3, 4) or \
             set(index.get("plugins", {})) != {identity} or set(index.get("hosts", {})) != set(hosts):
         raise DataError("previous package index has invalid schema/identity/host closure")
-    if "dsh" in hosts and index["schema_version"] != 3:
+    if ("antigravity" in hosts) != (index["schema_version"] == 4):
+        raise DataError("package index schema 4 is required exactly for Antigravity")
+    if "dsh" in hosts and index["schema_version"] < 3:
         raise DataError("DSH package index requires schema 3")
     plugin = index["plugins"][identity]
     if plugin.get("version") != version or plugin.get("source_tree_hash") != release["source_tree_hash"] or set(plugin.get("hosts", {})) != set(hosts):
@@ -172,23 +176,28 @@ def historical(previous):
         native = _json(package, manifest_path(host))
         if native.get("name") != identity or native.get("version") != version or native.get("author") != product.get("publisher"):
             raise DataError("previous native manifest identity/version/publisher is inconsistent")
-        market_relative = f"packages/{host}/{marketplace_path(host)}"
-        market = _json(files, market_relative)
-        market_entry = index["hosts"][host]
-        if market_entry.get("marketplace") != f"{host}/{marketplace_path(host)}" or market_entry.get("marketplace_sha256") != io.sha256(files[market_relative]):
-            raise DataError("previous marketplace path/hash is inconsistent")
-        if not isinstance(market, dict) or not isinstance(market.get("plugins"), list) or len(market["plugins"]) != 1:
-            raise DataError("previous market must contain exactly one plugin")
-        item = market["plugins"][0]
-        expected_source = {"source": "local", "path": f"./{identity}"} if host == "codex" else f"./{identity}"
-        version_matches = item.get("versions", [{}])[0].get("version") == version if host == "dsh" else item.get("version") == version and item.get("source") == expected_source
-        if item.get("name") != identity or not version_matches:
-            raise DataError("previous market identity/version/source is inconsistent")
         raw_zip = f"packages/{entry[archive_key]}"
         if entry.get(f"{archive_key}_sha256") != io.sha256(files[raw_zip]):
             raise DataError("previous ZIP checksum is inconsistent")
         expected_zip = {f"{identity}/{name}": data for name, data in package.items()}
-        expected_zip[marketplace_path(host)] = files[market_relative]
+        market_path = marketplace_path(host)
+        if market_path is not None:
+            market_relative = f"packages/{host}/{market_path}"
+            market = _json(files, market_relative)
+            market_entry = index["hosts"][host]
+            if market_entry.get("marketplace") != f"{host}/{market_path}" or market_entry.get("marketplace_sha256") != io.sha256(files[market_relative]):
+                raise DataError("previous marketplace path/hash is inconsistent")
+            if not isinstance(market, dict) or not isinstance(market.get("plugins"), list) or len(market["plugins"]) != 1:
+                raise DataError("previous market must contain exactly one plugin")
+            item = market["plugins"][0]
+            expected_source = {"source": "local", "path": f"./{identity}"} if host == "codex" else f"./{identity}"
+            version_matches = item.get("versions", [{}])[0].get("version") == version if host == "dsh" else item.get("version") == version and item.get("source") == expected_source
+            if item.get("name") != identity or not version_matches:
+                raise DataError("previous market identity/version/source is inconsistent")
+            expected_zip[market_path] = files[market_relative]
+            allowed.add(market_relative)
+        elif index["hosts"][host] != {}:
+            raise DataError("previous direct-install host must have no marketplace registration")
         if host == "dsh":
             if entry.get("archive_format") != "npm-tgz":
                 raise DataError("DSH archive must use npm-tgz format")
@@ -216,13 +225,15 @@ def historical(previous):
             raise DataError("previous source-kit closure differs from package/readme inputs")
         submission = f"submissions/{channel}/{identity}-{version}.zip"
         verify_zip(files[submission], {f"{identity}/{name}": data for name, data in kit.items()}, "previous submission")
-        registration = f"submissions/{channel}/{marketplace_path(host)}"
-        source_market = _json(files, registration)
-        expected_item = item if host == "dsh" else dict(item, source={"source": "local", "path": f"./plugins/{identity}"} if host == "codex" else f"./plugins/{identity}")
-        if source_market != dict(market, plugins=[expected_item]):
-            raise DataError("previous source-kit market differs from package identity/source")
+        if market_path is not None:
+            registration = f"submissions/{channel}/{market_path}"
+            source_market = _json(files, registration)
+            expected_item = item if host == "dsh" else dict(item, source={"source": "local", "path": f"./plugins/{identity}"} if host == "codex" else f"./plugins/{identity}")
+            if source_market != dict(market, plugins=[expected_item]):
+                raise DataError("previous source-kit market differs from package identity/source")
+            allowed.add(registration)
         allowed.update(name for name in files if name.startswith(base) or name.startswith(source_base))
-        allowed.update({market_relative, raw_zip, download, submission, registration})
+        allowed.update({raw_zip, download, submission})
     if set(files) != allowed:
         raise DataError("previous release contains unexpected file closure")
     return release, package_hashes

@@ -20,5 +20,5 @@ test('the public catalog discovers CodeStack as an independent plugin', () => {
   assert.ok(plugin, 'The successful public list response must include CodeStack.');
   assert.equal(plugin.display_name, 'CodeStack');
   assert.equal(plugin.path, 'plugins/codestack');
-  assert.deepEqual([...plugin.hosts].sort(), ['claude', 'codex', 'dsh', 'zcode']);
+  assert.deepEqual([...plugin.hosts].sort(), ['antigravity', 'claude', 'codex', 'dsh', 'zcode']);
 });

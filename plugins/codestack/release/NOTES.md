@@ -5,6 +5,18 @@
 Stable releases use the shared `ai-code` marketplace. Versions and availability
 are recorded in the [release index](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json).
 
+## 1.0.3
+
+### English
+
+- Add a native Google Antigravity package with the CodeStack skill and its shared reference files.
+- Install from the versioned GitHub directory with the Antigravity CLI, or use the GitHub Release ZIP in the desktop app.
+
+### 中文
+
+- 新增 Google Antigravity 原生包，包含 CodeStack 技能和共享参考文件。
+- Antigravity CLI 可从 GitHub 版本目录安装，桌面端可使用 GitHub Release ZIP。
+
 ## 1.0.2
 
 ### English

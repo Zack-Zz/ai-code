@@ -143,3 +143,12 @@ DSH 原生 bundle 的 `engines.dsh` 与 DSH peerDependencies 均声明最低
 手工解析策略并披露未验证项。工具白名单不构成独立文件系统沙箱，读取根沿用宿主权限。
 
 身份变更的卸载和重装步骤见[本次迁移说明](https://github.com/Zack-Zz/ai-code/blob/main/plugins/codevow/docs/2026-10-27-identity-migration.zh-CN.md)。
+
+## Google Antigravity
+
+`antigravity` 原生包提供技能、引用文件和 `plugin.json`。在
+[发行索引](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json)确认该插件已发布 Antigravity 版本后，
+CLI 可从 GitHub 版本目录安装，桌面端可读取同一份安装，也可使用 GitHub Release ZIP。
+具体步骤见[桌面端与 CLI 安装指南](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md#google-antigravity)。
+
+CodeVow 包含可选的 Python 工作流工具。Antigravity 版未注册专用 Reviewer 智能体。

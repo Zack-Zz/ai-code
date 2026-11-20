@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tooling"))
 from plugin_tools import io
 from plugin_tools.registry import load_catalog
 from plugin_tools.release import check_release, prepare_release, verify_release
+from plugin_tools.release import integrity
 from plugin_tools.rendering import file_hashes, package_files
 from tests.tooling.test_registry import add_plugin, write_json
 
@@ -91,6 +92,40 @@ class ReleaseTests(unittest.TestCase):
         self.assertTrue(report["ok"], report)
         self.assertFalse(report["publication_ready"])
         self.assertEqual(set(report["pending_acceptance"]), set(HOSTS))
+
+    def test_antigravity_release_keeps_the_plugin_without_marketplace_metadata(self):
+        product_path = self.plugin / "product.json"
+        product = json.loads(product_path.read_text())
+        write_json(product_path, dict(product, hosts=[*HOSTS, "antigravity"]))
+        write_json(self.plugin / "adapters/antigravity/plugin.json", {
+            "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+            "description": "Useful AI skills",
+            "logo": "assets/icon.svg",
+            "suggestedPrompts": ["Use the ask skill."],
+        })
+        config_path = self.plugin / "release.json"
+        config = json.loads(config_path.read_text())
+        config["acceptance"]["antigravity"] = None
+        write_json(config_path, config)
+
+        report = self.prepare()
+        self.assertIn("antigravity", report["pending_acceptance"])
+        self.assertEqual(integrity.historical(self.output)[0]["schema_version"], 4)
+        self.assertTrue(verify_release(self.root, self.spec(), self.output)["ok"])
+        host_files = {path.name for path in (self.output / "packages/antigravity").iterdir()}
+        self.assertEqual(host_files, {"ai-one", "ai-one-1.0.0.zip"})
+        archive_name = "ai-one-1.0.0-antigravity"
+        installer = self.output / "installers" / f"{archive_name}-plugin.zip"
+        download = self.output / "downloads" / f"{archive_name}.zip"
+        self.assertEqual(installer.read_bytes(), download.read_bytes())
+        with zipfile.ZipFile(installer) as archive:
+            self.assertIn("ai-one/plugin.json", archive.namelist())
+            self.assertIn("ai-one/skills/ask/SKILL.md", archive.namelist())
+            self.assertTrue(all(name.startswith("ai-one/") for name in archive.namelist()))
+        (self.output / "packages/antigravity/marketplace.json").write_text("{}")
+        refresh_record(self.output)
+        with self.assertRaisesRegex(io.DataError, "closure"):
+            integrity.historical(self.output)
 
     def test_prepare_three_host_downloads_and_submission_source_kits(self):
         self.prepare()

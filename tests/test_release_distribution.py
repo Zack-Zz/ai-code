@@ -1,4 +1,4 @@
-"""Committed distribution checks support actual public and workflow four-host builds."""
+"""Committed distribution checks support actual public and workflow builds."""
 
 import json
 import hashlib
@@ -43,18 +43,21 @@ class ReleaseDistributionTests(unittest.TestCase):
         return subprocess.run([sys.executable, str(CHECKER), "--committed", str(committed),
                                "--fresh", str(fresh)], capture_output=True, text=True)
 
-    def test_public_four_host_distribution_passes_with_claude_native_market(self):
+    def test_public_distribution_passes_with_marketplace_and_direct_install_hosts(self):
         committed, fresh = self.copied("public")
         index = json.loads((committed / "index.json").read_text())
-        self.assertEqual(set(index["hosts"]), {"claude", "codex", "zcode", "dsh"})
+        self.assertEqual(set(index["hosts"]), {"claude", "codex", "zcode", "dsh", "antigravity"})
+        self.assertEqual(index["schema_version"], 4)
+        self.assertEqual(index["hosts"]["antigravity"], {})
         self.assertTrue((committed / "claude/.claude-plugin/marketplace.json").is_file())
         result = self.check(committed, fresh)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_standalone_four_host_distribution_passes(self):
+    def test_standalone_distribution_passes_with_antigravity(self):
         committed, fresh = self.copied("standalone")
         index = json.loads((committed / "index.json").read_text())
-        self.assertEqual(set(index["hosts"]), {"claude", "codex", "zcode", "dsh"})
+        self.assertEqual(set(index["hosts"]), {"claude", "codex", "zcode", "dsh", "antigravity"})
+        self.assertNotIn("marketplace", index["hosts"]["antigravity"])
         result = self.check(committed, fresh)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 

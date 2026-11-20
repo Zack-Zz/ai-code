@@ -1,7 +1,7 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "source_branch": "main",
   "marketplace": {"branch": "main", "name": "ai-code", "version_policy": "latest-stable"},
-  "transports": {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip", "dsh": "git-subdir"},
+  "transports": {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip", "dsh": "git-subdir", "antigravity": "git-subdir"},
   "identity_replacements": {"ai-code-workflow": "codevow", "ai-code-stack-standards": "codestack"}
 }

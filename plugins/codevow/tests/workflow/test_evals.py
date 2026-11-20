@@ -558,7 +558,7 @@ class GradeTests(unittest.TestCase):
                 material = json.loads((run_dir / "deterministic-evidence.json").read_text())
                 self.assertEqual(len(material["commands"]), len(json.loads((REPO_ROOT / "product.json").read_text())["hosts"]))
                 self.assertEqual(set(material["observations"]["traceability"]["reports"]),
-                                 {"claude", "codex", "zcode", "dsh"})
+                                 set(json.loads((REPO_ROOT / "product.json").read_text())["hosts"]))
 
     def test_a25_checks_claude_native_metadata_separately_from_shared_bytes(self):
         prep = self.prepared("A25")

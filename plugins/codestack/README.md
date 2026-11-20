@@ -110,3 +110,11 @@ Invoke the skill with `/code-standards`. Independent
 official filesystem providers expose each plugin's bundled resources.
 
 See the [identity migration guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/migrations/2026-10-27-plugin-identities.md) for uninstall and reinstall steps.
+
+## Google Antigravity
+
+The native `antigravity` package includes skills, reference files and `plugin.json`.
+Check the [release index](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json) for available versions.
+The CLI installs from a versioned GitHub directory. The desktop app can use the
+same installation or the GitHub Release ZIP. See the
+[desktop and CLI installation guide](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.md#google-antigravity).

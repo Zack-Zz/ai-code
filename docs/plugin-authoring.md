@@ -280,9 +280,12 @@ collecting and rechecking registered plugin inputs. Do not treat a plugin
 subdirectory as a new trust root that permits following links in parent
 directories.
 
-The build output `<output>/index.json` uses schema_version 3 when DSH is included (legacy builds use 2). It records each
-package's path and hash under plugins/ID/hosts/HOST and aggregate marketplaces
-under hosts/HOST. Each plugin's artifact retains its own identity and provenance.
+The build index at `<output>/index.json` uses schema 4 with Antigravity, schema 3
+with DSH alone or alongside legacy hosts, and schema 2 for the legacy hosts.
+It records package paths and hashes under `plugins/ID/hosts/HOST` and marketplace
+registrations under `hosts/HOST`. Antigravity uses an empty host entry because
+it installs directly from a plugin directory. Each plugin's artifact retains
+its own identity and provenance.
 When changing one plugin, verify that sibling plugin contents and hashes are
 unaffected.
 

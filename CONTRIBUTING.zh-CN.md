@@ -67,7 +67,7 @@ python3 tooling/plugin_tool.py build --all --host all --output /tmp/ai-code-dev-
 
 输出目录必须不存在或为空；再次构建时使用新的空目录。只处理一个插件可将
 `--all` 改成 `--plugin codevow`，`--host` 可选 `claude`、`codex`、
-`zcode` 或 `all`。
+`zcode`、`dsh`、`antigravity` 或 `all`。
 
 用可信源码独立检查生成的包，以 CodeVow 的 Codex 包为例：
 
@@ -81,13 +81,17 @@ python3 tooling/plugin_tool.py package check \
 
 ## 本地试用
 
-构建目录的每个宿主子目录包含名为 `ai-code-local` 的开发市场。按你使用的
-编码助手注册对应目录；下面以 Codex 和 CodeVow 为例：
+使用市场的宿主会生成开发市场。以 Codex 和 CodeVow 为例，可以注册
+`ai-code-local`：
 
 ```sh
 codex plugin marketplace add /tmp/ai-code-dev-packages/codex
 codex plugin add codevow@ai-code-local
 ```
+
+Antigravity 使用独立插件包。用
+`agy plugin validate --strict /tmp/ai-code-dev-packages/antigravity/codevow`
+校验生成的目录。
 
 Claude Code 与 ZCode 的本地市场操作见[下载包安装](docs/installation.zh-CN.md#下载包安装)。
 试用后新建会话，检查技能和实际任务结果。修改源码后重新构建，在编码助手

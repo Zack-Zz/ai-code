@@ -51,8 +51,8 @@ def _dist_files(root, relative="dist"):
 def _validate_dist(root, specs):
     index, raw = io.read_json(root, "dist/index.json")
     fields = {"schema_version", "plugins", "hosts", "source_revision", "working_tree_dirty"}
-    if not isinstance(index, dict) or set(index) != fields or type(index["schema_version"]) is not int or index["schema_version"] not in (2, 3):
-        raise DataError("dist/index.json must match distribution schema 2 or 3")
+    if not isinstance(index, dict) or set(index) != fields or type(index["schema_version"]) is not int or index["schema_version"] not in (2, 3, 4):
+        raise DataError("dist/index.json must match distribution schema 2, 3 or 4")
     identities = {spec.product_id for spec in specs}
     hosts = {host for spec in specs for host in spec.hosts}
     if not isinstance(index["plugins"], dict) or set(index["plugins"]) != identities:
@@ -61,7 +61,12 @@ def _validate_dist(root, specs):
         raise DataError("distribution host inventory differs from declared source hosts")
     validated = {"dist/index.json": raw}
     for host in hosts:
-        relative = f"dist/{host}/{marketplace_path(host)}"
+        market = marketplace_path(host)
+        if market is None:
+            if index["schema_version"] < 4 or index["hosts"][host] != {}:
+                raise DataError(f"host without a marketplace requires an empty schema 4 registration: {host}")
+            continue
+        relative = f"dist/{host}/{market}"
         entry = index["hosts"][host]
         if not isinstance(entry, dict) or set(entry) != {"marketplace", "marketplace_sha256"} or entry["marketplace"] != relative.removeprefix("dist/"):
             raise DataError(f"invalid distribution marketplace registration: {host}")
@@ -154,7 +159,7 @@ def _receipt(root):
             type(receipt["schema_version"]) is not int or receipt["schema_version"] != 1 or
             not isinstance(receipt["files"], dict)):
         raise DataError("marketplaces.lock.json requires schema_version 1 and files only")
-    allowed = {marketplace_path(host) for host in HOSTS}
+    allowed = {marketplace_path(host) for host in HOSTS if marketplace_path(host) is not None}
     for relative, digest in receipt["files"].items():
         if relative not in allowed or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
             raise DataError(f"invalid marketplace ownership receipt entry: {relative}")
@@ -208,8 +213,8 @@ def _sync_development_repository(root, check=False):
     catalog_bytes = io.read_file(root, "catalog.json", limit=1024 * 1024)
     specs = load_catalog(root)
     hosts, captured = _validate_dist(root, specs)
-    expected = {marketplace_path(host): io.dump_json(_project_market(specs, host)) for host in HOSTS if host in hosts}
-    previous = {marketplace_path(host): _existing(root, marketplace_path(host)) for host in HOSTS}
+    expected = {marketplace_path(host): io.dump_json(_project_market(specs, host)) for host in HOSTS if host in hosts and marketplace_path(host) is not None}
+    previous = {marketplace_path(host): _existing(root, marketplace_path(host)) for host in HOSTS if marketplace_path(host) is not None}
     receipt, receipt_bytes = _receipt(root)
     problems = [f"missing or stale repository market: {relative}" for relative, payload in expected.items() if previous[relative] != payload]
     problems.extend(f"unexpected repository market for undeclared host: {relative}" for relative in previous if relative not in expected and previous[relative] is not None)
@@ -485,7 +490,7 @@ def initialize_public_market(root, *, migrate=False):
         return check_public_markets(root)
     specs = load_catalog(root)
     legacy = {marketplace_path(host): io.dump_json(_project_market(specs, host))
-              for host in HOSTS if any(host in spec.hosts for spec in specs)}
+              for host in HOSTS if marketplace_path(host) is not None and any(host in spec.hosts for spec in specs)}
     if journal_raw is None:
         _, old_raw = _receipt(root)
         _initial_snapshot(current, expected, legacy, old_raw, migrate)

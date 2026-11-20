@@ -1,5 +1,16 @@
 English | [简体中文](support-matrix.zh-CN.md)
 
+## Source candidate: Google Antigravity
+
+The source candidate declares a fifth native target, `antigravity`. Its package
+contains root `plugin.json`, shared skills, references and Python helpers; it has
+no marketplace manifest or DSH runtime resources. Installation will use an
+immutable GitHub version directory after a supporting release is published; see
+[Google Antigravity installation](../../../docs/installation.md#google-antigravity).
+`acceptance.antigravity` is null. Native loading, automatic selection, reviewer
+capabilities and task outcomes remain unverified. Local package and helper checks
+do not establish host acceptance. The current published release is described below.
+
 ## Current release (CodeVow 1.0.8)
 
 The current release is `codevow` 1.0.8, with Claude Code, Codex, ZCode and DSH

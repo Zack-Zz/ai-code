@@ -15,3 +15,10 @@ CodeVow `codevow` 1.0.7 已发布，其 DSH 安装包和公开索引在 `engines
 桌面端自带 Node.js 与 pnpm，无需另行安装 npm CLI。
 
 配置、任务记录和可选项目文件暂存见[使用 CodeVow](usage.zh-CN.md)。
+
+## Google Antigravity
+
+当前源码候选新增此原生目标。发布后按
+[Antigravity 指南](../../../docs/installation.zh-CN.md#google-antigravity)
+使用 GitHub 上不可变的版本路径安装。既有发行包不含此适配。原生安装、加载和
+技能行为仍待真实宿主验证。

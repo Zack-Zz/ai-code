@@ -92,14 +92,15 @@
     "hosts": {
       "type": "array",
       "minItems": 1,
-      "maxItems": 4,
+      "maxItems": 5,
       "uniqueItems": true,
       "items": {
         "enum": [
           "claude",
           "codex",
           "zcode",
-          "dsh"
+          "dsh",
+          "antigravity"
         ]
       }
     },
@@ -289,6 +290,35 @@
           }
         },
         "dsh": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "target",
+              "include"
+            ],
+            "properties": {
+              "source": {
+                "type": "string",
+                "pattern": "^[^/].*$"
+              },
+              "target": {
+                "type": "string",
+                "pattern": "^[^/].*$"
+              },
+              "include": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "antigravity": {
           "type": "array",
           "items": {
             "type": "object",

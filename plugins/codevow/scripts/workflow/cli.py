@@ -64,14 +64,14 @@ def _build_parser() -> argparse.ArgumentParser:
     tk.add_argument("--id", required=True)
 
     build_parser = sub.add_parser("build", help="build host packages deterministically")
-    build_parser.add_argument("--host", required=True, choices=["claude", "zcode", "codex", "dsh", "all"])
+    build_parser.add_argument("--host", required=True, choices=[*wproduct.HOSTS, "all"])
     build_parser.add_argument("--output", required=True)
 
     pcheck = sub.add_parser("package", help="package operations")
     package_sub = pcheck.add_subparsers(dest="package_command", required=True)
     pc = package_sub.add_parser("check", help="verify a built package")
     pc.add_argument("--path", required=True)
-    pc.add_argument("--host", required=True, choices=["claude", "zcode", "codex", "dsh"])
+    pc.add_argument("--host", required=True, choices=wproduct.HOSTS)
 
     files_parser = sub.add_parser("files", help="owned-file management")
     files_sub = files_parser.add_subparsers(dest="files_command", required=True)

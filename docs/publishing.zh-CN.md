@@ -149,6 +149,12 @@ schema 2 release bundle 包含 `packages/`、
 `published/marketplaces.lock.json` 保存公开记录及所有权哈希。
 `product.json` 的开发版本允许与已发布版本不同。
 
+Google Antigravity 使用 schema 4 发行包，其中的单插件 ZIP 包含原生清单、技能和
+其他已登记资源。正式发布沿用 Git 分发流程，将相同内容写入
+`published/antigravity/ID/VERSION/`，然后用正式记录绑定分发提交和文件哈希。
+CLI 从 `main` 的版本目录安装，桌面端也可使用 GitHub Release ZIP。
+Antigravity 不为本仓库生成市场清单。参见[安装指南](installation.zh-CN.md#google-antigravity)。
+
 公开清单由工具生成，不手工编辑。只读检查：
 
 ```sh

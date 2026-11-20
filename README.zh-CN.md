@@ -47,6 +47,7 @@ Agent Delegation 当前只有源码，尚未进入正式市场。
 | Claude Code | [桌面端与 CLI](docs/installation.zh-CN.md#claude-code) |
 | ZCode | [桌面端与 macOS 应用内置 CLI](docs/installation.zh-CN.md#zcode) |
 | DeepSeek Harness | [桌面端与独立 npm CLI](docs/installation.zh-CN.md#deepseek-harness) |
+| Google Antigravity | [桌面端与 CLI 的 GitHub 安装方式](docs/installation.zh-CN.md#google-antigravity) |
 
 在系统终端执行以下 CLI 命令，每条成功后再执行下一条。如果已使用正确来源
 添加 `ai-code`，从第二条命令的刷新市场步骤继续。
@@ -81,7 +82,7 @@ claude plugin install codevow@ai-code --scope user
 
 完整安装步骤和插件用法见以下指南：
 
-- [安装指南](docs/installation.zh-CN.md)：Claude Code、Codex、ZCode 和 DeepSeek Harness 的桌面端与 CLI 市场注册及安装步骤、下载包安装、更新、卸载及故障处理。
+- [安装指南](docs/installation.zh-CN.md)：各宿主的市场与 GitHub 安装、更新、卸载及故障处理。
 - [CodeVow 使用说明](plugins/codevow/README.zh-CN.md)：任务示例、协作模式和项目配置。
 - [Agent Delegation 使用说明](plugins/ai-agent-delegation/README.zh-CN.md)：依赖准备、任务派发、续接和取消。
 - [CodeStack 使用说明](plugins/codestack/README.zh-CN.md)：支持的规则范围、自动选择和市场可用状态。

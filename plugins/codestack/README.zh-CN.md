@@ -79,3 +79,10 @@ TypeScript 任务和不涉及文案的改动不因此引入国际化要求；Jav
 构建和包检查不能代替宿主验收。技能使用官方 `/code-standards` 显式调用。两个插件通过各自的官方文件系统提供方读取包内资源，启停互不替代。
 
 身份变更的卸载和重装步骤见[本次迁移说明](https://github.com/Zack-Zz/ai-code/blob/main/docs/migrations/2026-10-27-plugin-identities.zh-CN.md)。
+
+## Google Antigravity
+
+`antigravity` 原生包提供技能、引用文件和 `plugin.json`。在
+[发行索引](https://github.com/Zack-Zz/ai-code/blob/main/published/index.json)确认该插件已发布 Antigravity 版本后，
+CLI 可从 GitHub 版本目录安装，桌面端可读取同一份安装，也可使用 GitHub Release ZIP。
+具体步骤见[桌面端与 CLI 安装指南](https://github.com/Zack-Zz/ai-code/blob/main/docs/installation.zh-CN.md#google-antigravity)。

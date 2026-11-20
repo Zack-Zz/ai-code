@@ -108,26 +108,27 @@ def check_package(package_root, host, spec):
         # CPython caches are executable inputs. Matching a trusted source's
         # basename, timestamp and size does not authenticate their bytecode.
         problems.append(f"extra active file outside trusted closure: {relative}")
-    try:
-        market, _ = io.read_json(package_root.parent, marketplace_path(host))
-        fields = {"format", "title", "plugins"} if host == "dsh" else ({"name", "plugins", "owner"} if host == "claude" else {"name", "plugins"})
-        valid_identity = isinstance(market, dict) and ((market.get("format") == 1 and type(market.get("format")) is int and
-                          market.get("title") == {"en": "ai-code-local", "zh": "ai-code 本地开发"}) if host == "dsh" else market.get("name") == "ai-code-local")
-        if not isinstance(market, dict) or set(market) != fields or not valid_identity:
-            raise DataError("marketplace must be ai-code-local with native fields")
-        if host == "claude" and market["owner"] != {"name": "ai-code"}:
-            raise DataError("Claude marketplace owner must be the ai-code collection")
-        entries = market["plugins"]
-        if not isinstance(entries, list) or not all(isinstance(entry, dict) for entry in entries):
-            raise DataError("marketplace plugins must be a list of entries")
-        names = [entry.get("name") for entry in entries]
-        if not all(isinstance(name, str) for name in names) or len(set(names)) != len(names):
-            raise DataError("marketplace contains duplicate or invalid plugin identities")
-        matches = [entry for entry in entries if entry.get("name") == spec.product_id]
-        if matches != [marketplace_entry(spec, host)]:
-            problems.append("marketplace entry differs from trusted plugin identity/version/source")
-    except DataError as exc:
-        problems.append(f"invalid marketplace: {exc}")
+    if market_path := marketplace_path(host):
+        try:
+            market, _ = io.read_json(package_root.parent, market_path)
+            fields = {"format", "title", "plugins"} if host == "dsh" else ({"name", "plugins", "owner"} if host == "claude" else {"name", "plugins"})
+            valid_identity = isinstance(market, dict) and ((market.get("format") == 1 and type(market.get("format")) is int and
+                              market.get("title") == {"en": "ai-code-local", "zh": "ai-code 本地开发"}) if host == "dsh" else market.get("name") == "ai-code-local")
+            if not isinstance(market, dict) or set(market) != fields or not valid_identity:
+                raise DataError("marketplace must be ai-code-local with native fields")
+            if host == "claude" and market["owner"] != {"name": "ai-code"}:
+                raise DataError("Claude marketplace owner must be the ai-code collection")
+            entries = market["plugins"]
+            if not isinstance(entries, list) or not all(isinstance(entry, dict) for entry in entries):
+                raise DataError("marketplace plugins must be a list of entries")
+            names = [entry.get("name") for entry in entries]
+            if not all(isinstance(name, str) for name in names) or len(set(names)) != len(names):
+                raise DataError("marketplace contains duplicate or invalid plugin identities")
+            matches = [entry for entry in entries if entry.get("name") == spec.product_id]
+            if matches != [marketplace_entry(spec, host)]:
+                problems.append("marketplace entry differs from trusted plugin identity/version/source")
+        except DataError as exc:
+            problems.append(f"invalid marketplace: {exc}")
     return {"ok": not problems, "product_id": artifact["product_id"], "version": artifact["version"],
             "host": host, "content_hash": artifact["content_hash"],
             "source_tree_hash": artifact["source_tree_hash"], "files_checked": len(expected),

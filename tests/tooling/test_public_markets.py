@@ -223,6 +223,46 @@ class UnverifiedFrozenPublicSourceTests(FrozenPublicSourceTests):
     accepted_hosts = ("claude", "codex")
     unverified_hosts = ("zcode",)
 
+
+class AntigravityFrozenPublicSourceTests(unittest.TestCase):
+    def test_git_pinned_antigravity_and_pending_receipt_verify_without_a_marketplace(self):
+        class Fixture(FrozenPublicSourceTests):
+            accepted_hosts = ()
+
+            def configure_source(self):
+                path = self.case.plugin / "product.json"
+                product = json.loads(path.read_text())
+                write_json(path, dict(product, hosts=[*product["hosts"], "antigravity"]))
+                write_json(self.case.plugin / "adapters/antigravity/plugin.json", {
+                    "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+                    "description": "Useful AI skills", "logo": "assets/icon.svg",
+                    "suggestedPrompts": ["Use the ask skill."],
+                })
+                path = self.case.plugin / "release.json"
+                config = json.loads(path.read_text())
+                config["acceptance"]["antigravity"] = None
+                write_json(path, config)
+
+        case = Fixture()
+        case.setUp()
+        self.addCleanup(case.doCleanups)
+        current = markets.read_public_files(case.root)
+        record = json.loads(current["published/releases/ai-one/1.0.0.json"])
+        self.assertEqual(record["schema_version"], 4)
+        self.assertIsNone(record["hosts"]["antigravity"]["entry"])
+        self.assertEqual(record["git_installs"]["antigravity"]["revision"], case.installation)
+        self.assertTrue(markets.check_public_markets(case.root)["ok"])
+        self.assertNotIn("published/antigravity/index.json", current)
+        pending = markets._public_files_at(case.root, case.installation)
+        verified = markets.verify_staged_sources(case.root, pending)
+        self.assertEqual([item["product_id"] for item in verified], ["ai-one"])
+        manifest = "published/antigravity/ai-one/1.0.0/plugin.json"
+        with self.assertRaisesRegex(io.DataError, "missing or changed"):
+            markets.verify_staged_sources(case.root, dict(pending, **{manifest: b"{}"}))
+        (case.root / manifest).write_bytes(b"{}")
+        with self.assertRaisesRegex(io.DataError, "missing or changed"):
+            markets.check_public_markets(case.root)
+
 class PendingDistributionSourceTests(unittest.TestCase):
     def test_D_pending_passes_independent_source_check_and_tampered_receipt_fails(self):
         case = FrozenPublicSourceTests()

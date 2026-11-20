@@ -8,7 +8,7 @@ import tempfile
 import zipfile
 
 from . import io
-from .archives import download_name, download_bytes, download_index, verify_installer
+from .archives import download_name, download_bytes, download_index, package_index_schema, verify_installer
 from .io import ConflictError, DataError
 from .git_paths import reject_git_output
 from .package_check import check_package
@@ -66,7 +66,8 @@ def _verify_zip(path, spec, host, artifact):
     expected = {f"{spec.product_id}/{relative}": payload
                 for relative, payload in package_files(spec, host).items()}
     expected[f"{spec.product_id}/artifact.json"] = io.dump_json(artifact)
-    expected[marketplace_path(host)] = io.dump_json(marketplace([spec], host))
+    if market_path := marketplace_path(host):
+        expected[market_path] = io.dump_json(marketplace([spec], host))
     try:
         with zipfile.ZipFile(path) as archive:
             entries = archive.infolist()
@@ -103,7 +104,8 @@ def build_plugins(root, specs, output, hosts=HOSTS):
     _verify_inputs(active)
     revision, dirty = _git_state(Path(root))
     output.parent.mkdir(parents=True, exist_ok=True)
-    index = {"schema_version": 3 if any("dsh" in spec.hosts and "dsh" in hosts for spec in active) else 2, "plugins": {}, "hosts": {},
+    active_hosts = {host for spec in active for host in spec.hosts if host in hosts}
+    index = {"schema_version": package_index_schema(active_hosts), "plugins": {}, "hosts": {},
              "source_revision": revision, "working_tree_dirty": dirty}
     with tempfile.TemporaryDirectory(prefix=".ai-plugin-build-", dir=output.parent) as temporary:
         stage = Path(temporary) / "dist"
@@ -114,10 +116,12 @@ def build_plugins(root, specs, output, hosts=HOSTS):
                 continue
             host_root = stage / host
             market_rel = marketplace_path(host)
-            market_bytes = io.dump_json(marketplace(supported, host))
-            _write_bytes(host_root, {market_rel: market_bytes})
-            index["hosts"][host] = {"marketplace": f"{host}/{market_rel}",
-                                     "marketplace_sha256": io.sha256(market_bytes)}
+            index["hosts"][host] = {}
+            if market_rel is not None:
+                market_bytes = io.dump_json(marketplace(supported, host))
+                _write_bytes(host_root, {market_rel: market_bytes})
+                index["hosts"][host] = {"marketplace": f"{host}/{market_rel}",
+                                         "marketplace_sha256": io.sha256(market_bytes)}
             for spec in supported:
                 files = package_files(spec, host)
                 pairs = file_hashes(files)
@@ -140,7 +144,8 @@ def build_plugins(root, specs, output, hosts=HOSTS):
                     verify_installer(raw, files, spec.product_id, host)
                 else:
                     download = {f"{spec.product_id}/{name}": value for name, value in files.items()}
-                    download[market_rel] = io.dump_json(marketplace([spec], host))
+                    if market_rel is not None:
+                        download[market_rel] = io.dump_json(marketplace([spec], host))
                     _zip(host_root / archive_name, download)
                     _verify_zip(host_root / archive_name, spec, host, artifact)
                     raw = (host_root / archive_name).read_bytes()

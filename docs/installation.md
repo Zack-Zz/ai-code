@@ -10,12 +10,13 @@ Each plugin is installed independently; you can use either or both.
 
 ## Choose your application
 
-| Host | Desktop instructions | Terminal instructions | Marketplace source |
+| Host | Desktop instructions | Terminal instructions | Installation source |
 |---|---|---|---|
 | Codex | [Desktop](#codex-desktop) | [CLI](#codex-cli) | `Zack-Zz/ai-code`, branch `main` |
 | Claude Code | [Desktop Code tab](#claude-code-desktop) | [CLI](#claude-code-cli) | Claude-specific manifest or `Zack-Zz/ai-code#main` |
 | ZCode | [Desktop](#zcode-desktop) | [Bundled macOS CLI](#zcode-cli) | Root `marketplace.json` URL |
 | DeepSeek Harness | [Desktop](#deepseek-harness-desktop) | [Standalone CLI / Web](#deepseek-harness-cli) | Native DSH index or Release TGZ |
+| Google Antigravity | [App](#antigravity-app) | [CLI](#antigravity-cli) | GitHub version directory or Release ZIP |
 
 You do not need to clone this repository or build a plugin. Desktop installation
 uses each application's native plugin controls. Run `sh` blocks in a system
@@ -40,6 +41,43 @@ If the new versions are already installed, remove only the remaining old IDs.
 A retired entry can disappear from the market while its old local installation
 still exists. Do not edit plugin caches or global settings by hand.
 See the [migration guide](migrations/2026-10-27-plugin-identities.md).
+
+## Google Antigravity
+
+In the [release index](../published/index.json), look up each plugin's
+`version` and check that `installers` includes `antigravity`.
+Availability starts with the first stable release that lists this host.
+
+### Antigravity CLI
+
+Replace `VERSION` in each URL with the listed version for that plugin,
+then run the corresponding command with Google's
+[Antigravity CLI](https://antigravity.google/docs/getting-started?tab=cli).
+
+```sh
+agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codevow/VERSION
+agy plugin install https://github.com/Zack-Zz/ai-code/tree/main/published/antigravity/codestack/VERSION
+agy plugin list
+```
+
+The URL selects the published version directory on `main`. To update, install
+the new published version using the same command. To remove a plugin, run
+`agy plugin uninstall codevow` or `agy plugin uninstall codestack`.
+
+### Antigravity App
+
+The App sees plugins installed through the CLI. To install without the CLI,
+download the corresponding `*-antigravity-plugin.zip` from
+[GitHub Releases](https://github.com/Zack-Zz/ai-code/releases). Extract the
+`codevow` or `codestack` folder into `~/.gemini/config/plugins/`. Its
+`plugin.json` must be at the root of that plugin folder. See Google's
+[manual installation guide](https://antigravity.google/docs/plugins#manual-plugin-installation).
+
+Open **Customizations → Installed** to verify the plugins. In a new
+conversation in either surface, use `/workflow` for CodeVow or
+`/code-standards` for CodeStack. CodeVow includes its workflow skills and
+optional Python tools. The Antigravity package does not register a dedicated
+Reviewer agent or host-enforced Reviewer tool restrictions.
 
 ## Codex
 

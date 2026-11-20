@@ -69,7 +69,9 @@ def _adapter_inputs(spec=None):
         if host == "dsh":
             adapter_files.append("adapters/dsh/package.json")
             continue
-        adapter_files.extend([f"adapters/{host}/plugin.json", f"adapters/{host}/marketplace.json"])
+        adapter_files.append(f"adapters/{host}/plugin.json")
+        if host != "antigravity":
+            adapter_files.append(f"adapters/{host}/marketplace.json")
         if host in ("claude", "zcode"):
             adapter_files.append(f"adapters/{host}/agents/workflow-reviewer.md")
     if "codex" in hosts:
@@ -83,7 +85,7 @@ def _shared_repository():
         for candidate in (base, *base.parents):
             if (candidate / "tooling/plugin_tools/registry.py").is_file():
                 return candidate
-    raise DataError("DSH builds require the ai-code source repository and its shared tooling")
+    raise DataError("Native host builds require the ai-code source repository and its shared tooling")
 
 
 def _public_spec(source_root):
@@ -96,13 +98,13 @@ def _public_spec(source_root):
         root = Path(source_root).resolve()
         return load_product(root, catalog_path="plugins/codevow", boundary_root=root)
     except Exception as exc:
-        raise DataError(f"shared DSH source validation failed: {exc}") from exc
+        raise DataError(f"shared native source validation failed: {exc}") from exc
     finally:
         sys.path.remove(tooling)
 
 
 def _source_tree_hash(spec, inputs=None) -> str:
-    if "dsh" in spec.hosts:
+    if set(spec.hosts) & {"dsh", "antigravity"}:
         return _public_spec(spec.root).source_tree_hash
     def digest(relative):
         return (wio.sha256_bytes(inputs[relative]) if inputs is not None else
@@ -406,8 +408,8 @@ def build_packages(source_root: Path, hosts, output_root: Path) -> dict:
             raise DataError(f"build output cannot be inside a Git metadata directory: {metadata}")
     spec = wproduct.load_product(source_root)
     requested = list(spec.hosts) if list(hosts) == ["all"] else list(hosts)
-    if "dsh" in requested:
-        # The native TGZ implementation lives in the shared maintenance layer.
+    if set(requested) & {"dsh", "antigravity"}:
+        # Native TGZ and Antigravity implementations live in the shared maintenance layer.
         # Installed runtime tools do not ship source adapters or a second builder.
         import sys
         repository = _shared_repository()
@@ -431,7 +433,7 @@ def build_packages(source_root: Path, hosts, output_root: Path) -> dict:
         except Exception as exc:
             if isinstance(exc, DataError):
                 raise
-            raise DataError(f"shared DSH build failed: {exc}") from exc
+            raise DataError(f"shared native build failed: {exc}") from exc
         finally:
             sys.path.remove(tooling)
     inputs = _capture_inputs(spec)

@@ -2,7 +2,7 @@
   "schema_version": 2,
   "product_id": "codestack",
   "display_name": "CodeStack",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "repository": "https://github.com/Zack-Zz/ai-code",
   "license": "MIT",
   "publisher": {
@@ -13,7 +13,8 @@
     "claude",
     "codex",
     "zcode",
-    "dsh"
+    "dsh",
+    "antigravity"
   ],
   "host_listings": {
     "claude": {},

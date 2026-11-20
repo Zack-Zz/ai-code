@@ -15,9 +15,10 @@ import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tooling"))
-from plugin_tools.archives import verify_installer
+from plugin_tools.archives import package_index_schema, verify_installer
 from plugin_tools.io import DataError
 
+HOSTS = {"claude", "codex", "zcode", "dsh", "antigravity"}
 MARKETPLACE_PATHS = {"claude": ".claude-plugin/marketplace.json", "codex": ".agents/plugins/marketplace.json",
                      "zcode": "marketplace.json", "dsh": "published/dsh/index.json"}
 
@@ -45,7 +46,7 @@ def member(root, relative):
 def verify_workflow(root, index):
     """Verify the workflow plugin's own standalone builder output."""
     payload = {}
-    if not isinstance(index["hosts"], dict) or not index["hosts"] or set(index["hosts"]) - set(MARKETPLACE_PATHS):
+    if not isinstance(index["hosts"], dict) or not index["hosts"] or set(index["hosts"]) - HOSTS:
         raise ValueError("distribution must contain a nonempty supported host set")
     for host, entry in index["hosts"].items():
         package = member(root, entry["package_dir"])
@@ -70,10 +71,18 @@ def verify_workflow(root, index):
             raise ValueError(f"{host}: invalid package content hash")
         if artifact["source_tree_hash"] != index["source_tree_hash"]:
             raise ValueError(f"{host}: inconsistent source identity")
-        market = member(root, entry["marketplace"])
+        market = None
+        market_digest = None
+        if host in MARKETPLACE_PATHS:
+            market = member(root, entry["marketplace"])
+            market_digest = digest(market)
+            if market_digest != entry["marketplace_sha256"]:
+                raise ValueError(f"{host}: marketplace checksum mismatch")
+        elif {"marketplace", "marketplace_sha256"} & entry.keys():
+            raise ValueError(f"{host}: direct-install package cannot register a marketplace")
         archive_key = "archive" if host == "dsh" else "zip"
         archive = member(root, entry[archive_key])
-        if digest(market) != entry["marketplace_sha256"] or digest(archive) != entry[f"{archive_key}_sha256"]:
+        if digest(archive) != entry[f"{archive_key}_sha256"]:
             raise ValueError(f"{host}: distribution checksum mismatch")
         if host == "claude":
             native = json.loads(member(package, ".claude-plugin/plugin.json").read_text())
@@ -82,7 +91,8 @@ def verify_workflow(root, index):
                 raise ValueError("claude: invalid native marketplace owner/publisher")
         expected = {p.relative_to(root / host).as_posix(): p.read_bytes()
                     for p in package.rglob("*") if p.is_file()}
-        expected[market.relative_to(root / host).as_posix()] = market.read_bytes()
+        if market is not None:
+            expected[market.relative_to(root / host).as_posix()] = market.read_bytes()
         if host == "dsh":
             verify_installer(archive.read_bytes(), {p.relative_to(package).as_posix(): p.read_bytes()
                              for p in package.rglob("*") if p.is_file()}, index["product_id"], host)
@@ -98,15 +108,17 @@ def verify_workflow(root, index):
         stable = {key: value for key, value in artifact.items()
                   if key not in ("source_revision", "working_tree_dirty")}
         stable_bytes = json.dumps(stable, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
-        payload[host] = (actual, entry["marketplace_sha256"], stable_bytes)
+        payload[host] = (actual, market_digest, stable_bytes)
     return (index["product_id"], index["version"], index["source_tree_hash"], payload)
 
 
 def verify_collection(root, index):
     plugins, hosts = index["plugins"], index["hosts"]
     if not isinstance(plugins, dict) or not plugins or not isinstance(hosts, dict) or not hosts or \
-            set(hosts) - set(MARKETPLACE_PATHS):
+            set(hosts) - HOSTS:
         raise ValueError("distribution needs registered plugins and supported hosts")
+    if index["schema_version"] != package_index_schema(hosts):
+        raise ValueError("distribution schema differs from its registered hosts")
     expected_host_ids = {host: set() for host in hosts}
     for identity, plugin in plugins.items():
         if not isinstance(identity, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", identity) or \
@@ -117,8 +129,14 @@ def verify_collection(root, index):
     markets = {}
     registered_files = {"index.json"}
     for host, entry in hosts.items():
+        if not expected_host_ids[host]:
+            raise ValueError(f"{host}: no plugins registered")
+        if host not in MARKETPLACE_PATHS:
+            if entry != {}:
+                raise ValueError(f"{host}: direct-install package cannot register a marketplace")
+            continue
         relative = f"{host}/{MARKETPLACE_PATHS[host]}"
-        if entry["marketplace"] != relative or not expected_host_ids[host]:
+        if entry["marketplace"] != relative:
             raise ValueError(f"{host}: invalid marketplace registration")
         market_path = member(root, relative)
         if digest(market_path) != entry["marketplace_sha256"]:
@@ -180,9 +198,10 @@ def verify_collection(root, index):
             if digest(archive) != entry[f"{archive_key}_sha256"]:
                 raise ValueError(f"{identity}/{host}: archive checksum mismatch")
             expected = {p.relative_to(root / host).as_posix(): p.read_bytes() for p in paths}
-            market = dict(markets[host], plugins=[item for item in markets[host]["plugins"] if item["name"] == identity])
-            market_relative = Path(hosts[host]["marketplace"]).relative_to(host).as_posix()
-            expected[market_relative] = (json.dumps(market, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode()
+            if host in markets:
+                market = dict(markets[host], plugins=[item for item in markets[host]["plugins"] if item["name"] == identity])
+                market_relative = Path(hosts[host]["marketplace"]).relative_to(host).as_posix()
+                expected[market_relative] = (json.dumps(market, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode()
             if host == "dsh":
                 verify_installer(archive.read_bytes(), {p.relative_to(package).as_posix(): p.read_bytes()
                                  for p in paths}, identity, host)
@@ -205,7 +224,7 @@ def verify_collection(root, index):
                     if member(root, p.relative_to(root).as_posix()).is_file()}
     if actual_files != registered_files:
         raise ValueError("distribution contains missing or unregistered files")
-    return payload, {host: entry["marketplace_sha256"] for host, entry in hosts.items()}
+    return payload, {host: hosts[host]["marketplace_sha256"] for host in markets}
 
 
 def verify(root):
@@ -214,7 +233,7 @@ def verify(root):
         raise ValueError("distribution index schema must be an integer")
     if index.get("schema_version") == 1:
         return verify_workflow(root, index)
-    if index.get("schema_version") in (2, 3):
+    if index.get("schema_version") in (2, 3, 4):
         return verify_collection(root, index)
     raise ValueError("unsupported distribution index schema")
 

@@ -4,7 +4,7 @@
 （ID `codevow`），源码位于 `plugins/codevow/`；插件行为、
 测试和支持声明由各插件维护。
 公共层负责插件注册、源校验、构建、包检查、临时开发市场、main 公开快照
-及四宿主发布准备。
+及各宿主发布准备。
 
 ## 仓库内容
 
@@ -68,7 +68,8 @@
   preview 只公开 Release，不更新市场。没有正式版的插件不回退到 preview。
   `product.json` 是开发权威，`published/` 是已上线来源，允许版本不同。
 - `dist/` 不得进入新提交或远端分支，CI 拒绝任何跟踪文件。公开 ZIP/TGZ 是
-  Release 附件；`published/codex/` 与 `published/dsh/` 仅保存正式宿主安装所需的固定目录。
+  Release 附件；`published/codex/`、`published/dsh/` 和 `published/antigravity/`
+  仅保存正式宿主安装所需的固定目录。
 - 不提前增加运行时、SDK、调度、任意代码 hook、插件依赖管理、自动安装器、
   固定模型分工或强制代理流水线。新插件形态有实际需求后单独设计。
 - publisher 只维护公开署名，不代表平台认证。release 配置不复制版本；

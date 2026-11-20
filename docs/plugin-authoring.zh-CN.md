@@ -236,9 +236,11 @@ npm run lint
 或 `PYTHONDONTWRITEBYTECODE=1`。采集注册插件的输入及复查时始终从仓库根遍历目录，
 不把插件子目录重新作为允许跟随父目录链接的信任根。
 
-构建输出 `<output>/index.json` 使用 schema_version 2，按 plugins/ID/hosts/HOST 记录
-各包路径和哈希，按 hosts/HOST 记录聚合市场。插件自己的 artifact 保持自身
-身份和来源。修改一个插件时核对兄弟插件内容和哈希不受影响。
+构建索引 `<output>/index.json` 在包含 Antigravity 时使用 schema 4，只包含原有
+宿主和 DSH 时使用 schema 3，仅包含原有三宿主时使用 schema 2。
+`plugins/ID/hosts/HOST` 记录包路径和哈希，`hosts/HOST` 记录市场注册信息。
+Antigravity 直接从插件目录安装，对应宿主条目为空对象。各插件的 artifact
+保留自己的身份和来源。修改一个插件时核对兄弟插件内容和哈希不受影响。
 
 开发市场使用显式空输出目录，注册对应的 `<output>/<host>`：
 

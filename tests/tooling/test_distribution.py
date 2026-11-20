@@ -28,12 +28,27 @@ def accept_fixture(root, identity):
 
 
 class HostedConfigTests(unittest.TestCase):
+    def test_schema4_accepts_antigravity_git_transport_without_changing_frozen_schemas(self):
+        legacy = {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip"}
+        for version, transports in ((2, legacy), (3, dict(legacy, dsh="git-subdir")),
+                                    (4, dict(legacy, dsh="git-subdir", antigravity="git-subdir"))):
+            config = {"schema_version": version, "source_branch": "main",
+                      "marketplace": distribution.MARKETPLACE, "transports": transports}
+            if version >= 3:
+                config["identity_replacements"] = {}
+            with self.subTest(version=version):
+                self.assertEqual(distribution.validate_config(config), config)
+                if version < 4:
+                    changed = dict(config, transports=dict(transports, antigravity="git-subdir"))
+                    with self.assertRaisesRegex(io.DataError, "transports"):
+                        distribution.validate_config(changed)
+
     def test_repository_config_selects_main_latest_stable_and_native_transports(self):
         config = distribution.load_config(Path(__file__).resolve().parents[2])
         self.assertEqual(config.get("source_branch"), "main")
         self.assertEqual(config.get("marketplace"), {"branch": "main", "name": "ai-code",
                                                    "version_policy": "latest-stable"})
-        self.assertEqual(config["transports"], {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip", "dsh": "git-subdir"})
+        self.assertEqual(config["transports"], {"claude": "archive", "codex": "git-subdir", "zcode": "url-zip", "dsh": "git-subdir", "antigravity": "git-subdir"})
 
     def test_requested_marketplace_name_is_accepted_without_an_alias(self):
         config = json.loads((Path(__file__).resolve().parents[2] / "distribution.json").read_text())
@@ -791,3 +806,108 @@ class DshMinimumHostedMarketTests(DshHostedMarketTests):
                 record["hosts"]["dsh"]["entry"]["engines"]["dsh"] = requirement
                 with self.assertRaisesRegex(io.DataError, "DSH engines"):
                     distribution._record(record, "stable", record["repository"])
+
+
+class AntigravityHostedMarketTests(unittest.TestCase):
+    git = HostedMarketTests.git
+    info = HostedMarketTests.info
+    plan = HostedMarketTests.plan
+
+    def setUp(self):
+        HostedMarketTests.setUp(self)
+        product = json.loads((self.case.plugin / "product.json").read_text())
+        product.update(version="1.0.1", hosts=[*product["hosts"], "antigravity"])
+        release_fixtures.write_json(self.case.plugin / "product.json", product)
+        release_fixtures.write_json(self.case.plugin / "adapters/antigravity/plugin.json", {
+            "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+            "description": "Useful AI skills", "logo": "assets/icon.svg",
+            "suggestedPrompts": ["Use the ask skill."],
+        })
+        config = json.loads((self.case.plugin / "release.json").read_text())
+        config["acceptance"] = {host: None for host in product["hosts"]}
+        release_fixtures.write_json(self.case.plugin / "release.json", config)
+        self.git("add", "-A")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "--no-verify", "-qm", "Antigravity source")
+        self.git("tag", "ai-one/v1.0.1")
+        self.case.output = self.case.base / "antigravity-release"
+        result = prepare_release(self.root, self.case.spec(), self.case.output, mode="stable", committed_acceptance=True)
+        self.assertTrue(result["ok"], result)
+        self.release_info = self.info(self.case.spec(), self.case.output)
+
+    def test_git_stage_retry_and_finalize_bind_every_antigravity_byte_without_a_listing(self):
+        from plugin_tools.archives import read_installer
+        from plugin_tools import markets
+        plan = self.plan()
+        record = plan["record"]
+        self.assertEqual(record["schema_version"], 4)
+        self.assertIsNone(record["hosts"]["antigravity"]["entry"])
+        self.assertEqual(set(plan["git_install_files"]), {"codex", "antigravity"})
+        staged = distribution.stage_files(plan)
+        receipt_path = "published/staged/ai-one/1.0.1.json"
+        self.assertIn(receipt_path, staged)
+        prefix = "published/antigravity/ai-one/1.0.1/"
+        package = read_installer((self.case.output / "installers/ai-one-1.0.1-antigravity-plugin.zip").read_bytes(), "ai-one", "antigravity")
+        self.assertEqual({name.removeprefix(prefix): staged[name] for name in record["git_installs"]["antigravity"]["files"]}, package)
+        retry = self.plan(market_files=staged, base_commit="d" * 40)
+        final = distribution.finalize_files(retry, "d" * 40)
+        self.assertNotIn(receipt_path, final)
+        published = json.loads(final["published/releases/ai-one/1.0.1.json"])
+        self.assertEqual(published["git_installs"]["antigravity"]["revision"], "d" * 40)
+        self.assertEqual(json.loads(final[distribution.INDEX_PATH])["plugins"]["ai-one"]["git_revisions"],
+                         {"codex": "d" * 40, "antigravity": "d" * 40})
+        self.assertFalse(any(name.startswith("published/antigravity/") and not name.startswith(prefix) for name in final))
+        self.assertEqual(set(json.loads(final[distribution.LOCK_PATH])["files"]), distribution.NATIVE_PATHS)
+        deployed = self.plan(market_files=final, base_commit="e" * 40)
+        self.assertEqual(deployed["status"], "already_deployed")
+        self.assertEqual(distribution.finalize_files(deployed, "d" * 40), final)
+
+        scratch = self.case.base / "checked-antigravity-dist"
+        scratch.mkdir()
+        shutil.copytree(self.case.output / "packages", scratch / "dist")
+        hosts, captured = markets._validate_dist(scratch, [self.case.spec()])
+        self.assertIn("antigravity", hosts)
+        self.assertIn("dist/antigravity/ai-one-1.0.1.zip", captured)
+        self.assertNotIn("dist/antigravity/marketplace.json", captured)
+        index_path = scratch / "dist/index.json"
+        index = json.loads(index_path.read_text())
+        index["hosts"]["antigravity"] = {"marketplace": "antigravity/marketplace.json"}
+        index_path.write_bytes(io.dump_json(index))
+        with self.assertRaisesRegex(io.DataError, "empty schema 4 registration"):
+            markets._validate_dist(scratch, [self.case.spec()])
+
+    def test_development_market_sync_omits_antigravity_listing(self):
+        from plugin_tools import markets
+        shutil.copytree(self.case.output / "packages", self.root / "dist")
+        result = markets._sync_development_repository(self.root)
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(set(result["files"]), distribution.LEGACY_NATIVE_PATHS)
+        self.assertTrue(markets._sync_development_repository(self.root, check=True)["ok"])
+        self.assertFalse((self.root / "antigravity/marketplace.json").exists())
+
+    def test_legacy_config_cannot_authorize_an_antigravity_distribution_plan(self):
+        plan = self.plan()
+        plan["config"]["schema_version"] = 3
+        plan["config"]["transports"].pop("antigravity")
+        plan["config_hash"] = io.sha256(io.canonical_json(plan["config"]))
+        plan["plan_hash"] = distribution._digest(plan)
+        with self.assertRaisesRegex(io.DataError, "transports do not cover"):
+            distribution.check_plan(plan)
+
+    def test_staged_closure_tampering_or_invented_listing_is_rejected(self):
+        plan = self.plan()
+        staged = distribution.stage_files(plan)
+        manifest = "published/antigravity/ai-one/1.0.1/plugin.json"
+        for changed in ({**staged, manifest: b"{}"},
+                        {name: raw for name, raw in staged.items() if name != manifest},
+                        {**staged, "published/antigravity/index.json": b"{}"}):
+            with self.subTest(paths=set(changed) ^ set(staged)), self.assertRaises(io.DataError):
+                self.plan(market_files=changed, base_commit="d" * 40)
+        record = plan["record"]
+        record["hosts"]["antigravity"]["entry"] = {"name": "ai-one", "version": "1.0.1"}
+        with self.assertRaisesRegex(io.DataError, "entry must be null"):
+            distribution._record(record, "stable", record["repository"], staged=True)
+        record["hosts"]["antigravity"]["entry"] = None
+        record["schema_version"] = 3
+        with self.assertRaisesRegex(io.DataError, "frozen schema"):
+            distribution._record(record, "stable", record["repository"], staged=True)

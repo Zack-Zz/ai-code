@@ -1,5 +1,14 @@
 [English](support-matrix.md) | 简体中文
 
+## 源码候选：Google Antigravity
+
+当前源码候选声明第五个原生目标 `antigravity`。包内使用根 `plugin.json`，
+共享技能、引用及 Python 工具，不包含市场清单或 DSH 运行时资源。支持版本发布后，
+使用 GitHub 上不可变的版本目录安装，见
+[Google Antigravity 安装](../../../docs/installation.zh-CN.md#google-antigravity)。
+`acceptance.antigravity` 保持 null；原生加载、自动选择、Reviewer 能力与任务结果
+仍待实测。本地包与工具检查不等于宿主验收。下面保留当前已发布正式版的边界。
+
 # 当前支持与验证边界
 
 当前正式版为 `codevow` 1.0.8，声明 Claude Code、Codex、ZCode、DeepSeek Harness 四个制品目标。

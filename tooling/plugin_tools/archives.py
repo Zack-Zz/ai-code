@@ -12,6 +12,12 @@ from .io import DataError
 MAX_BYTES = 256 * 1024 * 1024
 
 
+def package_index_schema(hosts):
+    if "antigravity" in hosts:
+        return 4
+    return 3 if "dsh" in hosts else 2
+
+
 def installer_name(identity, version, host):
     return f"{identity}-{version}-{host}-plugin.{'tgz' if host == 'dsh' else 'zip'}"
 
@@ -98,8 +104,10 @@ def download_bytes(files, identity, host, market):
         return installer_bytes(files, identity, host)
     from .release.layout import zip_bytes
     from .rendering import marketplace_path
-    return zip_bytes({**{f"{identity}/{name}": data for name, data in files.items()},
-                      marketplace_path(host): io.dump_json(market)})
+    packaged = {f"{identity}/{name}": data for name, data in files.items()}
+    if market_path := marketplace_path(host):
+        packaged[market_path] = io.dump_json(market)
+    return zip_bytes(packaged)
 
 
 def download_index(relative, raw, host):
